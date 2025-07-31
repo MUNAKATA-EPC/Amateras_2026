@@ -1,0 +1,89 @@
+#include <Sprite.h>
+#include <Matrix.h>
+#include <PS2X_lib.h>
+
+Matrix myMatrix = Matrix(11, 13, 1);
+PS2X ps2x;
+
+Sprite player1 = Sprite(
+3, 2,
+B010,
+B111
+);
+Sprite player2 = Sprite(
+3, 2,
+B111,
+B010
+);
+
+double xx1 = 0 , xx2 = 5 , gun1[3] = {
+} 
+, gun2[3] = {
+};
+int death = 0;
+
+void setup(){
+  ps2x.config_gamepad(13, 11, 10, 12, true, true);
+}
+void loop(){
+  ps2x.read_gamepad();
+  myMatrix.clear();               //マトリクスLEDの表示を消す
+  if(ps2x.Analog(PSS_LY) < -20  &&  death != 1)xx1 = xx1 + 0.1;
+  if(xx1 > 6.5  &&  death != 1)xx1 = -1;
+  if(ps2x.Analog(PSS_LY) > 20  &&  death != 1)xx1 = xx1 - 0.1;
+  if(xx1 < -1.5  &&  death != 1)xx1 = 6;
+  if(death != 1)myMatrix.write(int(xx1) , 6 , player1);
+  if(ps2x.Button(PSB_L3)  &&  gun1[2] == 0  &&  death != 1){
+    gun1[0] = int(xx1) + 1;
+    gun1[1] = 5;
+    gun1[2] = 1;
+  }
+  if(gun1[2] == 1){
+    myMatrix.write(gun1[0] , gun1[1] , HIGH);
+    gun1[1] = gun1[1] - 0.1;
+    if(gun1[1] < -1)gun1[2] = 0;
+    if(gun1[0] == int(xx2) && gun1[1] < 0.5  ||  gun1[0] == int(xx2) + 1 && gun1[1] < 1.5  ||  gun1[0] == int(xx2) + 2 && gun1[1] < 0.5){
+      if(death == 0){
+        gun1[2] = 0;
+        death = 2;
+        xx2 = -10;
+      }
+    }
+  }
+
+  if(ps2x.Analog(PSS_RY) < -20  &&  death != 2)xx2 = xx2 + 0.1;
+  if(xx2 > 6.5  &&  death != 2)xx2 = -1;
+  if(ps2x.Analog(PSS_RY) > 20  &&  death != 2)xx2 = xx2 - 0.1;
+  if(xx2 < -1.5  &&  death != 2)xx2 = 6;
+  if(death != 2)myMatrix.write(int(xx2) , 0 , player2);
+  if(ps2x.Button(PSB_R3)  &&  gun2[2] == 0  &&  death != 2){
+    gun2[0] = int(xx2) + 1;
+    gun2[1] = 2;
+    gun2[2] = 1;
+  }
+  if(gun2[2] == 1){
+    myMatrix.write(gun2[0] , gun2[1] , HIGH);
+    gun2[1] = gun2[1] + 0.1;
+    if(gun2[1] > 8)gun2[2] = 0;
+    if(gun2[0] == int(xx1) && gun2[1] > 6.5  ||  gun2[0] == int(xx1) + 1 && gun2[1] > 5.5  ||  gun2[0] == int(xx1) + 2 && gun2[1] > 6.5){
+      if(death == 0){
+        gun2[2] = 0;
+        death = 1;
+        xx1 = -10;
+      }
+    }
+  }
+
+  if(ps2x.Button(PSB_L3)  &&  ps2x.Button(PSB_R3)  &&  death != 0){
+    myMatrix.clear();               //マトリクスLEDの表示を消す
+    death = 0;
+    xx1 = 0;
+    xx2 = 5;
+    for(int i = 0;i <= 2;i ++){
+      gun1[i] = 0;
+      gun2[i] = 0;
+    }
+    delay(1000);
+  }
+  delay(25);
+}

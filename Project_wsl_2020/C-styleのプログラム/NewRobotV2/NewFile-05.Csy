@@ -1,0 +1,54 @@
+Title:Main - [ NewFile-05 ] DAISEN C-Style for TJ3B  [ Ver.20190706 ]
+CN01:Ball
+CN02:Line
+CN03:L-Touch
+CN04:R-Touch
+CN05:C-Touch
+CN06:
+CN07:
+CN08:
+CN09:RED3
+CN10:RED2
+[0000]:sno:08,cno:07,val:111111-110010-000002,cmt:
+[0001]:sno:33,cno:33,val:000000-000000-000000,cmt:double IR_motermax = 80;  	// 回り込む際のモータの最大出力
+[0002]:sno:33,cno:33,val:000000-000000-000000,cmt:double IR_motermin = 50;  	// 回り込む際のモータの最低出力
+[0003]:sno:33,cno:33,val:000000-000000-000000,cmt:double IR_moterValue;  	// 回り込む際のモータの最大出力結果
+[0004]:sno:33,cno:33,val:000000-000000-000000,cmt:double Gyro_moterValue = 100 - IR_motermax;  	// ジャイロのモータの最大出力結果
+[0005]:sno:33,cno:33,val:000000-000000-000000,cmt:double IR_frontValue = 6;  	// 前とみなす、角度の範囲
+[0006]:sno:33,cno:33,val:000000-000000-000000,cmt:double IR_alpha = 70;  	// 回り込む際のボールに対して何度ずらして動くか
+[0007]:sno:33,cno:33,val:000000-000000-000000,cmt:double xx = 0;  	// 最終のモータ出力（X座標）
+[0008]:sno:33,cno:33,val:000000-000000-000000,cmt:double yy = 0;  	// 最終のモータ出力（Y座標）
+[0009]:sno:33,cno:33,val:000000-000000-000000,cmt:double IR_edge = 0;  	// IRの角度
+[0010]:sno:04,cno:01,val:000000-000000-000000,cmt:
+[0011]:sno:01,cno:14,val:000050-000010-000000,cmt:ボールが遠くにある
+[0012]:sno:34,cno:34,val:000000-000000-000000,cmt:
+[0013]:sno:33,cno:33,val:000000-000000-000000,cmt:IR_edge = gAD[CN3] * 0.98 + 405;  	// ４５度左にずらす
+[0014]:sno:33,cno:33,val:000000-000000-000000,cmt:IR_edge = IR_edge * 3.14 / 180;  	// ラジアンに直す
+[0015]:sno:33,cno:33,val:000000-000000-000000,cmt:xx = cos(IR_edge) * IR_motermax;  	// ボールのほうに行くには、、（X座標）
+[0016]:sno:33,cno:33,val:000000-000000-000000,cmt:yy = sin(IR_edge) * IR_motermax;  	// ボールのほうに行くには、、（Y座標）
+[0017]:sno:03,cno:00,val:000000-000000-000000,cmt:
+[0018]:sno:35,cno:35,val:000000-000001-000000,cmt:
+[0019]:sno:01,cno:33,val:000000-000000-000000,cmt:gAD[CN3] * 0.98 > IR_frontValue  &&  gAD[CN3] * 0.98 < 360 - IR_frontValue  	// 前以外のところにボールがあるとき
+[0020]:sno:33,cno:33,val:000000-000000-000000,cmt:IR_moterValue = ( (IR_motermin - IR_motermax) / (IR_frontValue * IR_frontValue + 32400 - 360 * IR_frontValue) ) * gAD[CN3] * gAD[CN3];
+[0021]:sno:33,cno:33,val:000000-000000-000000,cmt:IR_moterValue = IR_moterValue + ( (360 * IR_motermax - 360 * IR_motermin) / (IR_frontValue * IR_frontValue + 32400 - 360 * IR_frontValue) ) * gAD[CN3];
+[0022]:sno:33,cno:33,val:000000-000000-000000,cmt:IR_moterValue = IR_moterValue + IR_motermax +  ( (32400 * IR_motermin - 32400 * IR_motermax) / (IR_frontValue * IR_frontValue + 32400 - 360 * IR_frontValue) );
+[0023]:sno:01,cno:33,val:000000-000000-000000,cmt:gAD[CN3] * 0.98 < 180  	// 左にボールがある
+[0024]:sno:33,cno:33,val:000000-000000-000000,cmt:IR_edge = gAD[CN3] * 0.98 + 405 + IR_alpha;  	// ４５度＋IR＿alphaだけずらす
+[0025]:sno:33,cno:33,val:000000-000000-000000,cmt:IR_edge = IR_edge * 3.14 / 180;  	// ラジアンに直す
+[0026]:sno:03,cno:00,val:000000-000000-000000,cmt:
+[0027]:sno:33,cno:33,val:000000-000000-000000,cmt:IR_edge = gAD[CN3] * 0.98 + 405 - IR_alpha;  	// ４５度-IR＿alphaだけずらす
+[0028]:sno:33,cno:33,val:000000-000000-000000,cmt:IR_edge = IR_edge * 3.14 / 180;  	// ラジアンに直す
+[0029]:sno:00,cno:02,val:000000-000000-000000,cmt:
+[0030]:sno:33,cno:33,val:000000-000000-000000,cmt:xx = cos(IR_edge) * IR_moterValue;  	// 回り込むには、、（X座標）
+[0031]:sno:33,cno:33,val:000000-000000-000000,cmt:yy = sin(IR_edge) * IR_moterValue;  	// 回り込むには、、（Y座標）
+[0032]:sno:03,cno:00,val:000000-000000-000000,cmt:
+[0033]:sno:33,cno:33,val:000000-000000-000000,cmt:xx = IR_motermax;  	// 直進のためには、、（X座標）
+[0034]:sno:33,cno:33,val:000000-000000-000000,cmt:yy = IR_motermax;  	// 直進のためには、、（Y座標）
+[0035]:sno:00,cno:02,val:000000-000000-000000,cmt:
+[0036]:sno:00,cno:02,val:000000-000000-000000,cmt:
+[0037]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_A] =  - xx;  	// 代入
+[0038]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_B] = yy;  	// 代入
+[0039]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_C] =  - yy;  	// 代入
+[0040]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_D] =  xx;  	// 代入
+[0041]:sno:38,cno:38,val:400401-402999-403999,cmt:
+[0042]:sno:00,cno:03,val:000000-000000-000000,cmt:

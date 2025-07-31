@@ -1,0 +1,24 @@
+{
+    "folders": [
+		{
+			"path": ".."
+		},
+		{
+			"name": "M5stamp-pico",
+			"path": "../../M5stamp-pico"
+		},
+		{
+			"name": "SeeeduinoXiao",
+			"path": "../../SeeeduinoXiao"
+		},
+		{
+			"name": "Teenssy 4.0",
+			"path": "../../Teenssy 4.0"
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"cmath": "cpp"
+		}
+	}
+}

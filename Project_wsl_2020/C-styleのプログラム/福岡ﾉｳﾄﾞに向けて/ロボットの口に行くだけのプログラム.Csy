@@ -1,0 +1,28 @@
+Title:Main - [ ロボットの口に行くだけのプログラム ] DAISEN C-Style for TJ3B  [ Ver.20190706 ]
+CN01:Ball
+CN02:Line
+CN03:L-Touch
+CN04:R-Touch
+CN05:C-Touch
+CN06:
+CN07:
+CN08:
+CN09:RED3
+CN10:RED2
+[0000]:sno:08,cno:07,val:111111-110010-010002,cmt:
+[0001]:sno:33,cno:33,val:000000-000000-000000,cmt:const int MoterSpeed = 10;  	// IRボールを追うときの動く速さ
+[0002]:sno:33,cno:33,val:000000-000000-000000,cmt:const int GyroMoterSpeed = 50;  	// ジャイロ補正のときの速さ
+[0003]:sno:33,cno:33,val:000000-000000-000000,cmt:const int IRaroundValue = 70;  	// 回り込みの角度
+[0004]:sno:33,cno:33,val:000000-000000-000000,cmt:double RfLb_X;  	// 右前、左後のモータの出力
+[0005]:sno:33,cno:33,val:000000-000000-000000,cmt:double LfRb_Y;  	// 左前、右後のモータの出力
+[0006]:sno:33,cno:33,val:000000-000000-000000,cmt:double IRedge;  	// IRの角度
+[0007]:sno:33,cno:33,val:000000-000000-000000,cmt:double GYROedge;  	// ジャイロの角度
+[0008]:sno:04,cno:01,val:000000-000000-000000,cmt:
+[0009]:sno:33,cno:33,val:000000-000000-000000,cmt:RfLb_X = MoterSpeed;  	// IRボールが見えていないので出力は無し
+[0010]:sno:33,cno:33,val:000000-000000-000000,cmt:LfRb_Y = MoterSpeed;  	// IRボールが見えていないので出力は無し
+[0011]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_A] = - RfLb_X + gV[VAR_G];  	// 最終的な計算結果を代入・左前モータ
+[0012]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_B] = LfRb_Y + gV[VAR_G];  	// 最終的な計算結果を代入・右前モータ
+[0013]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_C] = - LfRb_Y + gV[VAR_G];  	// 最終的な計算結果を代入・左後モータ
+[0014]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_D] = RfLb_X + gV[VAR_G];  	// 最終的な計算結果を代入・右後モータ
+[0015]:sno:38,cno:38,val:400401-402403-999999,cmt:
+[0016]:sno:00,cno:03,val:000000-000000-000000,cmt:

@@ -1,0 +1,113 @@
+Title:Main - [ 回り込みV90+ 開発途中 より滑らかな方向修正 - コピー ] DAISEN C-Style for TJ3B  [ Ver.20190706 ]
+CN01:左
+CN02:右
+CN03:後
+CN04:左前
+CN05:
+CN06:右後
+CN07:右前
+CN08:左後
+CN09:
+CN10:
+[0000]:sno:08,cno:08,val:111111-111130-010002,cmt:
+[0001]:sno:33,cno:33,val:000000-000000-000000,cmt:int MoterSpeed = 80;  	// IRボールを追うときの動く速さ
+[0002]:sno:33,cno:33,val:000000-000000-000000,cmt:int GyroMoterSpeed = 15;  	// ジャイロ補正のときの速さ
+[0003]:sno:33,cno:33,val:000000-000000-000000,cmt:int IRaroundValue = 60;  	// 回り込みの角度
+[0004]:sno:33,cno:33,val:000000-000000-000000,cmt:double PIXY_val = 160;  	// PIXYの値
+[0005]:sno:33,cno:33,val:000000-000000-000000,cmt:double RfLb_X;  	// 右前、左後のモータの出力
+[0006]:sno:33,cno:33,val:000000-000000-000000,cmt:double LfRb_Y;  	// 左前、右後のモータの出力
+[0007]:sno:33,cno:33,val:000000-000000-000000,cmt:double IRedge;  	// IRの角度
+[0008]:sno:33,cno:33,val:000000-000000-000000,cmt:double GYROedge;  	// ジャイロの角度
+[0009]:sno:33,cno:33,val:000000-000000-000000,cmt:double LINEedge;  	// LINEの角度
+[0010]:sno:31,cno:31,val:150000-000001-000000,cmt:Pixy攻める方向を指定
+[0011]:sno:37,cno:37,val:000001-000001-000000,cmt:
+[0012]:sno:04,cno:01,val:000000-000000-000000,cmt:
+[0013]:sno:01,cno:14,val:000010-000070-000000,cmt:タクトスイッチが押されたとき
+[0014]:sno:30,cno:30,val:000000-010000-000000,cmt:
+[0015]:sno:04,cno:14,val:000010-000070-000000,cmt:待つ
+[0016]:sno:00,cno:03,val:000000-000000-000000,cmt:
+[0017]:sno:01,cno:31,val:151000-000001-000000,cmt:
+[0018]:sno:36,cno:36,val:000001-000000-000000,cmt:
+[0019]:sno:31,cno:31,val:150000-000002-000000,cmt:
+[0020]:sno:03,cno:00,val:000000-000000-000000,cmt:
+[0021]:sno:37,cno:37,val:000001-000001-000000,cmt:
+[0022]:sno:31,cno:31,val:150000-000001-000000,cmt:
+[0023]:sno:00,cno:02,val:000000-000000-000000,cmt:
+[0024]:sno:00,cno:02,val:000000-000000-000000,cmt:
+[0025]:sno:01,cno:33,val:000000-000000-000000,cmt:get_pixydat_index(gV[VAR_P]) > 0  &&  gV[VAR_P] < 3
+[0026]:sno:01,cno:31,val:151000-000001-000000,cmt:
+[0027]:sno:01,cno:45,val:144400-050050-000000,cmt:
+[0028]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_G] = -GyroMoterSpeed;
+[0029]:sno:02,cno:45,val:111100-050050-000000,cmt:
+[0030]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_G] = GyroMoterSpeed;
+[0031]:sno:03,cno:00,val:000000-000000-000000,cmt:
+[0032]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_G] = 0;
+[0033]:sno:00,cno:02,val:000000-000000-000000,cmt:
+[0034]:sno:03,cno:00,val:000000-000000-000000,cmt:
+[0035]:sno:01,cno:45,val:244400-050050-000000,cmt:
+[0036]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_G] = -GyroMoterSpeed;
+[0037]:sno:02,cno:45,val:211100-050050-000000,cmt:
+[0038]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_G] = GyroMoterSpeed;
+[0039]:sno:03,cno:00,val:000000-000000-000000,cmt:
+[0040]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_G] = 0;
+[0041]:sno:00,cno:02,val:000000-000000-000000,cmt:
+[0042]:sno:00,cno:02,val:000000-000000-000000,cmt:
+[0043]:sno:03,cno:00,val:000000-000000-000000,cmt:
+[0044]:sno:01,cno:14,val:000036-000021-000000,cmt:Gyro,LINE
+[0045]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_G] = -GyroMoterSpeed;
+[0046]:sno:02,cno:14,val:000036-000020-000000,cmt:Gyro,LINE
+[0047]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_G] = GyroMoterSpeed;
+[0048]:sno:03,cno:00,val:000000-000000-000000,cmt:
+[0049]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_G] = 0;
+[0050]:sno:00,cno:02,val:000000-000000-000000,cmt:
+[0051]:sno:00,cno:02,val:000000-000000-000000,cmt:
+[0052]:sno:33,cno:33,val:000000-000000-000000,cmt:LINEedge = 45 * (sub_io_get_sensor(1, CN4) < 200 ? 1 : 0) + 90 * (sub_io_get_sensor(1, CN1) < 200 ? 1 : 0) + 135 * (sub_io_get_sensor(1, CN8) < 200 ? 1 : 0) + 180 * (sub_io_get_sensor(1, CN3) < 200 ? 1 : 0);
+[0053]:sno:33,cno:33,val:000000-000000-000000,cmt:LINEedge = LINEedge + 225 * (sub_io_get_sensor(1, CN6) < 200 ? 1 : 0) + 270 * (sub_io_get_sensor(1, CN2) < 200 ? 1 : 0) + 315 * (sub_io_get_sensor(1, CN7) < 200 ? 1 : 0);
+[0054]:sno:33,cno:33,val:000000-000000-000000,cmt:LINEedge = LINEedge / ( (sub_io_get_sensor(1, CN4) < 200 ? 1 : 0) + (sub_io_get_sensor(1, CN1) < 200 ? 1 : 0) + (sub_io_get_sensor(1, CN8) < 200 ? 1 : 0) + (sub_io_get_sensor(1, CN3) < 200 ? 1 : 0) + (sub_io_get_sensor(1, CN6) < 200 ? 1 : 0) + (sub_io_get_sensor(1, CN2) < 200 ? 1 : 0) + (sub_io_get_sensor(1, CN7) < 200 ? 1 : 0) );
+[0055]:sno:01,cno:30,val:000200-000000-100000,cmt:
+[0056]:sno:02,cno:33,val:000000-000000-000000,cmt:LINEedge > 0
+[0057]:sno:35,cno:35,val:000000-000001-000000,cmt:
+[0058]:sno:30,cno:30,val:000000-000000-000000,cmt:
+[0059]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_L] = LINEedge + 180;
+[0060]:sno:31,cno:31,val:110125-000360-000000,cmt:
+[0061]:sno:33,cno:33,val:000000-000000-000000,cmt:RfLb_X = cos(gV[VAR_L] * 3.1415 / 180) * MoterSpeed;  	// LINEから離れる動き
+[0062]:sno:33,cno:33,val:000000-000000-000000,cmt:LfRb_Y = sin(gV[VAR_L] * 3.1415 / 180) * MoterSpeed;  	// LINEから離れる動き
+[0063]:sno:03,cno:00,val:000000-000000-000000,cmt:
+[0064]:sno:34,cno:34,val:000000-000000-000000,cmt:
+[0065]:sno:33,cno:33,val:000000-000000-000000,cmt:IRedge = gAD[CN1] * 18/15;  	// IR角度を代入
+[0066]:sno:01,cno:33,val:000000-000000-000000,cmt:gAD[CN5] < gAD[CN4]  &&  gAD[CN5] < gAD[CN6]
+[0067]:sno:33,cno:33,val:000000-000000-000000,cmt:RfLb_X = MoterSpeed;  	// 真っすぐ行く
+[0068]:sno:33,cno:33,val:000000-000000-000000,cmt:LfRb_Y = MoterSpeed;  	// 真っすぐ行く
+[0069]:sno:03,cno:00,val:000000-000000-000000,cmt:
+[0070]:sno:01,cno:33,val:000000-000000-000000,cmt:IRedge > 180
+[0071]:sno:33,cno:33,val:000000-000000-000000,cmt:IRedge = gAD[CN1] * 27/29;  	// IR角度を代入
+[0072]:sno:00,cno:02,val:000000-000000-000000,cmt:
+[0073]:sno:01,cno:33,val:000000-000000-000000,cmt:IRedge > 400  	// ボールがないとき
+[0074]:sno:33,cno:33,val:000000-000000-000000,cmt:RfLb_X = 0;  	// IRボールが見えていないので出力は無し
+[0075]:sno:33,cno:33,val:000000-000000-000000,cmt:LfRb_Y = 0;  	// IRボールが見えていないので出力は無し
+[0076]:sno:02,cno:33,val:000000-000000-000000,cmt:gAD[CN2] > 300 && (gAD[CN5] > gAD[CN4]  ||  gAD[CN5] > gAD[CN6])
+[0077]:sno:01,cno:33,val:000000-000000-000000,cmt:IRedge > 180  	// 左にボールがあるとき
+[0078]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_I] = 45 + IRedge + 360 - IRaroundValue;
+[0079]:sno:31,cno:31,val:080095-000360-000000,cmt:
+[0080]:sno:33,cno:33,val:000000-000000-000000,cmt:RfLb_X = cos(gV[VAR_I] * 3.1415 / 180) * MoterSpeed;  	// 回り込むための 速さ を計算・右前、左後　　～左にボールがあるとき～
+[0081]:sno:33,cno:33,val:000000-000000-000000,cmt:LfRb_Y = sin(gV[VAR_I] * 3.1415 / 180) * MoterSpeed;  	// 回り込むための 速さ を計算・左前、右後　　～左にボールがあるとき～
+[0082]:sno:03,cno:00,val:000000-000000-000000,cmt:
+[0083]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_I] = 45 + IRedge + IRaroundValue;
+[0084]:sno:31,cno:31,val:080095-000360-000000,cmt:
+[0085]:sno:33,cno:33,val:000000-000000-000000,cmt:RfLb_X = cos(gV[VAR_I] * 3.1415 / 180) * MoterSpeed;  	// 回り込むための 速さ を計算・右前、左後　　～右にボールがあるとき～
+[0086]:sno:33,cno:33,val:000000-000000-000000,cmt:LfRb_Y = sin(gV[VAR_I] * 3.1415 / 180) * MoterSpeed;  	// 回り込むための 速さ を計算・左前、右後　　～右にボールがあるとき～
+[0087]:sno:00,cno:02,val:000000-000000-000000,cmt:
+[0088]:sno:03,cno:00,val:000000-000000-000000,cmt:
+[0089]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_I] = 45 + IRedge;
+[0090]:sno:31,cno:31,val:080095-000360-000000,cmt:
+[0091]:sno:33,cno:33,val:000000-000000-000000,cmt:RfLb_X = cos(gV[VAR_I] * 3.1415 / 180) * MoterSpeed;  	// IRボールの方向へ行くための 速さ を計算・右前、左後
+[0092]:sno:33,cno:33,val:000000-000000-000000,cmt:LfRb_Y = sin(gV[VAR_I] * 3.1415 / 180) * MoterSpeed;  	// IRボールの方向へ行くための 速さ を計算・左前、右後
+[0093]:sno:00,cno:02,val:000000-000000-000000,cmt:
+[0094]:sno:00,cno:02,val:000000-000000-000000,cmt:
+[0095]:sno:00,cno:02,val:000000-000000-000000,cmt:
+[0096]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_A] = - RfLb_X + gV[VAR_G];  	// 最終的な計算結果を代入・左前モータ
+[0097]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_B] = LfRb_Y + gV[VAR_G];  	// 最終的な計算結果を代入・右前モータ
+[0098]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_C] = - LfRb_Y + gV[VAR_G];  	// 最終的な計算結果を代入・左後モータ
+[0099]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_D] = RfLb_X + gV[VAR_G];  	// 最終的な計算結果を代入・右後モータ
+[0100]:sno:38,cno:38,val:400401-402403-999999,cmt:
+[0101]:sno:00,cno:03,val:000000-000000-000000,cmt:

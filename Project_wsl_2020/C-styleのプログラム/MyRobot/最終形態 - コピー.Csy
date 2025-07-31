@@ -1,0 +1,21 @@
+Title:Main - [ 最終形態 - コピー ] DAISEN C-Style for TJ3B  [ Ver.20190706 ]
+CN01:Ball
+CN02:Line
+CN03:L-Touch
+CN04:R-Touch
+CN05:C-Touch
+CN06:
+CN07:
+CN08:
+CN09:RED3
+CN10:RED2
+[0000]:sno:08,cno:07,val:111111-110010-000002,cmt:
+[0001]:sno:00,cno:02,val:000000-000000-000000,cmt:
+[0002]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_A] =  - xx + gV[VAR_G];  	// 代入
+[0003]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_B] = yy + gV[VAR_G];  	// 代入
+[0004]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_C] =  - yy + gV[VAR_G];  	// 代入
+[0005]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_D] =  xx + gV[VAR_G];  	// 代入
+[0006]:sno:38,cno:38,val:400401-402403-999999,cmt:
+[0007]:sno:00,cno:03,val:000000-000000-000000,cmt:
+[0008]:sno:00,cno:02,val:000000-000000-000000,cmt:
+[0009]:sno:00,cno:03,val:000000-000000-000000,cmt:

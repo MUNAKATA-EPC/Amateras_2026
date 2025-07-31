@@ -1,0 +1,34 @@
+Title:Main - [ onigiri機体　V9からジャイロ ] DAISEN C-Style for TJ3B  [ Ver.20190706 ]
+CN01:IRedge,LINE左
+CN02:IRdist,LINE右
+CN03:Gyro,LINE後
+CN04:IR1,LINE左前
+CN05:IR2
+CN06:IR3,LINE右後
+CN07:　,LINE右前
+CN08:　,LINE左後
+CN09:
+CN10:
+[0000]:sno:08,cno:08,val:111111-111130-010002,cmt:
+[0001]:sno:33,cno:33,val:000000-000000-000000,cmt:int MoterSpeed = 0;  	// IRボールを追うときの動く速さ
+[0002]:sno:33,cno:33,val:000000-000000-000000,cmt:int GyroMoterSpeed = 100;  	// ジャイロ補正のときの速さ
+[0003]:sno:33,cno:33,val:000000-000000-000000,cmt:int IRaroundValue = 60;  	// 回り込みの角度
+[0004]:sno:33,cno:33,val:000000-000000-000000,cmt:double PIXY_val = 160;  	// PIXYの値
+[0005]:sno:33,cno:33,val:000000-000000-000000,cmt:double RfLb_X = 0;  	// 右前、左後のモータの出力
+[0006]:sno:33,cno:33,val:000000-000000-000000,cmt:double LfRb_Y = 0;  	// 左前、右後のモータの出力
+[0007]:sno:33,cno:33,val:000000-000000-000000,cmt:double IRedge;  	// IRの角度
+[0008]:sno:33,cno:33,val:000000-000000-000000,cmt:double GYROedge;  	// ジャイロの角度
+[0009]:sno:04,cno:01,val:000000-000000-000000,cmt:
+[0010]:sno:01,cno:14,val:000038-000021-000000,cmt:Gyro,LINE
+[0011]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_G] = -GyroMoterSpeed;
+[0012]:sno:02,cno:14,val:000034-000020-000000,cmt:Gyro,LINE
+[0013]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_G] = GyroMoterSpeed;
+[0014]:sno:03,cno:00,val:000000-000000-000000,cmt:
+[0015]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_G] = 0;
+[0016]:sno:00,cno:02,val:000000-000000-000000,cmt:
+[0017]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_A] = - RfLb_X + gV[VAR_G];  	// 最終的な計算結果を代入・左前モータ
+[0018]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_B] = LfRb_Y + gV[VAR_G];  	// 最終的な計算結果を代入・右前モータ
+[0019]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_C] = - LfRb_Y + gV[VAR_G];  	// 最終的な計算結果を代入・左後モータ
+[0020]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_D] = RfLb_X + gV[VAR_G];  	// 最終的な計算結果を代入・右後モータ
+[0021]:sno:38,cno:38,val:400401-402403-999999,cmt:
+[0022]:sno:00,cno:03,val:000000-000000-000000,cmt:

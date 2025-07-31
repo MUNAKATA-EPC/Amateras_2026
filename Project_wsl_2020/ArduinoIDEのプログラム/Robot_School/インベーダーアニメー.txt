@@ -1,0 +1,650 @@
+#include <Sprite.h>
+#include <Matrix.h>
+
+Matrix myMatrix = Matrix(11, 13, 1);
+
+//スプライトの指定
+//幅・高さ・絵柄を2進数で指定
+Sprite nothing = Sprite(
+8, 8,
+B00000000,
+B00000000,
+B00000000,
+B00000000,
+B00000000,
+B00000000,
+B00000000,
+B00000000
+);
+Sprite player1 = Sprite(
+3, 2,
+B010,
+B111
+);
+Sprite player2 = Sprite(
+3, 2,
+B111,
+B010
+);
+Sprite wall1 = Sprite(
+8, 2,
+B00110001,
+B11100110
+);
+Sprite wall2 = Sprite(
+8, 2,
+B00010001,
+B11100110
+);
+Sprite wall3 = Sprite(
+8, 2,
+B00000001,
+B11100110
+);
+Sprite wall4 = Sprite(
+8, 2,
+B00000001,
+B10100110
+);
+Sprite wall5 = Sprite(
+8, 2,
+B00000001,
+B10100010
+);
+Sprite wall_clear_1 = Sprite(
+8, 8,
+B01010101,
+B10101010,
+B01010101,
+B10101010,
+B01010101,
+B10101010,
+B01010101,
+B10101010
+);
+Sprite wall_clear_2 = Sprite(
+8, 8,
+B10101010,
+B01010101,
+B10101010,
+B01010101,
+B10101010,
+B01010101,
+B10101010,
+B01010101
+);
+
+
+Sprite win1 = Sprite(
+8, 8,
+B10101010,
+B00000000,
+B01100011,
+B00110110,
+B00001000,
+B00001000,
+B00000000,
+B01010101
+);
+Sprite win2 = Sprite(
+8, 8,
+B10101010,
+B00000000,
+B01111111,
+B01100011,
+B01100011,
+B01111111,
+B00000000,
+B01010101
+);
+Sprite win3 = Sprite(
+8, 8,
+B10101010,
+B00000000,
+B01100011,
+B01100011,
+B01100011,
+B00111110,
+B00000000,
+B01010101
+);
+Sprite win4 = Sprite(
+8, 8,
+B10101010,
+B00000000,
+B01100011,
+B01101011,
+B01101011,
+B00110110,
+B00000000,
+B01010101
+);
+Sprite win5 = Sprite(
+8, 8,
+B10101010,
+B00000000,
+B00111110,
+B00001000,
+B00001000,
+B00111110,
+B00000000,
+B01010101
+);
+Sprite win6 = Sprite(
+8, 8,
+B10101010,
+B00000000,
+B01110011,
+B01101011,
+B01100111,
+B01100111,
+B00000000,
+B01010101
+);
+Sprite win7 = Sprite(
+1, 8,
+B0,
+B0,
+B0,
+B0,
+B0,
+B0,
+B0,
+B1
+);
+
+void setup(){
+  myMatrix.setBrightness(2);        //マトリクスLEDの明るさを設定(0−8)
+}
+
+void loop(){
+  myMatrix.write(1, 6, player1);
+  myMatrix.write(1, 0, player2);
+  myMatrix.write(0, 3, wall1);
+  delay(800);
+  myMatrix.write(0, 0, nothing);
+
+  myMatrix.write(0, 6, player1);
+  myMatrix.write(2, 0, player2);
+  myMatrix.write(0, 3, wall1);
+  delay(800);
+  myMatrix.write(0, 0, nothing);
+
+  myMatrix.write(1, 6, player1);
+  myMatrix.write(3, 0, player2);
+  myMatrix.write(0, 3, wall1);
+  delay(800);
+  myMatrix.write(0, 0, nothing);
+
+  myMatrix.write(0, 6, player1);
+  myMatrix.write(2, 0, player2);
+  myMatrix.write(0, 3, wall1);
+  delay(800);
+  myMatrix.write(0, 0, nothing);
+
+  myMatrix.write(1, 6, player1);
+  myMatrix.write(1, 0, player2);
+  myMatrix.write(0, 3, wall1);
+  delay(800);
+  myMatrix.write(0, 0, nothing);
+
+  myMatrix.write(0, 6, player1);
+  myMatrix.write(0, 0, player2);
+  myMatrix.write(0, 3, wall1);
+  delay(800);
+  myMatrix.write(0, 0, nothing);
+
+  myMatrix.write(1, 6, player1);
+  myMatrix.write(0, 0, player2);
+  myMatrix.write(0, 3, wall1);
+  delay(800);
+  myMatrix.write(0, 0, nothing);
+
+  myMatrix.write(2, 6, player1);
+  myMatrix.write(1, 0, player2);
+  myMatrix.write(0, 3, wall1);
+  myMatrix.write(2, 2, HIGH);
+  delay(800);
+  myMatrix.write(0, 0, nothing);
+
+  myMatrix.write(3, 6, player1);
+  myMatrix.write(0, 0, player2);
+  myMatrix.write(0, 3, wall2);
+  delay(800);
+  myMatrix.write(0, 0, nothing);
+
+  myMatrix.write(4, 6, player1);
+  myMatrix.write(1, 0, player2);
+  myMatrix.write(0, 3, wall2);
+  myMatrix.write(4, 5, HIGH);
+  delay(800);
+  myMatrix.write(0, 0, nothing);
+
+  myMatrix.write(5, 6, player1);
+  myMatrix.write(2, 0, player2);
+  myMatrix.write(0, 3, wall2);
+  myMatrix.write(4, 4, HIGH);
+  delay(800);
+  myMatrix.write(0, 0, nothing);
+
+  myMatrix.write(4, 6, player1);
+  myMatrix.write(3, 0, player2);
+  myMatrix.write(0, 3, wall2);
+  myMatrix.write(4, 3, HIGH);
+  delay(800);
+  myMatrix.write(0, 0, nothing);
+
+  myMatrix.write(3, 6, player1);
+  myMatrix.write(2, 0, player2);
+  myMatrix.write(0, 3, wall2);
+  myMatrix.write(4, 2, HIGH);
+  delay(800);
+  myMatrix.write(0, 0, nothing);
+
+  myMatrix.write(2, 6, player1);
+  myMatrix.write(1, 0, player2);
+  myMatrix.write(0, 3, wall2);
+  myMatrix.write(4, 1, HIGH);
+  delay(800);
+  myMatrix.write(0, 0, nothing);
+
+  myMatrix.write(1, 6, player1);
+  myMatrix.write(0, 0, player2);
+  myMatrix.write(0, 3, wall2);
+  delay(800);
+  myMatrix.write(0, 0, nothing);
+
+  myMatrix.write(2, 6, player1);
+  myMatrix.write(0, 0, player2);
+  myMatrix.write(0, 3, wall2);
+  delay(800);
+  myMatrix.write(0, 0, nothing);
+
+  myMatrix.write(3, 6, player1);
+  myMatrix.write(0, 0, player2);
+  myMatrix.write(0, 3, wall2);
+  myMatrix.write(3, 5, HIGH);
+  delay(800);
+  myMatrix.write(0, 0, nothing);
+
+  myMatrix.write(2, 6, player1);
+  myMatrix.write(0, 0, player2);
+  myMatrix.write(0, 3, wall2);
+  myMatrix.write(3, 4, HIGH);
+  delay(800);
+  myMatrix.write(0, 0, nothing);
+
+  myMatrix.write(3, 6, player1);
+  myMatrix.write(0, 0, player2);
+  myMatrix.write(0, 3, wall3);
+  delay(800);
+  myMatrix.write(0, 0, nothing);
+
+  myMatrix.write(2, 6, player1);
+  myMatrix.write(0, 0, player2);
+  myMatrix.write(0, 3, wall3);
+  delay(800);
+  myMatrix.write(0, 0, nothing);
+
+  for(int i = 1;i <= 4;i ++){
+    myMatrix.write(3, 6, player1);
+    myMatrix.write(1, 0, player2);
+    myMatrix.write(0, 3, wall3);
+    delay(100);
+    myMatrix.write(0, 0, nothing);
+
+    myMatrix.write(3, 6, player1);
+    myMatrix.write(0, 0, player2);
+    myMatrix.write(0, 3, wall3);
+    delay(100);
+    myMatrix.write(0, 0, nothing);
+  }
+
+  for(int i = 1;i <= 4;i ++){
+    myMatrix.write(4, 6, player1);
+    myMatrix.write(1, 0, player2);
+    myMatrix.write(0, 3, wall3);
+    delay(100);
+    myMatrix.write(0, 0, nothing);
+
+    myMatrix.write(4, 6, player1);
+    myMatrix.write(0, 0, player2);
+    myMatrix.write(0, 3, wall3);
+    delay(100);
+    myMatrix.write(0, 0, nothing);
+  }
+
+  myMatrix.write(3, 6, player1);
+  myMatrix.write(0, 0, player2);
+  myMatrix.write(5, 0, player2);
+  myMatrix.write(0, 3, wall3);
+  delay(800);
+  myMatrix.write(0, 0, nothing);
+
+  myMatrix.write(3, 6, player1);
+  myMatrix.write(0, 0, player2);
+  myMatrix.write(5, 0, player2);
+  myMatrix.write(0, 3, wall3);
+  myMatrix.write(1, 2, HIGH);
+  delay(800);
+  myMatrix.write(0, 0, nothing);
+
+  myMatrix.write(4, 6, player1);
+  myMatrix.write(1, 0, player2);
+  myMatrix.write(4, 0, player2);
+  myMatrix.write(0, 3, wall3);
+  myMatrix.write(1, 3, HIGH);
+  myMatrix.write(5, 2, HIGH);
+  delay(800);
+  myMatrix.write(0, 0, nothing);
+
+  myMatrix.write(5, 6, player1);
+  myMatrix.write(0, 0, player2);
+  myMatrix.write(3, 0, player2);
+  myMatrix.write(0, 3, wall4);
+  myMatrix.write(5, 3, HIGH);
+  delay(800);
+  myMatrix.write(0, 0, nothing);
+
+  myMatrix.write(5, 6, player1);
+  myMatrix.write(0, 0, player2);
+  myMatrix.write(3, 0, player2);
+  myMatrix.write(0, 3, wall5);
+  delay(800);
+  myMatrix.write(0, 0, nothing);
+
+  myMatrix.write(4, 6, player1);
+  myMatrix.write(0, 0, player2);
+  myMatrix.write(3, 0, player2);
+  myMatrix.write(0, 3, wall5);
+  myMatrix.write(4, 2, HIGH);
+  delay(800);
+  myMatrix.write(0, 0, nothing);
+
+  myMatrix.write(3, 6, player1);
+  myMatrix.write(0, 0, player2);
+  myMatrix.write(3, 0, player2);
+  myMatrix.write(0, 3, wall5);
+  myMatrix.write(4, 3, HIGH);
+  delay(800);
+  myMatrix.write(0, 0, nothing);
+
+  myMatrix.write(2, 6, player1);
+  myMatrix.write(0, 0, player2);
+  myMatrix.write(3, 0, player2);
+  myMatrix.write(0, 3, wall5);
+  myMatrix.write(4, 4, HIGH);
+  delay(800);
+  myMatrix.write(0, 0, nothing);
+
+  myMatrix.write(1, 6, player1);
+  myMatrix.write(0, 0, player2);
+  myMatrix.write(3, 0, player2);
+  myMatrix.write(0, 3, wall5);
+  myMatrix.write(4, 5, HIGH);
+  delay(800);
+  myMatrix.write(0, 0, nothing);
+
+  myMatrix.write(0, 6, player1);
+  myMatrix.write(0, 0, player2);
+  myMatrix.write(3, 0, player2);
+  myMatrix.write(0, 3, wall5);
+  myMatrix.write(4, 6, HIGH);
+  delay(800);
+  myMatrix.write(0, 0, nothing);
+
+  myMatrix.write(0, 6, player1);
+  myMatrix.write(0, 0, player2);
+  myMatrix.write(4, 0, player2);
+  myMatrix.write(0, 3, wall5);
+  myMatrix.write(4, 7, HIGH);
+  myMatrix.write(1, 5, HIGH);
+  delay(800);
+  myMatrix.write(0, 0, nothing);
+
+  myMatrix.write(0, 6, player1);
+  myMatrix.write(0, 0, player2);
+  myMatrix.write(5, 0, player2);
+  myMatrix.write(0, 3, wall5);
+  myMatrix.write(1, 4, HIGH);
+  delay(800);
+  myMatrix.write(0, 0, nothing);
+
+  myMatrix.write(0, 6, player1);
+  myMatrix.write(1, 0, player2);
+  myMatrix.write(6, 0, player2);
+  myMatrix.write(0, 3, wall5);
+  myMatrix.write(1, 3, HIGH);
+  delay(800);
+  myMatrix.write(0, 0, nothing);
+
+  myMatrix.write(0, 6, player1);
+  myMatrix.write(1, 0, player2);
+  myMatrix.write(5, 0, player2);
+  myMatrix.write(0, 3, wall5);
+  myMatrix.write(1, 2, HIGH);
+  delay(800);
+  myMatrix.write(0, 0, nothing);
+
+  myMatrix.write(0, 6, player1);
+  myMatrix.write(0, 0, player2);
+  myMatrix.write(5, 0, player2);
+  myMatrix.write(0, 3, wall5);
+  myMatrix.write(1, 1, HIGH);
+  delay(800);
+  myMatrix.write(0, 0, nothing);
+
+  myMatrix.write(0, 0, nothing);
+  myMatrix.write(0, 6, player1);
+  //myMatrix.write(0, 0, player2);
+  myMatrix.write(5, 0, player2);
+  myMatrix.write(0, 3, wall5);
+  delay(800);
+  myMatrix.write(0, 0, nothing);
+
+  myMatrix.write(1, 6, player1);
+  //myMatrix.write(0, 0, player2);
+  myMatrix.write(5, 0, player2);
+  myMatrix.write(0, 3, wall5);
+  delay(800);
+  myMatrix.write(0, 0, nothing);
+
+  myMatrix.write(2, 6, player1);
+  //myMatrix.write(0, 0, player2);
+  myMatrix.write(4, 0, player2);
+  myMatrix.write(0, 3, wall5);
+  delay(800);
+  myMatrix.write(0, 0, nothing);
+
+  myMatrix.write(3, 6, player1);
+  //myMatrix.write(0, 0, player2);
+  myMatrix.write(3, 0, player2);
+  myMatrix.write(0, 3, wall5);
+  delay(4000);
+  myMatrix.write(0, 0, nothing);
+
+
+  myMatrix.write(3, 6, player1);
+  //myMatrix.write(0, 0, player2);
+  myMatrix.write(3, 0, player2);
+  myMatrix.write(0, 3, wall5);
+  myMatrix.write(4, 2, HIGH);
+  myMatrix.write(4, 5, HIGH);
+  delay(800);
+  myMatrix.write(0, 0, nothing);
+
+  myMatrix.write(3, 6, player1);
+  //myMatrix.write(0, 0, player2);
+  myMatrix.write(3, 0, player2);
+  myMatrix.write(0, 3, wall5);
+  myMatrix.write(4, 3, HIGH);
+  myMatrix.write(4, 4, HIGH);
+  delay(800);
+  myMatrix.write(0, 0, nothing);
+
+  myMatrix.write(3, 6, player1);
+  //myMatrix.write(0, 0, player2);
+  myMatrix.write(3, 0, player2);
+  myMatrix.write(0, 3, wall5);
+  delay(1600);
+  myMatrix.write(0, 0, nothing);
+
+  myMatrix.write(3, 6, player1);
+  //myMatrix.write(0, 0, player2);
+  myMatrix.write(3, 0, player2);
+  myMatrix.write(0, 3, wall5);
+  myMatrix.write(4, 2, HIGH);
+  delay(800);
+  myMatrix.write(0, 0, nothing);
+
+  myMatrix.write(3, 6, player1);
+  //myMatrix.write(0, 0, player2);
+  myMatrix.write(3, 0, player2);
+  myMatrix.write(0, 3, wall5);
+  myMatrix.write(4, 3, HIGH);
+  myMatrix.write(4, 5, HIGH);
+  delay(800);
+  myMatrix.write(0, 0, nothing);
+
+  myMatrix.write(3, 6, player1);
+  //myMatrix.write(0, 0, player2);
+  myMatrix.write(3, 0, player2);
+  myMatrix.write(0, 3, wall5);
+  myMatrix.write(4, 4, HIGH);
+  delay(800);
+  myMatrix.write(0, 0, nothing);
+
+  myMatrix.write(3, 6, player1);
+  //myMatrix.write(0, 0, player2);
+  myMatrix.write(3, 0, player2);
+  myMatrix.write(0, 3, wall5);
+  delay(2400);
+  myMatrix.write(0, 0, nothing);
+
+  myMatrix.write(3, 6, player1);
+  //myMatrix.write(0, 0, player2);
+  myMatrix.write(3, 0, player2);
+  myMatrix.write(0, 3, wall5);
+  myMatrix.write(4, 2, HIGH);
+  myMatrix.write(4, 5, HIGH);
+  delay(800);
+  myMatrix.write(0, 0, nothing);
+
+  myMatrix.write(3, 6, player1);
+  //myMatrix.write(0, 0, player2);
+  myMatrix.write(3, 0, player2);
+  myMatrix.write(0, 3, wall5);
+  myMatrix.write(4, 3, HIGH);
+  myMatrix.write(4, 4, HIGH);
+  delay(800);
+  myMatrix.write(0, 0, nothing);
+
+  myMatrix.write(3, 6, player1);
+  //myMatrix.write(0, 0, player2);
+  myMatrix.write(3, 0, player2);
+  myMatrix.write(0, 3, wall5);
+  delay(4000);
+  myMatrix.write(0, 0, nothing);
+
+
+  myMatrix.write(3, 6, player1);
+  //myMatrix.write(0, 0, player2);
+  myMatrix.write(3, 0, player2);
+  myMatrix.write(0, 3, wall5);
+  myMatrix.write(4, 2, HIGH);
+  delay(800);
+  myMatrix.write(0, 0, nothing);
+
+  myMatrix.write(2, 6, player1);
+  //myMatrix.write(0, 0, player2);
+  myMatrix.write(3, 0, player2);
+  myMatrix.write(0, 3, wall5);
+  myMatrix.write(4, 3, HIGH);
+  myMatrix.write(3, 5, HIGH);
+  delay(800);
+  myMatrix.write(0, 0, nothing);
+
+  myMatrix.write(1, 6, player1);
+  //myMatrix.write(0, 0, player2);
+  myMatrix.write(2, 0, player2);
+  myMatrix.write(0, 3, wall5);
+  myMatrix.write(4, 4, HIGH);
+  myMatrix.write(3, 4, HIGH);
+  delay(800);
+  myMatrix.write(0, 0, nothing);
+
+  myMatrix.write(0, 6, player1);
+  //myMatrix.write(0, 0, player2);
+  myMatrix.write(2, 0, player2);
+  myMatrix.write(0, 3, wall5);
+  myMatrix.write(4, 5, HIGH);
+  myMatrix.write(3, 3, HIGH);
+  delay(800);
+  myMatrix.write(0, 0, nothing);
+
+  myMatrix.write(0, 6, player1);
+  //myMatrix.write(0, 0, player2);
+  myMatrix.write(3, 0, player2);
+  myMatrix.write(0, 3, wall5);
+  myMatrix.write(4, 6, HIGH);
+  myMatrix.write(3, 2, HIGH);
+  delay(800);
+  myMatrix.write(0, 0, nothing);
+
+  myMatrix.write(0, 6, player1);
+  //myMatrix.write(0, 0, player2);
+  myMatrix.write(2, 0, player2);
+  myMatrix.write(0, 3, wall5);
+  myMatrix.write(4, 7, HIGH);
+  delay(800);
+  myMatrix.write(0, 0, nothing);
+
+  myMatrix.write(0, 6, player1);
+  //myMatrix.write(0, 0, player2);
+  //myMatrix.write(2, 0, player2);
+  myMatrix.write(0, 3, wall5);
+  delay(1000);
+  myMatrix.write(0, 0, nothing);
+
+  while(1){
+    myMatrix.write(0, 0, nothing);
+    for(int i = 1;i <= 10;i ++){
+      myMatrix.write(0, 0, wall_clear_1);
+      delay(100);
+      myMatrix.write(0, 0, wall_clear_2);
+      delay(100);
+    }
+    
+    for(int i = 0;i <= 41;i ++){
+      myMatrix.write(i, 0, win1);
+      myMatrix.write(i-8, 0, win2);
+      myMatrix.write(i-16, 0, win3);
+      myMatrix.write(i-24, 0, win4);
+      myMatrix.write(i-32, 0, win5);
+      myMatrix.write(i-40, 0, win6);
+      myMatrix.write(i-41, 0, win7);
+      delay(150);
+      myMatrix.write(0, 0, nothing);
+    }
+    
+    myMatrix.write(0, 0, nothing);
+    myMatrix.putch(0,1,'Y');
+    delay(500);
+    myMatrix.write(0, 0, nothing);
+    myMatrix.putch(0,0,'O');
+    delay(500);
+    myMatrix.write(0, 0, nothing);
+    myMatrix.putch(0,1,'U');
+    delay(800);
+    myMatrix.write(0, 0, nothing);
+    myMatrix.putch(1,0,'W');
+    delay(500);
+    myMatrix.write(0, 0, nothing);
+    myMatrix.putch(1,1,'I');
+    delay(500);
+    myMatrix.write(0, 0, nothing);
+    myMatrix.putch(1,0,'N');
+    delay(500);
+    myMatrix.write(0, 0, nothing);
+  }
+}

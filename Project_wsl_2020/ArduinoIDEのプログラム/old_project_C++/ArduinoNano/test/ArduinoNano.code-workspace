@@ -1,0 +1,11 @@
+{
+    "folders": [
+        {
+            "path": ".."
+        },
+        {
+            "name": "STM32F446RE",
+            "path": "../../STM32F446RE"
+        }
+    ]
+}

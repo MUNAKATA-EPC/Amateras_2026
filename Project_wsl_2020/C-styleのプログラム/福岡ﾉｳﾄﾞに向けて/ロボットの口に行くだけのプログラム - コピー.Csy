@@ -1,0 +1,40 @@
+Title:Main - [ ロボットの口に行くだけのプログラム - コピー ] DAISEN C-Style for TJ3B  [ Ver.20190706 ]
+CN01:Ball
+CN02:Line
+CN03:L-Touch
+CN04:R-Touch
+CN05:C-Touch
+CN06:
+CN07:
+CN08:
+CN09:RED3
+CN10:RED2
+[0000]:sno:08,cno:08,val:111111-110030-000002,cmt:
+[0001]:sno:33,cno:33,val:000000-000000-000000,cmt:const int MoterSpeed = 50;  	// IRボールを追うときの動く速さ
+[0002]:sno:33,cno:33,val:000000-000000-000000,cmt:const int GyroMoterSpeed = 50;  	// ジャイロ補正のときの速さ
+[0003]:sno:33,cno:33,val:000000-000000-000000,cmt:const int IRaroundValue = 70;  	// 回り込みの角度
+[0004]:sno:33,cno:33,val:000000-000000-000000,cmt:double RfLb_X;  	// 右前、左後のモータの出力
+[0005]:sno:33,cno:33,val:000000-000000-000000,cmt:double LfRb_Y;  	// 左前、右後のモータの出力
+[0006]:sno:33,cno:33,val:000000-000000-000000,cmt:double IRedge;  	// IRの角度
+[0007]:sno:33,cno:33,val:000000-000000-000000,cmt:double GYROedge;  	// ジャイロの角度
+[0008]:sno:04,cno:01,val:000000-000000-000000,cmt:
+[0009]:sno:33,cno:33,val:000000-000000-000000,cmt:IRedge = gAD[CN1] * 18 / 17;  	// IR角度を代入
+[0010]:sno:01,cno:14,val:000040-000001-000000,cmt:Ball
+[0011]:sno:33,cno:33,val:000000-000000-000000,cmt:RfLb_X = 0;  	// IRボールが見えていないので出力は無し
+[0012]:sno:33,cno:33,val:000000-000000-000000,cmt:LfRb_Y = 0;  	// IRボールが見えていないので出力は無し
+[0013]:sno:03,cno:00,val:000000-000000-000000,cmt:
+[0014]:sno:01,cno:33,val:000000-000000-000000,cmt:IRedge > 180  	// 左にボールがあるとき
+[0015]:sno:33,cno:33,val:000000-000000-000000,cmt:RfLb_X = cos((45 + IRedge + 360 - IRaroundValue) * 3.1415 / 180) * MoterSpeed;  	// 回り込むための 速さ を計算・右前、左後　　～左にボールがあるとき～
+[0016]:sno:33,cno:33,val:000000-000000-000000,cmt:LfRb_Y = sin((45 + IRedge + 360 - IRaroundValue) * 3.1415 / 180) * MoterSpeed;  	// 回り込むための 速さ を計算・左前、右後　　～左にボールがあるとき～
+[0017]:sno:03,cno:00,val:000000-000000-000000,cmt:
+[0018]:sno:33,cno:33,val:000000-000000-000000,cmt:RfLb_X = cos((45 + IRedge + IRaroundValue) * 3.1415 / 180) * MoterSpeed;  	// 回り込むための 速さ を計算・右前、左後　　～右にボールがあるとき～
+[0019]:sno:33,cno:33,val:000000-000000-000000,cmt:LfRb_Y = sin((45 + IRedge + IRaroundValue) * 3.1415 / 180) * MoterSpeed;  	// 回り込むための 速さ を計算・左前、右後　　～右にボールがあるとき～
+[0020]:sno:00,cno:02,val:000000-000000-000000,cmt:
+[0021]:sno:00,cno:02,val:000000-000000-000000,cmt:
+[0022]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_G] = 0;  	// ジャイロ補正の 速さ を計算
+[0023]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_A] = - RfLb_X + gV[VAR_G];  	// 最終的な計算結果を代入・左前モータ
+[0024]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_B] = LfRb_Y + gV[VAR_G];  	// 最終的な計算結果を代入・右前モータ
+[0025]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_C] = - LfRb_Y + gV[VAR_G];  	// 最終的な計算結果を代入・左後モータ
+[0026]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_D] = RfLb_X + gV[VAR_G];  	// 最終的な計算結果を代入・右後モータ
+[0027]:sno:38,cno:38,val:400401-402403-999999,cmt:
+[0028]:sno:00,cno:03,val:000000-000000-000000,cmt:

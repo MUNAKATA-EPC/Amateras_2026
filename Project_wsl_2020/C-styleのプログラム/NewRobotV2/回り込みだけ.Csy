@@ -1,0 +1,80 @@
+Title:Main - [ 回り込みだけ ] DAISEN C-Style for TJ3B  [ Ver.20190706 ]
+CN01:Ball
+CN02:Line
+CN03:L-Touch
+CN04:R-Touch
+CN05:C-Touch
+CN06:
+CN07:
+CN08:
+CN09:RED3
+CN10:RED2
+[0000]:sno:08,cno:07,val:111111-110010-000002,cmt:
+[0001]:sno:33,cno:33,val:000000-000000-000000,cmt:double IR_motermax = 70;  	// 回り込む際のモータの最大出力
+[0002]:sno:33,cno:33,val:000000-000000-000000,cmt:double IR_moterValue;  	// 回り込む際のモータの最大出力結果
+[0003]:sno:33,cno:33,val:000000-000000-000000,cmt:double IR_frontValue = 10;  	// 前とみなす、角度の範囲（IR）
+[0004]:sno:33,cno:33,val:000000-000000-000000,cmt:double IR_edge = 0;  	// IRの角度
+[0005]:sno:33,cno:33,val:000000-000000-000000,cmt:double IR_alpha = 45;  	// 回り込む際のボールに対して何度ずらして動くか
+[0006]:sno:33,cno:33,val:000000-000000-000000,cmt:double Gyro_moter_max = 30;  	// ジャイロのモータの最大出力結果
+[0007]:sno:33,cno:33,val:000000-000000-000000,cmt:double Gyro_moter_min = 10;  	// ジャイロのモータの最大出力結果
+[0008]:sno:33,cno:33,val:000000-000000-000000,cmt:double Gyro_frontValue = 1;  	// 前とみなす、角度の範囲（Gyro）
+[0009]:sno:33,cno:33,val:000000-000000-000000,cmt:double Gyro_edge = 0;  	// ジャイロの角度
+[0010]:sno:33,cno:33,val:000000-000000-000000,cmt:double xx = 0;  	// 最終のモータ出力（X座標）
+[0011]:sno:33,cno:33,val:000000-000000-000000,cmt:double yy = 0;  	// 最終のモータ出力（Y座標）
+[0012]:sno:04,cno:01,val:000000-000000-000000,cmt:
+[0013]:sno:01,cno:44,val:000300-000000-000000,cmt:
+[0014]:sno:33,cno:33,val:000000-000000-000000,cmt:xx = - IR_motermax;  	// 回り込むには、、（X座標）
+[0015]:sno:33,cno:33,val:000000-000000-000000,cmt:yy = IR_motermax;  	// 回り込むには、、（Y座標）
+[0016]:sno:02,cno:33,val:000000-000000-000000,cmt:gAD[CN2] < 500
+[0017]:sno:34,cno:34,val:000000-000000-000000,cmt:
+[0018]:sno:33,cno:33,val:000000-000000-000000,cmt:IR_edge = gAD[CN3] * 1.06 + 405;  	// ４５度左にずらす
+[0019]:sno:33,cno:33,val:000000-000000-000000,cmt:IR_edge = IR_edge * 3.14 / 180;  	// ラジアンに直す
+[0020]:sno:33,cno:33,val:000000-000000-000000,cmt:xx = cos(IR_edge) * IR_motermax;  	// ボールのほうに行くには、、（X座標）
+[0021]:sno:33,cno:33,val:000000-000000-000000,cmt:yy = sin(IR_edge) * IR_motermax;  	// ボールのほうに行くには、、（Y座標）
+[0022]:sno:02,cno:33,val:000000-000000-000000,cmt:gAD[CN3] * 1.06 < IR_frontValue * 2  &&  gAD[CN3] * 1.06 > 360 - IR_frontValue * 2
+[0023]:sno:34,cno:34,val:000000-000000-000000,cmt:
+[0024]:sno:33,cno:33,val:000000-000000-000000,cmt:IR_edge = gAD[CN3] * 1.06 + 405;  	// ４５度左にずらす
+[0025]:sno:33,cno:33,val:000000-000000-000000,cmt:IR_edge = IR_edge * 3.14 / 180;  	// ラジアンに直す
+[0026]:sno:33,cno:33,val:000000-000000-000000,cmt:xx = cos(IR_edge) * IR_motermax;  	// ボールのほうに行くには、、（X座標）
+[0027]:sno:33,cno:33,val:000000-000000-000000,cmt:yy = sin(IR_edge) * IR_motermax;  	// ボールのほうに行くには、、（Y座標）
+[0028]:sno:03,cno:00,val:000000-000000-000000,cmt:
+[0029]:sno:35,cno:35,val:000000-000001-000000,cmt:
+[0030]:sno:33,cno:33,val:000000-000000-000000,cmt:IR_moterValue = IR_motermax;
+[0031]:sno:01,cno:33,val:000000-000000-000000,cmt:gAD[CN3] * 1.06 > IR_frontValue  &&  gAD[CN3] * 1.06 < 360 - IR_frontValue  	// 前以外のところにボールがあるとき
+[0032]:sno:01,cno:33,val:000000-000000-000000,cmt:gAD[CN3] * 0.98 < 180  	// 左にボールがある
+[0033]:sno:33,cno:33,val:000000-000000-000000,cmt:IR_edge = gAD[CN3] * 1.06 + 405 + IR_alpha;  	// ４５度＋IR＿alphaだけずらす
+[0034]:sno:33,cno:33,val:000000-000000-000000,cmt:IR_edge = IR_edge * 3.14 / 180;  	// ラジアンに直す
+[0035]:sno:03,cno:00,val:000000-000000-000000,cmt:
+[0036]:sno:33,cno:33,val:000000-000000-000000,cmt:IR_edge = gAD[CN3] * 1.06 + 405 - IR_alpha;  	// ４５度-IR＿alphaだけずらす
+[0037]:sno:33,cno:33,val:000000-000000-000000,cmt:IR_edge = IR_edge * 3.14 / 180;  	// ラジアンに直す
+[0038]:sno:00,cno:02,val:000000-000000-000000,cmt:
+[0039]:sno:33,cno:33,val:000000-000000-000000,cmt:xx = cos(IR_edge) * IR_moterValue;  	// 回り込むには、、（X座標）
+[0040]:sno:33,cno:33,val:000000-000000-000000,cmt:yy = sin(IR_edge) * IR_moterValue;  	// 回り込むには、、（Y座標）
+[0041]:sno:03,cno:00,val:000000-000000-000000,cmt:
+[0042]:sno:33,cno:33,val:000000-000000-000000,cmt:xx = IR_motermax;  	// 直進のためには、、（X座標）
+[0043]:sno:33,cno:33,val:000000-000000-000000,cmt:yy = IR_motermax;  	// 直進のためには、、（Y座標）
+[0044]:sno:00,cno:02,val:000000-000000-000000,cmt:
+[0045]:sno:00,cno:02,val:000000-000000-000000,cmt:
+[0046]:sno:33,cno:33,val:000000-000000-000000,cmt:Gyro_edge = gAD[CN1];
+[0047]:sno:01,cno:33,val:000000-000000-000000,cmt:Gyro_edge > 50  &&  Gyro_edge < 310
+[0048]:sno:33,cno:33,val:000000-000000-000000,cmt:xx = 0;
+[0049]:sno:33,cno:33,val:000000-000000-000000,cmt:yy = 0;
+[0050]:sno:00,cno:02,val:000000-000000-000000,cmt:
+[0051]:sno:01,cno:33,val:000000-000000-000000,cmt:Gyro_edge < Gyro_frontValue  	// 前にロボットが向いている時
+[0052]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_G] = 0;
+[0053]:sno:02,cno:33,val:000000-000000-000000,cmt:Gyro_edge > 360 - Gyro_frontValue  	// 前にロボットが向いている時
+[0054]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_G] = 0;
+[0055]:sno:02,cno:33,val:000000-000000-000000,cmt:Gyro_edge < 180
+[0056]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_G] = ( (Gyro_moter_min - Gyro_moter_max) / 32400 ) * Gyro_edge * Gyro_edge;
+[0057]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_G] = gV[VAR_G] - (Gyro_moter_min - Gyro_moter_max) / 90 * Gyro_edge + Gyro_moter_min;
+[0058]:sno:03,cno:00,val:000000-000000-000000,cmt:
+[0059]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_G] = ( (Gyro_moter_min - Gyro_moter_max) / 32400 ) * Gyro_edge * Gyro_edge;
+[0060]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_G] = gV[VAR_G] - (Gyro_moter_min - Gyro_moter_max) / 90 * Gyro_edge + Gyro_moter_min;
+[0061]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_G] = - gV[VAR_G];
+[0062]:sno:00,cno:02,val:000000-000000-000000,cmt:
+[0063]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_A] =  - xx + gV[VAR_G];  	// 代入
+[0064]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_B] = yy + gV[VAR_G];  	// 代入
+[0065]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_C] =  - yy + gV[VAR_G];  	// 代入
+[0066]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_D] =  xx + gV[VAR_G];  	// 代入
+[0067]:sno:38,cno:38,val:400401-402999-403999,cmt:
+[0068]:sno:00,cno:03,val:000000-000000-000000,cmt:

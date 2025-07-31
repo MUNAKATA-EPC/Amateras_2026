@@ -1,0 +1,48 @@
+Title:Main - [ NewFile-06 ] DAISEN C-Style for TJ3B  [ Ver.20190706 ]
+CN01:Ball
+CN02:Line
+CN03:L-Touch
+CN04:R-Touch
+CN05:C-Touch
+CN06:
+CN07:
+CN08:
+CN09:RED3
+CN10:RED2
+[0000]:sno:08,cno:07,val:111111-110010-000002,cmt:
+[0001]:sno:33,cno:33,val:000000-000000-000000,cmt:double IR_motermax = 80;
+[0002]:sno:33,cno:33,val:000000-000000-000000,cmt:double IR_moterValue = 0;
+[0003]:sno:33,cno:33,val:000000-000000-000000,cmt:double IR_edge = 0;
+[0004]:sno:33,cno:33,val:000000-000000-000000,cmt:double moter_LF = 0;
+[0005]:sno:33,cno:33,val:000000-000000-000000,cmt:double moter_RF = 0;
+[0006]:sno:33,cno:33,val:000000-000000-000000,cmt:double IR_arpha = 0.8;
+[0007]:sno:04,cno:01,val:000000-000000-000000,cmt:
+[0008]:sno:01,cno:14,val:000040-000020-000000,cmt:IRボールがある
+[0009]:sno:33,cno:33,val:000000-000000-000000,cmt:IR_moterValue = 
+[0010]:sno:01,cno:14,val:000030-000011-000000,cmt:IRボールが近い
+[0011]:sno:37,cno:37,val:000001-000001-000000,cmt:
+[0012]:sno:33,cno:33,val:000000-000000-000000,cmt:IR_edge = gAD[CN3] * 0.98;
+[0013]:sno:33,cno:33,val:000000-000000-000000,cmt:IR_edge = IR_edge * 3.14 / 180;
+[0014]:sno:01,cno:33,val:000000-000000-000000,cmt:IR_edge < 180 * 3.14 / 180  	// IRボールが左にある
+[0015]:sno:33,cno:33,val:000000-000000-000000,cmt:moter_LF = - IR_moterValue * cos(IR_edge + IR_arpha + 45 * 3.14 /180);
+[0016]:sno:33,cno:33,val:000000-000000-000000,cmt:moter_RF = - IR_moterValue * cos(IR_edge + IR_arpha + 135 * 3.14 /180);
+[0017]:sno:03,cno:00,val:000000-000000-000000,cmt:
+[0018]:sno:33,cno:33,val:000000-000000-000000,cmt:moter_LF = - IR_moterValue * cos(IR_edge - IR_arpha + 45 * 3.14 /180);
+[0019]:sno:33,cno:33,val:000000-000000-000000,cmt:moter_RF = - IR_moterValue * cos(IR_edge - IR_arpha + 135 * 3.14 /180);
+[0020]:sno:00,cno:02,val:000000-000000-000000,cmt:
+[0021]:sno:03,cno:00,val:000000-000000-000000,cmt:
+[0022]:sno:36,cno:36,val:000001-000000-000000,cmt:
+[0023]:sno:33,cno:33,val:000000-000000-000000,cmt:IR_edge = gAD[CN3] * 0.98;
+[0024]:sno:33,cno:33,val:000000-000000-000000,cmt:IR_edge = IR_edge * 3.14 / 180;
+[0025]:sno:33,cno:33,val:000000-000000-000000,cmt:moter_LF = - IR_moterValue * cos(IR_edge + 45 * 3.14 /180);
+[0026]:sno:33,cno:33,val:000000-000000-000000,cmt:moter_RF = - IR_moterValue * cos(IR_edge + 135 * 3.14 /180);
+[0027]:sno:00,cno:02,val:000000-000000-000000,cmt:
+[0028]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_A] = moter_LF;
+[0029]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_B] = moter_RF;
+[0030]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_C] = - moter_LF;
+[0031]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_D] = - moter_RF;
+[0032]:sno:38,cno:38,val:400401-403999-402999,cmt:
+[0033]:sno:03,cno:00,val:000000-000000-000000,cmt:
+[0034]:sno:38,cno:38,val:200200-200999-200999,cmt:
+[0035]:sno:00,cno:02,val:000000-000000-000000,cmt:
+[0036]:sno:00,cno:03,val:000000-000000-000000,cmt:

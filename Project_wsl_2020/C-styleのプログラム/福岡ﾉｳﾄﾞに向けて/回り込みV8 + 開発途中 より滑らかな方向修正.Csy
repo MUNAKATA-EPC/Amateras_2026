@@ -1,0 +1,53 @@
+Title:Main - [ 回り込みV8 + 開発途中 より滑らかな方向修正 ] DAISEN C-Style for TJ3B  [ Ver.20190706 ]
+CN01:IRedge,LINE左
+CN02:IRdist,LINE右
+CN03:Gyro,LINE後
+CN04:IR1,LINE後
+CN05:IR2
+CN06:IR3,LINE右後
+CN07:　,LINE前
+CN08:　,LINE左後
+CN09:
+CN10:
+[0000]:sno:08,cno:08,val:111111-111130-010002,cmt:
+[0001]:sno:33,cno:33,val:000000-000000-000000,cmt:int MoterSpeed = 80;  	// IRボールを追うときの動く速さ
+[0002]:sno:33,cno:33,val:000000-000000-000000,cmt:int GyroMoterSpeed = 20;  	// ジャイロ補正のときの速さ
+[0003]:sno:33,cno:33,val:000000-000000-000000,cmt:int IRaroundValue = 60;  	// 回り込みの角度
+[0004]:sno:33,cno:33,val:000000-000000-000000,cmt:double PIXY_val = 160;  	// PIXYの値
+[0005]:sno:33,cno:33,val:000000-000000-000000,cmt:double RfLb_X;  	// 右前、左後のモータの出力
+[0006]:sno:33,cno:33,val:000000-000000-000000,cmt:double LfRb_Y;  	// 左前、右後のモータの出力
+[0007]:sno:33,cno:33,val:000000-000000-000000,cmt:double IRedge;  	// IRの角度
+[0008]:sno:33,cno:33,val:000000-000000-000000,cmt:double GYROedge;  	// ジャイロの角度
+[0009]:sno:04,cno:01,val:000000-000000-000000,cmt:
+[0010]:sno:01,cno:30,val:000400-000000-000000,cmt:
+[0011]:sno:02,cno:14,val:000050-000030-100000,cmt:IR1,LINE後
+[0012]:sno:35,cno:35,val:000000-000001-000000,cmt:
+[0013]:sno:30,cno:30,val:000000-000000-000000,cmt:
+[0014]:sno:33,cno:33,val:000000-000000-000000,cmt:RfLb_X = MoterSpeed;  	// 前に行く
+[0015]:sno:33,cno:33,val:000000-000000-000000,cmt:LfRb_Y = MoterSpeed;  	// 前に行く
+[0016]:sno:02,cno:14,val:000050-000060-100000,cmt:　,LINE前
+[0017]:sno:35,cno:35,val:000000-000001-000000,cmt:
+[0018]:sno:30,cno:30,val:000000-000000-000000,cmt:
+[0019]:sno:33,cno:33,val:000000-000000-000000,cmt:RfLb_X = -MoterSpeed;  	// 後に行く
+[0020]:sno:33,cno:33,val:000000-000000-000000,cmt:LfRb_Y = -MoterSpeed;  	// 後に行く
+[0021]:sno:02,cno:14,val:000050-000000-100000,cmt:IRedge,LINE左
+[0022]:sno:35,cno:35,val:000000-000001-000000,cmt:
+[0023]:sno:30,cno:30,val:000000-000000-000000,cmt:
+[0024]:sno:33,cno:33,val:000000-000000-000000,cmt:RfLb_X = MoterSpeed;  	// 右に行く
+[0025]:sno:33,cno:33,val:000000-000000-000000,cmt:LfRb_Y = -MoterSpeed;  	// 右に行く
+[0026]:sno:02,cno:14,val:000050-000010-100000,cmt:IRdist,LINE右
+[0027]:sno:35,cno:35,val:000000-000001-000000,cmt:
+[0028]:sno:30,cno:30,val:000000-000000-000000,cmt:
+[0029]:sno:33,cno:33,val:000000-000000-000000,cmt:RfLb_X = -MoterSpeed;  	// 左に行く
+[0030]:sno:33,cno:33,val:000000-000000-000000,cmt:LfRb_Y = MoterSpeed;  	// 左に行く
+[0031]:sno:03,cno:00,val:000000-000000-000000,cmt:
+[0032]:sno:34,cno:34,val:000000-000000-000000,cmt:
+[0033]:sno:33,cno:33,val:000000-000000-000000,cmt:RfLb_X = 0;  	// 前に行く
+[0034]:sno:33,cno:33,val:000000-000000-000000,cmt:LfRb_Y = 0;  	// 前に行く
+[0035]:sno:00,cno:02,val:000000-000000-000000,cmt:
+[0036]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_A] = - RfLb_X + gV[VAR_G];  	// 最終的な計算結果を代入・左前モータ
+[0037]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_B] = LfRb_Y + gV[VAR_G];  	// 最終的な計算結果を代入・右前モータ
+[0038]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_C] = - LfRb_Y + gV[VAR_G];  	// 最終的な計算結果を代入・左後モータ
+[0039]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_D] = RfLb_X + gV[VAR_G];  	// 最終的な計算結果を代入・右後モータ
+[0040]:sno:38,cno:38,val:400401-402403-999999,cmt:
+[0041]:sno:00,cno:03,val:000000-000000-000000,cmt:

@@ -1,0 +1,128 @@
+Title:Main - [ カメラ入り最終形態 ] DAISEN C-Style for TJ3B  [ Ver.20190706 ]
+CN01:Ball
+CN02:Line
+CN03:L-Touch
+CN04:R-Touch
+CN05:C-Touch
+CN06:
+CN07:
+CN08:
+CN09:RED3
+CN10:RED2
+[0000]:sno:08,cno:07,val:111111-110010-010002,cmt:
+[0001]:sno:33,cno:33,val:000000-000000-000000,cmt:double IR_motermax = 65;  	// 回り込む際のモータの最大出力結果
+[0002]:sno:33,cno:33,val:000000-000000-000000,cmt:double IR_frontValue = 20;  	// 前とみなす、角度の範囲（IR）
+[0003]:sno:33,cno:33,val:000000-000000-000000,cmt:double IR_front_number = 1.5;  	// ボールが前に近しいところにいるときの角度を微調整
+[0004]:sno:33,cno:33,val:000000-000000-000000,cmt:double IR_edge_move = 0;  	// IRの角度
+[0005]:sno:33,cno:33,val:000000-000000-000000,cmt:double IR_edge_true = 0;  	// IRの角度
+[0006]:sno:33,cno:33,val:000000-000000-000000,cmt:double IR_edgeAdjust = 0;  	// IRの角度の調整用　０～３６０にする用
+[0007]:sno:33,cno:33,val:000000-000000-000000,cmt:double IR_edgeCentralValue = 0;  	// IRの角度の調整用　０～３６０にする用
+[0008]:sno:33,cno:33,val:000000-000000-000000,cmt:double IR_alpha_max = 70;  	// 回り込む際のボールに対して何度ずらして動くか（max）
+[0009]:sno:33,cno:33,val:000000-000000-000000,cmt:double IR_alpha_min = 60;  	// 回り込む際のボールに対して何度ずらして動くか（min）
+[0010]:sno:33,cno:33,val:000000-000000-000000,cmt:double IR_alpha = 0;  	// 回り込む際のボールに対して何度ずらして動くか（結果）
+[0011]:sno:33,cno:33,val:000000-000000-000000,cmt:double Gyro_moter_max = 15;  	// ジャイロのモータの最大出力結果
+[0012]:sno:33,cno:33,val:000000-000000-000000,cmt:double Gyro_moter_min = 13;  	// ジャイロのモータの最大出力結果
+[0013]:sno:33,cno:33,val:000000-000000-000000,cmt:double Gyro_frontValue = 1;  	// 前とみなす、角度の範囲（Gyro）
+[0014]:sno:33,cno:33,val:000000-000000-000000,cmt:double Gyro_edge = 0;  	// ジャイロの角度
+[0015]:sno:33,cno:33,val:000000-000000-000000,cmt:double Camera_xx;
+[0016]:sno:33,cno:33,val:000000-000000-000000,cmt:double Camera_yy;
+[0017]:sno:33,cno:33,val:000000-000000-000000,cmt:double Camera_motermax = 15;
+[0018]:sno:33,cno:33,val:000000-000000-000000,cmt:int Goal_number = 0;  	// 1が黄ゴール、2が青ゴール
+[0019]:sno:33,cno:33,val:000000-000000-000000,cmt:double Line_time = 400;  	// ラインを踏んでから何秒以上たっていたらブレーキするか
+[0020]:sno:33,cno:33,val:000000-000000-000000,cmt:double Line_timer = 0;  	// ライン制御で使うタイマー
+[0021]:sno:33,cno:33,val:000000-000000-000000,cmt:double Line_timerAdd = Line_time;  	// ラインセンサーで使うタイマーの付属品
+[0022]:sno:33,cno:33,val:000000-000000-000000,cmt:double Line_edge = 0;  	// LINEの角度
+[0023]:sno:33,cno:33,val:000000-000000-000000,cmt:double xx = 0;  	// 最終のモータ出力（X座標）
+[0024]:sno:33,cno:33,val:000000-000000-000000,cmt:double yy = 0;  	// 最終のモータ出力（Y座標）
+[0025]:sno:30,cno:30,val:000000-000000-000000,cmt:
+[0026]:sno:04,cno:01,val:000000-000000-000000,cmt:
+[0027]:sno:33,cno:33,val:000000-000000-000000,cmt:Line_timer = gT[T1] + Line_timerAdd;  	// ラインタイマーの計算
+[0028]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_I] = (gAD[CN1] - IR_edgeAdjust - (IR_edgeCentralValue - IR_edgeAdjust)) + 360;  	// IR角度の調整
+[0029]:sno:31,cno:31,val:080095-000360-000000,cmt:IR角度　３６０に収める
+[0030]:sno:33,cno:33,val:000000-000000-000000,cmt:IR_edge_true = gV[VAR_I] * 1.1;  	// IR角度を読む　　度数のまま
+[0031]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_I] = (gAD[CN1] - IR_edgeAdjust) + 360 - 45;  	// IR角度の調整
+[0032]:sno:31,cno:31,val:080095-000360-000000,cmt:IR角度　３６０に収める
+[0033]:sno:33,cno:33,val:000000-000000-000000,cmt:IR_edge_move = gV[VAR_I] * 3.14 / 180 * 1.1;  	// IR角度を読む　　ラジアンに直す
+[0034]:sno:33,cno:33,val:000000-000000-000000,cmt:Gyro_edge = gAD[CN3] * 1.1;  	// ジャイロを読む
+[0035]:sno:33,cno:33,val:000000-000000-000000,cmt:i2c_get_pixy();
+[0036]:sno:01,cno:14,val:000050-000040-000000,cmt:C-Touch
+[0037]:sno:33,cno:33,val:000000-000000-000000,cmt:Goal_number = 1;
+[0038]:sno:03,cno:00,val:000000-000000-000000,cmt:
+[0039]:sno:33,cno:33,val:000000-000000-000000,cmt:Goal_number = 2;
+[0040]:sno:00,cno:02,val:000000-000000-000000,cmt:
+[0041]:sno:33,cno:33,val:000000-000000-000000,cmt:Camera_xx = get_pixydat_x(Goal_number);
+[0042]:sno:33,cno:33,val:000000-000000-000000,cmt:Camera_yy = get_pixydat_y(Goal_number);
+[0043]:sno:33,cno:33,val:000000-000000-000000,cmt:Gyro_edge = gAD[CN3] * 1.1;  	// ジャイロを読む
+[0044]:sno:31,cno:31,val:110341-000180-000000,cmt:ラインを読む（ラインをよける方向に調節）
+[0045]:sno:31,cno:31,val:110125-000360-000000,cmt:ラインを読む（ラインをよける方向に調節）
+[0046]:sno:33,cno:33,val:000000-000000-000000,cmt:Line_edge = gV[VAR_L] * 3.14 / 180 * 1.1;  	// LINEを読む　　ラジアンに直す
+[0047]:sno:01,cno:33,val:000000-000000-000000,cmt:gAD[CN4] < 400  	// LINEが反応した時、ラインを踏んでからLine_time以上経っていたら
+[0048]:sno:21,cno:21,val:000050-000050-000000,cmt:ブザーをやませる
+[0049]:sno:01,cno:33,val:000000-000000-000000,cmt:Line_timer > Line_time  	// Line_number以上経っていたら、ブレーキ
+[0050]:sno:33,cno:33,val:000000-000000-000000,cmt:Line_timerAdd = 0;  	// ラインタイマー付属品の調整
+[0051]:sno:38,cno:38,val:200200-200200-999999,cmt:
+[0052]:sno:30,cno:30,val:000000-000000-000000,cmt:
+[0053]:sno:00,cno:02,val:000000-000000-000000,cmt:
+[0054]:sno:33,cno:33,val:000000-000000-000000,cmt:xx = cos(Line_edge) * IR_motermax;  	// LINEから離れるには、、（X座標）
+[0055]:sno:33,cno:33,val:000000-000000-000000,cmt:yy = sin(Line_edge) * IR_motermax;  	// LINEから離れるには、、（Y座標）
+[0056]:sno:02,cno:33,val:000000-000000-000000,cmt:Gyro_edge > 50  &&  Gyro_edge < 310  &&  get_pixydat_index(Goal_number) == 0
+[0057]:sno:22,cno:22,val:-00050--00050-000000,cmt:ブザーをやませる
+[0058]:sno:33,cno:33,val:000000-000000-000000,cmt:Line_timerAdd = Line_time;  	// ラインタイマー付属品の調整
+[0059]:sno:33,cno:33,val:000000-000000-000000,cmt:xx = 0;  	// 0
+[0060]:sno:33,cno:33,val:000000-000000-000000,cmt:yy = 0;  	// 0
+[0061]:sno:02,cno:33,val:000000-000000-000000,cmt:gAD[CN2] == 500  	// ボールが遠くにある時
+[0062]:sno:22,cno:22,val:-00050--00050-000000,cmt:ブザーをやませる
+[0063]:sno:33,cno:33,val:000000-000000-000000,cmt:Line_timerAdd = Line_time;  	// ラインタイマー付属品の調整
+[0064]:sno:33,cno:33,val:000000-000000-000000,cmt:xx = cos(IR_edge_move) * IR_motermax;  	// ボールのほうに行くには、、（X座標）
+[0065]:sno:33,cno:33,val:000000-000000-000000,cmt:yy = sin(IR_edge_move) * IR_motermax;  	// ボールのほうに行くには、、（Y座標）
+[0066]:sno:02,cno:33,val:000000-000000-000000,cmt:IR_edge_true < IR_frontValue * IR_front_number  ||  IR_edge_true  > (360 - IR_frontValue) * IR_front_number  	// ボールが前に近しい所にある時
+[0067]:sno:22,cno:22,val:-00050--00050-000000,cmt:ブザーをやませる
+[0068]:sno:33,cno:33,val:000000-000000-000000,cmt:Line_timerAdd = Line_time;  	// ラインタイマー付属品の調整
+[0069]:sno:01,cno:33,val:000000-000000-000000,cmt:IR_edge_true < IR_frontValue  ||  IR_edge_true  > 360 - IR_frontValue  	// ボールがない時
+[0070]:sno:33,cno:33,val:000000-000000-000000,cmt:xx = IR_motermax;  	// 直進のためには、、（X座標）
+[0071]:sno:33,cno:33,val:000000-000000-000000,cmt:yy = - IR_motermax;  	// 直進のためには、、（Y座標）
+[0072]:sno:03,cno:00,val:000000-000000-000000,cmt:
+[0073]:sno:33,cno:33,val:000000-000000-000000,cmt:xx = cos(IR_edge_move) * IR_motermax;  	// ボールのほうに行くには、、（X座標）
+[0074]:sno:33,cno:33,val:000000-000000-000000,cmt:yy = sin(IR_edge_move) * IR_motermax;  	// ボールのほうに行くには、、（Y座標）
+[0075]:sno:00,cno:02,val:000000-000000-000000,cmt:
+[0076]:sno:03,cno:00,val:000000-000000-000000,cmt:
+[0077]:sno:22,cno:22,val:-00050--00050-000000,cmt:ブザーをやませる
+[0078]:sno:33,cno:33,val:000000-000000-000000,cmt:Line_timerAdd = Line_time;  	// ラインタイマー付属品の調整
+[0079]:sno:33,cno:33,val:000000-000000-000000,cmt:IR_alpha = ( (IR_alpha_min - IR_alpha_max) / 32400 ) * IR_edge_true * IR_edge_true;
+[0080]:sno:33,cno:33,val:000000-000000-000000,cmt:IR_alpha = IR_alpha - (IR_alpha_min - IR_alpha_max) / 90 * IR_edge_true + IR_alpha_min;
+[0081]:sno:01,cno:33,val:000000-000000-000000,cmt:IR_edge_true < 180  	// 左にボールがある
+[0082]:sno:33,cno:33,val:000000-000000-000000,cmt:IR_edge_move += IR_alpha * 3.14 / 180;  	// IR＿alphaだけずらす
+[0083]:sno:03,cno:00,val:000000-000000-000000,cmt:
+[0084]:sno:33,cno:33,val:000000-000000-000000,cmt:IR_edge_move -= IR_alpha * 3.14 / 180;  	// -IR＿alphaだけずらす
+[0085]:sno:00,cno:02,val:000000-000000-000000,cmt:
+[0086]:sno:33,cno:33,val:000000-000000-000000,cmt:IR_edge_move= IR_edge_move * 180 / 3.14 + 360;
+[0087]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_J] = IR_edge_move;  	// ０～３６０度に直す作業
+[0088]:sno:31,cno:31,val:090105-000360-000000,cmt:０～３６０度に直す作業
+[0089]:sno:33,cno:33,val:000000-000000-000000,cmt:IR_edge_move = gV[VAR_J] * 3.14 / 180;  	// ０～３６０度に直す作業
+[0090]:sno:33,cno:33,val:000000-000000-000000,cmt:xx = cos(IR_edge_move) * IR_motermax;  	// 回り込むには、、（X座標）
+[0091]:sno:33,cno:33,val:000000-000000-000000,cmt:yy = sin(IR_edge_move) * IR_motermax;  	// 回り込むには、、（Y座標）
+[0092]:sno:00,cno:02,val:000000-000000-000000,cmt:
+[0093]:sno:01,cno:33,val:000000-000000-000000,cmt:get_pixydat_index(Goal_number) == 0
+[0094]:sno:01,cno:33,val:000000-000000-000000,cmt:Gyro_edge < Gyro_frontValue  	// 前にロボットが向いている時
+[0095]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_G] = 0;
+[0096]:sno:02,cno:33,val:000000-000000-000000,cmt:Gyro_edge > 360 - Gyro_frontValue  	// 前にロボットが向いている時
+[0097]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_G] = 0;
+[0098]:sno:02,cno:33,val:000000-000000-000000,cmt:Gyro_edge < 180
+[0099]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_G] = ( (Gyro_moter_min - Gyro_moter_max) / 32400 ) * Gyro_edge * Gyro_edge;
+[0100]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_G] = gV[VAR_G] - (Gyro_moter_min - Gyro_moter_max) / 90 * Gyro_edge + Gyro_moter_min;
+[0101]:sno:03,cno:00,val:000000-000000-000000,cmt:
+[0102]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_G] = ( (Gyro_moter_min - Gyro_moter_max) / 32400 ) * Gyro_edge * Gyro_edge;
+[0103]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_G] = gV[VAR_G] - (Gyro_moter_min - Gyro_moter_max) / 90 * Gyro_edge + Gyro_moter_min;
+[0104]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_G] = - gV[VAR_G];
+[0105]:sno:00,cno:02,val:000000-000000-000000,cmt:
+[0106]:sno:02,cno:33,val:000000-000000-000000,cmt:Camera_xx < 160
+[0107]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_G] = Camera_motermax / 25600 * Camera_xx * Camera_xx - Camera_motermax / 80 * Camera_xx + Camera_motermax;
+[0108]:sno:03,cno:00,val:000000-000000-000000,cmt:
+[0109]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_G] = - Camera_motermax / 25600 * Camera_xx * Camera_xx + Camera_motermax / 80 * Camera_xx - Camera_motermax;
+[0110]:sno:00,cno:02,val:000000-000000-000000,cmt:
+[0111]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_A] =  yy + gV[VAR_G];  	// 代入
+[0112]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_B] = xx + gV[VAR_G];  	// 代入
+[0113]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_C] =  - xx + gV[VAR_G];  	// 代入
+[0114]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_D] =  -yy + gV[VAR_G];  	// 代入
+[0115]:sno:38,cno:38,val:400401-402403-999999,cmt:
+[0116]:sno:00,cno:03,val:000000-000000-000000,cmt:

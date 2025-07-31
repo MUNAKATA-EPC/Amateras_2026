@@ -1,0 +1,21 @@
+Title:Main - [ NewFile-07 ] DAISEN C-Style for TJ3B  [ Ver.20190706 ]
+CN01:Ball
+CN02:Line
+CN03:L-Touch
+CN04:R-Touch
+CN05:C-Touch
+CN06:
+CN07:
+CN08:
+CN09:RED3
+CN10:RED2
+[0000]:sno:08,cno:07,val:111111-110010-000002,cmt:
+[0001]:sno:31,cno:31,val:000000-000000-000000,cmt:
+[0002]:sno:04,cno:01,val:000000-000000-000000,cmt:
+[0003]:sno:31,cno:31,val:000000-000080-000000,cmt:
+[0004]:sno:38,cno:38,val:400400-500999-500999,cmt:
+[0005]:sno:29,cno:29,val:003000-000000-000000,cmt:
+[0006]:sno:31,cno:31,val:000000--00080-000000,cmt:
+[0007]:sno:38,cno:38,val:400400-500999-500999,cmt:
+[0008]:sno:29,cno:29,val:003000-000000-000000,cmt:
+[0009]:sno:00,cno:03,val:000000-000000-000000,cmt:

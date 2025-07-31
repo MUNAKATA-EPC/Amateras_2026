@@ -1,0 +1,33 @@
+Title:Main - [ line ] DAISEN C-Style for TJ3B  [ Ver.20190706 ]
+CN01:Ball
+CN02:Line
+CN03:L-Touch
+CN04:R-Touch
+CN05:C-Touch
+CN06:
+CN07:
+CN08:
+CN09:RED3
+CN10:RED2
+[0000]:sno:08,cno:07,val:111111-110010-000002,cmt:
+[0001]:sno:33,cno:33,val:000000-000000-000000,cmt:double Line_motermax = 80;
+[0002]:sno:33,cno:33,val:000000-000000-000000,cmt:double xx = 0;
+[0003]:sno:33,cno:33,val:000000-000000-000000,cmt:double yy = 0;
+[0004]:sno:33,cno:33,val:000000-000000-000000,cmt:double Line_edge = 0;
+[0005]:sno:04,cno:01,val:000000-000000-000000,cmt:
+[0006]:sno:31,cno:31,val:110341-000180-000000,cmt:
+[0007]:sno:31,cno:31,val:110125-000360-000000,cmt:
+[0008]:sno:33,cno:33,val:000000-000000-000000,cmt:Line_edge = gV[VAR_L] * 3.14 / 180;
+[0009]:sno:01,cno:14,val:000040-000031-000000,cmt:Å@Å@Å@
+[0010]:sno:37,cno:37,val:000001-000001-000000,cmt:
+[0011]:sno:33,cno:33,val:000000-000000-000000,cmt:xx = 70;
+[0012]:sno:33,cno:33,val:000000-000000-000000,cmt:yy = 70;
+[0013]:sno:03,cno:00,val:000000-000000-000000,cmt:
+[0014]:sno:36,cno:36,val:000001-000000-000000,cmt:
+[0015]:sno:33,cno:33,val:000000-000000-000000,cmt:xx = cos(Line_edge) * Line_motermax;
+[0016]:sno:33,cno:33,val:000000-000000-000000,cmt:yy = sin(Line_edge) * Line_motermax;
+[0017]:sno:00,cno:02,val:000000-000000-000000,cmt:
+[0018]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_X] = xx;
+[0019]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_Y] = yy;
+[0020]:sno:38,cno:38,val:424423-523524-999999,cmt:
+[0021]:sno:00,cno:03,val:000000-000000-000000,cmt:

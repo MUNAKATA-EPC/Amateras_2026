@@ -1,0 +1,61 @@
+Title:Main - [ 回り込みV1 ] DAISEN C-Style for TJ3B  [ Ver.20190706 ]
+CN01:Ball
+CN02:Line
+CN03:L-Touch
+CN04:R-Touch
+CN05:C-Touch
+CN06:
+CN07:
+CN08:
+CN09:RED3
+CN10:RED2
+[0000]:sno:08,cno:07,val:111111-110010-010002,cmt:
+[0001]:sno:33,cno:33,val:000000-000000-000000,cmt:const int MoterSpeed = 50;  	// IRボールを追うときの動く速さ
+[0002]:sno:33,cno:33,val:000000-000000-000000,cmt:const int GyroMoterSpeed = 50;  	// ジャイロ補正のときの速さ
+[0003]:sno:33,cno:33,val:000000-000000-000000,cmt:const int IRaroundValue = 50;  	// 回り込みの角度
+[0004]:sno:33,cno:33,val:000000-000000-000000,cmt:const int IRfrontValue = 4;  	// IRボールが目の前にあると認識する角度
+[0005]:sno:33,cno:33,val:000000-000000-000000,cmt:int IRedgeResetValue = 0;
+[0006]:sno:33,cno:33,val:000000-000000-000000,cmt:double RfLb_X;  	// 右前、左後のモータの出力
+[0007]:sno:33,cno:33,val:000000-000000-000000,cmt:double LfRb_Y;  	// 左前、右後のモータの出力
+[0008]:sno:33,cno:33,val:000000-000000-000000,cmt:double IRedge;  	// IRの角度
+[0009]:sno:33,cno:33,val:000000-000000-000000,cmt:double GYROedge;  	// ジャイロの角度
+[0010]:sno:04,cno:01,val:000000-000000-000000,cmt:
+[0011]:sno:01,cno:14,val:000050-000050-000000,cmt:IRリセットピンが作動
+[0012]:sno:33,cno:33,val:000000-000000-000000,cmt:IRedgeResetValue = gAD[CN1] * 18 / 17;
+[0013]:sno:00,cno:02,val:000000-000000-000000,cmt:
+[0014]:sno:33,cno:33,val:000000-000000-000000,cmt:IRedge = gAD[CN1] * 18 / 17 - IRedgeResetValue + 360;  	// IR角度を代入
+[0015]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_I] = IRedge;
+[0016]:sno:31,cno:31,val:080095-000360-000000,cmt:
+[0017]:sno:33,cno:33,val:000000-000000-000000,cmt:IRedge = gV[VAR_I];
+[0018]:sno:01,cno:33,val:000000-000000-000000,cmt:gAD[CN1] * 18 / 17 > 400  	// ～～～IRプログラム～～～
+[0019]:sno:33,cno:33,val:000000-000000-000000,cmt:RfLb_X = 0;  	// IRボールが見えていないので出力は無し
+[0020]:sno:33,cno:33,val:000000-000000-000000,cmt:LfRb_Y = 0;  	// IRボールが見えていないので出力は無し
+[0021]:sno:03,cno:00,val:000000-000000-000000,cmt:
+[0022]:sno:01,cno:33,val:000000-000000-000000,cmt:IRedge < IRfrontValue  ||  IRedge > 360 - IRfrontValue
+[0023]:sno:33,cno:33,val:000000-000000-000000,cmt:RfLb_X = MoterSpeed;  	// 前にIRボールがあるので真っすぐ行く
+[0024]:sno:33,cno:33,val:000000-000000-000000,cmt:LfRb_Y = MoterSpeed;  	// 前にIRボールがあるので真っすぐ行く
+[0025]:sno:02,cno:14,val:000040-000011-000000,cmt:ボールが近くにある時
+[0026]:sno:01,cno:33,val:000000-000000-000000,cmt:IRedge > 180  	// 左にボールがあるとき
+[0027]:sno:33,cno:33,val:000000-000000-000000,cmt:RfLb_X = cos((45 + IRedge + 360 - IRaroundValue) * 3.1415 / 180) * MoterSpeed;  	// 回り込むための 速さ を計算・右前、左後　　～左にボールがあるとき～
+[0028]:sno:33,cno:33,val:000000-000000-000000,cmt:LfRb_Y = sin((45 + IRedge + 360 - IRaroundValue) * 3.1415 / 180) * MoterSpeed;  	// 回り込むための 速さ を計算・左前、右後　　～左にボールがあるとき～
+[0029]:sno:03,cno:00,val:000000-000000-000000,cmt:
+[0030]:sno:33,cno:33,val:000000-000000-000000,cmt:RfLb_X = cos((45 + IRedge + IRaroundValue) * 3.1415 / 180) * MoterSpeed;  	// 回り込むための 速さ を計算・右前、左後　　～右にボールがあるとき～
+[0031]:sno:33,cno:33,val:000000-000000-000000,cmt:LfRb_Y = sin((45 + IRedge + IRaroundValue) * 3.1415 / 180) * MoterSpeed;  	// 回り込むための 速さ を計算・左前、右後　　～右にボールがあるとき～
+[0032]:sno:00,cno:02,val:000000-000000-000000,cmt:
+[0033]:sno:03,cno:00,val:000000-000000-000000,cmt:
+[0034]:sno:33,cno:33,val:000000-000000-000000,cmt:RfLb_X = cos((45 + IRedge) * 3.1415 / 180) * MoterSpeed;  	// IRボールの方向へ行くための 速さ を計算・右前、左後
+[0035]:sno:33,cno:33,val:000000-000000-000000,cmt:LfRb_Y = sin((45 + IRedge) * 3.1415 / 180) * MoterSpeed;  	// IRボールの方向へ行くための 速さ を計算・左前、右後
+[0036]:sno:00,cno:02,val:000000-000000-000000,cmt:
+[0037]:sno:00,cno:02,val:000000-000000-000000,cmt:
+[0038]:sno:33,cno:33,val:000000-000000-000000,cmt:GYROedge = gAD[CN3] * 18 / 17;  	// ジャイロ角度を代入
+[0039]:sno:01,cno:33,val:000000-000000-000000,cmt:GYROedge < 180  	// ～～～ジャイロプログラム～～～
+[0040]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_G] = (GYROedge) * GyroMoterSpeed / 180;  	// ジャイロ補正の 速さ を計算
+[0041]:sno:03,cno:00,val:000000-000000-000000,cmt:
+[0042]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_G] = (GYROedge - 360) * GyroMoterSpeed / 180;  	// ジャイロ補正の 速さ を計算
+[0043]:sno:00,cno:02,val:000000-000000-000000,cmt:
+[0044]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_A] = - RfLb_X + gV[VAR_G];  	// 最終的な計算結果を代入・左前モータ
+[0045]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_B] = LfRb_Y + gV[VAR_G];  	// 最終的な計算結果を代入・右前モータ
+[0046]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_C] = - LfRb_Y + gV[VAR_G];  	// 最終的な計算結果を代入・左後モータ
+[0047]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_D] = RfLb_X + gV[VAR_G];  	// 最終的な計算結果を代入・右後モータ
+[0048]:sno:38,cno:38,val:400401-402403-999999,cmt:
+[0049]:sno:00,cno:03,val:000000-000000-000000,cmt:

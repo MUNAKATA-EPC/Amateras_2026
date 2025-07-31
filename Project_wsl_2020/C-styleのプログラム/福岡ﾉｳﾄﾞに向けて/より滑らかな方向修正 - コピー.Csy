@@ -1,0 +1,41 @@
+Title:Main - [ より滑らかな方向修正 - コピー ] DAISEN C-Style for TJ3B  [ Ver.20190706 ]
+CN01:IRedge,LINE
+CN02:IRdist,LINE
+CN03:Gyro,LINE
+CN04:IR1
+CN05:IR2
+CN06:IR3
+CN07:
+CN08:
+CN09:
+CN10:
+[0000]:sno:08,cno:08,val:111111-111130-010002,cmt:
+[0001]:sno:33,cno:33,val:000000-000000-000000,cmt:int GyroMoterSpeed = 40;  	// ジャイロ補正のときの速さ
+[0002]:sno:33,cno:33,val:000000-000000-000000,cmt:int PIXY_val = 160;  	// PIXY補正で滑らかに制御するときの範囲（0 ~ 160）
+[0003]:sno:04,cno:01,val:000000-000000-000000,cmt:
+[0004]:sno:01,cno:33,val:000000-000000-000000,cmt:get_pixydat_index(1) == 0
+[0005]:sno:34,cno:34,val:000000-000000-000000,cmt:
+[0006]:sno:36,cno:36,val:000003-000000-000000,cmt:
+[0007]:sno:01,cno:14,val:000038-000021-000000,cmt:Gyro,LINE
+[0008]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_G] = -GyroMoterSpeed;
+[0009]:sno:02,cno:14,val:000034-000020-000000,cmt:Gyro,LINE
+[0010]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_G] = GyroMoterSpeed;
+[0011]:sno:03,cno:00,val:000000-000000-000000,cmt:
+[0012]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_G] = 0;
+[0013]:sno:00,cno:02,val:000000-000000-000000,cmt:
+[0014]:sno:03,cno:00,val:000000-000000-000000,cmt:
+[0015]:sno:35,cno:35,val:000000-000001-000000,cmt:
+[0016]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_G] = GyroMoterSpeed * (160 - get_pixydat_x(1)) / PIXY_val;
+[0017]:sno:00,cno:02,val:000000-000000-000000,cmt:
+[0018]:sno:38,cno:38,val:406406-406406-999999,cmt:
+[0019]:sno:00,cno:03,val:000000-000000-000000,cmt:
+[0020]:sno:01,cno:33,val:000000-000000-000000,cmt:160 - get_pixydat_x(1) < PIXY_val  &&  160 - get_pixydat_x(1) > -PIXY_val
+[0021]:sno:37,cno:37,val:000003-000001-000000,cmt:
+[0022]:sno:03,cno:00,val:000000-000000-000000,cmt:
+[0023]:sno:36,cno:36,val:000003-000000-000000,cmt:
+[0024]:sno:01,cno:33,val:000000-000000-000000,cmt:get_pixydat_x(1) > 160
+[0025]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_G] = -GyroMoterSpeed;
+[0026]:sno:03,cno:00,val:000000-000000-000000,cmt:
+[0027]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_G] = GyroMoterSpeed;
+[0028]:sno:00,cno:02,val:000000-000000-000000,cmt:
+[0029]:sno:00,cno:02,val:000000-000000-000000,cmt:

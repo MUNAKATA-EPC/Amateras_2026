@@ -1,0 +1,17 @@
+Title:Main - [ é¿å± ] DAISEN C-Style for TJ3B  [ Ver.20190706 ]
+CN01:ëO
+CN02:âE
+CN03:å„
+CN04:ç∂
+CN05:
+CN06:
+CN07:
+CN08:
+CN09:RED3
+CN10:RED2
+[0000]:sno:08,cno:08,val:111111-110030-011000,cmt:
+[0001]:sno:04,cno:01,val:000000-000000-000000,cmt:
+[0002]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_A] = get_pixydat_s(1);
+[0003]:sno:33,cno:33,val:000000-000000-000000,cmt:printf("Camera_X : %4ld\r\n",gV[VAR_A]);
+[0004]:sno:33,cno:33,val:000000-000000-000000,cmt:wait_ms(100);
+[0005]:sno:00,cno:03,val:000000-000000-000000,cmt:

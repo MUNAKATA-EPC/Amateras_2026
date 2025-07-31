@@ -1,0 +1,44 @@
+Title:Main - [ NewFile-02 ] DAISEN C-Style for TJ3B  [ Ver.20190706 ]
+CN01:Ball
+CN02:Line
+CN03:L-Touch
+CN04:R-Touch
+CN05:C-Touch
+CN06:
+CN07:
+CN08:
+CN09:RED3
+CN10:RED2
+[0000]:sno:08,cno:07,val:111111-110010-010002,cmt:
+[0001]:sno:33,cno:33,val:000000-000000-000000,cmt:double Camera_xx;
+[0002]:sno:33,cno:33,val:000000-000000-000000,cmt:double Camera_yy;
+[0003]:sno:33,cno:33,val:000000-000000-000000,cmt:double Camera_motermax = 30;
+[0004]:sno:33,cno:33,val:000000-000000-000000,cmt:double Gyro_moter_max = 20;  	// ジャイロのモータの最大出力結果
+[0005]:sno:33,cno:33,val:000000-000000-000000,cmt:double Gyro_moter_min = 10;  	// ジャイロのモータの最大出力結果
+[0006]:sno:33,cno:33,val:000000-000000-000000,cmt:double Gyro_frontValue = 1;  	// 前とみなす、角度の範囲（Gyro）
+[0007]:sno:33,cno:33,val:000000-000000-000000,cmt:double Gyro_edge = 0;  	// ジャイロの角度
+[0008]:sno:04,cno:01,val:000000-000000-000000,cmt:
+[0009]:sno:33,cno:33,val:000000-000000-000000,cmt:i2c_get_pixy();
+[0010]:sno:33,cno:33,val:000000-000000-000000,cmt:Camera_xx = get_pixydat_x(1);
+[0011]:sno:33,cno:33,val:000000-000000-000000,cmt:Camera_yy = get_pixydat_y(1);
+[0012]:sno:33,cno:33,val:000000-000000-000000,cmt:Gyro_edge = gAD[CN3] * 1.1;  	// ジャイロを読む
+[0013]:sno:01,cno:33,val:000000-000000-000000,cmt:get_pixydat_index(1) == 0
+[0014]:sno:01,cno:33,val:000000-000000-000000,cmt:Gyro_edge < Gyro_frontValue  	// 前にロボットが向いている時
+[0015]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_G] = 0;
+[0016]:sno:02,cno:33,val:000000-000000-000000,cmt:Gyro_edge > 360 - Gyro_frontValue  	// 前にロボットが向いている時
+[0017]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_G] = 0;
+[0018]:sno:02,cno:33,val:000000-000000-000000,cmt:Gyro_edge < 180
+[0019]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_G] = ( (Gyro_moter_min - Gyro_moter_max) / 32400 ) * Gyro_edge * Gyro_edge;
+[0020]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_G] = gV[VAR_G] - (Gyro_moter_min - Gyro_moter_max) / 90 * Gyro_edge + Gyro_moter_min;
+[0021]:sno:03,cno:00,val:000000-000000-000000,cmt:
+[0022]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_G] = ( (Gyro_moter_min - Gyro_moter_max) / 32400 ) * Gyro_edge * Gyro_edge;
+[0023]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_G] = gV[VAR_G] - (Gyro_moter_min - Gyro_moter_max) / 90 * Gyro_edge + Gyro_moter_min;
+[0024]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_G] = - gV[VAR_G];
+[0025]:sno:00,cno:02,val:000000-000000-000000,cmt:
+[0026]:sno:02,cno:33,val:000000-000000-000000,cmt:Camera_xx < 160
+[0027]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_G] = Camera_motermax / 25600 * Camera_xx * Camera_xx - Camera_motermax / 80 * Camera_xx + Camera_motermax;
+[0028]:sno:03,cno:00,val:000000-000000-000000,cmt:
+[0029]:sno:33,cno:33,val:000000-000000-000000,cmt:gV[VAR_G] = - Camera_motermax / 25600 * Camera_xx * Camera_xx + Camera_motermax / 80 * Camera_xx - Camera_motermax;
+[0030]:sno:00,cno:02,val:000000-000000-000000,cmt:
+[0031]:sno:38,cno:38,val:406406-406406-999999,cmt:
+[0032]:sno:00,cno:03,val:000000-000000-000000,cmt:
