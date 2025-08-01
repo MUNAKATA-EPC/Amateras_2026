@@ -1,5 +1,5 @@
-#ifndef FUNCTION_HPP
-#define FUNCTION_HPP
+#ifndef COMPUTE_HPP
+#define COMPUTE_HPP
 
 #include <Arduino.h>
 

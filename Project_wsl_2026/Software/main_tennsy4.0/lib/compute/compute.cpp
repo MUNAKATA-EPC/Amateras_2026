@@ -1,4 +1,4 @@
-#include "function.hpp"
+#include "compute.hpp"
 
 // char型からint型に変換する関数
 int char_to_int(const char *char_data, int start_index, int end_index)

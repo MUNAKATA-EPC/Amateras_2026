@@ -16,7 +16,7 @@ void LINExiao::update()
     if ((*_serial).available())
     {
         // 情報を10進数で受信->2進数に直す方法
-        int data_10 = (*_serial).readStringUntil('\0').toInt(); // 16+3個のデータを受信
+        int data_10 = (*_serial).readStringUntil('\0').toInt(); // 16個(エンジェル)+3個(右・左・後)のデータを受信
 
         int shift_num; // 解析に使う変数
         for (int i = 0; i < 19; i++)
@@ -53,5 +53,8 @@ bool LINExiao::getSideBack()
 
 int LINExiao::getData(int pin)
 {
-    return _data[pin];
+    if (pin < 0 || pin > 18) // 範囲外のデータ請求ならば
+        return 0;
+    else
+        return _data[pin];
 }
