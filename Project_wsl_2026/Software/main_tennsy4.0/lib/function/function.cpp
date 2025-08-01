@@ -3,7 +3,7 @@
 // char型からint型に変換する関数
 int char_to_int(const char *char_data, int start_index, int end_index)
 {
-    if (!char_data || start_index < 0 || end_index < start_index) // 不正なデータ入力ではないか
+    if (start_index < 0 || end_index < start_index) // 不正なデータ入力ではないか
     {
         return 0; // エラー
     }

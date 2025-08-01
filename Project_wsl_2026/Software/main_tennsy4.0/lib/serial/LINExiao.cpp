@@ -15,35 +15,18 @@ void LINExiao::update()
 {
     if ((*_serial).available())
     {
-        char buf[20];                                                        // 多めにとる、受信したデータを格納する変数
-        int buf_long = (*_serial).readBytesUntil('a', buf, sizeof(buf) - 1); // ↑'a'は読まないので7文字受信 000000a
-        buf[buf_long] = '\0';                                                // 終端記号を追加
+        // 情報を10進数で受信->2進数に直す方法
+        int data_10 = (*_serial).readStringUntil('\0').toInt(); // 16+3個のデータを受信
 
-        // 受信したデータが6文字なら正常なデータである
-        if (buf_long == 6)
+        int shift_num; // 解析に使う変数
+        for (int i = 0; i < 19; i++)
         {
-            if (buf[0] == '-')
-            {
-                _deg = -1;
-            }
-            else
-            {
-                _deg = char_to_int(buf, 0, 2); // 0番目から2番目までの数をint型で読み取る
-            }
+            shift_num = 1 << i; // 0001を左にiだけ移動させる
 
-            // サイドの状態を取得
-            _side_right = char_to_int(buf, 3, 3);
-            _side_left = char_to_int(buf, 4, 4);
-            _side_back = char_to_int(buf, 5, 5);
-
-            if (_side_right || _side_left || _side_back || _deg != -1)
-            {
-                _exist = true;
-            }
+            if ((shift_num & data_10) > 0) // shift_numとdata_10の論理積が0より大きいならば
+                _data[i] = true;
             else
-            {
-                _exist = false;
-            }
+                _data[i] = false;
         }
     }
 }
@@ -55,20 +38,20 @@ bool LINExiao::isExist()
 
 bool LINExiao::getSideRight()
 {
-    return _side_right;
+    return _data[16];
 }
 
 bool LINExiao::getSideLeft()
 {
-    return _side_left;
+    return _data[17];
 }
 
 bool LINExiao::getSideBack()
 {
-    return _side_back;
+    return _data[18];
 }
 
-int LINExiao::getDeg()
+int LINExiao::getData(int pin)
 {
-    return _deg;
+    return _data[pin];
 }

@@ -12,10 +12,7 @@ private:
 
     bool _exist;
 
-    bool _side_right;
-    bool _side_left;
-    bool _side_back;
-    int _deg;
+    bool _data[19];
 
 public:
     LINExiao(HardwareSerial *serial); // 定義
@@ -24,10 +21,10 @@ public:
 
     bool isExist(); // ラインが存在するかどうか
 
-    int getDeg();         // ラインの方向
-    bool getSideRight(); // 右サイド
-    bool getSideLeft();  // 左サイド
-    bool getSideBack();  // 後サイド
+    int getData(int pin); // エンジェル
+    bool getSideRight();  // 右サイド
+    bool getSideLeft();   // 左サイド
+    bool getSideBack();   // 後サイド
 };
 
 #endif
