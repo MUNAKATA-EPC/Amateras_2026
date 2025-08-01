@@ -2,7 +2,6 @@
 #define LINEXIAO_HPP
 
 #include <Arduino.h>
-#include "function.hpp"
 
 class LINExiao
 {
