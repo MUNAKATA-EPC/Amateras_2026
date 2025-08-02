@@ -1,51 +1,34 @@
 #include <Arduino.h>
-#include "IRxiao.hpp"
-#include "LINExiao.hpp"
+#include "IRserial.hpp"
+#include "LINEserial.hpp"
 #include "BNO055.hpp"
-
-IRxiao myIRball(&Serial2); // Serial2でIRのデータを取得
-LINExiao myLine(&Serial3); // Serial3でLINEのデータ取得
-
-Adafruit_BNO055 adafBno(0xA0, 0x28, &Wire1);
-BNO055 myBno(&adafBno);
 
 void setup()
 {
-  Serial.begin(9600); // USBシリアルを開始
+  Serial.begin(9600); // PCとのシリアル通信を開始
 
-  myIRball.begin(9600); // IRxiaoとのシリアル開始
-  myLine.begin(9600);   // LINExiaoとのシリアル開始
+  IRserial_init(&Serial1, 9600); // シリアル1を使いボートレート9600にする
 
-  myBno.setresetPin(22, INPUT_PULLUP); // BNO055のリセットピン設定
-  myBno.begin();                       // BNO055の通信確立まで待つ
+  LINEserial_init(&Serial2, 9600); // シリアル2を使いボートレート9600にする
+
+  BNO055_set_resetpin(22, INPUT_PULLDOWN); // BNOのリセットピンを定義
+  BNO055_init(&Wire1, 0x28);               // どのBNOを使うか
 }
 
 void loop()
 {
-  myIRball.update(); // 更新
-
-  Serial.print(myIRball.isExist());
-  Serial.print(" ");
-  Serial.print(myIRball.getDeg());
-  Serial.print(" ");
-  Serial.print(myIRball.getDistance());
+  IRserial_update(); // IRserialを更新
+  Serial.print(get_IR_deg());
   Serial.print(" ");
 
-  myLine.update(); // 更新
-
-  Serial.print(myLine.isExist());
-  Serial.print(" ");
+  LINEserial_update(); // LINEserialを更新
   for (int i = 0; i < 19; i++)
   {
-    Serial.print(myLine.getData(i));
+    Serial.print(get_LINE_data(i));
     Serial.print(" ");
   }
 
-  myBno.update(); // 更新
-
-  Serial.print(myBno.getDeg());
-
+  BNO055_update(); // BNO055を更新
+  Serial.print(BNO055_getDeg());
   Serial.println(); // 改行
-
-  delay(100);
 }

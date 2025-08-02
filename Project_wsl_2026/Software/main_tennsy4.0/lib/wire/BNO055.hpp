@@ -7,28 +7,14 @@
 #include <utility/imumaths.h>
 #include <SPI.h>
 
-class BNO055
-{
-private:
-    Adafruit_BNO055 *_bno; // ポインタでとりあえず定義
+// リセットスイッチのピン番号とモードを設定
+void BNO055_set_resetpin(int pin, int pinmode);
+// I2C定義・開始
+void BNO055_init(TwoWire *wire, uint8_t adress);
+// 更新
+void BNO055_update();
 
-    TwoWire *_wire;
-    uint8_t _adress;
-
-    int _reset_pin;
-    int _reset_pinmode;
-
-    int _normal_deg;
-    int _reset_deg;
-    int _deg;
-
-public:
-    BNO055(Adafruit_BNO055 *bno);           // 定義
-    void setresetPin(int pin, int pinmode); // リセットピンの定義
-    void begin();                           // シリアル開始
-    void update();                          // 更新
-
-    int getDeg(); // ジャイロの角度
-};
+// 計算した角度を出力
+int BNO055_getDeg();
 
 #endif
