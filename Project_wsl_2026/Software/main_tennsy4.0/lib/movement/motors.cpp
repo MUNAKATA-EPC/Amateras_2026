@@ -48,7 +48,7 @@ void motors_move(int deg, int abs_power)
 
 /*ここのファイル内だけで使う関数*/
 
-double motor_power_sub[4]; // 計算したモータ出力（合力の向きから計算したやつ）
+double motor_power_sub[4]; // 計算したモータ出力
 double motor_x_power[4];   // モータ出力をx方向に分解した出力
 double motor_y_power[4];   // モータ出力をy方向に分解した出力
 
@@ -70,19 +70,19 @@ void compute_motor_power(int deg, int power)
     }
 }
 
-// ch番のモータの合力の大きさ（実際の出力値）を返す
+// index番目のモータの合力の大きさを返す
 double get_motor_power(int index)
 {
     return motor_power_sub[index];
 }
 
-// ch番のモータの出力をx方向に分解した値を返す
+// index番目のモータの出力をx方向に分解した値を返す
 double get_motor_x_power(int index)
 {
     return motor_x_power[index];
 }
 
-// ch番のモータの出力をy方向に分解した値を返す
+// index番目のモータの出力をy方向に分解した値を返す
 double get_motor_y_power(int index)
 {
     return motor_y_power[index];
