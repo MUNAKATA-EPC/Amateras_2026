@@ -35,7 +35,7 @@ void motors_move(int deg, int abs_power)
             constrain(motor_power_main[i], -abs_power, abs_power);                // 一応納める
         }
     }
-    else
+    else // 0で割ってはいけないので
     {
         for (int i = 0; i < 4; i++)
         {
