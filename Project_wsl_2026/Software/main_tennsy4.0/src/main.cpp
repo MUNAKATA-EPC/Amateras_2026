@@ -1,7 +1,17 @@
 #include <Arduino.h>
+// IRについて
 #include "IRserial.hpp"
+#include "IRcompute.hpp"
+// LINEについて
 #include "LINEserial.hpp"
+#include "LINEcompute.hpp"
+// BNO055について
 #include "BNO055.hpp"
+// OpenMVについて
+#include "OpenMV.hpp"
+// DSR1202について
+#include "DSR1202.hpp"
+#include "motors.hpp"
 
 void setup()
 {
@@ -10,6 +20,9 @@ void setup()
   IRserial_init(&Serial1, 9600); // シリアル1を使いボートレート9600にする
 
   LINEserial_init(&Serial2, 9600); // シリアル2を使いボートレート9600にする
+
+  DSR1202_init(&Serial3, 115200); // シリアル3を使いボートレート115200にする
+  motors_init(45, 135, 225, 315); // それぞれのモータの角度を定義
 
   BNO055_set_resetpin(22, INPUT_PULLDOWN); // BNOのリセットピンを定義
   BNO055_init(&Wire1, 0x28);               // どのBNOを使うか
