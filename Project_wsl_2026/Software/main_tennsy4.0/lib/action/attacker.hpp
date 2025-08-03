@@ -13,7 +13,7 @@
 #include "OpenMV.hpp"
 // DSR1202について
 #include "DSR1202.hpp"
-#include "motors.hpp"
+#include "motors-boost_ver.hpp"
 
 // 攻撃用のプログラムを実行
 void play_attacker();

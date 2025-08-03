@@ -22,7 +22,7 @@ void motors_move(int deg, int abs_power)
 {
     abs_power = abs(abs_power); // 一応絶対値にする（めんどくさいから絶対値にしている）
 
-    compute_motor_power(deg, 100); // 適当に100の出力での各モータの出力を計算する
+    compute_motor_power(deg, 100); // 適当に100の出力での各モータの出力を計算する->後でスケーリングするため適当でよい
 
     double max_abs_power = 0; // 最大の出力を見つける
     for (int i = 0; i < 4; i++)

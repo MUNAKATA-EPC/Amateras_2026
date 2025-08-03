@@ -13,7 +13,7 @@
 #include "OpenMV.hpp"
 // DSR1202について
 #include "DSR1202.hpp"
-#include "motors.hpp"
+#include "motors-boost_ver.hpp"
 
 // 守備用のプログラムを実行
 void play_defender();
