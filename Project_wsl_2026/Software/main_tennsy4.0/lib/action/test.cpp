@@ -43,9 +43,9 @@ void play_test(int test_mode)
         Serial.print(get_IR_distance());
         // IRcomputeについて
         Serial.print(" -> ir_mawarikomi_deg: ");
-        Serial.print(get_IR_mawarikomi_deg(get_IR_deg()));
+        Serial.print(get_IR_mawarikomi_deg());
         Serial.print(" ir_follow_deg: ");
-        Serial.print(get_IR_follow_deg(get_IR_deg(), get_IR_distance(), 0));
+        Serial.print(get_IR_follow_deg(0));
 
         Serial.println();
         break;

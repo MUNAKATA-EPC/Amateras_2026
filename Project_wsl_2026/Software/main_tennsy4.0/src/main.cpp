@@ -25,10 +25,11 @@ void setup()
 
 void loop()
 {
-  IRserial_update();                     // 更新
-  LINEserial_update();                   // 更新
-  OpenMVserial_update();                 // 更新
-  BNO055_update();                       // 更新
-  
-  play_test(TEST_ALL_CHECK_WITH_SERIAL); // 全て確認する
+  IRserial_update();     // 更新
+  LINEserial_update();   // 更新
+  OpenMVserial_update(); // 更新
+  BNO055_update();       // 更新
+
+  // play_test(TEST_ALL_CHECK_WITH_SERIAL); // 全て確認する
+  play_attacker(); // 攻撃を開始
 }

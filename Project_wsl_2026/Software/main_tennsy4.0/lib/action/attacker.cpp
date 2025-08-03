@@ -21,7 +21,7 @@ void play_attacker()
             {
                 motors_move(0, 95); // 前進する
             }
-            else if (get_IR_deg() < 10 || get_IR_deg() > 350) // 前付近にIRボールがあるとき
+            else if (get_IR_deg() < 25 || get_IR_deg() > 335) // 前付近にIRボールがあるとき
             {
                 motors_move(get_IR_follow_deg(100), 95); // 前方100方向にボールが行くように制御する
             }
@@ -33,7 +33,7 @@ void play_attacker()
                 }
                 else
                 {
-                    motors_move(get_IR_follow_deg(0), 95); // ボールに近づくように制御
+                    motors_move(get_IR_follow_deg(0), 95); // ボールに近寄るように制御
                 }
             }
         }
