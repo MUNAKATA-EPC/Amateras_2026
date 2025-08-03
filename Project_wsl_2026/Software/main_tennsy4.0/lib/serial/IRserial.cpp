@@ -5,10 +5,10 @@
 HardwareSerial *ir_serial; // とりあえず定義
 int ir_baudrate;           // ボートレート格納用
 
-bool ir_exist; // IRが反応するかどうか
+bool ir_exist = false; // IRボールがあるかどうか
 
-int ir_deg;      // IRボールの角度格納用
-int ir_distance; // IRボールの距離格納用
+int ir_deg = -1;      // IRボールの角度格納用
+int ir_distance = -1; // IRボールの距離格納用
 
 void IRserial_init(HardwareSerial *serial, int baudrate)
 {

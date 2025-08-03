@@ -5,9 +5,9 @@
 HardwareSerial *line_serial; // とりあえず定義
 int line_baudrate;           // ボートレート格納用
 
-bool line_exist; // ラインセンサーが存在するかどうか
+bool line_exist = false; // ラインがあるかどうか
 
-bool line_data[19]; // 受信した19個のデータ格納用
+bool line_data[19] = {0}; // 受信した19個のデータ格納用
 
 void LINEserial_init(HardwareSerial *serial, int baudrate)
 {
