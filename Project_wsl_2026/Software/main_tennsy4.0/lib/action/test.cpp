@@ -4,17 +4,13 @@
 
 void play_test(int test_mode)
 {
-    IRserial_update();   // 更新
-    LINEserial_update(); // 更新
-    BNO055_update();     // 更新
-
     switch (test_mode)
     {
     case TEST_ALL_CHECK_WITH_SERIAL:
         // IRについて
         Serial.print(" ir_deg: ");
         Serial.print(get_IR_deg());
-        Serial.print(" ir_dist: ");
+        Serial.print(" ir_dis: ");
         Serial.print(get_IR_distance());
         // LINEについて
         Serial.print(" line_side: r");
@@ -29,8 +25,12 @@ void play_test(int test_mode)
         Serial.print(" bno_deg: ");
         Serial.print(get_BNO055_deg());
         // カメラについて
-        Serial.print(" cam_deg: ");
-        Serial.print(" -1");
+        Serial.print(" field_deg: ");
+        Serial.print(get_field_deg());
+        Serial.print(" yellow_deg: ");
+        Serial.print(get_yellow_goal_deg());
+        Serial.print(" blue_deg: ");
+        Serial.print(get_blue_goal_deg());
 
         Serial.println();
         break;
@@ -72,6 +72,7 @@ void play_test(int test_mode)
         Serial.print(" bno_deg: ");
         Serial.print(get_BNO055_deg());
         Serial.print(" pd_power: ");
+        PD_use_gyro(); // ジャイロで計算させる
         Serial.print(get_PD_power());
 
         Serial.println();
@@ -79,7 +80,17 @@ void play_test(int test_mode)
 
     case TEST_CAM_CHECK_WITH_SERIAL:
         // カメラについて
-        Serial.print("I haven't made it yet.");
+        Serial.print(" field_deg: ");
+        Serial.print(get_field_deg());
+        Serial.print(" yellow_deg: ");
+        Serial.print(get_yellow_goal_deg());
+        Serial.print(" yellow_dis: ");
+        Serial.print(get_yellow_goal_distance());
+        Serial.print(" blue_deg: ");
+        Serial.print(get_blue_goal_deg());
+        Serial.print(" blue_dis: ");
+        Serial.print(get_blue_goal_distance());
+
         Serial.println();
         break;
 

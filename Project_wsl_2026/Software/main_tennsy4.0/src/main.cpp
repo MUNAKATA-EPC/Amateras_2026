@@ -17,11 +17,18 @@ void setup()
   DSR1202_init(&Serial3, 115200); // シリアル3を使いボートレート115200にする
   motors_init(45, 135, 225, 315); // それぞれのモータの角度を定義
 
+  OpenMVserial_init(&Serial4, 115200); // シリアル4を使いボートレート115200にする
+
   BNO055_set_resetpin(22, INPUT_PULLDOWN); // BNOのリセットピンを定義
   BNO055_init(&Wire1, 0x28);               // どのBNOを使うか
 }
 
 void loop()
 {
+  IRserial_update();                     // 更新
+  LINEserial_update();                   // 更新
+  OpenMVserial_update();                 // 更新
+  BNO055_update();                       // 更新
+  
   play_test(TEST_ALL_CHECK_WITH_SERIAL); // 全て確認する
 }

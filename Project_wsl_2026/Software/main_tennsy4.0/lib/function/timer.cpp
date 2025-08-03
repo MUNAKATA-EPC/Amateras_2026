@@ -3,6 +3,7 @@
 void Timer::reset() /// タイマーを初期化、0からカウントを始める
 {
     _reset_time = millis(); // リセット時の時間更新
+    _is_timer_stop = false; // リセットしたら必ず動く状態にする
 }
 
 int Timer::get_time() // タイマーからの時間を取得
