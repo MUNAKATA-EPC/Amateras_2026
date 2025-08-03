@@ -1,5 +1,8 @@
 #include "PDpower.hpp"
 
+
+int pd_power; //PD制御の出力格納用
+
 void PD_use_gyro()
 {
 }

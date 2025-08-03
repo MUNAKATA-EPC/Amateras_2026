@@ -48,7 +48,7 @@ void motors_move(int deg, int abs_power)
 
 /*ここのファイル内だけで使う関数*/
 
-double motor_power_sub[4]; // 計算したモータ出力
+double motor_power_sub[4]; // 計算したモータ出力git
 double motor_x_power[4];   // モータ出力をx方向に分解した出力
 double motor_y_power[4];   // モータ出力をy方向に分解した出力
 
