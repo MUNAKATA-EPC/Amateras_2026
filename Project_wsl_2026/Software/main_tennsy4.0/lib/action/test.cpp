@@ -79,7 +79,8 @@ void play_test(int test_mode)
 
     case TEST_CAM_CHECK_WITH_SERIAL:
         // カメラについて
-        Serial.println("I haven't made it yet.");
+        Serial.print("I haven't made it yet.");
+        Serial.println();
         break;
 
     default:
