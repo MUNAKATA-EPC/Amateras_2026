@@ -1,5 +1,7 @@
 #include "PDpower.hpp"
 
+/*PD制御の出力値を計算する*/
+
 #define GYRO_P_GAIN 0.8
 #define GYRO_D_GAIN 0.6
 
@@ -15,7 +17,7 @@ bool gyro_first_call = true; // 関数が最初に呼び出されたかを読む
 
 void PD_use_gyro()
 {
-    now_gyro_value = 180 - BNO055_getDeg();              // BNO055の角度を-180~180にして保存
+    now_gyro_value = 180 - get_BNO055_deg();              // BNO055の角度を-180~180にして保存
     gap_of_gyro_value = now_gyro_value - old_gyro_value; // 差を計算
     old_gyro_value = now_gyro_value;                     // BNO055の昔の角度を-180~180にして保存
 

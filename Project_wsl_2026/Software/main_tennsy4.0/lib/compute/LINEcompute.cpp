@@ -1,5 +1,7 @@
 #include "LINEcompute.hpp"
 
+/*得たラインセンサーの状況から角度などを算出する*/
+
 int get_LINE_deg()
 {
     double line_x = 0;

@@ -1,5 +1,7 @@
 #include "LINEserial.hpp"
 
+/*LINEセンサーの状況をシリアル通信で受信する*/
+
 HardwareSerial *line_serial; // とりあえず定義
 int line_baudrate;           // ボートレート格納用
 

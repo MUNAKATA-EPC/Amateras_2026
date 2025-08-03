@@ -1,8 +1,6 @@
 #ifndef PDPOWER_HPP
 #define PDPOWER_HPP
 
-/*PD制御の出力値を計算する*/
-
 #include <Arduino.h>
 #include "BNO055.hpp"
 #include "OpenMV.hpp"

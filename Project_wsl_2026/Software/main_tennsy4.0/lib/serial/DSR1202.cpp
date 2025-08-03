@@ -1,5 +1,7 @@
 #include "DSR1202.hpp"
 
+/*DSR1202とシリアル通信し、DSR1202を制御する*/
+
 HardwareSerial *_serial; // とりあえず定義
 int _baudrate;           // ボートレート格納用
 

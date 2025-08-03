@@ -1,8 +1,6 @@
 #ifndef MOTORS_HPP
 #define MOTORS_HPP
 
-/*計算して指定した出力・方向に動くようにモーターを制御する*/
-
 #include <Arduino.h>
 #include "DSR1202.hpp"
 #include "PDpower.hpp"

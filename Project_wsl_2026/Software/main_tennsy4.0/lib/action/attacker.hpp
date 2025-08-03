@@ -1,8 +1,6 @@
 #ifndef ATTACKER_HPP
 #define ATTACKER_HPP
 
-/*攻撃用のプログラムを実行する*/
-
 // IRについて
 #include "IRserial.hpp"
 #include "IRcompute.hpp"

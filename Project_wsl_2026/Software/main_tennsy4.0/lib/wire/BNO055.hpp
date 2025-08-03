@@ -16,6 +16,6 @@ void BNO055_init(TwoWire *wire, uint8_t adress);
 void BNO055_update();
 
 // 計算した角度を出力
-int BNO055_getDeg();
+int get_BNO055_deg();
 
 #endif

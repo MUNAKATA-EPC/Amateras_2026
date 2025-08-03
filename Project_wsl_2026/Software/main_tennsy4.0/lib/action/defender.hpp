@@ -1,8 +1,6 @@
 #ifndef DEFENDER_HPP
 #define DEFENDER_HPP
 
-/*守備用のプログラムを実行する*/
-
 // IRについて
 #include "IRserial.hpp"
 #include "IRcompute.hpp"

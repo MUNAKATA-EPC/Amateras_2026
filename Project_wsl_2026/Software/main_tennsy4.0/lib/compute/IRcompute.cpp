@@ -1,5 +1,7 @@
 #include "IRcompute.hpp"
 
+/*得たIRボールの状況から回り込む角度などを算出する*/
+
 int get_IR_mawarikomi_deg(int deg)
 {
     if (deg < 45) // 左にボールがある

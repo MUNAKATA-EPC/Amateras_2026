@@ -1,8 +1,6 @@
 #ifndef LINECOMPUTE_HPP
 #define LINECOMPUTE_HPP
 
-/*得たラインセンサーの状況から角度などを算出する*/
-
 #include <Arduino.h>
 #include "LINEserial.hpp"
 

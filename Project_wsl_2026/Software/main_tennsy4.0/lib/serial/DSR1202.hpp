@@ -1,8 +1,6 @@
 #ifndef DSR1202_HPP
 #define DSR1202_HPP
 
-/*DSR1202とシリアル通信し、DSR1202を制御する*/
-
 #include <Arduino.h>
 
 // シリアル定義・開始

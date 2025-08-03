@@ -1,8 +1,6 @@
 #ifndef IRCOMPUTE
 #define IRCOMPUTE
 
-/*得たIRボールの状況から回り込む角度などを算出する*/
-
 #include <Arduino.h>
 #include "IRserial.hpp"
 

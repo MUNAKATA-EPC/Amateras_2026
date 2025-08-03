@@ -1,5 +1,7 @@
 #include "BNO055.hpp"
 
+/*BNO055からのデータをI2Cで入手する*/
+
 Adafruit_BNO055 *bno = nullptr; // とりあえず定義
 
 int bno_reset_pin = 0;                // ジャイロのリセットスイッチのピン番号格納用
@@ -59,7 +61,7 @@ void BNO055_update()
     bno_deg = (int)(bno_normal_deg - bno_reset_deg + 360) % 360; // 角度を計算
 }
 
-int BNO055_getDeg()
+int get_BNO055_deg()
 {
     return bno_deg; // 計算したジャイロの角度を返す
 }

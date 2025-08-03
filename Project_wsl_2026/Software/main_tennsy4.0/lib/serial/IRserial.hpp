@@ -1,8 +1,6 @@
 #ifndef IRSERIAL_HPP
 #define IRSERIAL_HPP
 
-/*IRボールの状況をシリアル通信で受信する*/
-
 #include <Arduino.h>
 
 // シリアル定義・開始

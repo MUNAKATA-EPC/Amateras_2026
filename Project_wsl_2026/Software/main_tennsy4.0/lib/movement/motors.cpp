@@ -1,9 +1,14 @@
 #include "motors.hpp"
 
+/*計算して指定した出力・方向に動くようにモーターを制御する*/
+/*モーターはすべて正で、まっすぐ進むようにする*/
+
 int motor_deg[4];             // モータの設置角度を格納用
 int motor_move_power_main[4]; // モータのスケーリングされた出力格納用(移動のための出力)
 int motor_pd_power_main[4];   // モータのスケーリングされた出力格納用(PD制御のための出力)
 int motor_power_main[4];      // 最終的な出力格納用
+
+int motor_pid_sign[4] = {1, -1, -1, 1}; // モータを回転させるための符号を格納
 
 void motors_init(int deg_1ch, int deg_2ch, int deg_3ch, int deg_4ch)
 {
@@ -48,8 +53,8 @@ void motors_move(int deg, int abs_power)
 
     for (int i = 0; i < 4; i++)
     {
-        motor_power_main[i] = motor_move_power_main[i] - get_PD_power();             // 移動-PD制御で最終的な出力を出す
-        motor_power_main[i] = constrain(motor_power_main[i], -abs_power, abs_power); // 一応丸める
+        motor_power_main[i] = motor_move_power_main[i] + get_PD_power() * motor_pid_sign[i]; // 移動-PD制御で最終的な出力を出す
+        motor_power_main[i] = constrain(motor_power_main[i], -abs_power, abs_power);         // 一応丸める
     }
 
     DSR1202_move(motor_power_main[0], motor_power_main[1], motor_power_main[2], motor_power_main[3]); // モータを動かす

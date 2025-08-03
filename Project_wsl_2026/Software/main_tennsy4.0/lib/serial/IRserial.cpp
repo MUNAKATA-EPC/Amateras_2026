@@ -1,5 +1,7 @@
 #include "IRserial.hpp"
 
+/*IRボールの状況をシリアル通信で受信する*/
+
 HardwareSerial *ir_serial; // とりあえず定義
 int ir_baudrate;           // ボートレート格納用
 

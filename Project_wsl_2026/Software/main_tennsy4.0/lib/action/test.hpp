@@ -1,8 +1,6 @@
 #ifndef TEST_HPP
 #define TEST_HPP
 
-/*テスト用のプログラムを実行する*/
-
 // IRについて
 #include "IRserial.hpp"
 #include "IRcompute.hpp"
