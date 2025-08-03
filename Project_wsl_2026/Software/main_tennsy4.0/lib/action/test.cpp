@@ -46,6 +46,7 @@ void play_test(int test_mode)
         Serial.print(get_IR_mawarikomi_deg(get_IR_deg()));
         Serial.print(" ir_follow_deg: ");
         Serial.print(get_IR_follow_deg(get_IR_deg(), get_IR_distance(), 0));
+
         Serial.println();
         break;
 
@@ -62,9 +63,18 @@ void play_test(int test_mode)
         Serial.print(get_LINE_side_back());
         Serial.print(" line_deg: ");
         Serial.print(get_LINE_deg());
+
+        Serial.println();
         break;
 
     case TEST_GYRO_CHECK_WITH_SERIAL:
+        // ジャイロについて
+        Serial.print(" bno_deg: ");
+        Serial.print(get_BNO055_deg());
+        Serial.print(" pd_power: ");
+        Serial.print(get_PD_power());
+
+        Serial.println();
         break;
 
     case TEST_CAM_CHECK_WITH_SERIAL:

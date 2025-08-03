@@ -62,12 +62,10 @@ void motors_move(int deg, int abs_power)
 
 /*ここのファイル内だけで使う関数*/
 
-double motor_move_power_sub[4]; // 計算したモータ出力git
+double motor_move_power_sub[4]; // 計算したモータ出力
 double motor_x_power[4];        // モータ出力をx方向に分解した出力
 double motor_y_power[4];        // モータ出力をy方向に分解した出力
 
-// degはロボット全体として進みたい方向
-// powerはその方向へ進むときの合力の大きさ
 void compute_motor_power(int deg, int power)
 {
     for (int i = 0; i < 4; i++)
@@ -84,19 +82,16 @@ void compute_motor_power(int deg, int power)
     }
 }
 
-// index番目のモータの合力の大きさを返す
 double get_motor_power(int index)
 {
     return motor_move_power_sub[index];
 }
 
-// index番目のモータの出力をx方向に分解した値を返す
 double get_motor_x_power(int index)
 {
     return motor_x_power[index];
 }
 
-// index番目のモータの出力をy方向に分解した値を返す
 double get_motor_y_power(int index)
 {
     return motor_y_power[index];
