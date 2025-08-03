@@ -6,6 +6,7 @@
 #include <Arduino.h>
 #include "BNO055.hpp"
 #include "OpenMV.hpp"
+#include "timer.hpp"
 
 // ジャイロをPD制御で使う場合
 void PD_use_gyro();
