@@ -14,7 +14,7 @@ public:
         _reset_time = millis(); // リセット時の時間更新
     }
 
-    int get_from_timer() // タイマーからの時間を取得
+    int get_time() // タイマーからの時間を取得
     {
         if (!_is_timer_stop) // タイマーが起動している場合
         {

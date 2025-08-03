@@ -6,6 +6,7 @@
 #include <Adafruit_Sensor.h>
 #include <utility/imumaths.h>
 #include <SPI.h>
+#include "timer.hpp"
 
 // リセットスイッチのピン番号とモードを設定
 void BNO055_set_resetpin(int pin, int pinmode);

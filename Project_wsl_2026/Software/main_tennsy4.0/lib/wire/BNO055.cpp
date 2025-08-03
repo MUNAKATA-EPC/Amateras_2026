@@ -19,10 +19,15 @@ void BNO055_set_resetpin(int pin, int pinmode)
 
 void BNO055_init(TwoWire *wire, uint8_t address)
 {
-    bno = new Adafruit_BNO055(BNO055_ID, address, wire); //_bnoを定義
+    if (bno != nullptr)
+    {
+        delete bno;
+    }
+    bno = new Adafruit_BNO055(BNO055_ID, address, wire); // 新しく作る
 
-    int now_time = millis(); // タイマーをセット
-    while (!(*bno).begin(OPERATION_MODE_IMUPLUS) && (millis() - now_time) <= 5000)
+    Timer my_bno_timer;
+    my_bno_timer.reset(); // タイマーをリセット
+    while (!(*bno).begin(OPERATION_MODE_IMUPLUS) && my_bno_timer.get_time() < 5000)
     {
         delay(10); // 10ms待機
     } // BNO055との通信が成功するか5000ms経つかそれまで待つ
