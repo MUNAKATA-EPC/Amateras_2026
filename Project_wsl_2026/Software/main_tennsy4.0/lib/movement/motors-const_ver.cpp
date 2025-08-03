@@ -1,14 +1,14 @@
-#include "motors.hpp"
+#include "motors-const_ver.hpp"
 
-/*計算して指定した出力・方向に動くようにモーターを制御する*/
+/*すべてのモータの合力が常に指定した値になるようにモーターを制御する*/
+
 /*モーターはすべて正で、まっすぐ進むようにする*/
+int motor_pid_sign[4] = {1, -1, -1, 1}; // モータを回転させるための符号を格納
 
 int motor_deg[4];             // モータの設置角度を格納用
 int motor_move_power_main[4]; // モータのスケーリングされた出力格納用(移動のための出力)
 int motor_pd_power_main[4];   // モータのスケーリングされた出力格納用(PD制御のための出力)
 int motor_power_main[4];      // 最終的な出力格納用
-
-int motor_pid_sign[4] = {1, -1, -1, 1}; // モータを回転させるための符号を格納
 
 void motors_init(int deg_1ch, int deg_2ch, int deg_3ch, int deg_4ch)
 {
