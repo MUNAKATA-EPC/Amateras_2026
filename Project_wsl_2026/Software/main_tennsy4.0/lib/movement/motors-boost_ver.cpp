@@ -41,6 +41,22 @@ void motors_move(int deg, int abs_power)
     DSR1202_move(motor_power_main[0], motor_power_main[1], motor_power_main[2], motor_power_main[3]); // モータを動かす
 }
 
+void motors_only_PD(int max_pd_power)
+{
+    for (int i = 0; i < 4; i++) // 最終的な計算
+    {
+        motor_power_main[i] = get_PD_power() * motor_pid_sign[i];        // 移動-PD制御で最終的な出力を出す
+        motor_power_main[i] = constrain(motor_power_main[i], -max_pd_power, max_pd_power); // 一応丸める
+    }
+
+    DSR1202_move(motor_power_main[0], motor_power_main[1], motor_power_main[2], motor_power_main[3]); // モータを動かす
+}
+
+void motors_break()
+{
+    DSR1202_break(); // モータを停止させる
+}
+
 /*ここのファイル内だけで使う関数*/
 
 void compute_motor_power(int deg, int power)

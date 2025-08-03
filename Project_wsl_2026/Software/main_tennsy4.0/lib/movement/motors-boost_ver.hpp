@@ -11,6 +11,12 @@ void motors_init(int deg_1ch, int deg_2ch, int deg_3ch, int deg_4ch);
 // 指定した方向に動かす（PD制御付き）
 void motors_move(int deg, int abs_power);
 
+// PD制御のみをする
+void motors_only_PD(int max_pd_power);
+
+// すべてのモータを停止させる
+void motors_break();
+
 /*ここのファイル内だけで使う関数*/
 
 // degはロボット全体として進みたい方向
