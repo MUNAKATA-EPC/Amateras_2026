@@ -1,17 +1,10 @@
 #include <Arduino.h>
-// IRについて
-#include "IRserial.hpp"
-#include "IRcompute.hpp"
-// LINEについて
-#include "LINEserial.hpp"
-#include "LINEcompute.hpp"
-// BNO055について
-#include "BNO055.hpp"
-// OpenMVについて
-#include "OpenMV.hpp"
-// DSR1202について
-#include "DSR1202.hpp"
-#include "motors.hpp"
+// 攻撃用
+#include "attacker.hpp"
+// 守備用
+#include "defender.hpp"
+// テスト用
+#include "test.hpp"
 
 void setup()
 {
@@ -30,18 +23,5 @@ void setup()
 
 void loop()
 {
-  IRserial_update(); // IRserialを更新
-  Serial.print(get_IR_deg());
-  Serial.print(" ");
-
-  LINEserial_update(); // LINEserialを更新
-  for (int i = 0; i < 19; i++)
-  {
-    Serial.print(get_LINE_data(i));
-    Serial.print(" ");
-  }
-
-  BNO055_update(); // BNO055を更新
-  Serial.print(BNO055_getDeg());
-  Serial.println(); // 改行
+  play_test(TEST_ALL_CHECK_WITH_SERIAL); // 全て確認する
 }
