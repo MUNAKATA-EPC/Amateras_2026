@@ -47,7 +47,8 @@ void PD_use_gyro()
     }
 
     /*足し合わせる*/
-    pd_power = (int)(p_power + d_power); // それぞれの出力を足し合わせる
+    pd_power = (int)(p_power + d_power);       // それぞれの出力を足し合わせる
+    pd_power = constrain(pd_power, -100, 100); // 一応-100~100に収める
 }
 
 void PD_use_cam()
