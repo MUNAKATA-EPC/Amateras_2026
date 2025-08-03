@@ -14,6 +14,8 @@
 // DSR1202について
 #include "DSR1202.hpp"
 #include "motors-boost_ver.hpp"
+// キッカーについて
+#include "kicker.hpp"
 
 // モード
 // シリアルですべてのセンサーの状況を確認する

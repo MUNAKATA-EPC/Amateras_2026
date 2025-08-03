@@ -15,12 +15,12 @@ void BNO055_set_resetpin(int pin, int pinmode)
 {
     bno_reset_pin = pin;
     bno_reset_pinmode = pinmode;
-
-    pinMode(bno_reset_pin, bno_reset_pinmode); // ピンを設定
 }
 
 void BNO055_init(TwoWire *wire, uint8_t address)
 {
+    pinMode(bno_reset_pin, bno_reset_pinmode); // ピンを設定
+
     if (bno != nullptr)
     {
         delete bno;

@@ -21,6 +21,10 @@ void setup()
 
   BNO055_set_resetpin(22, INPUT_PULLDOWN); // BNOのリセットピンを定義
   BNO055_init(&Wire1, 0x28);               // どのBNOを使うか
+
+  // catchsensor_init(1);     // キャッチセンサーのピンを設定
+  kicker_set_fetpin(2, 3); // キッカーのFETピンを設定
+  kicker_init(1000);       // クールダウン時間の定義
 }
 
 void loop()

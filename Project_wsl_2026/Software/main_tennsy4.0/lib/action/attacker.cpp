@@ -5,10 +5,18 @@
 
 void play_attacker()
 {
+    /*PCにシリアルプリント*/
     play_test(TEST_ALL_CHECK_WITH_SERIAL); // シリアルプリントさせる
 
+    /*キッカー制御*/
+    // kicker_kick(get_catchsensor()); // キャッチセンサーが反応したら蹴る
+    kicker_kick((get_IR_deg() < 20 || get_IR_deg() > 340) && (get_IR_distance() < 150)); // 前付近で近くのボールがあったら蹴る
+    kicker_charge(true);                                                                 // キッカーは常時チャージする
+
+    /*PD制御*/
     PD_use_gyro(); // PD制御にジャイロを使う
 
+    /*ロボット制御*/
     if (is_LINE_exist) // ラインがあるならば
     {
         motors_move(get_LINE_deg() + 180, 95); // ラインから逃れる動きをする
