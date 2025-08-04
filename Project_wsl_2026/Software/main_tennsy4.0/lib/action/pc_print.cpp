@@ -1,10 +1,10 @@
-#include "PCprint.hpp"
+#include "pc_print.hpp"
 
 /*パソコンにシリアルプリント用のプログラムを実行する*/
 
-void play_PCprint(int PCprint_mode)
+void play_pc_print(int pc_print_mode)
 {
-    switch (PCprint_mode)
+    switch (pc_print_mode)
     {
     case ALL_CHECK_WITH_PC:
         // IRについて

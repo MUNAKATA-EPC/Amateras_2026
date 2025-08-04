@@ -1,5 +1,5 @@
-#ifndef PCPRINT_HPP
-#define PCPRINT_HPP
+#ifndef PC_PRINT_HPP
+#define PC_PRINT_HPP
 
 // IRについて
 #include "IRserial.hpp"
@@ -20,7 +20,7 @@
 #include "ui.hpp"
 
 // パソコンにシリアルプリント用のプログラムを実行
-void play_PCprint(int PCprint_mode);
+void play_pc_print(int pc_print_mode);
 /* ↓ 入力 */
 // シリアルですべてのセンサーの状況を確認する
 #define ALL_CHECK_WITH_PC 0

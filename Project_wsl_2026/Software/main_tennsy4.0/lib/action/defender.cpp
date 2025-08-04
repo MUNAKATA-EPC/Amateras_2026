@@ -1,5 +1,4 @@
 #include "defender.hpp"
-#include "PCprint.hpp"
 
 /*守備用のプログラムを実行する*/
 

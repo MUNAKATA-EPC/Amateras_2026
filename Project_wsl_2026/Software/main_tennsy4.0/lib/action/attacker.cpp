@@ -1,5 +1,4 @@
 #include "attacker.hpp"
-#include "PCprint.hpp"
 
 /*攻撃用のプログラムを実行する*/
 

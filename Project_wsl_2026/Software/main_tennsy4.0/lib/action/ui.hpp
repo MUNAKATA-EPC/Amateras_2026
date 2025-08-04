@@ -2,7 +2,24 @@
 #define UI_CPP
 
 #include <Arduino.h>
+// IRについて
+#include "IRserial.hpp"
+#include "IRcompute.hpp"
+// LINEについて
+#include "LINEserial.hpp"
+#include "LINEcompute.hpp"
+// BNO055について
+#include "BNO055.hpp"
+// OpenMVについて
+#include "OpenMV.hpp"
+// DSR1202について
+#include "DSR1202.hpp"
+#include "motors-boost_ver.hpp"
+// キッカーについて
+#include "kicker.hpp"
+// LCDについて
 #include "SSD1306.hpp"
+// 便利な関数♡
 #include "button.hpp"
 #include "toggle.hpp"
 #include "timer.hpp"
@@ -45,5 +62,19 @@ int get_selected_ui_mode();
 #define TEST_PD_GYRO_MODE 1
 // カメラでのPD制御のテストを行うモード
 #define TEST_PD_CAM_MODE 2
+
+// LCDにプリントするプログラムを実行＊clearとshowは外部処理＊
+void play_lcd_print(int lcd_print_mode);
+/* ↓ 入力 */
+// LCDでIRとLINEとジャイロの状況を確認する
+#define IR_LINE_GYRO_CHECK_WITH_LCD 0
+// LCDですべてのIRの状況を確認する
+#define IR_CHECK_WITH_LCD 1
+// LCDですべてのLINEの状況を確認する
+#define LINE_CHECK_WITH_LCD 2
+// LCDですべてのジャイロの状況を確認する
+#define GYRO_CHECK_WITH_LCD 3
+// LCDですべてのカメラの状況を確認する
+#define CAM_CHECK_WITH_LCD 4
 
 #endif

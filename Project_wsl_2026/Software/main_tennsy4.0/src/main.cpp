@@ -4,7 +4,7 @@
 // 守備用
 #include "defender.hpp"
 // PCプリント用
-#include "PCprint.hpp"
+#include "pc_print.hpp"
 // テスト（動作確認）用
 #include "test.hpp"
 // LCD用
@@ -53,7 +53,7 @@ void loop()
     switch (get_selected_ui_action())
     {
     case ACTION_ATTACKER:
-      play_PCprint(ALL_CHECK_WITH_PC); // 全て確認する
+      play_pc_print(ALL_CHECK_WITH_PC); // 全て確認する
       switch (get_selected_ui_mode())
       {
       case PD_USE_ONLY_GYRO_MODE:
@@ -67,7 +67,7 @@ void loop()
       break;
 
     case ACTION_DEFENDER:
-      play_PCprint(ALL_CHECK_WITH_PC); // 全て確認する
+      play_pc_print(ALL_CHECK_WITH_PC); // 全て確認する
       switch (get_selected_ui_mode())
       {
       case PD_USE_ONLY_GYRO_MODE:
@@ -81,7 +81,7 @@ void loop()
       break;
 
     case ACTION_TEST:
-      play_PCprint(ALL_CHECK_WITH_PC); // 全て確認する
+      play_pc_print(ALL_CHECK_WITH_PC); // 全て確認する
       switch (get_selected_ui_mode())
       {
       case TEST_KICKER_MODE:
