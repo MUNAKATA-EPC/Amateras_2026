@@ -47,12 +47,12 @@ void loop()
   switch (get_selected_ui_action())
   {
   case ACTION_ATTACKER_MODE:
-    play_attacker(is_selected_ui_use_cam());
+    play_attacker(is_selected_ui_use_cam(), 95);
 
     break;
 
   case ACTION_DEFENDER_MODE:
-    play_defender(is_selected_ui_use_cam());
+    play_defender(is_selected_ui_use_cam(), 95);
 
     break;
 

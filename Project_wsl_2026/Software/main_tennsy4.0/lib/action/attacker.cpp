@@ -3,7 +3,7 @@
 
 /*攻撃用のプログラムを実行する*/
 
-void play_attacker(bool use_cam)
+void play_attacker(bool use_cam, int motor_power)
 {
     /*PCにシリアルプリント*/
     play_PCprint(TEST_ALL_CHECK_WITH_PC); // シリアルプリントさせる
@@ -31,7 +31,7 @@ void play_attacker(bool use_cam)
     /*ロボット制御*/
     if (is_LINE_exist()) // ラインがあるならば
     {
-        motors_move(get_LINE_deg() + 180, 95); // ラインから逃れる動きをする
+        motors_move(get_LINE_deg() + 180, motor_power); // ラインから逃れる動きをする
     }
     else
     {
@@ -39,27 +39,27 @@ void play_attacker(bool use_cam)
         {
             if (get_IR_deg() < 10 || get_IR_deg() > 350) // 前にIRボールがあるとき
             {
-                motors_move(0, 95); // 前進する
+                motors_move(0, motor_power); // 前進する
             }
             else if (get_IR_deg() < 25 || get_IR_deg() > 335) // 前付近にIRボールがあるとき
             {
-                motors_move(get_IR_follow_deg(100), 95); // 前方100方向にボールが行くように制御する
+                motors_move(get_IR_follow_deg(100), motor_power); // 前方100方向にボールが行くように制御する
             }
             else
             {
                 if (get_IR_distance() < 170) // 近くにIRボールがあるとき
                 {
-                    motors_move(get_IR_mawarikomi_deg(), 95); // 回り込むように制御
+                    motors_move(get_IR_mawarikomi_deg(), motor_power); // 回り込むように制御
                 }
                 else
                 {
-                    motors_move(get_IR_follow_deg(0), 95); // ボールに近寄るように制御
+                    motors_move(get_IR_follow_deg(0), motor_power); // ボールに近寄るように制御
                 }
             }
         }
         else
         {
-            motors_only_PD(95); // PD制御のみさせる
+            motors_only_PD(motor_power); // PD制御のみさせる
         }
     }
 }

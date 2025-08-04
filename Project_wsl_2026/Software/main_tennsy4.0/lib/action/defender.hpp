@@ -20,6 +20,6 @@
 #include "ui.hpp"
 
 // 守備用のプログラムを実行
-void play_defender(bool use_cam);
+void play_defender(bool use_cam, int motor_power);
 
 #endif
