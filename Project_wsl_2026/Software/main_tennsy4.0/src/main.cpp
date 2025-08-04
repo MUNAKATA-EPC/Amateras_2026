@@ -41,6 +41,25 @@ void loop()
   OpenMVserial_update(); // 更新
   BNO055_update();       // 更新
 
+  ui_select(); // モードを選ばせる
+
+  switch (get_ui_action())
+  {
+  case ACTION_ATTACKER_MODE:
+    play_attacker(is_ui_use_cam());
+
+    break;
+
+  case ACTION_DEFENDER_MODE:
+    play_defender(is_ui_use_cam());
+
+    break;
+
+  case ACTION_TEST_MODE:
+    play_test(get_ui_test_mode()); // 動作確認用
+
+    break;
+  }
+
   // play_PCprint(TEST_ALL_CHECK_WITH_PC); // 全て確認する
-  play_attacker(); // 攻撃を開始
 }

@@ -3,7 +3,7 @@
 
 /*守備用のプログラムを実行する*/
 
-void play_defender()
+void play_defender(bool use_cam)
 {
-    play_PCprint(TEST_ALL_CHECK_WITH_SERIAL); // シリアルプリントさせる
+    play_PCprint(TEST_ALL_CHECK_WITH_PC); // シリアルプリントさせる
 }

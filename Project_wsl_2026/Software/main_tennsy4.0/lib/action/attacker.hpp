@@ -20,6 +20,6 @@
 #include "ui.hpp"
 
 // 攻撃用のプログラムを実行
-void play_attacker();
+void play_attacker(bool use_cam);
 
 #endif

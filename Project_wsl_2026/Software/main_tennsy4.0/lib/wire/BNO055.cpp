@@ -48,6 +48,7 @@ void BNO055_update()
 
     bno_normal_deg = euler.x(); // X軸のデータを取得
 
+    bno_reset_button.update();          // 更新する
     if (bno_reset_button.is_released()) // ボタンが押されたなら
         bno_reset_deg = bno_normal_deg; // reset_degを更新
 

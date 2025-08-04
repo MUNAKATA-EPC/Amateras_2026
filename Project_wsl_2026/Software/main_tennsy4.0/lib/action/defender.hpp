@@ -20,6 +20,6 @@
 #include "ui.hpp"
 
 // 守備用のプログラムを実行
-void play_defender();
+void play_defender(bool use_cam);
 
 #endif

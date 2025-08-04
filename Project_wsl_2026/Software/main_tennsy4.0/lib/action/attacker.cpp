@@ -3,10 +3,10 @@
 
 /*攻撃用のプログラムを実行する*/
 
-void play_attacker()
+void play_attacker(bool use_cam)
 {
     /*PCにシリアルプリント*/
-    play_PCprint(TEST_ALL_CHECK_WITH_SERIAL); // シリアルプリントさせる
+    play_PCprint(TEST_ALL_CHECK_WITH_PC); // シリアルプリントさせる
 
     /*キッカー制御*/
     // kicker_kick(get_catchsensor()); // キャッチセンサーが反応したら蹴る

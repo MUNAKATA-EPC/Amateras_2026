@@ -19,7 +19,7 @@ void ui_set_lcdpin(int enter_pin, int enter_pinmode, int left_pin, int left_pinm
 void ui_init();
 
 // uiを実行する（選んでもらう）
-void ui_mode_select();
+void ui_select();
 
 // 攻撃か守備かテストかを出力
 int get_ui_action();
@@ -31,12 +31,10 @@ int get_ui_action();
 // テスト(確認)モード
 #define ACTION_TEST_MODE 2
 
+// ジャイロのみかカメラを使うのかどうか
+bool is_ui_use_cam();
+
 // ジャイロのみかカメラを使うのかを出力
-int get_ui_pd_mode();
-/* ↓ 出力 */
-// ジャイロモード
-#define PD_GYRO_MODE 0
-// カメラモード
-#define PD_CAM_MODE 1
+int get_ui_test_mode();
 
 #endif

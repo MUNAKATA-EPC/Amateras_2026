@@ -27,7 +27,12 @@ void ui_init()
     lcd_right_button.init();
 }
 
-void ui_mode_select() {}
+void ui_select()
+{
+    lcd_enter_button.update(); // 更新する
+    lcd_left_button.update();  // 更新する
+    lcd_right_button.update(); // 更新する
+}
 
 int get_ui_action() {}
 
