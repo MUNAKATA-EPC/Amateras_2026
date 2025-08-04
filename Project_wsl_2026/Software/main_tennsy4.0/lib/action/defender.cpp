@@ -5,5 +5,4 @@
 
 void play_defender(bool use_cam, int motor_power)
 {
-    play_PCprint(TEST_ALL_CHECK_WITH_PC); // シリアルプリントさせる
 }

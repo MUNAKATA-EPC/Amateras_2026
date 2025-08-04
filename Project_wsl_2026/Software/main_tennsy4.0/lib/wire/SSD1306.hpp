@@ -7,7 +7,7 @@
 #include "timer.hpp"
 
 // I2C定義・開始
-void SSD1306_init(TwoWire *wire, uint8_t adress, int width, int heigh);
+void SSD1306_init(TwoWire *wire, uint8_t adress, int width, int height);
 
 // 表示をすべて消す
 void SSD1306_clear();

@@ -14,22 +14,36 @@ void ui_set_lcdpin(int enter_pin, int enter_pinmode, int left_pin, int left_pinm
 void ui_init();
 
 // uiを実行する（選んでもらう）
-void ui_select();
+void ui_process();
+
+// まだ選ばれている途中かどうか
+bool is_now_selecting_ui();
 
 // 攻撃か守備かテストかを出力
 int get_selected_ui_action();
 /* ↓ 出力 */
-// 攻撃モード
-#define ACTION_ATTACKER_MODE 0
-// 守備モード
-#define ACTION_DEFENDER_MODE 1
-// テスト(確認)モード
-#define ACTION_TEST_MODE 2
+// 攻撃する
+#define ACTION_ATTACKER 0
+// 守備する
+#define ACTION_DEFENDER 1
+// テスト(確認)する
+#define ACTION_TEST 2
 
-// ジャイロのみかカメラを使うのかどうか
-bool is_selected_ui_use_cam();
+// 選ばれたActionの中でのモードを出力
+int get_selected_ui_mode();
+/* ↓ 出力 */
+// 攻撃or守備をするとき
+//  PD制御でジャイロだけ使うモード
+#define PD_USE_ONLY_GYRO_MODE 0
+// PD制御でカメラも使うモード
+#define PD_USE_CAM_MODE 1
 
-// ジャイロのみかカメラを使うのかを出力
-int get_selected_ui_test_mode();
+// テストをするとき
+//  キッカーの動作を確認するモード
+#define TEST_KICKER_MODE 0
+// ジャイロでのPD制御のテストを行うモード
+#define TEST_PD_GYRO_MODE 1
+// カメラでのPD制御のテストを行うモード
+#define TEST_PD_CAM_MODE 2
 
 #endif

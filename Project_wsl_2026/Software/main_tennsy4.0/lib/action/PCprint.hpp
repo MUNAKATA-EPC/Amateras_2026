@@ -23,14 +23,14 @@
 void play_PCprint(int PCprint_mode);
 /* ↓ 入力 */
 // シリアルですべてのセンサーの状況を確認する
-#define TEST_ALL_CHECK_WITH_PC 0
+#define ALL_CHECK_WITH_PC 0
 // シリアルですべてのIRの状況を確認する
-#define TEST_IR_CHECK_WITH_PC 1
+#define IR_CHECK_WITH_PC 1
 // シリアルですべてのLINEの状況を確認する
-#define TEST_LINE_CHECK_WITH_PC 2
+#define LINE_CHECK_WITH_PC 2
 // シリアルですべてのジャイロの状況を確認する
-#define TEST_GYRO_CHECK_WITH_PC 3
+#define GYRO_CHECK_WITH_PC 3
 // シリアルですべてのカメラの状況を確認する
-#define TEST_CAM_CHECK_WITH_PC 4
+#define CAM_CHECK_WITH_PC 4
 
 #endif

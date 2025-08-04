@@ -42,25 +42,65 @@ void loop()
   OpenMVserial_update(); // 更新
   BNO055_update();       // 更新
 
-  ui_select(); // モードを選ばせる
+  ui_process(); // モードを選ばせるー＞LCDアニメーションの実行
 
-  switch (get_selected_ui_action())
+  if (is_now_selecting_ui()) // 今選んでる途中なら
   {
-  case ACTION_ATTACKER_MODE:
-    play_attacker(is_selected_ui_use_cam(), 95);
-
-    break;
-
-  case ACTION_DEFENDER_MODE:
-    play_defender(is_selected_ui_use_cam(), 95);
-
-    break;
-
-  case ACTION_TEST_MODE:
-    play_test(get_selected_ui_test_mode()); // 動作確認用
-
-    break;
+    Serial.println("Now selecting");
   }
+  else // 今選んだ
+  {
+    switch (get_selected_ui_action())
+    {
+    case ACTION_ATTACKER:
+      play_PCprint(ALL_CHECK_WITH_PC); // 全て確認する
+      switch (get_selected_ui_mode())
+      {
+      case PD_USE_ONLY_GYRO_MODE:
+        play_attacker(false, 95); // ジャイロのみで動かす
+        break;
+      case PD_USE_CAM_MODE:
+        play_attacker(true, 95); // カメラで動かす
+        break;
+      }
 
-  // play_PCprint(TEST_ALL_CHECK_WITH_PC); // 全て確認する
+      break;
+
+    case ACTION_DEFENDER:
+      play_PCprint(ALL_CHECK_WITH_PC); // 全て確認する
+      switch (get_selected_ui_mode())
+      {
+      case PD_USE_ONLY_GYRO_MODE:
+        play_defender(false, 95); // ジャイロのみで動かす
+        break;
+      case PD_USE_CAM_MODE:
+        play_defender(true, 95); // カメラで動かす
+        break;
+      }
+
+      break;
+
+    case ACTION_TEST:
+      play_PCprint(ALL_CHECK_WITH_PC); // 全て確認する
+      switch (get_selected_ui_mode())
+      {
+      case TEST_KICKER_MODE:
+        play_test(TEST_KICKER_MODE);
+        break;
+      case TEST_PD_GYRO_MODE:
+        play_test(TEST_PD_GYRO_MODE);
+        break;
+      case TEST_PD_CAM_MODE:
+        play_test(TEST_PD_CAM_MODE);
+        break;
+      }
+
+      break;
+
+    default:
+      Serial.println("error");
+
+      break;
+    }
+  }
 }

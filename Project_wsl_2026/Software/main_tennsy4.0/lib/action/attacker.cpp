@@ -5,9 +5,6 @@
 
 void play_attacker(bool use_cam, int motor_power)
 {
-    /*PCにシリアルプリント*/
-    play_PCprint(TEST_ALL_CHECK_WITH_PC); // シリアルプリントさせる
-
     /*キッカー制御*/
     // kicker_kick(get_catchsensor()); // キャッチセンサーが反応したら蹴る
     kicker_kick((get_IR_deg() < 20 || get_IR_deg() > 340) && (get_IR_distance() < 150)); // 前付近で近くのボールがあったら蹴る

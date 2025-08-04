@@ -6,7 +6,7 @@ void play_PCprint(int PCprint_mode)
 {
     switch (PCprint_mode)
     {
-    case TEST_ALL_CHECK_WITH_PC:
+    case ALL_CHECK_WITH_PC:
         // IRについて
         Serial.print(" ir_deg: ");
         Serial.print(get_IR_deg());
@@ -36,7 +36,7 @@ void play_PCprint(int PCprint_mode)
 
         break;
 
-    case TEST_IR_CHECK_WITH_PC:
+    case IR_CHECK_WITH_PC:
         // IRについて
         Serial.print(" ir_deg: ");
         Serial.print(get_IR_deg());
@@ -52,7 +52,7 @@ void play_PCprint(int PCprint_mode)
 
         break;
 
-    case TEST_LINE_CHECK_WITH_PC:
+    case LINE_CHECK_WITH_PC:
         // LINEについて
         Serial.print(" line_data ");
         for (int i = 0; i < 16; i++)
@@ -70,7 +70,7 @@ void play_PCprint(int PCprint_mode)
 
         break;
 
-    case TEST_GYRO_CHECK_WITH_PC:
+    case GYRO_CHECK_WITH_PC:
         // ジャイロについて
         Serial.print(" bno_deg: ");
         Serial.print(get_BNO055_deg());
@@ -82,7 +82,7 @@ void play_PCprint(int PCprint_mode)
 
         break;
 
-    case TEST_CAM_CHECK_WITH_PC:
+    case CAM_CHECK_WITH_PC:
         // カメラについて
         Serial.print(" field_deg: ");
         Serial.print(get_field_deg());
@@ -96,7 +96,7 @@ void play_PCprint(int PCprint_mode)
         Serial.print(get_blue_goal_distance());
 
         Serial.println();
-        
+
         break;
 
     default:

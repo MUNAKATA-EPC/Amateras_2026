@@ -27,29 +27,166 @@ void ui_init()
     lcd_right_button.init();
 }
 
-void ui_select()
+Timer my_ui_timer;         // UI用のタイマー
+bool ui_first_call = true; // 関数が最初に呼び出されたかを読む
+
+/*Actionについてのメモ*/
+// 攻撃する
+// #define ACTION_ATTACKER 0
+// 守備する
+// #define ACTION_DEFENDER 1
+// テスト(確認)する
+// #define ACTION_TEST 2
+int action_number = ACTION_ATTACKER; // とりあえず攻撃するを格納
+bool action_decided = false;         // Actionをユーザーが決定されたかどうか
+
+/*modeについてのメモ*/
+// 攻撃or守備をするとき
+// PD制御でジャイロだけ使うモード
+// #define PD_USE_ONLY_GYRO_MODE 0
+// PD制御でカメラも使うモード
+// #define PD_USE_CAM_MODE 1
+
+// テストをするとき
+// キッカーの動作を確認するモード
+// #define TEST_KICKER_MODE 0
+// ジャイロでのPD制御のテストを行うモード
+// #define TEST_PD_GYRO_MODE 1
+// カメラでのPD制御のテストを行うモード
+// #define TEST_PD_CAM_MODE 2
+int mode_number = 0;
+bool mode_decided = false; // modeをユーザーが決定されたかどうか
+
+void ui_process()
 {
-    lcd_enter_button.update(); // 更新する
-    lcd_left_button.update();  // 更新する
-    lcd_right_button.update(); // 更新する
+    lcd_enter_button.update(); // ボタンの状況を更新
+    lcd_left_button.update();  // ボタンの状況を更新
+    lcd_right_button.update(); // ボタンの状況を更新
+
+    // 右ボタンが押された場合
+    if (lcd_right_button.is_released())
+    {
+        if (!action_decided) // まだactionが決められていない
+            action_number = (action_number + 1 + 3) % 3;
+        else if (!mode_decided) // まだmodeが決められていない
+        {
+            if (action_number == ACTION_ATTACKER || action_number == ACTION_DEFENDER) // 攻撃か守備なら
+                mode_number = (mode_number + 1 + 2) % 2;
+            else // 確認なら
+                mode_number = (mode_number + 1 + 3) % 3;
+        }
+    }
+    // 左ボタンが押された場合
+    if (lcd_left_button.is_released())
+    {
+        if (!action_decided) // まだactionが決められていない
+            action_number = (action_number - 1 + 3) % 3;
+        else if (!mode_decided) // まだmodeが決められていない
+        {
+            if (action_number == ACTION_ATTACKER || action_number == ACTION_DEFENDER) // 攻撃か守備なら
+                mode_number = (mode_number - 1 + 2) % 2;
+            else // 確認なら
+                mode_number = (mode_number - 1 + 3) % 3;
+        }
+    }
+
+    // 決定ボタンが押された場合
+    if (lcd_enter_button.is_released())
+    {
+        if (!action_decided) // まだactionが決められていない
+            action_decided = true;
+        else if (!mode_decided) // まだmodeが決められていない
+            mode_decided = true;
+    }
+
+    if (ui_first_call)
+    {
+        ui_first_call = false; // 次回からは初めてではない
+        my_ui_timer.reset();   // リセットする
+    }
+    if (my_ui_timer.get_time() >= 100 && (!action_decided || !mode_decided)) // 100ms経ってactionまたはmodeが決められていないなら
+    {
+        my_ui_timer.reset(); // リセット
+
+        SSD1306_clear(); // LCDに初期化する
+
+        // actionについて
+        switch (action_number)
+        {
+        case ACTION_ATTACKER:
+            SSD1306_write(1, 0, 0, "Action-Attacker", false);
+
+            if (action_decided) // actionが決められた
+            {
+                // modeについて
+                switch (mode_number)
+                {
+                case PD_USE_ONLY_GYRO_MODE:
+                    SSD1306_write(1, 0, 10, "PD : Use only gyro", false);
+                    break;
+
+                case PD_USE_CAM_MODE:
+                    SSD1306_write(1, 0, 10, "PD : Use cam", false);
+                    break;
+                }
+            }
+            break;
+
+        case ACTION_DEFENDER:
+            SSD1306_write(1, 0, 0, "Action-Defender", false);
+
+            if (action_decided) // actionが決められた
+            {
+                // modeについて
+                switch (mode_number)
+                {
+                case PD_USE_ONLY_GYRO_MODE:
+                    SSD1306_write(1, 0, 10, "PD : Use only gyro", false);
+                    break;
+
+                case PD_USE_CAM_MODE:
+                    SSD1306_write(1, 0, 10, "PD : Use cam", false);
+                    break;
+                }
+            }
+            break;
+
+        case ACTION_TEST:
+            SSD1306_write(1, 0, 0, "Action-Test", false);
+
+            if (action_decided) // actionが決められた
+            {
+                // modeについて
+                switch (mode_number)
+                {
+                case TEST_KICKER_MODE:
+                    SSD1306_write(1, 0, 10, "check : kicker", false);
+                    break;
+
+                case TEST_PD_GYRO_MODE:
+                    SSD1306_write(1, 0, 10, "check : PD only gyro", false);
+                    break;
+
+                case TEST_PD_CAM_MODE:
+                    SSD1306_write(1, 0, 10, "check : PD cam", false);
+                    break;
+                }
+            }
+            break;
+        }
+
+        SSD1306_show(); // LCDに表示する
+    }
 }
 
-int get_selected_ui_action()
-{
-    return 1;
+bool is_now_selecting_ui() {
+    return (!action_decided || !mode_decided);
 }
 
-int get_selected_ui_pd_mode()
-{
-    return 1;
+int get_selected_ui_action() {
+    return action_number;
 }
 
-bool is_selected_ui_use_cam()
-{
-    return -1;
-}
-
-int get_selected_ui_test_mode()
-{
-    return -1;
+int get_selected_ui_mode() {
+    return mode_number;
 }

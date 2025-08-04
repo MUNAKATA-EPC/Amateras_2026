@@ -21,12 +21,5 @@
 
 // 動作確認用のプログラムを実行
 void play_test(int test_mode);
-/* ↓ 入力 */
-// キッカーの動作を確認する
-#define TEST_KICKER 0
-// ジャイロでのPD制御のテストを行う
-#define TEST_PD_GYRO 1
-// カメラでのPD制御のテストを行う
-#define TEST_PD_CAM 2
 
 #endif
