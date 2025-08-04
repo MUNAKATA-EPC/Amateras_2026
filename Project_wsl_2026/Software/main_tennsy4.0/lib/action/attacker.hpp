@@ -16,6 +16,8 @@
 #include "motors-boost_ver.hpp"
 // キッカーについて
 #include "kicker.hpp"
+// uiについて
+#include "ui.hpp"
 
 // 攻撃用のプログラムを実行
 void play_attacker();

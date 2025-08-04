@@ -16,19 +16,21 @@
 #include "motors-boost_ver.hpp"
 // キッカーについて
 #include "kicker.hpp"
+// uiについて
+#include "ui.hpp"
 
 // パソコンにシリアルプリント用のプログラムを実行
 void play_PCprint(int PCprint_mode);
 /* ↓ 入力 */
 // シリアルですべてのセンサーの状況を確認する
-#define TEST_ALL_CHECK_WITH_SERIAL 0
+#define TEST_ALL_CHECK_WITH_PC 0
 // シリアルですべてのIRの状況を確認する
-#define TEST_IR_CHECK_WITH_SERIAL 1
+#define TEST_IR_CHECK_WITH_PC 1
 // シリアルですべてのLINEの状況を確認する
-#define TEST_LINE_CHECK_WITH_SERIAL 2
+#define TEST_LINE_CHECK_WITH_PC 2
 // シリアルですべてのジャイロの状況を確認する
-#define TEST_GYRO_CHECK_WITH_SERIAL 3
+#define TEST_GYRO_CHECK_WITH_PC 3
 // シリアルですべてのカメラの状況を確認する
-#define TEST_CAM_CHECK_WITH_SERIAL 4
+#define TEST_CAM_CHECK_WITH_PC 4
 
 #endif

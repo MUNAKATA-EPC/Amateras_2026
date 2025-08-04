@@ -3,8 +3,10 @@
 #include "attacker.hpp"
 // 守備用
 #include "defender.hpp"
-// テスト用
+// PCプリント用
 #include "PCprint.hpp"
+// テスト（動作確認）用
+#include "test.hpp"
 // LCD用
 #include "ui.hpp"
 
@@ -34,12 +36,11 @@ void setup()
 
 void loop()
 {
-
   IRserial_update();     // 更新
   LINEserial_update();   // 更新
   OpenMVserial_update(); // 更新
   BNO055_update();       // 更新
 
-  // play_PCprint(TEST_ALL_CHECK_WITH_SERIAL); // 全て確認する
+  // play_PCprint(TEST_ALL_CHECK_WITH_PC); // 全て確認する
   play_attacker(); // 攻撃を開始
 }
