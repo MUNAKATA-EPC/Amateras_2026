@@ -14,7 +14,19 @@ void play_attacker(bool use_cam)
     kicker_charge(true);                                                                 // キッカーは常時チャージする
 
     /*PD制御*/
-    PD_use_gyro(); // PD制御にジャイロを使う
+    if (use_cam)
+    {
+        // カメラを使う
+        if (goal_select_toggle.is_turn_on())
+            PD_use_yellow_goal(); // 黄色ゴールをPD制御に使う
+        else
+            PD_use_blue_goal(); // 青ゴールをPD制御に使う
+    }
+    else
+    {
+        // ジャイロを使う
+        PD_use_gyro(); // PD制御にジャイロを使う
+    }
 
     /*ロボット制御*/
     if (is_LINE_exist()) // ラインがあるならば
