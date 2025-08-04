@@ -20,7 +20,4 @@ void BNO055_update();
 // 計算した角度を出力
 int get_BNO055_deg();
 
-/*ボタンの実態を定義*/
-extern Button bno_reset_button; // BNO055のリセットボタン用
-
 #endif

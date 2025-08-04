@@ -28,4 +28,11 @@ public:
     bool is_released();
 };
 
+/*ボタンの実態を定義*/
+extern Button bno_reset_button; // BNO055のリセットボタン用
+
+extern Button lcd_enter_button; // 決定ボタン
+extern Button lcd_right_button; // 右ボタン
+extern Button lcd_left_button;  // 左ボタン
+
 #endif

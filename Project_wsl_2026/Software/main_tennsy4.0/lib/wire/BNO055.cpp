@@ -11,9 +11,6 @@ int bno_normal_deg = 0; // BNO055からの生データ格納用
 int bno_reset_deg = 0;  // リセットスイッチが押されたときの角度格納用
 int bno_deg = 0;        // 採取的な角度格納用
 
-/*ボタンを定義*/
-Button bno_reset_button; // BNO055のリセットボタン用
-
 void BNO055_set_resetpin(int pin, int pinmode)
 {
     bno_reset_pin = pin;

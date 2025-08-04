@@ -1,5 +1,12 @@
 #include "button.hpp"
 
+/*ボタンを定義*/
+Button bno_reset_button; // BNO055のリセットボタン用
+
+Button lcd_enter_button; // 決定ボタン
+Button lcd_right_button; // 右ボタン
+Button lcd_left_button;  // 左ボタン
+
 void Button::set_pin(int pin, int pinmode)
 {
     _button_pin = pin;         // ピン番号を格納
