@@ -109,10 +109,10 @@ void ui_process()
     {
         my_ui_timer.reset(); // リセット
 
-        SSD1306_clear(); // LCDに初期化する
-
         if (!action_decided || !mode_decided) // まだ選ばれていないなら
         {
+            SSD1306_clear(); // LCDを初期化する
+
             // actionについて
             switch (action_number)
             {
@@ -125,11 +125,15 @@ void ui_process()
                     switch (mode_number)
                     {
                     case PD_USE_ONLY_GYRO_MODE:
-                        SSD1306_write(1, 0, 10, "PD : Use only gyro", false);
+                        SSD1306_write(1, 6, 10, "PD : Use only gyro", false);
+
+                        play_lcd_print(GYRO_CHECK_WITH_LCD, 1, 30);
                         break;
 
                     case PD_USE_CAM_MODE:
-                        SSD1306_write(1, 0, 10, "PD : Use cam", false);
+                        SSD1306_write(1, 6, 10, "PD : Use cam", false);
+
+                        play_lcd_print(CAM_CHECK_WITH_LCD, 1, 30);
                         break;
                     }
                 }
@@ -144,11 +148,15 @@ void ui_process()
                     switch (mode_number)
                     {
                     case PD_USE_ONLY_GYRO_MODE:
-                        SSD1306_write(1, 0, 10, "PD : Use only gyro", false);
+                        SSD1306_write(1, 6, 10, "PD : Use only gyro", false);
+
+                        play_lcd_print(GYRO_CHECK_WITH_LCD, 1, 30);
                         break;
 
                     case PD_USE_CAM_MODE:
-                        SSD1306_write(1, 0, 10, "PD : Use cam", false);
+                        SSD1306_write(1, 6, 10, "PD : Use cam", false);
+
+                        play_lcd_print(CAM_CHECK_WITH_LCD, 1, 30);
                         break;
                     }
                 }
@@ -163,26 +171,35 @@ void ui_process()
                     switch (mode_number)
                     {
                     case TEST_KICKER_MODE:
-                        SSD1306_write(1, 0, 10, "check : kicker", false);
+                        SSD1306_write(1, 6, 10, "check : kicker", false);
                         break;
 
                     case TEST_PD_GYRO_MODE:
-                        SSD1306_write(1, 0, 10, "check : PD only gyro", false);
+                        SSD1306_write(1, 6, 10, "check : PD only gyro", false);
+
+                        play_lcd_print(GYRO_CHECK_WITH_LCD, 1, 30);
                         break;
 
                     case TEST_PD_CAM_MODE:
-                        SSD1306_write(1, 0, 10, "check : PD cam", false);
+                        SSD1306_write(1, 6, 10, "check : PD cam", false);
+
+                        play_lcd_print(CAM_CHECK_WITH_LCD, 1, 30);
                         break;
                     }
                 }
                 break;
             }
+
+            SSD1306_show(); // LCDに表示する
         }
         else // 決定された後
         {
-        }
+            SSD1306_clear(); // LCDを初期化する
 
-        SSD1306_show(); // LCDに表示する
+            SSD1306_write(2, 0, 0, "Running", false);
+
+            SSD1306_show(); // LCDに表示する
+        }
     }
 }
 
@@ -199,89 +216,4 @@ int get_selected_ui_action()
 int get_selected_ui_mode()
 {
     return mode_number;
-}
-
-void play_lcd_print(int lcd_print_mode)
-{
-    switch (lcd_print_mode)
-    {
-    case IR_LINE_GYRO_CHECK_WITH_LCD:
-        // IRについて
-        SSD1306_write(1, 0, 0, "ir_deg: " + String(get_IR_deg()), false);
-        SSD1306_write(1, 0, 10, "dis_deg:" + String(get_IR_distance()), false);
-        // LINEについて
-        SSD1306_write(1, 0, 20, "line_deg: " + String(get_LINE_deg()), false);
-        SSD1306_write(1, 0, 30, "line_side: " + String(get_LINE_side_right()) + String(get_LINE_side_left()) + String(get_LINE_side_back()), false);
-        // ジャイロについて
-        SSD1306_write(1, 0, 20, "bno_deg: " + String(get_BNO055_deg()), false);
-
-        break;
-
-    case IR_CHECK_WITH_LCD:
-        // IRserialについて
-        Serial.print(" ir_deg: ");
-        Serial.print(get_IR_deg());
-        Serial.print(" ir_dist: ");
-        Serial.print(get_IR_distance());
-        // IRcomputeについて
-        Serial.print(" -> ir_mawarikomi_deg: ");
-        Serial.print(get_IR_mawarikomi_deg());
-        Serial.print(" ir_follow_deg: ");
-        Serial.print(get_IR_follow_deg(0));
-
-        Serial.println();
-
-        break;
-
-    case LINE_CHECK_WITH_LCD:
-        // LINEselial・computeについて
-        Serial.print(" line_data ");
-        for (int i = 0; i < 16; i++)
-            Serial.print(get_LINE_data(i));
-        Serial.print(" line_side: r");
-        Serial.print(get_LINE_side_right());
-        Serial.print("l");
-        Serial.print(get_LINE_side_left());
-        Serial.print("b");
-        Serial.print(get_LINE_side_back());
-        Serial.print(" line_deg: ");
-        Serial.print(get_LINE_deg());
-
-        Serial.println();
-
-        break;
-
-    case GYRO_CHECK_WITH_LCD:
-        // ジャイロについて
-        Serial.print(" bno_deg: ");
-        Serial.print(get_BNO055_deg());
-        Serial.print(" pd_power: ");
-        PD_use_gyro(); // ジャイロで計算させる
-        Serial.print(get_PD_power());
-
-        Serial.println();
-
-        break;
-
-    case CAM_CHECK_WITH_LCD:
-        // カメラについて
-        Serial.print(" field_deg: ");
-        Serial.print(get_field_deg());
-        Serial.print(" yellow_deg: ");
-        Serial.print(get_yellow_goal_deg());
-        Serial.print(" yellow_dis: ");
-        Serial.print(get_yellow_goal_distance());
-        Serial.print(" blue_deg: ");
-        Serial.print(get_blue_goal_deg());
-        Serial.print(" blue_dis: ");
-        Serial.print(get_blue_goal_distance());
-
-        Serial.println();
-
-        break;
-
-    default:
-        Serial.println("error");
-        break;
-    }
 }
