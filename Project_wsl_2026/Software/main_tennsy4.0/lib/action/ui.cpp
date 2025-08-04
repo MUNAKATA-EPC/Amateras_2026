@@ -34,22 +34,22 @@ void ui_select()
     lcd_right_button.update(); // 更新する
 }
 
-int get_ui_action()
+int get_selected_ui_action()
 {
     return 1;
 }
 
-int get_ui_pd_mode()
+int get_selected_ui_pd_mode()
 {
     return 1;
 }
 
-bool is_ui_use_cam()
+bool is_selected_ui_use_cam()
 {
     return -1;
 }
 
-int get_ui_test_mode()
+int get_selected_ui_test_mode()
 {
     return -1;
 }

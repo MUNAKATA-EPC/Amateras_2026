@@ -1,5 +1,9 @@
 #include "toggle.hpp"
 
+/*トグルを定義*/
+Toggle motormove_toggle;  // モータを動かす選択用
+Toggle goal_select_toggle; // ゴール選択用
+
 void Toggle::set_pin(int pin)
 {
     _toggle_pin = pin;

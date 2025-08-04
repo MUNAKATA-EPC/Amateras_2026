@@ -18,8 +18,9 @@ void setup()
 
   LINEserial_init(&Serial2, 9600); // シリアル2を使いボートレート9600にする
 
-  DSR1202_init(&Serial3, 115200); // シリアル3を使いボートレート115200にする
-  motors_init(45, 135, 225, 315); // それぞれのモータの角度を定義
+  DSR1202_set_motormove_togglepin(10); // モータを動かすトグルスイッチのピン番号を設定
+  DSR1202_init(&Serial3, 115200);      // シリアル3を使いボートレート115200にする
+  motors_init(45, 135, 225, 315);      // それぞれのモータの角度を定義
 
   OpenMVserial_init(&Serial4, 115200); // シリアル4を使いボートレート115200にする
 
@@ -43,20 +44,20 @@ void loop()
 
   ui_select(); // モードを選ばせる
 
-  switch (get_ui_action())
+  switch (get_selected_ui_action())
   {
   case ACTION_ATTACKER_MODE:
-    play_attacker(is_ui_use_cam());
+    play_attacker(is_selected_ui_use_cam());
 
     break;
 
   case ACTION_DEFENDER_MODE:
-    play_defender(is_ui_use_cam());
+    play_defender(is_selected_ui_use_cam());
 
     break;
 
   case ACTION_TEST_MODE:
-    play_test(get_ui_test_mode()); // 動作確認用
+    play_test(get_selected_ui_test_mode()); // 動作確認用
 
     break;
   }

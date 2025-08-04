@@ -17,7 +17,7 @@ void ui_init();
 void ui_select();
 
 // 攻撃か守備かテストかを出力
-int get_ui_action();
+int get_selected_ui_action();
 /* ↓ 出力 */
 // 攻撃モード
 #define ACTION_ATTACKER_MODE 0
@@ -27,9 +27,9 @@ int get_ui_action();
 #define ACTION_TEST_MODE 2
 
 // ジャイロのみかカメラを使うのかどうか
-bool is_ui_use_cam();
+bool is_selected_ui_use_cam();
 
 // ジャイロのみかカメラを使うのかを出力
-int get_ui_test_mode();
+int get_selected_ui_test_mode();
 
 #endif

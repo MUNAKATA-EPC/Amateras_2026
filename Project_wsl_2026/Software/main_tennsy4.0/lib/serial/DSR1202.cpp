@@ -5,8 +5,19 @@
 HardwareSerial *_serial; // とりあえず定義
 int _baudrate;           // ボートレート格納用
 
+int DSR1202_motormove_toggle_pin = 0; // モータを動かすかどうかを決定するトグルスイッチのピン格納用
+
+void DSR1202_set_motormove_togglepin(int pin)
+{
+    DSR1202_motormove_toggle_pin = pin;
+
+    motormove_toggle.set_pin(DSR1202_motormove_toggle_pin); // トグルスイッチのピン番号を設定
+}
+
 void DSR1202_init(HardwareSerial *serial, int baudrate)
 {
+    motormove_toggle.init(); // トグルスイッチのピンを設定
+
     _serial = serial;
     _baudrate = baudrate;
     (*_serial).begin(_baudrate); // ボートレート定義
@@ -20,6 +31,16 @@ void DSR1202_break()
 
 void DSR1202_move(int value_1ch, int value_2ch, int value_3ch, int value_4ch)
 {
+    /*トグルスイッチがオフならば*/
+
+    if (!motormove_toggle.is_turn_on())
+    {
+        DSR1202_break(); // モータを停止させる
+        return;          // 終わり
+    }
+
+    /*トグルスイッチがオンならそれぞれのチャンネルを動かす*/
+
     // 1chについて
     value_1ch = constrain(value_1ch, -100, 100);       // -100~100の範囲に収める
     String str_abs_value_1ch = String(abs(value_1ch)); // 符号を除いた値をString型に変換

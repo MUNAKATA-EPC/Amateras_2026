@@ -19,4 +19,8 @@ public:
     bool is_turn_on();
 };
 
+/*トグルを定義*/
+extern Toggle motormove_toggle;  // モータを動かす選択用
+extern Toggle goal_select_toggle; // ゴール選択用
+
 #endif

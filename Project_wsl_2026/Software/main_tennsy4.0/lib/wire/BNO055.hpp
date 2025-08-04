@@ -10,7 +10,7 @@
 #include "toggle.hpp"
 #include "timer.hpp"
 
-// リセットスイッチのピン番号とモードを設定
+// リセットボタンのピン番号とモードを設定
 void BNO055_set_resetpin(int pin, int pinmode);
 // I2C定義・開始
 void BNO055_init(TwoWire *wire, uint8_t adress);
