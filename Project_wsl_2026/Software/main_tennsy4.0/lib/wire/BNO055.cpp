@@ -11,15 +11,20 @@ int bno_normal_deg = 0; // BNO055からの生データ格納用
 int bno_reset_deg = 0;  // リセットスイッチが押されたときの角度格納用
 int bno_deg = 0;        // 採取的な角度格納用
 
+/*ボタンを定義*/
+Button bno_reset_button; // BNO055のリセットボタン用
+
 void BNO055_set_resetpin(int pin, int pinmode)
 {
     bno_reset_pin = pin;
     bno_reset_pinmode = pinmode;
+
+    bno_reset_button.set_pin(bno_reset_pin, bno_reset_pinmode); // ピンをセット
 }
 
 void BNO055_init(TwoWire *wire, uint8_t address)
 {
-    pinMode(bno_reset_pin, bno_reset_pinmode); // ピンを設定
+    bno_reset_button.init(); // 設定する
 
     if (bno != nullptr)
     {
@@ -43,20 +48,8 @@ void BNO055_update()
 
     bno_normal_deg = euler.x(); // X軸のデータを取得
 
-    if (bno_reset_pinmode == INPUT_PULLDOWN)
-    {
-        if (digitalRead(bno_reset_pin) == HIGH)
-        {
-            bno_reset_deg = bno_normal_deg; // reset_degを更新
-        }
-    }
-    else if (bno_reset_pinmode == INPUT_PULLUP)
-    {
-        if (digitalRead(bno_reset_pin) == LOW)
-        {
-            bno_reset_deg = bno_normal_deg; // reset_degを更新
-        }
-    }
+    if (bno_reset_button.is_released()) // ボタンが押されたなら
+        bno_reset_deg = bno_normal_deg; // reset_degを更新
 
     bno_deg = (int)(bno_normal_deg - bno_reset_deg + 360) % 360; // 角度を計算
 }

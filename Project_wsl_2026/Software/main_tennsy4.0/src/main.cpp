@@ -4,7 +4,7 @@
 // 守備用
 #include "defender.hpp"
 // テスト用
-#include "test.hpp"
+#include "PCprint.hpp"
 
 void setup()
 {
@@ -34,6 +34,6 @@ void loop()
   OpenMVserial_update(); // 更新
   BNO055_update();       // 更新
 
-  // play_test(TEST_ALL_CHECK_WITH_SERIAL); // 全て確認する
+  // play_PCprint(TEST_ALL_CHECK_WITH_SERIAL); // 全て確認する
   play_attacker(); // 攻撃を開始
 }

@@ -1,9 +1,9 @@
 #include "defender.hpp"
-#include "test.hpp"
+#include "PCprint.hpp"
 
 /*守備用のプログラムを実行する*/
 
 void play_defender()
 {
-    play_test(TEST_ALL_CHECK_WITH_SERIAL); // シリアルプリントさせる
+    play_PCprint(TEST_ALL_CHECK_WITH_SERIAL); // シリアルプリントさせる
 }

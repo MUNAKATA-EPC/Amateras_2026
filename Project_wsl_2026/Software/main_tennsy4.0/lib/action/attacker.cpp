@@ -1,12 +1,12 @@
 #include "attacker.hpp"
-#include "test.hpp"
+#include "PCprint.hpp"
 
 /*攻撃用のプログラムを実行する*/
 
 void play_attacker()
 {
     /*PCにシリアルプリント*/
-    play_test(TEST_ALL_CHECK_WITH_SERIAL); // シリアルプリントさせる
+    play_PCprint(TEST_ALL_CHECK_WITH_SERIAL); // シリアルプリントさせる
 
     /*キッカー制御*/
     // kicker_kick(get_catchsensor()); // キャッチセンサーが反応したら蹴る
@@ -17,13 +17,13 @@ void play_attacker()
     PD_use_gyro(); // PD制御にジャイロを使う
 
     /*ロボット制御*/
-    if (is_LINE_exist) // ラインがあるならば
+    if (is_LINE_exist()) // ラインがあるならば
     {
         motors_move(get_LINE_deg() + 180, 95); // ラインから逃れる動きをする
     }
     else
     {
-        if (is_IR_exist) // IRボールがあるならば
+        if (is_IR_exist()) // IRボールがあるならば
         {
             if (get_IR_deg() < 10 || get_IR_deg() > 350) // 前にIRボールがあるとき
             {

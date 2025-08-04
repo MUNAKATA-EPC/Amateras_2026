@@ -17,19 +17,14 @@
 // キッカーについて
 #include "kicker.hpp"
 
-// モード
-// シリアルですべてのセンサーの状況を確認する
-#define TEST_ALL_CHECK_WITH_SERIAL 0
-// シリアルですべてのIRの状況を確認する
-#define TEST_IR_CHECK_WITH_SERIAL 1
-// シリアルですべてのLINEの状況を確認する
-#define TEST_LINE_CHECK_WITH_SERIAL 2
-// シリアルですべてのジャイロの状況を確認する
-#define TEST_GYRO_CHECK_WITH_SERIAL 3
-// シリアルですべてのカメラの状況を確認する
-#define TEST_CAM_CHECK_WITH_SERIAL 4
-
-// テスト用のプログラムを実行
+// 動作確認用のプログラムを実行
 void play_test(int test_mode);
+/* ↓ 入力 */
+// キッカーの動作を確認する
+#define TEST_KICKER 0
+// ジャイロでのPD制御のテストを行う
+#define TEST_PD_GYRO 1
+// カメラでのPD制御のテストを行う
+#define TEST_PD_CAM 2
 
 #endif

@@ -55,3 +55,8 @@ int get_LINE_data(int pin)
     else
         return line_data[pin]; // pin番目のラインセンサーの状況を返す
 }
+
+bool is_LINE_exist()
+{
+    return line_exist; // ラインが有るかどうかを返す
+}

@@ -6,6 +6,8 @@
 #include <Adafruit_Sensor.h>
 #include <utility/imumaths.h>
 #include <SPI.h>
+#include "button.hpp"
+#include "toggle.hpp"
 #include "timer.hpp"
 
 // リセットスイッチのピン番号とモードを設定
