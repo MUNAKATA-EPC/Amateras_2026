@@ -5,6 +5,8 @@
 #include "defender.hpp"
 // テスト用
 #include "PCprint.hpp"
+// LCD用
+#include "ui.hpp"
 
 void setup()
 {
@@ -25,10 +27,14 @@ void setup()
   // catchsensor_init(1);     // キャッチセンサーのピンを設定
   kicker_set_fetpin(2, 3); // キッカーのFETピンを設定
   kicker_init(1000);       // クールダウン時間の定義
+
+  ui_set_lcdpin(4, INPUT_PULLUP, 5, INPUT_PULLUP, 6, INPUT_PULLUP); // LCD用のボタンの定義
+  ui_init();                                                        // 定義
 }
 
 void loop()
 {
+
   IRserial_update();     // 更新
   LINEserial_update();   // 更新
   OpenMVserial_update(); // 更新

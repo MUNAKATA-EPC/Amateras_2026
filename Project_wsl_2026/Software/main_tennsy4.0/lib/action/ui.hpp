@@ -2,12 +2,24 @@
 #define UI_CPP
 
 #include <Arduino.h>
+#include "SSD1306.hpp"
 #include "button.hpp"
 #include "toggle.hpp"
 #include "timer.hpp"
 
+// 使うButtonの実態のみ定義
+extern Button lcd_enter_button;
+extern Button lcd_right_button;
+extern Button lcd_left_button;
+
+// LCDを動かすButtonのピンを定義
+void ui_set_lcdpin(int enter_pin, int enter_pinmode, int left_pin, int left_pinmode, int right_pin, int right_pinmode);
+
+// uiで使うButtonの設定
+void ui_init();
+
 // uiを実行する（選んでもらう）
-void ui_process();
+void ui_mode_select();
 
 // 攻撃か守備かテストかを出力
 int get_ui_action();
