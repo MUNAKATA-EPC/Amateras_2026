@@ -93,10 +93,24 @@ void ui_process()
     // 決定ボタンが押された場合
     if (lcd_enter_button.is_released())
     {
-        if (!action_decided) // まだactionが決められていない
-            action_decided = true;
-        else if (!mode_decided) // まだmodeが決められていない
-            mode_decided = true;
+        if (lcd_enter_button.get_pushing_time() >= 1500) // 1.5s以上押されていたら
+        {
+            if (action_decided && mode_decided) // actionもmodeも決定されたなら
+            {
+                mode_decided = false; // modeをもう一度決めれるようにする
+            }
+            else if (action_decided) // actionが決められていたら
+            {
+                action_decided = false; // actinoをもう一度決めれるようにする
+            }
+        }
+        else // それ未満なら
+        {
+            if (!action_decided) // まだactionが決められていない
+                action_decided = true;
+            else if (!mode_decided) // まだmodeが決められていない
+                mode_decided = true;
+        }
     }
 
     /*LCDに表示*/

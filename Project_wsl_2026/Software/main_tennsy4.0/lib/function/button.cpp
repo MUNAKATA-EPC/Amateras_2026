@@ -1,5 +1,7 @@
 #include "button.hpp"
 
+/*ボタンを使いやすくする関数*/
+
 /*ボタンを定義*/
 Button bno_reset_button; // BNO055のリセットボタン用
 
@@ -25,7 +27,12 @@ void Button::update()
     {
         if (digitalRead(_button_pin) == HIGH) // ボタンが押されたなら
         {
+            if (_button_count <= 0)
+                _pushing_timer.reset(); // 最初に押されたときにタイマーをリセット
+
             _button_count++; // カウントアップ
+
+            _pushing_time = _pushing_timer.get_time(); // タイマーからの時間を格納
         }
         else // ボタンが押されていないなら
         {
@@ -36,6 +43,9 @@ void Button::update()
             else //_button_countが正なら
             {
                 _button_count = -1; // カウントアップされているので-1にする
+
+                _pushing_time = _pushing_timer.get_time(); // 最後の時間を記録
+                _pushing_timer.reset();                    // 押されていないのでリセット
             }
         }
     }
@@ -43,7 +53,12 @@ void Button::update()
     {
         if (digitalRead(_button_pin) == LOW) // ボタンが押されたなら
         {
+            if (_button_count <= 0)
+                _pushing_timer.reset(); // 最初に押されたときにタイマーをリセット
+
             _button_count++; // カウントアップ
+
+            _pushing_time = _pushing_timer.get_time(); // タイマーからの時間を格納
         }
         else // ボタンが押されていないなら
         {
@@ -54,6 +69,9 @@ void Button::update()
             else //_button_countが正なら
             {
                 _button_count = -1; // カウントアップされているので-1にする
+
+                _pushing_time = _pushing_timer.get_time(); // 最後の時間を記録
+                _pushing_timer.reset();                    // 押されていないのでリセット
             }
         }
     }
@@ -67,4 +85,9 @@ bool Button::is_pushing()
 bool Button::is_released()
 {
     return _button_count == -1; // _button_countが-1の状況はボタンが離されて直後の状況と判断
+}
+
+int Button::get_pushing_time()
+{
+    return _pushing_time; // 前回ボタンがどのくらい押されていた、または今押されているボタンが今までどのくらい押され続けてきたか返す
 }

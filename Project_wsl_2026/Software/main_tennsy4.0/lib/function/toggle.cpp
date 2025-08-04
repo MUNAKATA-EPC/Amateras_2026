@@ -1,5 +1,7 @@
 #include "toggle.hpp"
 
+/*トグルスイッチが使いやすくなる関数*/
+
 /*トグルを定義*/
 Toggle motormove_toggle;  // モータを動かす選択用
 Toggle goal_select_toggle; // ゴール選択用

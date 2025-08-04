@@ -1,5 +1,7 @@
 #include "timer.hpp"
 
+/*タイマーが使えるようになる関数*/
+
 void Timer::reset() /// タイマーを初期化、0からカウントを始める
 {
     _reset_time = millis(); // リセット時の時間更新

@@ -1,6 +1,6 @@
 #include "kicker.hpp"
 
-/*キッカー*/
+/*キッカーで蹴ったり貯めたりする*/
 
 int fet1_kick_pin = 0;   // fet1につないだピン格納用
 int fet2_charge_pin = 0; // fet2につないだピン格納用

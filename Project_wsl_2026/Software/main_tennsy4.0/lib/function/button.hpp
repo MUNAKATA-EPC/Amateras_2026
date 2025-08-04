@@ -2,6 +2,7 @@
 #define BUTTON_HPP
 
 #include <Arduino.h>
+#include "timer.hpp"
 
 class Button
 {
@@ -10,6 +11,9 @@ private:
     int _button_pinmode = INPUT_PULLUP; // ボタンのピンモード格納用
 
     int _button_count = 0; // ボタンが押されている回数格納用
+
+    Timer _pushing_timer;  // 押されている時間計測用
+    int _pushing_time = 0; // 押されている間の時間格納用
 
 public:
     // 使うボタンのピン番号・ピンモードを設定する
@@ -26,6 +30,9 @@ public:
 
     // ボタンが離されたかどうか
     bool is_released();
+
+    // 前回ボタンがどのくらい押されていた、または今押されているボタンが今までどのくらい押され続けてきたか出力
+    int get_pushing_time();
 };
 
 /*ボタンの実態を定義*/

@@ -1,5 +1,7 @@
 #include "test.hpp"
 
+/*動作確認用のプログラムを実行する*/
+
 void play_test(int test_mode)
 {
     switch (test_mode)

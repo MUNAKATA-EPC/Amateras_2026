@@ -1,11 +1,11 @@
 #include "SSD1306.hpp"
 
-/*BNO055からのデータをI2Cで入手する*/
+/*SSD1306をI2Cで制御する*/
 
 Adafruit_SSD1306 *display = nullptr; // とりあえず定義
 
 int display_width = 128; // displayの横幅格納用
-int display_height = 64;  // displayの縦幅格納用
+int display_height = 64; // displayの縦幅格納用
 
 void SSD1306_init(TwoWire *wire, uint8_t adress, int width, int height)
 {
@@ -88,10 +88,10 @@ void SSD1306_function_line(double origin_x, double origin_y, double a, double b,
     // 計算
     double start_x = 0;                                         // x = 0の時について
     double start_y = a * start_x - a * origin_x + b + origin_y; // x = 0の時のyを求める
-    start_y = -start_y + display_height - 1;                     // 縦方向が正になるように調整
+    start_y = -start_y + display_height - 1;                    // 縦方向が正になるように調整
     double end_x = display_width - 1;                           // x = SSD1306_WIDTH - 1の時について
     double end_y = a * end_x - a * origin_x + b + origin_y;     // x = SSD1306_WIDTH - 1の時のyを求める
-    end_y = -end_y + display_height - 1;                         // 縦方向が正になるように調整
+    end_y = -end_y + display_height - 1;                        // 縦方向が正になるように調整
     // ラインを描画
     if (!black)
     {
