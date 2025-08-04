@@ -17,6 +17,16 @@ void SSD1306_init(TwoWire *wire, uint8_t adress, int width, int heigh)
         delete display;
     }
     display = new Adafruit_SSD1306(display_width, display_heigh, wire, -1); // 新しく作る
+
+    Timer my_display_timer;
+    my_display_timer.reset(); // タイマーをリセット
+    while (!(*display).begin(SSD1306_SWITCHCAPVCC, adress) && my_display_timer.get_time() < 5000)
+    {
+        delay(10); // 10ms待機
+    } // SSD1306との通信が成功するか5000ms経つかそれまで待つ
+
+    // 画面初期化
+    (*display).clearDisplay();
 }
 
 void SSD1306_clear()

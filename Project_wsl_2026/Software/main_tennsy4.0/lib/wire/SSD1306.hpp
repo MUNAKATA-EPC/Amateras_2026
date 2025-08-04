@@ -4,6 +4,7 @@
 #include <Arduino.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
+#include "timer.hpp"
 
 // I2C定義・開始
 void SSD1306_init(TwoWire *wire, uint8_t adress, int width, int heigh);
