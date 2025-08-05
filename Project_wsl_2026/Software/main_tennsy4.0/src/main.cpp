@@ -29,7 +29,7 @@ void setup()
 
   // catchsensor_init(1);     // キャッチセンサーのピンを設定
   kicker_set_fetpin(2, 3); // キッカーのFETピンを設定
-  kicker_init(1000);       // クールダウン時間の定義
+  kicker_init(700);       // クールダウン時間の定義
 
   SSD1306_init(&Wire1, 0x3C, 128, 64);
   ui_set_lcdpin(11, INPUT_PULLDOWN, 10, INPUT_PULLDOWN, 12, INPUT_PULLDOWN); // LCD用のボタンの定義
@@ -45,7 +45,7 @@ void loop()
 
   ui_process(); // モードを選ばせるー＞LCDアニメーションの実行
 
-  kicker_kick(lcd_enter_button.is_released()); // 決定ボタンが押されたら蹴る
+  //kicker_kick(1); // 決定ボタンが押されたら蹴る
 
   if (is_now_selecting_ui()) // 今選んでる途中なら
   {
@@ -60,7 +60,7 @@ void loop()
       switch (get_selected_ui_mode())
       {
       case PD_USE_ONLY_GYRO_MODE:
-        play_attacker(false, 95); // ジャイロのみで動かす
+        play_attacker(false, 80); // ジャイロのみで動かす
         break;
       case PD_USE_CAM_MODE:
         play_attacker(true, 95); // カメラで動かす

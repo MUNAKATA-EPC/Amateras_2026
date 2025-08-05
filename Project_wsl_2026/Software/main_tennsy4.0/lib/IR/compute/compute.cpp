@@ -1,4 +1,4 @@
-#include "IRcompute.hpp"
+#include "compute.hpp"
 
 /*得たIRボールの状況から回り込む角度などを算出する*/
 
@@ -47,6 +47,9 @@ int get_IR_mawarikomi_deg()
 int get_IR_follow_deg(int follow_target_offset)
 {
     int IR_follow_deg; // 近寄る角度格納用
+
+    if (follow_target_offset == 0)
+        return get_IR_deg(); // 近寄る目標がないときはそのままの角度を返す
 
     double delta_x = cos(radians(get_IR_deg())) * get_IR_distance();                        // xの変化量
     double delta_y = sin(radians(get_IR_deg())) * get_IR_distance() - follow_target_offset; // yの変化量

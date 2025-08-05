@@ -39,13 +39,6 @@ void motors_move(int deg, int abs_power)
     }
 
     DSR1202_move(motor_power_main[0], motor_power_main[1], motor_power_main[2], motor_power_main[3]); // モータを動かす
-
-    for (int i = 0; i < 4; i++)
-    {
-        Serial.print(motor_power_main[i]);
-        Serial.print(" , ");
-    }
-    Serial.print(" -> ");
 }
 
 void motors_only_PD(int max_pd_power)

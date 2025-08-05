@@ -14,9 +14,6 @@ void kicker_init(int cooldown_time);
 // キックする（クールダウンタイム中は蹴らない）
 void kicker_kick(bool kick_signal);
 
-// チャージする（クールダウンタイム中は蹴らない）
-void kicker_charge(bool charge_signal);
-
 /*キャッチセンサー*/
 
 // キャッチセンサーのピン設定・開始

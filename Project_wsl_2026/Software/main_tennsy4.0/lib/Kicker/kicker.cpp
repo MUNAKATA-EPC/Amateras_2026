@@ -7,7 +7,8 @@ int fet2_charge_pin = 0; // fet2につないだピン格納用
 
 int kicker_cooldown_time = 1000; // クールダウンタイム格納用
 
-Timer my_kicker_timer;         // クールダウン用のタイマー
+Timer my_continue_kick_timer;  // キックの信号を多めに送るためのタイマー
+Timer my_cooldown_timer;       // クールダウン用のタイマー
 bool kicker_first_call = true; // 最初の呼び出しかどうか
 
 void kicker_set_fetpin(int kick_pin, int charge_pin)
@@ -23,7 +24,7 @@ void kicker_init(int cooldown_time)
 
     kicker_cooldown_time = cooldown_time;
 
-    my_kicker_timer.reset(); // 一応リセットする
+    my_cooldown_timer.reset(); // 一応リセットする
 }
 
 void kicker_kick(bool kick_signal)
@@ -31,29 +32,27 @@ void kicker_kick(bool kick_signal)
     if (kicker_first_call) // もし最初の呼び出しなら
     {
         kicker_first_call = false;
-        my_kicker_timer.reset(); // リセットする
+        my_cooldown_timer.reset(); // リセットする
     }
 
-    if (kick_signal && my_kicker_timer.get_time() > kicker_cooldown_time)
+    if (kick_signal && my_cooldown_timer.get_time() > kicker_cooldown_time)
     {
-        digitalWrite(fet1_kick_pin, HIGH); // キックする
-        my_kicker_timer.reset();           // クールダウン開始
-    }
-    else
-    {
-        digitalWrite(fet1_kick_pin, LOW); // キックしない
-    }
-}
-
-void kicker_charge(bool charge_signal)
-{
-    if (charge_signal)
-    {
-        digitalWrite(fet2_charge_pin, HIGH); // チャージする
-    }
-    else
-    {
+        digitalWrite(fet1_kick_pin, HIGH);  // キックする
         digitalWrite(fet2_charge_pin, LOW); // チャージしない
+
+        my_continue_kick_timer.reset(); // リセットする
+    }
+    else if (my_continue_kick_timer.get_time() < 100) // キック信号が出てから100ms以内なら
+    {
+        digitalWrite(fet1_kick_pin, HIGH);  // キックし続ける
+        digitalWrite(fet2_charge_pin, LOW); // チャージし続けない
+
+        my_cooldown_timer.reset(); // クールダウンタイムをリセットする
+    }
+    else
+    {
+        digitalWrite(fet1_kick_pin, LOW);    // キックしない
+        digitalWrite(fet2_charge_pin, HIGH); // チャージする
     }
 }
 

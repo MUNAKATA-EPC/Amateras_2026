@@ -2,7 +2,7 @@
 #define LINECOMPUTE_HPP
 
 #include <Arduino.h>
-#include "LINEserial.hpp"
+#include "LINE.hpp"
 
 // 右サイドの状況を取得
 bool get_LINE_side_right();

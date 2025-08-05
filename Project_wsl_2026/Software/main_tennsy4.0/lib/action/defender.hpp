@@ -2,23 +2,19 @@
 #define DEFENDER_HPP
 
 // IRについて
-#include "IRserial.hpp"
-#include "IRcompute.hpp"
+#include "IR.hpp"
 // LINEについて
-#include "LINEserial.hpp"
-#include "LINEcompute.hpp"
+#include "LINE.hpp"
 // BNO055について
-#include "BNO055.hpp"
+#include "Gyro.hpp"
 // OpenMVについて
-#include "OpenMV.hpp"
+#include "Camera.hpp"
 // DSR1202について
-#include "DSR1202.hpp"
-#include "motors-boost_ver.hpp"
+#include "Motors.hpp"
 // キッカーについて
 #include "kicker.hpp"
 // uiについて
 #include "ui.hpp"
-
 // 守備用のプログラムを実行
 void play_defender(bool use_cam, int motor_power);
 

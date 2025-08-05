@@ -2,9 +2,7 @@
 #define PDPOWER_HPP
 
 #include <Arduino.h>
-#include "BNO055.hpp"
-#include "OpenMV.hpp"
-#include "timer.hpp"
+#include "Motors.hpp"
 
 // ジャイロをPD制御で使う場合
 void PD_use_gyro();

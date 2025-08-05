@@ -2,7 +2,7 @@
 #define DSR1202_HPP
 
 #include <Arduino.h>
-#include "toggle.hpp"
+#include "Motors.hpp"
 
 // モータ用のトグルスイッチのピン番号を設定
 void DSR1202_set_motormove_togglepin(int pin);

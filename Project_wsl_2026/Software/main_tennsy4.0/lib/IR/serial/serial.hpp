@@ -1,7 +1,8 @@
-#ifndef IRSERIAL_HPP
-#define IRSERIAL_HPP
+#ifndef IR_SERIAL_HPP
+#define IR_SERIAL_HPP
 
 #include <Arduino.h>
+#include "IR.hpp"
 
 // シリアル定義・開始
 void IRserial_init(HardwareSerial *serial, int baudrate);

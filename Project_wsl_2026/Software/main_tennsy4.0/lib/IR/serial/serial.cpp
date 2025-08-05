@@ -1,4 +1,4 @@
-#include "IRserial.hpp"
+#include "serial.hpp"
 
 /*IRボールの状況をシリアル通信で受信する*/
 

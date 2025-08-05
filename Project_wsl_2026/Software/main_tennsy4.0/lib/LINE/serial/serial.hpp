@@ -1,7 +1,8 @@
-#ifndef LINESERIAL_HPP
-#define LINESERIAL_HPP
+#ifndef LINE_SERIAL_HPP
+#define LINE_SERIAL_HPP
 
 #include <Arduino.h>
+#include "LINE.hpp"
 
 // シリアル定義・開始
 void LINEserial_init(HardwareSerial *serial, int baudrate);

@@ -8,8 +8,7 @@ void play_test(int test_mode)
     {
     case TEST_KICKER_MODE:
         // キッカーについて
-        kicker_charge(true);                                     // 常にチャージはする
-        if (lcd_enter_button.is_released() || get_catchsensor()) // 決定ボタンもしくはキャッチセンサーに反応があったら
+        if (bno_reset_button.is_released() || lcd_right_button.is_released() || lcd_left_button.is_released() || get_catchsensor()) // ボタンもしくはキャッチセンサーに反応があったら
         {
             kicker_kick(true);
         }

@@ -93,7 +93,7 @@ void ui_process()
     // 決定ボタンが押された場合
     if (lcd_enter_button.is_released())
     {
-        if (lcd_enter_button.get_pushing_time() >= 800) // 800ms以上押されていたら
+        if (lcd_enter_button.get_pushing_time() >= 600) // 600ms以上押されていたら
         {
             if (action_decided && mode_decided) // actionもmodeも決定されたなら
             {
@@ -103,8 +103,9 @@ void ui_process()
             {
                 action_decided = false; // actinoをもう一度決めれるようにする
             }
+            lcd_enter_button.reset_pushing_time(); // 押されている時間をリセット
         }
-        else // それ未満なら
+        else
         {
             if (!action_decided) // まだactionが決められていない
                 action_decided = true;
@@ -123,98 +124,95 @@ void ui_process()
     {
         my_ui_timer.reset(); // リセット
 
+        SSD1306_clear(); // LCDを初期化する
+
+        // actionについて
+        switch (action_number)
+        {
+        case ACTION_ATTACKER:
+            SSD1306_write(1, 0, 0, "Action-Attacker", false);
+
+            if (action_decided) // actionが決められた
+            {
+                // modeについて
+                switch (mode_number)
+                {
+                case PD_USE_ONLY_GYRO_MODE:
+                    SSD1306_write(1, 6, 10, "PD : Use only gyro", false);
+
+                    play_lcd_print(GYRO_CHECK_WITH_LCD, 1, 25);
+                    break;
+
+                case PD_USE_CAM_MODE:
+                    SSD1306_write(1, 6, 10, "PD : Use cam", false);
+
+                    play_lcd_print(CAM_CHECK_WITH_LCD, 1, 25);
+                    break;
+                }
+            }
+            break;
+
+        case ACTION_DEFENDER:
+            SSD1306_write(1, 0, 0, "Action-Defender", false);
+
+            if (action_decided) // actionが決められた
+            {
+                // modeについて
+                switch (mode_number)
+                {
+                case PD_USE_ONLY_GYRO_MODE:
+                    SSD1306_write(1, 6, 10, "PD : Use only gyro", false);
+
+                    play_lcd_print(GYRO_CHECK_WITH_LCD, 1, 25);
+                    break;
+
+                case PD_USE_CAM_MODE:
+                    SSD1306_write(1, 6, 10, "PD : Use cam", false);
+
+                    play_lcd_print(CAM_CHECK_WITH_LCD, 1, 25);
+                    break;
+                }
+            }
+            break;
+
+        case ACTION_TEST:
+            SSD1306_write(1, 0, 0, "Action-Test", false);
+
+            if (action_decided) // actionが決められた
+            {
+                // modeについて
+                switch (mode_number)
+                {
+                case TEST_KICKER_MODE:
+                    SSD1306_write(1, 6, 10, "check : kicker", false);
+                    break;
+
+                case TEST_PD_GYRO_MODE:
+                    SSD1306_write(1, 6, 10, "check : PD only gyro", false);
+
+                    play_lcd_print(GYRO_CHECK_WITH_LCD, 1, 25);
+                    break;
+
+                case TEST_PD_CAM_MODE:
+                    SSD1306_write(1, 6, 10, "check : PD cam", false);
+
+                    play_lcd_print(CAM_CHECK_WITH_LCD, 1, 25);
+                    break;
+                }
+            }
+            break;
+        }
+
         if (!action_decided || !mode_decided) // まだ選ばれていないなら
         {
-            SSD1306_clear(); // LCDを初期化する
-
-            // actionについて
-            switch (action_number)
-            {
-            case ACTION_ATTACKER:
-                SSD1306_write(1, 0, 0, "Action-Attacker", false);
-
-                if (action_decided) // actionが決められた
-                {
-                    // modeについて
-                    switch (mode_number)
-                    {
-                    case PD_USE_ONLY_GYRO_MODE:
-                        SSD1306_write(1, 6, 10, "PD : Use only gyro", false);
-
-                        play_lcd_print(GYRO_CHECK_WITH_LCD, 1, 25);
-                        break;
-
-                    case PD_USE_CAM_MODE:
-                        SSD1306_write(1, 6, 10, "PD : Use cam", false);
-
-                        play_lcd_print(CAM_CHECK_WITH_LCD, 1, 25);
-                        break;
-                    }
-                }
-                break;
-
-            case ACTION_DEFENDER:
-                SSD1306_write(1, 0, 0, "Action-Defender", false);
-
-                if (action_decided) // actionが決められた
-                {
-                    // modeについて
-                    switch (mode_number)
-                    {
-                    case PD_USE_ONLY_GYRO_MODE:
-                        SSD1306_write(1, 6, 10, "PD : Use only gyro", false);
-
-                        play_lcd_print(GYRO_CHECK_WITH_LCD, 1, 25);
-                        break;
-
-                    case PD_USE_CAM_MODE:
-                        SSD1306_write(1, 6, 10, "PD : Use cam", false);
-
-                        play_lcd_print(CAM_CHECK_WITH_LCD, 1, 25);
-                        break;
-                    }
-                }
-                break;
-
-            case ACTION_TEST:
-                SSD1306_write(1, 0, 0, "Action-Test", false);
-
-                if (action_decided) // actionが決められた
-                {
-                    // modeについて
-                    switch (mode_number)
-                    {
-                    case TEST_KICKER_MODE:
-                        SSD1306_write(1, 6, 10, "check : kicker", false);
-                        break;
-
-                    case TEST_PD_GYRO_MODE:
-                        SSD1306_write(1, 6, 10, "check : PD only gyro", false);
-
-                        play_lcd_print(GYRO_CHECK_WITH_LCD, 1, 25);
-                        break;
-
-                    case TEST_PD_CAM_MODE:
-                        SSD1306_write(1, 6, 10, "check : PD cam", false);
-
-                        play_lcd_print(CAM_CHECK_WITH_LCD, 1, 25);
-                        break;
-                    }
-                }
-                break;
-            }
-
-            SSD1306_show(); // LCDに表示する
+            // SSD1306_write(1, 0, 40, "now selecting", false);
         }
         else // 決定された後
         {
-            SSD1306_clear(); // LCDを初期化する
-
-            SSD1306_write(2, 0, 0, "Running", false);
-            play_lcd_print(IR_LINE_GYRO_CHECK_WITH_LCD, 0, 16);
-
-            SSD1306_show(); // LCDに表示する
+            SSD1306_write(2, 80, 40, "Run", true);
         }
+
+        SSD1306_show(); // LCDに表示する
     }
 }
 

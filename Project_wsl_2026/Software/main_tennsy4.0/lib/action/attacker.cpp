@@ -6,8 +6,7 @@ void play_attacker(bool use_cam, int motor_power)
 {
     /*キッカー制御*/
     // kicker_kick(get_catchsensor()); // キャッチセンサーが反応したら蹴る
-    // kicker_kick((is_IR_exist()) && ((get_IR_deg() < 20 || get_IR_deg() > 340) && (get_IR_distance() < 150))); // 前付近で近くのボールがあったら蹴る
-    kicker_charge(true); // キッカーは常時チャージする
+    kicker_kick((is_IR_exist()) && ((get_IR_deg() < 20 || get_IR_deg() > 340) && (get_IR_distance() < 150))); // 前付近で近くのボールがあったら蹴る
 
     /*PD制御*/
     if (use_cam)
@@ -37,9 +36,17 @@ void play_attacker(bool use_cam, int motor_power)
             {
                 motors_move(0, motor_power); // 前進する
             }
-            else if (get_IR_deg() < 25 || get_IR_deg() > 335) // 前付近にIRボールがあるとき
+            else if (get_IR_deg() < 20) // 左にボールがあるとき
             {
-                motors_move(get_IR_follow_deg(100), motor_power); // 前方100方向にボールが行くように制御する
+                motors_move(90, motor_power); // 前方100方向にボールが行くように制御する
+            }
+            else if (get_IR_deg() > 340) // 右にボールがあるとき
+            {
+                motors_move(270, motor_power); // 前方100方向にボールが行くように制御する
+            }
+            else if (get_IR_deg() < 30 || get_IR_deg() > 330) // 前付近にIRボールがあるとき
+            {
+                motors_move(get_IR_follow_deg(280), motor_power); // 前方100方向にボールが行くように制御する
             }
             else
             {

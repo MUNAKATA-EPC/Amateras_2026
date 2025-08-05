@@ -1,4 +1,4 @@
-#include "LINEserial.hpp"
+#include "serial.hpp"
 
 /*LINEセンサーの状況をシリアル通信で受信する*/
 

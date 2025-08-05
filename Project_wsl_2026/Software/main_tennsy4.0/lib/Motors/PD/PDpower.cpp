@@ -2,8 +2,8 @@
 
 /*PD制御の出力値を計算する*/
 
-#define GYRO_P_GAIN 0.3
-#define GYRO_D_GAIN 0.01
+#define GYRO_P_GAIN 0.75
+#define GYRO_D_GAIN 0.035
 
 #define GOAL_P_GAIN 0.1
 #define GOAL_D_GAIN 0.1
@@ -52,7 +52,7 @@ void PD_use_gyro()
     }
 
     /*合計*/
-    pd_power = -(int)(p_power + d_power);       // それぞれの出力を足し合わせる
+    pd_power = (int)(p_power + d_power);       // それぞれの出力を足し合わせる
     pd_power = constrain(pd_power, -100, 100); // 一応-100~100に収める
 }
 
@@ -100,7 +100,7 @@ void PD_use_yellow_goal()
         }
 
         /*合計*/
-        pd_power = -(int)(yellow_goal_p_power + yellow_goal_d_power);
+        pd_power = (int)(yellow_goal_p_power + yellow_goal_d_power);
         pd_power = constrain(pd_power, -100, 100);
     }
     else
@@ -156,7 +156,7 @@ void PD_use_blue_goal()
         }
 
         /*合計*/
-        pd_power = -(int)(blue_goal_p_power + blue_goal_d_power);
+        pd_power = (int)(blue_goal_p_power + blue_goal_d_power);
         pd_power = constrain(pd_power, -100, 100);
     }
     else
@@ -170,5 +170,5 @@ void PD_use_blue_goal()
 
 int get_PD_power()
 {
-    return pd_power; // 計算したPD出力を返す
+    return -pd_power; // 計算したPD出力を返す
 }

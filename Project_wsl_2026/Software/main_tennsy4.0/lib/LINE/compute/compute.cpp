@@ -1,4 +1,4 @@
-#include "LINEcompute.hpp"
+#include "compute.hpp"
 
 /*得たラインセンサーの状況から角度などを算出する*/
 

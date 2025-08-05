@@ -1,15 +1,21 @@
-#ifndef MOTORS_HPP
-#define MOTORS_HPP
+#ifndef MOTORS_BOOST_HPP
+#define MOTORS_BOOST_HPP
 
 #include <Arduino.h>
-#include "DSR1202.hpp"
-#include "PDpower.hpp"
+#include "Motors.hpp"
+
 
 // それぞれのチャンネルに接続したモータの角度を指定
 void motors_init(int deg_1ch, int deg_2ch, int deg_3ch, int deg_4ch);
 
 // 指定した方向に動かす（PD制御付き）
 void motors_move(int deg, int abs_power);
+
+// PD制御のみをする
+void motors_only_PD(int max_pd_power);
+
+// すべてのモータを停止させる
+void motors_break();
 
 /*ここのファイル内だけで使う関数*/
 
@@ -19,11 +25,5 @@ void compute_motor_power(int deg, int power);
 
 // index番目のモータの合力の大きさを返す
 double get_motor_power(int index);
-
-// index番目のモータの出力をx方向に分解した値を返す
-double get_motor_x_power(int index);
-
-// index番目のモータの出力をy方向に分解した値を返す
-double get_motor_y_power(int index);
 
 #endif

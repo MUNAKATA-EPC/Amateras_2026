@@ -91,3 +91,8 @@ int Button::get_pushing_time()
 {
     return _pushing_time; // 前回ボタンがどのくらい押されていた、または今押されているボタンが今までどのくらい押され続けてきたか返す
 }
+
+void Button::reset_pushing_time(){
+    _pushing_time = 0; // 押されている時間をリセット
+    _pushing_timer.reset(); // タイマーもリセット
+}
