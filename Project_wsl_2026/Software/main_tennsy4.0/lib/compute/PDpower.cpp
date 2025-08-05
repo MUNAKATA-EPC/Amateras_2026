@@ -2,11 +2,11 @@
 
 /*PD制御の出力値を計算する*/
 
-#define GYRO_P_GAIN 0.8
-#define GYRO_D_GAIN 0.6
+#define GYRO_P_GAIN 0.3
+#define GYRO_D_GAIN 0.01
 
-#define GOAL_P_GAIN 1.0
-#define GOAL_D_GAIN 0.8
+#define GOAL_P_GAIN 0.1
+#define GOAL_D_GAIN 0.1
 
 int pd_power;            // PD制御の出力格納用
 double p_power, d_power; // P・Dそれぞれの出力格納
@@ -20,9 +20,9 @@ bool gyro_first_call = true; // 関数が最初に呼び出されたかを読む
 
 void PD_use_gyro()
 {
-    now_gyro_value = 180 - get_BNO055_deg();             // BNO055の角度を-180~180にして保存
-    gap_of_gyro_value = now_gyro_value - old_gyro_value; // 差を計算
-    old_gyro_value = now_gyro_value;                     // BNO055の昔の角度を-180~180にして保存
+    now_gyro_value = (get_BNO055_deg() < 180) ? get_BNO055_deg() : get_BNO055_deg() - 360; // BNO055の角度を-180~180にして保存
+    gap_of_gyro_value = now_gyro_value - old_gyro_value;                                   // 差を計算
+    old_gyro_value = now_gyro_value;                                                       // BNO055の昔の角度を-180~180にして保存
 
     /*P制御について*/
     p_power = now_gyro_value * GYRO_P_GAIN; // 角度のずれ様によって比例制御
@@ -52,7 +52,7 @@ void PD_use_gyro()
     }
 
     /*合計*/
-    pd_power = (int)(p_power + d_power);       // それぞれの出力を足し合わせる
+    pd_power = -(int)(p_power + d_power);       // それぞれの出力を足し合わせる
     pd_power = constrain(pd_power, -100, 100); // 一応-100~100に収める
 }
 
@@ -69,8 +69,8 @@ void PD_use_yellow_goal()
 {
     if (is_yellow_goal_exist())
     {
-        now_yellow_goal_value = get_yellow_goal_deg();                            // 現在の角度
-        gap_of_yellow_goal_value = now_yellow_goal_value - old_yellow_goal_value; // 差を計算
+        now_yellow_goal_value = (get_yellow_goal_deg() < 180) ? get_yellow_goal_deg() : get_yellow_goal_deg() - 360; // 現在の角度
+        gap_of_yellow_goal_value = now_yellow_goal_value - old_yellow_goal_value;                                    // 差を計算
         old_yellow_goal_value = now_yellow_goal_value;
 
         /*P制御*/
@@ -100,7 +100,7 @@ void PD_use_yellow_goal()
         }
 
         /*合計*/
-        pd_power = (int)(yellow_goal_p_power + yellow_goal_d_power);
+        pd_power = -(int)(yellow_goal_p_power + yellow_goal_d_power);
         pd_power = constrain(pd_power, -100, 100);
     }
     else
@@ -125,8 +125,8 @@ void PD_use_blue_goal()
 {
     if (is_blue_goal_exist())
     {
-        now_blue_goal_value = get_blue_goal_deg();                          // 現在の角度
-        gap_of_blue_goal_value = now_blue_goal_value - old_blue_goal_value; // 差を計算
+        now_blue_goal_value = (get_blue_goal_deg() < 180) ? get_blue_goal_deg() : get_blue_goal_deg() - 360; // 現在の角度
+        gap_of_blue_goal_value = now_blue_goal_value - old_blue_goal_value;                                  // 差を計算
         old_blue_goal_value = now_blue_goal_value;
 
         /*P制御*/
@@ -156,7 +156,7 @@ void PD_use_blue_goal()
         }
 
         /*合計*/
-        pd_power = (int)(blue_goal_p_power + blue_goal_d_power);
+        pd_power = -(int)(blue_goal_p_power + blue_goal_d_power);
         pd_power = constrain(pd_power, -100, 100);
     }
     else

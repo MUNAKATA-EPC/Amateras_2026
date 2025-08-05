@@ -4,7 +4,7 @@
 // 守備用
 #include "defender.hpp"
 // PCプリント用
-#include "pc_print.hpp"
+#include "print.hpp"
 // テスト（動作確認）用
 #include "test.hpp"
 // LCD用
@@ -16,23 +16,24 @@ void setup()
 
   IRserial_init(&Serial1, 9600); // シリアル1を使いボートレート9600にする
 
-  LINEserial_init(&Serial2, 9600); // シリアル2を使いボートレート9600にする
+  LINEserial_init(&Serial5, 9600); // シリアル2を使いボートレート9600にする
 
-  DSR1202_set_motormove_togglepin(10); // モータを動かすトグルスイッチのピン番号を設定
-  DSR1202_init(&Serial3, 115200);      // シリアル3を使いボートレート115200にする
-  motors_init(45, 135, 225, 315);      // それぞれのモータの角度を定義
+  DSR1202_set_motormove_togglepin(4); // モータを動かすトグルスイッチのピン番号を設定
+  DSR1202_init(&Serial2, 115200);     // シリアル3を使いボートレート115200にする
+  motors_init(315, 45, 225, 135);     // モーターの設置角度を定義
 
-  OpenMVserial_init(&Serial4, 115200); // シリアル4を使いボートレート115200にする
+  OpenMVserial_init(&Serial3, 115200); // シリアル4を使いボートレート115200にする
 
-  BNO055_set_resetpin(22, INPUT_PULLDOWN); // BNOのリセットピンを定義
-  BNO055_init(&Wire1, 0x28);               // どのBNOを使うか
+  BNO055_set_resetpin(9, INPUT_PULLDOWN); // BNOのリセットピンを定義
+  BNO055_init(&Wire, 0x28);               // どのBNOを使うか
 
   // catchsensor_init(1);     // キャッチセンサーのピンを設定
   kicker_set_fetpin(2, 3); // キッカーのFETピンを設定
   kicker_init(1000);       // クールダウン時間の定義
 
-  ui_set_lcdpin(4, INPUT_PULLUP, 5, INPUT_PULLUP, 6, INPUT_PULLUP); // LCD用のボタンの定義
-  ui_init();                                                        // 定義
+  SSD1306_init(&Wire1, 0x3C, 128, 64);
+  ui_set_lcdpin(11, INPUT_PULLDOWN, 10, INPUT_PULLDOWN, 12, INPUT_PULLDOWN); // LCD用のボタンの定義
+  ui_init();                                                                 // 定義
 }
 
 void loop()
@@ -43,6 +44,8 @@ void loop()
   BNO055_update();       // 更新
 
   ui_process(); // モードを選ばせるー＞LCDアニメーションの実行
+
+  kicker_kick(lcd_enter_button.is_released()); // 決定ボタンが押されたら蹴る
 
   if (is_now_selecting_ui()) // 今選んでる途中なら
   {

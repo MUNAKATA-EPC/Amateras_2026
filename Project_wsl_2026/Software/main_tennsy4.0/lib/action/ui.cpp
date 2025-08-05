@@ -93,7 +93,7 @@ void ui_process()
     // 決定ボタンが押された場合
     if (lcd_enter_button.is_released())
     {
-        if (lcd_enter_button.get_pushing_time() >= 1500) // 1.5s以上押されていたら
+        if (lcd_enter_button.get_pushing_time() >= 800) // 800ms以上押されていたら
         {
             if (action_decided && mode_decided) // actionもmodeも決定されたなら
             {
@@ -141,13 +141,13 @@ void ui_process()
                     case PD_USE_ONLY_GYRO_MODE:
                         SSD1306_write(1, 6, 10, "PD : Use only gyro", false);
 
-                        play_lcd_print(GYRO_CHECK_WITH_LCD, 1, 30);
+                        play_lcd_print(GYRO_CHECK_WITH_LCD, 1, 25);
                         break;
 
                     case PD_USE_CAM_MODE:
                         SSD1306_write(1, 6, 10, "PD : Use cam", false);
 
-                        play_lcd_print(CAM_CHECK_WITH_LCD, 1, 30);
+                        play_lcd_print(CAM_CHECK_WITH_LCD, 1, 25);
                         break;
                     }
                 }
@@ -164,13 +164,13 @@ void ui_process()
                     case PD_USE_ONLY_GYRO_MODE:
                         SSD1306_write(1, 6, 10, "PD : Use only gyro", false);
 
-                        play_lcd_print(GYRO_CHECK_WITH_LCD, 1, 30);
+                        play_lcd_print(GYRO_CHECK_WITH_LCD, 1, 25);
                         break;
 
                     case PD_USE_CAM_MODE:
                         SSD1306_write(1, 6, 10, "PD : Use cam", false);
 
-                        play_lcd_print(CAM_CHECK_WITH_LCD, 1, 30);
+                        play_lcd_print(CAM_CHECK_WITH_LCD, 1, 25);
                         break;
                     }
                 }
@@ -191,13 +191,13 @@ void ui_process()
                     case TEST_PD_GYRO_MODE:
                         SSD1306_write(1, 6, 10, "check : PD only gyro", false);
 
-                        play_lcd_print(GYRO_CHECK_WITH_LCD, 1, 30);
+                        play_lcd_print(GYRO_CHECK_WITH_LCD, 1, 25);
                         break;
 
                     case TEST_PD_CAM_MODE:
                         SSD1306_write(1, 6, 10, "check : PD cam", false);
 
-                        play_lcd_print(CAM_CHECK_WITH_LCD, 1, 30);
+                        play_lcd_print(CAM_CHECK_WITH_LCD, 1, 25);
                         break;
                     }
                 }
@@ -211,6 +211,7 @@ void ui_process()
             SSD1306_clear(); // LCDを初期化する
 
             SSD1306_write(2, 0, 0, "Running", false);
+            play_lcd_print(IR_LINE_GYRO_CHECK_WITH_LCD, 0, 16);
 
             SSD1306_show(); // LCDに表示する
         }

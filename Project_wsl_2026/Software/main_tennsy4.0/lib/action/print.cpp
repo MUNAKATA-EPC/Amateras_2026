@@ -148,17 +148,17 @@ void play_lcd_print(int lcd_print_mode, int ahead_x, int ahead_y)
     case GYRO_CHECK_WITH_LCD:
         // ジャイロについて
         SSD1306_write(1, 0 + ahead_x, 0 + ahead_y, "bno_deg: " + String(get_BNO055_deg()), false);
+        PD_use_gyro();
         SSD1306_write(1, 0 + ahead_x, 10 + ahead_y, "pd_power: " + String(get_PD_power()), false);
 
         break;
 
     case CAM_CHECK_WITH_LCD:
         // カメラについて
-        SSD1306_write(1, 0 + ahead_x, 0 + ahead_y, "field_deg: " + String(get_field_deg()), false);
-        SSD1306_write(1, 0 + ahead_x, 10 + ahead_y, "yellow_deg: " + String(get_yellow_goal_deg()), false);
-        SSD1306_write(1, 0 + ahead_x, 20 + ahead_y, "yellow_dis: " + String(get_yellow_goal_distance()), false);
-        SSD1306_write(1, 0 + ahead_x, 30 + ahead_y, "blue_deg: " + String(get_blue_goal_deg()), false);
-        SSD1306_write(1, 0 + ahead_x, 20 + ahead_y, "blue_dis: " + String(get_blue_goal_distance()), false);
+        SSD1306_write(1, 0 + ahead_x, 0 + ahead_y, "yellow_deg: " + String(get_yellow_goal_deg()), false);
+        SSD1306_write(1, 0 + ahead_x, 10 + ahead_y, "yellow_dis: " + String(get_yellow_goal_distance()), false);
+        SSD1306_write(1, 0 + ahead_x, 20 + ahead_y, "blue_deg: " + String(get_blue_goal_deg()), false);
+        SSD1306_write(1, 0 + ahead_x, 30 + ahead_y, "blue_dis: " + String(get_blue_goal_distance()), false);
 
         break;
 
