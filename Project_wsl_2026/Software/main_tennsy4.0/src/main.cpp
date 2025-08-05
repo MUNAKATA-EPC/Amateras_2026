@@ -16,22 +16,27 @@ void setup()
 
   IRserial_init(&Serial1, 9600); // シリアル1を使いボートレート9600にする
 
-  LINEserial_init(&Serial5, 9600); // シリアル2を使いボートレート9600にする
+  LINEserial_init(&Serial5, 115200); // シリアル5を使いボートレート115200にする
 
   DSR1202_set_motormove_togglepin(4); // モータを動かすトグルスイッチのピン番号を設定
-  DSR1202_init(&Serial2, 115200);     // シリアル3を使いボートレート115200にする
+  DSR1202_init(&Serial2, 115200);     // シリアル2を使いボートレート115200にする
   motors_init(315, 45, 225, 135);     // モーターの設置角度を定義
 
-  OpenMVserial_init(&Serial3, 115200); // シリアル4を使いボートレート115200にする
+  goal_select_toggle.set_pin(5);       // ゴール選択用のトグルスイッチのピン番号を設定
+  goal_select_toggle.init();           // トグルスイッチを初期化
+  OpenMVserial_init(&Serial3, 115200); // シリアル3を使いボートレート115200にする
 
   BNO055_set_resetpin(9, INPUT_PULLDOWN); // BNOのリセットピンを定義
   BNO055_init(&Wire, 0x28);               // どのBNOを使うか
 
-  // catchsensor_init(1);     // キャッチセンサーのピンを設定
+  catchsensor_init(6);     // キャッチセンサーのピンを設定
   kicker_set_fetpin(2, 3); // キッカーのFETピンを設定
-  kicker_init(700);       // クールダウン時間の定義
+  kicker_init(700);        // クールダウン時間の定義
 
   SSD1306_init(&Wire1, 0x3C, 128, 64);
+  SSD1306_clear();
+  SSD1306_write(1, 0, 0, "Hello", false);
+  SSD1306_show();
   ui_set_lcdpin(11, INPUT_PULLDOWN, 10, INPUT_PULLDOWN, 12, INPUT_PULLDOWN); // LCD用のボタンの定義
   ui_init();                                                                 // 定義
 }
@@ -43,13 +48,16 @@ void loop()
   OpenMVserial_update(); // 更新
   BNO055_update();       // 更新
 
-  ui_process(); // モードを選ばせるー＞LCDアニメーションの実行
+  // kicker_kick(1); // 決定ボタンが押されたら蹴る
 
-  //kicker_kick(1); // 決定ボタンが押されたら蹴る
+  ui_process(); // uiを実行
 
   if (is_now_selecting_ui()) // 今選んでる途中なら
   {
-    Serial.println("Now selecting");
+    Serial.print(analogRead(A6)); // ゴール選択トグルスイッチの状態を出力
+    Serial.println("Now selecting UI: ");
+
+    motors_break(); // モータは停止させる
   }
   else // 今選んだ
   {

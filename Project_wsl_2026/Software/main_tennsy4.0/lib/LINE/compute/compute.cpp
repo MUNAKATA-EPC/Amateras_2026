@@ -19,14 +19,19 @@ bool get_LINE_side_back()
 
 int get_LINE_deg()
 {
+    if (!is_LINE_exist())
+    {
+        return -1; // ラインが存在しないなら-1を返す
+    }
+
     double line_x = 0;
     double line_y = 0;
     // エンジェルラインについてx,yそれぞれの方向で加算
     for (int i = 0; i < 16; i++)
     {
         // 裏表逆なので位置がIRセンサーとは逆
-        line_x += cos(radians(-22.5 * i)) * get_LINE_data(i);
-        line_y += sin(radians(-22.5 * i)) * get_LINE_data(i);
+        line_x += cos(radians(22.5 * i)) * get_LINE_data(i);
+        line_y += sin(radians(22.5 * i)) * get_LINE_data(i);
     }
     // サイドラインについてx,yそれぞれの方向で加算
     if (get_LINE_side_right())
@@ -46,6 +51,7 @@ int get_LINE_deg()
     }
     // 角度算出
     double line_deg = degrees(atan2(line_y, line_x));
+    line_deg = (line_deg > 0) ? line_deg : line_deg + 360; // 0~360に直す
 
     return (int)line_deg;
 }

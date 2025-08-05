@@ -20,25 +20,30 @@ void motors_init(int deg_1ch, int deg_2ch, int deg_3ch, int deg_4ch)
 
 void motors_move(int deg, int abs_power)
 {
-    abs_power = abs(abs_power); // 一応絶対値にする（めんどくさいから絶対値にしている）
+    abs_power = abs(abs_power);    // 一応絶対値にする
+    compute_motor_power(deg, 100); // 移動のための出力を計算
 
-    compute_motor_power(deg, 100); // 適当に100の出力での各モータの出力を計算する->後でスケーリングするため適当でよい
-
-    double max_abs_power = 0; // 最大の出力を見つける
+    double max_move_power = 0;
     for (int i = 0; i < 4; i++)
     {
-        if (abs(motor_move_power[i]) > max_abs_power)
-            max_abs_power = abs(motor_move_power[i]); // 大きかったら更新する
+        double tmp = abs(motor_move_power[i] * motor_move_sign[i]); // 絶対値を取る
+        if (tmp > max_move_power)
+            max_move_power = tmp;
     }
-    double scale_value_for_max = (max_abs_power == 0) ? 0 : abs_power / max_abs_power; // モータの出力を最大(abs_power)にできるような係数を計算
 
-    for (int i = 0; i < 4; i++) // 最終的な計算
+    double pd_power = get_PD_power();
+
+    // PDを考慮したスケーリング可能最大値を計算
+    double max_allowed_move = abs_power - abs(pd_power);
+    double scale = (max_move_power == 0) ? 0 : max_allowed_move / max_move_power;
+
+    for (int i = 0; i < 4; i++)
     {
-        motor_power_main[i] = motor_move_power[i] * scale_value_for_max * motor_move_sign[i] + get_PD_power(); // 移動-PD制御で最終的な出力を出す
-        motor_power_main[i] = constrain(motor_power_main[i], -abs_power, abs_power);                           // 一応丸める
+        motor_power_main[i] = motor_move_power[i] * scale * motor_move_sign[i] + pd_power;
+        motor_power_main[i] = constrain(motor_power_main[i], -abs_power, abs_power); // 念のため
     }
 
-    DSR1202_move(motor_power_main[0], motor_power_main[1], motor_power_main[2], motor_power_main[3]); // モータを動かす
+    DSR1202_move(motor_power_main[0], motor_power_main[1], motor_power_main[2], motor_power_main[3]);
 }
 
 void motors_only_PD(int max_pd_power)

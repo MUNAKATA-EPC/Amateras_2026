@@ -28,10 +28,10 @@ void OpenMVserial_update()
 {
     if ((*openmv_serial).available() > 0)
     {
-        field_deg = (*openmv_serial).readStringUntil('a').toInt();            //'a'まで読む
-        yellow_goal_deg = (*openmv_serial).readStringUntil('b').toInt();      //'b'まで読む
+        field_deg = 360 - (*openmv_serial).readStringUntil('a').toInt();            //'a'まで読む
+        yellow_goal_deg = 360 - (*openmv_serial).readStringUntil('b').toInt();      //'b'まで読む
         yellow_goal_distance = (*openmv_serial).readStringUntil('c').toInt(); //'c'まで読む
-        blue_goal_deg = (*openmv_serial).readStringUntil('d').toInt();        //'d'まで読む
+        blue_goal_deg = 360 - (*openmv_serial).readStringUntil('d').toInt();        //'d'まで読む
         blue_goal_distance = (*openmv_serial).readStringUntil('e').toInt();   //'e'まで読む
 
         if (field_deg == -1)

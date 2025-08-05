@@ -19,10 +19,10 @@ void LINEserial_init(HardwareSerial *serial, int baudrate)
 
 void LINEserial_update()
 {
-    if ((*line_serial).available())
+    if ((*line_serial).available() > 0)
     {
         // 情報を10進数で受信->2進数に直す
-        int data_10 = (*line_serial).readStringUntil('\0').toInt(); // 16個(エンジェル)+3個(右・左・後)のデータを受信
+        unsigned int data_10 = (*line_serial).readStringUntil('\n').toInt(); // 16個(エンジェル)+3個(右・左・後)のデータを受信
 
         bool line_flag = false; // ラインの反応を見るフラグ
         int shift_num;          // 解析に使う変数

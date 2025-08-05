@@ -212,6 +212,9 @@ void ui_process()
             SSD1306_write(2, 80, 40, "Run", true);
         }
 
+        if (!action_decided) // actionが決められていないなら
+            play_lcd_print(IR_LINE_GYRO_CHECK_WITH_LCD, 0, 15);
+
         SSD1306_show(); // LCDに表示する
     }
 }

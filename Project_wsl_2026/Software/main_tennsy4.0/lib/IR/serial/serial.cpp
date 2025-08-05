@@ -22,7 +22,8 @@ void IRserial_update()
 {
     if ((*ir_serial).available() > 0)
     {
-        ir_deg = (*ir_serial).readStringUntil('a').toInt();      // 'a'まで読む
+        ir_deg = (*ir_serial).readStringUntil('a').toInt(); // 'a'まで読む
+        ir_deg = (ir_deg - 357 + 360) % 360;
         ir_distance = (*ir_serial).readStringUntil('b').toInt(); //'b'まで読む
 
         if (ir_deg == -1)
