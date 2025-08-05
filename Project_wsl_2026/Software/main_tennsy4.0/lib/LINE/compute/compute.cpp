@@ -17,10 +17,16 @@ bool get_LINE_side_back()
     return get_LINE_data(18); // 18個目のデータを返す
 }
 
+bool is_LINE_exsit_memory[16] = {false}; // ラインセンサー記憶用配列（エンジェル）
+
 int get_LINE_deg()
 {
     if (!is_LINE_exist())
     {
+        for (int i = 0; i < 16; i++)
+        {
+            is_LINE_exsit_memory[i] = false; // ラインが見えていないので、メモリクリア
+        }
         return -1; // ラインが存在しないなら-1を返す
     }
 
@@ -29,9 +35,14 @@ int get_LINE_deg()
     // エンジェルラインについてx,yそれぞれの方向で加算
     for (int i = 0; i < 16; i++)
     {
+        if (get_LINE_data(i) == true)
+            is_LINE_exsit_memory[i] = true; // 見えたらtrueにする
+    }
+    for (int i = 0; i < 16; i++)
+    {
         // 裏表逆なので位置がIRセンサーとは逆
-        line_x += cos(radians(22.5 * i)) * get_LINE_data(i);
-        line_y += sin(radians(22.5 * i)) * get_LINE_data(i);
+        line_x += cos(radians(22.5 * i)) * is_LINE_exsit_memory[i];
+        line_y += sin(radians(22.5 * i)) * is_LINE_exsit_memory[i];
     }
     // サイドラインについてx,yそれぞれの方向で加算
     if (get_LINE_side_right())

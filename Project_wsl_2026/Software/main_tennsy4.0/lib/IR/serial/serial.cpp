@@ -22,14 +22,17 @@ void IRserial_update()
 {
     if ((*ir_serial).available() > 0)
     {
-        ir_deg = (*ir_serial).readStringUntil('a').toInt(); // 'a'まで読む
-        ir_deg = (ir_deg - 357 + 360) % 360;
+        ir_deg = (*ir_serial).readStringUntil('a').toInt();      // 'a'まで読む
         ir_distance = (*ir_serial).readStringUntil('b').toInt(); //'b'まで読む
 
         if (ir_deg == -1)
             ir_exist = false; // 存在しない
         else
+        {
             ir_exist = true; // 存在する
+
+            ir_deg = (ir_deg - 357 + 360) % 360; // 調整
+        }
     }
 }
 

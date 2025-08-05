@@ -2,6 +2,8 @@
 
 /*攻撃用のプログラムを実行する*/
 
+// Timer attacker_line_timer; // ラインセンサー用のタイマー
+
 void play_attacker(bool use_cam, int motor_power)
 {
     /*PD制御*/
