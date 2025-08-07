@@ -15,7 +15,7 @@ int IRball_distance;             // 距離
 void setup()
 {
   Serial.begin(9600);
-  Serial1.begin(9600);
+  Serial1.begin(115200);
 
   ir_mux.set_pin(1, 2, 3, 4, 5, -1); // マルチプレクサのピンを設定
   ir_mux.init(10);                   // マルチプレクサの初期化、
@@ -78,6 +78,7 @@ void loop()
   Serial1.print("a");
   Serial1.print(IRball_distance);
   Serial1.print("b");
+  Serial1.flush(); // シリアル通信のバッファをフラッシュ
 
   delay(10);
 }
