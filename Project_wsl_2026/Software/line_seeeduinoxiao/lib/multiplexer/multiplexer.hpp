@@ -24,7 +24,7 @@ public:
     void init(int multiplexer_settle_microseconds);
 
     // マルチプレクサから情報を読み取る
-    int read(int index);
+    unsigned int read(int index);
 };
 
 #endif

@@ -27,7 +27,7 @@ void Multiplexer::init(int multiplexer_settle_microseconds)
         pinMode(_enable_pin, OUTPUT);
 }
 
-int Multiplexer::read(int index)
+unsigned int Multiplexer::read(int index)
 {
     index = constrain(index, 0, 15); // 一応丸める
 
