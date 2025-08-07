@@ -14,11 +14,11 @@ void setup()
 {
   Serial.begin(9600); // PCとのシリアル通信を開始
 
-  IRserial_init(&Serial1, 9600); // シリアル1を使いボートレート9600にする
+  IRserial_init(&Serial1, 115200); // シリアル1を使いボートレート9600にする
 
   LINEserial_init(&Serial5, 115200); // シリアル5を使いボートレート115200にする
 
-  DSR1202_set_motormove_togglepin(4); // モータを動かすトグルスイッチのピン番号を設定
+  DSR1202_set_motormove_togglepin(5); // モータを動かすトグルスイッチのピン番号を設定
   DSR1202_init(&Serial2, 115200);     // シリアル2を使いボートレート115200にする
   motors_init(315, 45, 225, 135);     // モーターの設置角度を定義
 
@@ -29,7 +29,7 @@ void setup()
   BNO055_set_resetpin(9, INPUT_PULLDOWN); // BNOのリセットピンを定義
   BNO055_init(&Wire, 0x28);               // どのBNOを使うか
 
-  catchsensor_init(6);     // キャッチセンサーのピンを設定
+  catchsensor_init(A6);     // キャッチセンサーのピンを設定
   kicker_set_fetpin(2, 3); // キッカーのFETピンを設定
   kicker_init(700);        // クールダウン時間の定義
 
@@ -49,6 +49,8 @@ void loop()
   BNO055_update();       // 更新
 
   // kicker_kick(1); // 決定ボタンが押されたら蹴る
+
+  Serial.print(get_catchsensor());
 
   ui_process(); // uiを実行
 

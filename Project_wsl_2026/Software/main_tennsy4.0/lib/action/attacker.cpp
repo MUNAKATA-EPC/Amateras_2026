@@ -21,6 +21,9 @@ void play_attacker(bool use_cam, int motor_power)
         PD_use_gyro(); // PD制御にジャイロを使う
     }
 
+    /*キッカー制御*/
+    // kicker_kick(get_catchsensor() <= 300); // キャッチセンサーが反応したら蹴る
+
     /*ロボット制御*/
     if (is_LINE_exist()) // ラインがあるならば
     {
@@ -30,17 +33,15 @@ void play_attacker(bool use_cam, int motor_power)
     {
         if (is_IR_exist()) // IRボールがあるならば
         {
-            if ((get_IR_deg() < 4) || (get_IR_deg() > 356))
+            if ((get_IR_deg() < 3) || (get_IR_deg() > 357))
             {
-                motors_move(0, motor_power);
+                kicker_kick(get_IR_distance() < 200); // 前付近で近くのボールがあったら蹴る
 
-                /*キッカー制御*/
-                // kicker_kick(get_catchsensor()); // キャッチセンサーが反応したら蹴る
-                kicker_kick(get_IR_distance() < 250); // 前付近で近くのボールがあったら蹴る
+                motors_move(0, motor_power); // 前進する
             }
             else if ((get_IR_deg() < 80) || (get_IR_deg() > 280))
             {
-                motors_move(get_IR_hirei_deg(2.3), motor_power);
+                motors_move(get_IR_hirei_deg(2.6), motor_power);
             }
             else
             {

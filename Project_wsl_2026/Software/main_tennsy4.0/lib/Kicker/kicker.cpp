@@ -7,7 +7,6 @@ int fet2_charge_pin = 0; // fet2につないだピン格納用
 
 int kicker_cooldown_time = 1000; // クールダウンタイム格納用
 
-Timer my_continue_kick_timer;  // キックの信号を多めに送るためのタイマー
 Timer my_cooldown_timer;       // クールダウン用のタイマー
 bool kicker_first_call = true; // 最初の呼び出しかどうか
 
@@ -40,14 +39,12 @@ void kicker_kick(bool kick_signal)
         digitalWrite(fet1_kick_pin, HIGH);  // キックする
         digitalWrite(fet2_charge_pin, LOW); // チャージしない
 
-        my_continue_kick_timer.reset(); // リセットする
+       my_cooldown_timer.reset(); // リセットする
     }
-    else if (my_continue_kick_timer.get_time() < 100) // キック信号が出てから100ms以内なら
+    else if (my_cooldown_timer.get_time() <= 50) // キック信号が出てから50ms以内なら
     {
         digitalWrite(fet1_kick_pin, HIGH);  // キックし続ける
         digitalWrite(fet2_charge_pin, LOW); // チャージし続けない
-
-        my_cooldown_timer.reset(); // クールダウンタイムをリセットする
     }
     else
     {
@@ -66,7 +63,7 @@ void catchsensor_init(int pin)
     pinMode(catchsensor_pin, INPUT); // ピン設定
 }
 
-bool get_catchsensor()
+unsigned int get_catchsensor()
 {
-    return digitalRead(catchsensor_pin); // キャッチセンサーの状態を返す
+    return analogRead(catchsensor_pin); // キャッチセンサーの状態を返す
 }

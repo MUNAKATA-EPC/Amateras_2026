@@ -1,6 +1,8 @@
 {
     "files.associations": {
         "memory": "cpp",
-        "random": "cpp"
+        "random": "cpp",
+        "executor": "cpp",
+        "future": "cpp"
     }
 }

@@ -31,7 +31,7 @@ void IRserial_update()
         {
             ir_exist = true; // 存在する
 
-            ir_deg = (ir_deg - 357 + 360) % 360; // 調整
+            ir_deg = (ir_deg - 359 + 360) % 360; // 調整
         }
     }
 }

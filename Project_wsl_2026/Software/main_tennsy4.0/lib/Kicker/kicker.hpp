@@ -20,6 +20,6 @@ void kicker_kick(bool kick_signal);
 void catchsensor_init(int pin);
 
 // キャッチセンサーは反応しているかどうか
-bool get_catchsensor();
+unsigned int get_catchsensor();
 
 #endif
