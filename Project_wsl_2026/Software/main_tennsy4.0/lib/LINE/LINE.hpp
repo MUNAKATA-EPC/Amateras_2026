@@ -5,4 +5,6 @@
 #include "compute/compute.hpp"
 #include "serial/serial.hpp"
 
+void LINE_update(); // 更新
+
 #endif

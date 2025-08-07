@@ -29,7 +29,7 @@ void setup()
   BNO055_set_resetpin(9, INPUT_PULLDOWN); // BNOのリセットピンを定義
   BNO055_init(&Wire, 0x28);               // どのBNOを使うか
 
-  catchsensor_init(A6);     // キャッチセンサーのピンを設定
+  catchsensor_init(A6);    // キャッチセンサーのピンを設定
   kicker_set_fetpin(2, 3); // キッカーのFETピンを設定
   kicker_init(700);        // クールダウン時間の定義
 
@@ -44,7 +44,7 @@ void setup()
 void loop()
 {
   IRserial_update();     // 更新
-  LINEserial_update();   // 更新
+  LINE_update();         // 更新
   OpenMVserial_update(); // 更新
   BNO055_update();       // 更新
 
