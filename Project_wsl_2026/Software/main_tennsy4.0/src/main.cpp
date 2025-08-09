@@ -3,10 +3,12 @@
 #include "attacker.hpp"
 // 守備用
 #include "defender.hpp"
-// PCプリント用
-#include "print.hpp"
 // テスト（動作確認）用
 #include "test.hpp"
+// ラジコン用
+#include "radicon.hpp"
+// PCプリント用
+#include "print.hpp"
 // LCD用
 #include "ui.hpp"
 
@@ -118,16 +120,16 @@ void loop()
       switch (get_selected_ui_mode())
       {
       case RADICON_50cc_MODE:
-        play_test(35);
+        play_radicon(35);
         break;
       case RADICON_100cc_MODE:
-        play_test(55);
+        play_radicon(55);
         break;
       case RADICON_150cc_MODE:
-        play_test(75);
+        play_radicon(75);
         break;
       case RADICON_200cc_MODE:
-        play_test(95);
+        play_radicon(95);
         break;
       }
 
