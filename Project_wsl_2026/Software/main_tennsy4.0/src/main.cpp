@@ -22,8 +22,6 @@ void setup()
   DSR1202_init(&Serial2, 115200);     // シリアル2を使いボートレート115200にする
   motors_init(315, 45, 225, 135);     // モーターの設置角度を定義
 
-  goal_select_toggle.set_pin(5); // ゴール選択用のトグルスイッチのピン番号を設定
-  goal_select_toggle.init();     // トグルスイッチを初期化
   Camera_init(&Serial3, 115200); // シリアル3を使いボートレート115200にする
 
   BNO055_set_resetpin(9, INPUT_PULLDOWN); // BNOのリセットピンを定義
@@ -32,6 +30,9 @@ void setup()
   catchsensor_init(A6);    // キャッチセンサーのピンを設定
   kicker_set_fetpin(2, 3); // キッカーのFETピンを設定
   kicker_init(700);        // クールダウン時間の定義
+
+  // Ps3_set_stick_adjust(5, 5, 5, 5);
+  // Ps3_init(&Serial4, 115200); // シリアル4を使いボートレート115200にする
 
   SSD1306_init(&Wire1, 0x3C, 128, 64);
   SSD1306_clear();
@@ -43,22 +44,18 @@ void setup()
 
 void loop()
 {
-  // motors_move(0, 40); // モータは停止させる
   IR_update();           // 更新
   LINE_serial_update();  // 更新1
   LINE_compute_update(); // 更新2
   Camera_update();       // 更新
   BNO055_update();       // 更新
-
-  // kicker_kick(1); // 決定ボタンが押されたら蹴る
-
-  Serial.print(get_catchsensor());
+  // Ps3_serial_update();   // 更新1
+  // Ps3_compute_update();  // 更新2
 
   ui_process(); // uiを実行
 
   if (is_now_selecting_ui()) // 今選んでる途中なら
   {
-    Serial.print(analogRead(A6)); // ゴール選択トグルスイッチの状態を出力
     Serial.println("Now selecting UI: ");
 
     motors_break(); // モータは停止させる
@@ -121,16 +118,16 @@ void loop()
       switch (get_selected_ui_mode())
       {
       case RADICON_50cc_MODE:
-        play_test(RADICON_50cc_MODE);
+        play_test(35);
         break;
       case RADICON_100cc_MODE:
-        play_test(RADICON_100cc_MODE);
+        play_test(55);
         break;
       case RADICON_150cc_MODE:
-        play_test(RADICON_150cc_MODE);
+        play_test(75);
         break;
       case RADICON_200cc_MODE:
-        play_test(RADICON_200cc_MODE);
+        play_test(95);
         break;
       }
 

@@ -12,6 +12,6 @@ void LINE_serial_update();
 // ラインが存在するかどうか
 bool is_LINE_exist();
 // LINEのデータを出力
-int get_LINE_data(int pin);
+int get_LINE_data(int index);
 
 #endif

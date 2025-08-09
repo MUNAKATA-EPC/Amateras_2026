@@ -48,12 +48,12 @@ void LINE_serial_update()
     }
 }
 
-int get_LINE_data(int pin)
+int get_LINE_data(int index)
 {
-    if (pin < 0 || pin > 18)
+    if (index < 0 || index > 18)
         return 0; // 範囲外のデータ請求ならば0を返す
     else
-        return line_data[pin]; // pin番目のラインセンサーの状況を返す
+        return line_data[index]; // index番目のラインセンサーの状況を返す
 }
 
 bool is_LINE_exist()

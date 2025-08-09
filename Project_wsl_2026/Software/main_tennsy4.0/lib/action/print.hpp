@@ -13,6 +13,8 @@
 #include "Motors.hpp"
 // キッカーについて
 #include "kicker.hpp"
+// PS3コントローラーについて
+#include "Ps3.hpp"
 // uiについて
 #include "ui.hpp"
 

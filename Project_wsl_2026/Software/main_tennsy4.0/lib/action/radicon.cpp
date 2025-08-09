@@ -1,20 +1,34 @@
+#include "radicon.hpp"
 #include "attacker.hpp"
+#include "defender.hpp"
 
 /*ラジコン用のプログラムを実行する*/
 
-// Timer attacker_line_timer; // ラインセンサー用のタイマー
-
-void play_radicon(int radicon_mode)
+void play_radicon(int motor_power)
 {
-    switch (radicon_mode)
+    /*PD制御*/
+    if (is_Ps3_stick_right_move())                             // 右ステックが倒されたならば
+        PD_use_gyro_set_target_ver(get_Ps3_stick_right_deg()); // PD制御にジャイロを使う
+    else
+        PD_use_gyro(); // PD制御にジャイロを使う
+
+    /*ロボット制御*/
+    int motor_power_variable = map(get_Ps3_stick_left_distance(), 0, 128, 0, motor_power); // 左ステックの倒されようによってスピードを変える
+
+    if (is_LINE_exist()) // ラインがあるならば
     {
-    case RADICON_50cc_MODE:
-        break;
-    case RADICON_100cc_MODE:
-        break;
-    case RADICON_150cc_MODE:
-        break;
-    case RADICON_200cc_MODE:
-        break;
+        motors_move(get_LINE_deg() + 180, motor_power_variable); // ラインから逃れる動きをする
+    }
+    else if (is_IR_exist() && get_Ps3_button_l3()) // IRボールがあってl3ボタンが押されたら
+    {
+        play_attacker(false, false, motor_power_variable); // 攻撃モードに切り替える
+    }
+    else if (is_Ps3_stick_left_move()) // 左スティックが倒されたならば
+    {
+        motors_move(get_Ps3_stick_left_deg(), motor_power_variable); // 左ステックの方向へ行く
+    }
+    else
+    {
+        motors_only_PD(motor_power_variable); // PD制御のみで動く
     }
 }

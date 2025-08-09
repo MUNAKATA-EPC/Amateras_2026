@@ -13,10 +13,12 @@
 #include "Motors.hpp"
 // キッカーについて
 #include "kicker.hpp"
+// PS3コントローラーについて
+#include "Ps3.hpp"
 // uiについて
 #include "ui.hpp"
 
 // ラジコン用のプログラムを実行
-void play_radicon(int radicon_mode);
+void play_radicon(int motor_power);
 
 #endif

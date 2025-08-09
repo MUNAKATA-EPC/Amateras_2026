@@ -1,72 +1,118 @@
 #include "compute.hpp"
 
-/*得たIRボールの状況から回り込む角度などを算出する*/
+/*ps3のデータを加工する*/
 
-int get_IR_mawarikomi_deg()
+int ps3_stick_left_deg;      // 左スティックの角度格納用
+int ps3_stick_left_distance; // 左スティックの距離格納用
+
+int ps3_stick_right_deg;      // 右スティックの角度格納用
+int ps3_stick_right_distance; // 右スティックの距離格納用
+
+bool get_Ps3_button_up()
 {
-    int IR_mawarikomi_deg; // 回り込むための角度格納用
-
-    if (get_IR_deg() < 45) // 左にボールがある
-    {
-        IR_mawarikomi_deg = get_IR_deg() + 70;
-    }
-    else if (get_IR_deg() < 90)
-    {
-        IR_mawarikomi_deg = get_IR_deg() + 56;
-    }
-    else if (get_IR_deg() < 135)
-    {
-        IR_mawarikomi_deg = get_IR_deg() + 55;
-    }
-    else if (get_IR_deg() < 180)
-    {
-        IR_mawarikomi_deg = get_IR_deg() + 70;
-    }
-    else if (get_IR_deg() < 225) // 右にボールがある
-    {
-        IR_mawarikomi_deg = get_IR_deg() - 70;
-    }
-    else if (get_IR_deg() < 270)
-    {
-        IR_mawarikomi_deg = get_IR_deg() - 55;
-    }
-    else if (get_IR_deg() < 315)
-    {
-        IR_mawarikomi_deg = get_IR_deg() - 55;
-    }
-    else
-    {
-        IR_mawarikomi_deg = get_IR_deg() - 70;
-    }
-
-    IR_mawarikomi_deg = (IR_mawarikomi_deg + 360) % 360; // 一応0~360に直す
-
-    return IR_mawarikomi_deg; // 回り込む角度を返す
+    return get_Ps3_button_data(0); // 0個目のデータを返す
 }
 
-int get_IR_follow_deg(int follow_target_offset)
+bool get_Ps3_button_down()
 {
-    int IR_follow_deg; // 近寄る角度格納用
-
-    if (follow_target_offset == 0)
-        return get_IR_deg(); // 近寄る目標がないときはそのままの角度を返す
-
-    double delta_x = cos(radians(get_IR_deg())) * get_IR_distance();                        // xの変化量
-    double delta_y = sin(radians(get_IR_deg())) * get_IR_distance() - follow_target_offset; // yの変化量
-
-    IR_follow_deg = (int)atan2(delta_y, delta_x); // 角度算出
-    IR_follow_deg = (IR_follow_deg + 360) % 360;  // 0~360に直す
-
-    return IR_follow_deg; // 近寄る角度を返す
+    return get_Ps3_button_data(1); // 1個目のデータを返す
 }
 
-int get_IR_hirei_deg(double a)
+bool get_Ps3_button_left()
 {
-    int IR_hirei_deg; // 比例して角度を調整するための角度格納用
+    return get_Ps3_button_data(2); // 2個目のデータを返す
+}
 
-    int IR_value = (get_IR_deg() < 180) ? get_IR_deg() : get_IR_deg() - 360; // 現在の角度を-180~180に変換
-    IR_hirei_deg = (int)(IR_value * a);                                      // 比例して角度を調整
-    IR_hirei_deg = (IR_hirei_deg + 360) % 360;                               // 一応0~360に直す
+bool get_Ps3_button_right()
+{
+    return get_Ps3_button_data(3); // 3個目のデータを返す
+}
 
-    return IR_hirei_deg; // 比例角度を返す
+bool get_Ps3_button_triangle()
+{
+    return get_Ps3_button_data(4); // 4個目のデータを返す
+}
+
+bool get_Ps3_button_circle()
+{
+    return get_Ps3_button_data(5); // 5個目のデータを返す
+}
+
+bool get_Ps3_button_cross()
+{
+    return get_Ps3_button_data(6); // 6個目のデータを返す
+}
+
+bool get_Ps3_button_square()
+{
+    return get_Ps3_button_data(7); // 7個目のデータを返す
+}
+
+bool get_Ps3_button_l1()
+{
+    return get_Ps3_button_data(8); // 8個目のデータを返す
+}
+
+bool get_Ps3_button_l2()
+{
+    return get_Ps3_button_data(9); // 9個目のデータを返す
+}
+
+bool get_Ps3_button_l3()
+{
+    return get_Ps3_button_data(10); // 10個目のデータを返す
+}
+
+bool get_Ps3_button_r1()
+{
+    return get_Ps3_button_data(11); // 11個目のデータを返す
+}
+
+bool get_Ps3_button_r2()
+{
+    return get_Ps3_button_data(12); // 12個目のデータを返す
+}
+
+bool get_Ps3_button_r3()
+{
+    return get_Ps3_button_data(13); // 13個目のデータを返す
+}
+
+int get_Ps3_stick_left_deg()
+{
+    return ps3_stick_left_deg; // 左スティックの角度を返す
+}
+
+int get_Ps3_stick_left_distance()
+{
+    return ps3_stick_left_distance; // 左スティックの距離を返す
+}
+
+int get_Ps3_stick_right_deg()
+{
+    return ps3_stick_right_deg; // 右スティックの角度を返す
+}
+
+int get_Ps3_stick_right_distance()
+{
+    return ps3_stick_right_distance; // 右スティックの距離を返す
+}
+
+void Ps3_compute_update()
+{
+    double ps3_stick_left_deg_sub = degrees(atan2(get_Ps3_stick_ly(), get_Ps3_stick_lx()));                        // 左スティックの角度を求める
+    ps3_stick_left_deg_sub = (ps3_stick_left_deg_sub < 0) ? ps3_stick_left_deg_sub + 360 : ps3_stick_left_deg_sub; // 0~360に直す
+    ps3_stick_left_deg = (int)ps3_stick_left_deg_sub;                                                              // 左スティックの角度を格納
+
+    ps3_stick_left_distance = (int)sqrt(pow(get_Ps3_stick_lx(), 2) + pow(get_Ps3_stick_ly(), 2)); // 左スティックの距離を求める
+    if (ps3_stick_left_distance > 128)                                                            // 128を超えたら128にする
+        ps3_stick_left_distance = 128;
+
+    double ps3_stick_right_deg_sub = degrees(atan2(get_Ps3_stick_ry(), get_Ps3_stick_rx()));                           // 右スティックの角度を求める
+    ps3_stick_right_deg_sub = (ps3_stick_right_deg_sub < 0) ? ps3_stick_right_deg_sub + 360 : ps3_stick_right_deg_sub; // 0~360に直す
+    ps3_stick_right_deg = (int)ps3_stick_right_deg_sub;                                                                // 右スティックの角度を格納
+
+    ps3_stick_right_distance = (int)sqrt(pow(get_Ps3_stick_rx(), 2) + pow(get_Ps3_stick_ry(), 2)); // 右スティックの距離を求める
+    if (ps3_stick_right_distance > 128)                                                            // 128を超えたら128にする
+        ps3_stick_right_distance = 128;
 }
