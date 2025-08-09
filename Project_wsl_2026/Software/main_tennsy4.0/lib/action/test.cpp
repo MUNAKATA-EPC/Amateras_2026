@@ -19,14 +19,10 @@ void play_test(int test_mode)
 
         break;
 
-    case TEST_PD_GYRO_MODE:
+    case TEST_MONITOR_MODE:
         break;
 
-    case TEST_PD_CAM_MODE:
-        break;
-
-    default:
-        Serial.println("error");
+    case TEST_PD_MODE:
         break;
     }
 }

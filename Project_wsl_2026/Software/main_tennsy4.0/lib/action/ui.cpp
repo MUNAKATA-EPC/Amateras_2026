@@ -67,13 +67,18 @@ void ui_process()
     if (lcd_right_button.is_released())
     {
         if (!action_decided) // まだactionが決められていない
-            action_number = (action_number + 1 + 3) % 3;
+        {
+            action_number = (action_number + 1 + 4) % 4;
+            mode_number = 0; // 初期化
+        }
         else if (!mode_decided) // まだmodeが決められていない
         {
             if (action_number == ACTION_ATTACKER || action_number == ACTION_DEFENDER) // 攻撃か守備なら
-                mode_number = (mode_number + 1 + 2) % 2;
-            else // 確認なら
                 mode_number = (mode_number + 1 + 3) % 3;
+            else if (action_number == ACTION_TEST) // 確認なら
+                mode_number = (mode_number + 1 + 3) % 3;
+            else // ラジコンなら
+                mode_number = (mode_number + 1 + 4) % 4;
         }
     }
 
@@ -159,8 +164,14 @@ void ui_process()
                     play_lcd_print(GYRO_CHECK_WITH_LCD, 1, 25);
                     break;
 
-                case PD_USE_CAM_MODE:
-                    SSD1306_write(1, 6, 10, "PD : Use cam", false);
+                case PD_USE_YELLOW_CAM_MODE:
+                    SSD1306_write(1, 6, 10, "PD : Use yellow cam", false);
+
+                    play_lcd_print(CAM_CHECK_WITH_LCD, 1, 25);
+                    break;
+
+                case PD_USE_BLUE_CAM_MODE:
+                    SSD1306_write(1, 6, 10, "PD : Use blue cam", false);
 
                     play_lcd_print(CAM_CHECK_WITH_LCD, 1, 25);
                     break;
@@ -182,8 +193,14 @@ void ui_process()
                     play_lcd_print(GYRO_CHECK_WITH_LCD, 1, 25);
                     break;
 
-                case PD_USE_CAM_MODE:
-                    SSD1306_write(1, 6, 10, "PD : Use cam", false);
+                case PD_USE_YELLOW_CAM_MODE:
+                    SSD1306_write(1, 6, 10, "PD : Use yellow cam", false);
+
+                    play_lcd_print(CAM_CHECK_WITH_LCD, 1, 25);
+                    break;
+
+                case PD_USE_BLUE_CAM_MODE:
+                    SSD1306_write(1, 6, 10, "PD : Use blue cam", false);
 
                     play_lcd_print(CAM_CHECK_WITH_LCD, 1, 25);
                     break;
@@ -203,16 +220,43 @@ void ui_process()
                     SSD1306_write(1, 6, 10, "check : kicker", false);
                     break;
 
-                case TEST_PD_GYRO_MODE:
-                    SSD1306_write(1, 6, 10, "check : PD only gyro", false);
+                case TEST_MONITOR_MODE:
+                    SSD1306_write(1, 6, 10, "check : monitor", false);
 
                     play_lcd_print(GYRO_CHECK_WITH_LCD, 1, 25);
                     break;
 
-                case TEST_PD_CAM_MODE:
-                    SSD1306_write(1, 6, 10, "check : PD cam", false);
+                case TEST_PD_MODE:
+                    SSD1306_write(1, 6, 10, "check : PD", false);
 
                     play_lcd_print(CAM_CHECK_WITH_LCD, 1, 25);
+                    break;
+                }
+            }
+            break;
+
+        case ACTION_RADICON:
+            SSD1306_write(1, 0, 0, "Action-Radicon", false);
+
+            if (action_decided) // actionが決められた
+            {
+                // modeについて
+                switch (mode_number)
+                {
+                case RADICON_50cc_MODE:
+                    SSD1306_write(1, 6, 10, "speed : 50cc", false);
+                    break;
+
+                case RADICON_100cc_MODE:
+                    SSD1306_write(1, 6, 10, "speed : 100cc", false);
+                    break;
+
+                case RADICON_150cc_MODE:
+                    SSD1306_write(1, 6, 10, "speed : 150cc", false);
+                    break;
+
+                case RADICON_200cc_MODE:
+                    SSD1306_write(1, 6, 10, "speed : 200cc", false);
                     break;
                 }
             }

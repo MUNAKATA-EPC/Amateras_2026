@@ -1,5 +1,5 @@
-#ifndef ATTACKER_HPP
-#define ATTACKER_HPP
+#ifndef RADICON_HPP
+#define RADICON_HPP
 
 // IRについて
 #include "IR.hpp"
@@ -16,7 +16,7 @@
 // uiについて
 #include "ui.hpp"
 
-// 攻撃用のプログラムを実行
-void play_attacker(bool use_yellow_cam, bool use_blue_cam, int motor_power);
+// ラジコン用のプログラムを実行
+void play_radicon(int radicon_mode);
 
 #endif

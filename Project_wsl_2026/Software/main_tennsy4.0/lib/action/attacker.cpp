@@ -4,16 +4,16 @@
 
 // Timer attacker_line_timer; // ラインセンサー用のタイマー
 
-void play_attacker(bool use_cam, int motor_power)
+void play_attacker(bool use_yellow_cam, bool use_blue_cam, int motor_power)
 {
     /*PD制御*/
-    if (use_cam)
+    if (use_yellow_cam)
     {
-        // カメラを使う
-        if (goal_select_toggle.is_turn_on())
-            PD_use_yellow_goal(); // 黄色ゴールをPD制御に使う
-        else
-            PD_use_blue_goal(); // 青ゴールをPD制御に使う
+        PD_use_yellow_goal(); // 黄色ゴールをPD制御に使う
+    }
+    else if (use_blue_cam)
+    {
+        PD_use_blue_goal(); // 黄色ゴールをPD制御に使う
     }
     else
     {

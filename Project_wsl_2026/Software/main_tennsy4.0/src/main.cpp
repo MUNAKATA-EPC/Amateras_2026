@@ -43,7 +43,7 @@ void setup()
 
 void loop()
 {
-  //motors_move(0, 40); // モータは停止させる
+  // motors_move(0, 40); // モータは停止させる
   IRserial_update();     // 更新
   LINE_update();         // 更新
   OpenMVserial_update(); // 更新
@@ -64,48 +64,72 @@ void loop()
   }
   else // 今選んだ
   {
+    play_pc_print(ALL_CHECK_WITH_PC); // 全て確認する
+
     switch (get_selected_ui_action())
     {
     case ACTION_ATTACKER:
-      play_pc_print(ALL_CHECK_WITH_PC); // 全て確認する
       switch (get_selected_ui_mode())
       {
       case PD_USE_ONLY_GYRO_MODE:
-        play_attacker(false, 95); // ジャイロのみで動かす
+        play_attacker(false, false, 95); // ジャイロのみで動かす
         break;
-      case PD_USE_CAM_MODE:
-        play_attacker(true, 95); // カメラで動かす
+      case PD_USE_YELLOW_CAM_MODE:
+        play_attacker(true, false, 95); // カメラで動かす
+        break;
+      case PD_USE_BLUE_CAM_MODE:
+        play_attacker(false, true, 95); // カメラで動かす
         break;
       }
 
       break;
 
     case ACTION_DEFENDER:
-      play_pc_print(ALL_CHECK_WITH_PC); // 全て確認する
       switch (get_selected_ui_mode())
       {
       case PD_USE_ONLY_GYRO_MODE:
-        play_defender(false, 60); // ジャイロのみで動かす
+        play_attacker(false, false, 95); // ジャイロのみで動かす
         break;
-      case PD_USE_CAM_MODE:
-        play_defender(true, 60); // カメラで動かす
+      case PD_USE_YELLOW_CAM_MODE:
+        play_attacker(true, false, 95); // カメラで動かす
+        break;
+      case PD_USE_BLUE_CAM_MODE:
+        play_attacker(false, true, 95); // カメラで動かす
         break;
       }
 
       break;
 
     case ACTION_TEST:
-      play_pc_print(ALL_CHECK_WITH_PC); // 全て確認する
       switch (get_selected_ui_mode())
       {
       case TEST_KICKER_MODE:
         play_test(TEST_KICKER_MODE);
         break;
-      case TEST_PD_GYRO_MODE:
-        play_test(TEST_PD_GYRO_MODE);
+      case TEST_MONITOR_MODE:
+        play_test(TEST_MONITOR_MODE);
         break;
-      case TEST_PD_CAM_MODE:
-        play_test(TEST_PD_CAM_MODE);
+      case TEST_PD_MODE:
+        play_test(TEST_PD_MODE);
+        break;
+      }
+
+      break;
+
+    case ACTION_RADICON:
+      switch (get_selected_ui_mode())
+      {
+      case RADICON_50cc_MODE:
+        play_test(RADICON_50cc_MODE);
+        break;
+      case RADICON_100cc_MODE:
+        play_test(RADICON_100cc_MODE);
+        break;
+      case RADICON_150cc_MODE:
+        play_test(RADICON_150cc_MODE);
+        break;
+      case RADICON_200cc_MODE:
+        play_test(RADICON_200cc_MODE);
         break;
       }
 

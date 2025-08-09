@@ -2,7 +2,7 @@
 
 /*守備用のプログラムを実行する*/
 
-void play_defender(bool use_cam_if_attacker, int motor_power)
+void play_defender(bool use_yellow_cam, bool use_blue_cam, int motor_power)
 {
     /*PD制御*/
     // ジャイロを使う
