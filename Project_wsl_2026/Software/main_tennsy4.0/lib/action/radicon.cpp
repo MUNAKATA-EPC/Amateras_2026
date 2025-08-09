@@ -12,6 +12,9 @@ void play_radicon(int motor_power)
     else
         PD_use_gyro(); // PD制御にジャイロを使う
 
+    /*キッカー制御*/
+    kicker_kick(get_Ps3_button_l1() || get_Ps3_button_l2() || get_Ps3_button_r1() || get_Ps3_button_r2()); // ボタンが反応したら蹴る
+
     /*ロボット制御*/
     int motor_power_variable = map(get_Ps3_stick_left_distance(), 0, 128, 0, motor_power); // 左ステックの倒されようによってスピードを変える
 
