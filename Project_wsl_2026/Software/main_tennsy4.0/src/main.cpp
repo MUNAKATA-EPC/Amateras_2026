@@ -41,6 +41,8 @@ void setup()
   ui_init();                                                                 // 定義
 }
 
+int start_num = 0;
+
 void loop()
 {
   IRserial_update();     // 更新
@@ -52,6 +54,7 @@ void loop()
 
   Serial.print(get_catchsensor());
 
+  /*
   ui_process(); // uiを実行
 
   if (is_now_selecting_ui()) // 今選んでる途中なら
@@ -84,10 +87,10 @@ void loop()
       switch (get_selected_ui_mode())
       {
       case PD_USE_ONLY_GYRO_MODE:
-        play_defender(false, 95); // ジャイロのみで動かす
+        play_defender(false, 60); // ジャイロのみで動かす
         break;
       case PD_USE_CAM_MODE:
-        play_defender(true, 95); // カメラで動かす
+        play_defender(true, 60); // カメラで動かす
         break;
       }
 
@@ -115,5 +118,22 @@ void loop()
 
       break;
     }
+  }
+  */
+
+  if (lcd_enter_button.is_released())
+  {
+    start_num++;
+    start_num = (start_num + 2) % 2;
+  }
+
+  if (start_num == 0)
+  {
+    PD_use_gyro;
+    motors_only_PD(95); // PD制御のみで動く
+  }
+  else
+  {
+    play_attacker(false, 95);
   }
 }

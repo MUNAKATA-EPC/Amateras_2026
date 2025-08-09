@@ -27,7 +27,14 @@ void play_attacker(bool use_cam, int motor_power)
     /*ロボット制御*/
     if (is_LINE_exist()) // ラインがあるならば
     {
-        motors_move(get_LINE_deg() + 180, motor_power); // ラインから逃れる動きをする
+        if (is_LINE_half_out())
+        {
+            motors_move(get_LINE_deg() + 180, motor_power / 2); // ラインから逃れる動きをする
+        }
+        else
+        {
+            motors_move(get_LINE_deg() + 180, motor_power); // ラインから逃れる動きをする
+        }
     }
     else
     {
@@ -35,22 +42,29 @@ void play_attacker(bool use_cam, int motor_power)
         {
             if ((get_IR_deg() < 3) || (get_IR_deg() > 357))
             {
-                kicker_kick(get_IR_distance() < 200); // 前付近で近くのボールがあったら蹴る
+                kicker_kick(get_IR_distance() < 300); // 前付近で近くのボールがあったら蹴る
 
                 motors_move(0, motor_power); // 前進する
             }
-            else if ((get_IR_deg() < 80) || (get_IR_deg() > 280))
+            else if (get_IR_distance() < 300) // 近く
             {
-                motors_move(get_IR_hirei_deg(2.6), motor_power);
+                if ((get_IR_deg() < 80) || (get_IR_deg() > 280))
+                {
+                    motors_move(get_IR_hirei_deg(2.6), motor_power);
+                }
+                else
+                {
+                    motors_move(get_IR_mawarikomi_deg(), motor_power);
+                }
             }
             else
             {
-                motors_move(get_IR_mawarikomi_deg(), motor_power);
+                motors_move(get_IR_follow_deg(0), motor_power);
             }
         }
         else
         {
-            motors_only_PD(95); // PD制御のみで動く
+            motors_only_PD(motor_power); // PD制御のみで動く
         }
     }
 }

@@ -5,7 +5,7 @@
 #define GYRO_P_GAIN 0.6
 #define GYRO_D_GAIN 0.02
 
-#define GOAL_P_GAIN 0.6
+#define GOAL_P_GAIN 0.35
 #define GOAL_D_GAIN 0.02
 
 int pd_power;            // PD制御の出力格納用
