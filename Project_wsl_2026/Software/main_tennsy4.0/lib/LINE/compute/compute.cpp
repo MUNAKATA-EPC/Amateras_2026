@@ -73,7 +73,7 @@ bool check_half_out(int base_pin)
     return false;
 }
 
-void LINEcompute_update()
+void LINE_compute_update()
 {
     // === 角度計算 ===
     if (!is_LINE_exist())

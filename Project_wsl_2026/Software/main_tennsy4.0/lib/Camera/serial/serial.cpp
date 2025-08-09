@@ -1,4 +1,4 @@
-#include "OpenMV.hpp"
+#include "serial.hpp"
 
 /*カメラからの情報をシリアル通信で受信する*/
 
@@ -16,7 +16,7 @@ int blue_goal_deg = -1;       // 青色ゴールの角度格納用
 int blue_goal_distance = -1;  // 青色ゴールの距離格納用
 bool blue_goal_exsit = false; // 青色ゴールが見えるかどうか
 
-void OpenMVserial_init(HardwareSerial *serial, int baudrate)
+void Camera_init(HardwareSerial *serial, int baudrate)
 {
     openmv_serial = serial;
     openmv_baudrate = baudrate;
@@ -24,7 +24,7 @@ void OpenMVserial_init(HardwareSerial *serial, int baudrate)
     (*openmv_serial).setTimeout(10);
 }
 
-void OpenMVserial_update()
+void Camera_update()
 {
     if ((*openmv_serial).available() > 0)
     {

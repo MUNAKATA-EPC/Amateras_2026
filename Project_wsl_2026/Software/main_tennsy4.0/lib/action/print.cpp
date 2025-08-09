@@ -116,7 +116,7 @@ void play_lcd_print(int lcd_print_mode, int ahead_x, int ahead_y)
     case IR_LINE_GYRO_CHECK_WITH_LCD:
         // IRについて
         SSD1306_write(1, 0 + ahead_x, 0 + ahead_y, "ir_deg: " + String(get_IR_deg()), false);
-        SSD1306_write(1, 0 + ahead_x, 10 + ahead_y, "dis_deg:" + String(get_IR_distance()), false);
+        SSD1306_write(1, 0 + ahead_x, 10 + ahead_y, "ir_dis:" + String(get_IR_distance()), false);
         // LINEについて
         SSD1306_write(1, 0 + ahead_x, 20 + ahead_y, "line_deg: " + String(get_LINE_deg()), false);
         SSD1306_write(1, 0 + ahead_x, 30 + ahead_y, "line_side: " + String(get_LINE_side_right()) + String(get_LINE_side_left()) + String(get_LINE_side_back()), false);

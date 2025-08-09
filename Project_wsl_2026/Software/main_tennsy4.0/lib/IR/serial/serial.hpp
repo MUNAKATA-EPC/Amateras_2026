@@ -5,9 +5,9 @@
 #include "IR.hpp"
 
 // シリアル定義・開始
-void IRserial_init(HardwareSerial *serial, int baudrate);
+void IR_init(HardwareSerial *serial, int baudrate);
 // 更新
-void IRserial_update();
+void IR_update();
 
 // ボールが存在するかどうか
 bool is_IR_exist();

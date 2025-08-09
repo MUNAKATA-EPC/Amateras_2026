@@ -9,7 +9,7 @@ bool line_exist = false; // ラインがあるかどうか
 
 bool line_data[19] = {0}; // 受信した19個のデータ格納用
 
-void LINEserial_init(HardwareSerial *serial, int baudrate)
+void LINE_init(HardwareSerial *serial, int baudrate)
 {
     line_serial = serial;
     line_baudrate = baudrate;
@@ -17,7 +17,7 @@ void LINEserial_init(HardwareSerial *serial, int baudrate)
     (*line_serial).setTimeout(10);
 }
 
-void LINEserial_update()
+void LINE_serial_update()
 {
     if ((*line_serial).available() > 0)
     {

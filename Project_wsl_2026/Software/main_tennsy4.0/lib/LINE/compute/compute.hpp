@@ -5,7 +5,7 @@
 #include "LINE.hpp"
 
 // 更新
-void LINEcompute_update();
+void LINE_compute_update();
 
 // 右サイドの状況を取得
 bool get_LINE_side_right();

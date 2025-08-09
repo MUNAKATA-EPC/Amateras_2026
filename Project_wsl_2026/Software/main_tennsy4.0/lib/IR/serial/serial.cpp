@@ -10,7 +10,7 @@ bool ir_exist = false; // IRボールがあるかどうか
 int ir_deg = -1;      // IRボールの角度格納用
 int ir_distance = -1; // IRボールの距離格納用
 
-void IRserial_init(HardwareSerial *serial, int baudrate)
+void IR_init(HardwareSerial *serial, int baudrate)
 {
     ir_serial = serial;
     ir_baudrate = baudrate;
@@ -18,7 +18,7 @@ void IRserial_init(HardwareSerial *serial, int baudrate)
     (*ir_serial).setTimeout(10);     // 10msでタイムアウトとする
 }
 
-void IRserial_update()
+void IR_update()
 {
     if ((*ir_serial).available() > 0)
     {

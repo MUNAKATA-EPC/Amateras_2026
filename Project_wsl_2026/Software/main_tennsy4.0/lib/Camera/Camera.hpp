@@ -3,6 +3,6 @@
 
 #include <Arduino.h>
 
-#include "serial/OpenMV.hpp"
+#include "serial/serial.hpp"
 
 #endif

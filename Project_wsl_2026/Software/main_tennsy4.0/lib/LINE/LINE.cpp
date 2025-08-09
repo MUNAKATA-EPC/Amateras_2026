@@ -2,6 +2,6 @@
 
 void LINE_update()
 {
-    LINEserial_update();
-    LINEcompute_update();
+    LINE_serial_update();
+    LINE_compute_update();
 }

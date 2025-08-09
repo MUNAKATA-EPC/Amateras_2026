@@ -4,9 +4,9 @@
 #include <Arduino.h>
 
 // シリアル定義・開始
-void OpenMVserial_init(HardwareSerial *serial, int baudrate);
+void Camera_init(HardwareSerial *serial, int baudrate);
 // 更新
-void OpenMVserial_update();
+void Camera_update();
 
 // コートが存在するかどうか
 bool is_field_exist();

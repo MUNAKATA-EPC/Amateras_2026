@@ -14,9 +14,9 @@ void setup()
 {
   Serial.begin(9600); // PCとのシリアル通信を開始
 
-  IRserial_init(&Serial1, 115200); // シリアル1を使いボートレート9600にする
+  IR_init(&Serial1, 115200); // シリアル1を使いボートレート9600にする
 
-  LINEserial_init(&Serial5, 115200); // シリアル5を使いボートレート115200にする
+  LINE_init(&Serial5, 115200); // シリアル5を使いボートレート115200にする
 
   DSR1202_set_motormove_togglepin(5); // モータを動かすトグルスイッチのピン番号を設定
   DSR1202_init(&Serial2, 115200);     // シリアル2を使いボートレート115200にする
@@ -24,7 +24,7 @@ void setup()
 
   goal_select_toggle.set_pin(5);       // ゴール選択用のトグルスイッチのピン番号を設定
   goal_select_toggle.init();           // トグルスイッチを初期化
-  OpenMVserial_init(&Serial3, 115200); // シリアル3を使いボートレート115200にする
+  Camera_init(&Serial3, 115200); // シリアル3を使いボートレート115200にする
 
   BNO055_set_resetpin(9, INPUT_PULLDOWN); // BNOのリセットピンを定義
   BNO055_init(&Wire, 0x28);               // どのBNOを使うか
@@ -44,10 +44,10 @@ void setup()
 void loop()
 {
   // motors_move(0, 40); // モータは停止させる
-  IRserial_update();     // 更新
-  LINE_update();         // 更新
-  OpenMVserial_update(); // 更新
-  BNO055_update();       // 更新
+  IR_update();     // 更新
+  LINE_update();   // 更新
+  Camera_update(); // 更新
+  BNO055_update(); // 更新
 
   // kicker_kick(1); // 決定ボタンが押されたら蹴る
 
