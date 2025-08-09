@@ -1,5 +1,5 @@
-#ifndef OPENMV_HPP
-#define OPENMV_HPP
+#ifndef SERIAL_HPP
+#define SERIAL_HPP
 
 #include <Arduino.h>
 

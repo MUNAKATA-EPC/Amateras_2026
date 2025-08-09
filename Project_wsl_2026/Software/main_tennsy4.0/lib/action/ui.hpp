@@ -6,7 +6,7 @@
 #include "toggle.hpp"
 #include "timer.hpp"
 // LCDプリント用
-#include "SSD1306.hpp"
+#include "OLED.hpp"
 #include "print.hpp"
 
 // LCDを動かすButtonのピンを定義

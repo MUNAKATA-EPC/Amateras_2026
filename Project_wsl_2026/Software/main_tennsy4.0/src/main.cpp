@@ -22,8 +22,8 @@ void setup()
   DSR1202_init(&Serial2, 115200);     // シリアル2を使いボートレート115200にする
   motors_init(315, 45, 225, 135);     // モーターの設置角度を定義
 
-  goal_select_toggle.set_pin(5);       // ゴール選択用のトグルスイッチのピン番号を設定
-  goal_select_toggle.init();           // トグルスイッチを初期化
+  goal_select_toggle.set_pin(5); // ゴール選択用のトグルスイッチのピン番号を設定
+  goal_select_toggle.init();     // トグルスイッチを初期化
   Camera_init(&Serial3, 115200); // シリアル3を使いボートレート115200にする
 
   BNO055_set_resetpin(9, INPUT_PULLDOWN); // BNOのリセットピンを定義
@@ -44,10 +44,11 @@ void setup()
 void loop()
 {
   // motors_move(0, 40); // モータは停止させる
-  IR_update();     // 更新
-  LINE_update();   // 更新
-  Camera_update(); // 更新
-  BNO055_update(); // 更新
+  IR_update();           // 更新
+  LINE_serial_update();  // 更新1
+  LINE_compute_update(); // 更新2
+  Camera_update();       // 更新
+  BNO055_update();       // 更新
 
   // kicker_kick(1); // 決定ボタンが押されたら蹴る
 
