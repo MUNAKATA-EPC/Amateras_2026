@@ -76,8 +76,20 @@ void ui_process()
                 mode_number = (mode_number + 1 + 3) % 3;
         }
     }
+
     // 左ボタンが押された場合
     if (lcd_left_button.is_released())
+    {
+        if (action_decided && mode_decided) // actionもmodeも決定されたなら
+        {
+            mode_decided = false; // modeをもう一度決めれるようにする
+        }
+        else if (action_decided) // actionが決められていたら
+        {
+            action_decided = false; // actinoをもう一度決めれるようにする
+        }
+    }
+    /*if (lcd_left_button.is_released())
     {
         if (!action_decided) // まだactionが決められていない
             action_number = (action_number - 1 + 3) % 3;
@@ -88,12 +100,16 @@ void ui_process()
             else // 確認なら
                 mode_number = (mode_number - 1 + 3) % 3;
         }
-    }
+    }*/
 
     // 決定ボタンが押された場合
     if (lcd_enter_button.is_released())
     {
-        if (lcd_enter_button.get_pushing_time() >= 600) // 600ms以上押されていたら
+        if (!action_decided) // まだactionが決められていない
+            action_decided = true;
+        else if (!mode_decided) // まだmodeが決められていない
+            mode_decided = true;
+        /*if (lcd_enter_button.get_pushing_time() >= 600) // 600ms以上押されていたら
         {
             if (action_decided && mode_decided) // actionもmodeも決定されたなら
             {
@@ -111,7 +127,7 @@ void ui_process()
                 action_decided = true;
             else if (!mode_decided) // まだmodeが決められていない
                 mode_decided = true;
-        }
+        }*/
     }
 
     /*LCDに表示*/

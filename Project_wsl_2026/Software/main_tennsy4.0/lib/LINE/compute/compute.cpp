@@ -41,7 +41,7 @@ bool is_LINE_half_out()
 bool check_half_out(int base_pin)
 {
     int pinA = (base_pin + 4) % 16;
-    //int pinB = (base_pin - 4 + 16) % 16;
+    // int pinB = (base_pin - 4 + 16) % 16;
 
     // 弧A: base_pin を含まない方向
     bool passed_base = false;
