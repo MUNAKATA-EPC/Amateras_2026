@@ -26,13 +26,13 @@ void setup()
 
 void loop()
 {
-  Serial.println(stick_lx); // 左スティックのX軸
+  Serial.println(stick_lx); // 左スティックのX方向
   Serial.print("a");
-  Serial.println(stick_ly); // 左スティックのY軸
+  Serial.println(stick_ly); // 左スティックのY方向
   Serial.print("b");
-  Serial.println(stick_rx); // 右スティックのX軸
+  Serial.println(stick_rx); // 右スティックのX方向
   Serial.print("c");
-  Serial.println(stick_ry); // 右スティックのY軸
+  Serial.println(stick_ry); // 右スティックのY方向
   Serial.print("d");
   Serial.println(SW_data_10); // SWの情報を送信
   Serial.print("e");
@@ -56,10 +56,10 @@ void connect_false()
 void survey_data()
 {
   // アナログスティックの情報を取得
-  stick_lx = Ps3.data.analog.stick.lx + 128; // 左スティックのX軸(範囲を0~255にする)
-  stick_ly = Ps3.data.analog.stick.ly + 128; // 左スティックのY軸(範囲を0~255にする)
-  stick_rx = Ps3.data.analog.stick.rx + 128; // 右スティックのX軸(範囲を0~255にする)
-  stick_ry = Ps3.data.analog.stick.ry + 128; // 右スティックのY軸(範囲を0~255にする)
+  stick_lx = Ps3.data.analog.stick.lx + 128; // 左スティックのX方向(範囲を0~255にする)
+  stick_ly = Ps3.data.analog.stick.ly + 128; // 左スティックのY方向(範囲を0~255にする)
+  stick_rx = Ps3.data.analog.stick.rx + 128; // 右スティックのX方向(範囲を0~255にする)
+  stick_ry = Ps3.data.analog.stick.ry + 128; // 右スティックのY方向(範囲を0~255にする)
 
   // ボタンの情報を取得(押されたら加算)
   SW_data_10 = 0; // 初期化
