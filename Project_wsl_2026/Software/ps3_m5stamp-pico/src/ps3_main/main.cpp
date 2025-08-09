@@ -2,7 +2,7 @@
 #include <Ps3Controller.h>
 
 int stick_lx, stick_ly, stick_rx, stick_ry; // それぞれのコントローラの情報が格納用(範囲は-128~127らしい)
-unsigned int SW_data_10 = 0;                // SWの情報を10進数で格納用
+unsigned int button_data_10 = 0;            // SWの情報を10進数で格納用
 
 // PS3が接続されると呼ばれる関数
 void connect_success();
@@ -34,7 +34,7 @@ void loop()
   Serial.print("c");
   Serial.println(stick_ry); // 右スティックのY方向
   Serial.print("d");
-  Serial.println(SW_data_10); // SWの情報を送信
+  Serial.println(button_data_10); // buttonの情報を送信
   Serial.print("e");
 
   delay(10); // 10ms待機
@@ -62,37 +62,37 @@ void survey_data()
   stick_ry = Ps3.data.analog.stick.ry + 128; // 右スティックのY方向(範囲を0~255にする)
 
   // ボタンの情報を取得(押されたら加算)
-  SW_data_10 = 0; // 初期化
+  button_data_10 = 0; // 初期化
 
   if (Ps3.data.button.up) // 上
-    SW_data_10 += pow(2, 0);
+    button_data_10 += pow(2, 0);
   if (Ps3.data.button.down) // 下
-    SW_data_10 += pow(2, 1);
+    button_data_10 += pow(2, 1);
   if (Ps3.data.button.left) // 左
-    SW_data_10 += pow(2, 2);
+    button_data_10 += pow(2, 2);
   if (Ps3.data.button.right) // 右
-    SW_data_10 += pow(2, 3);
+    button_data_10 += pow(2, 3);
 
   if (Ps3.data.button.triangle) // △
-    SW_data_10 += pow(2, 4);
+    button_data_10 += pow(2, 4);
   if (Ps3.data.button.circle) // ○
-    SW_data_10 += pow(2, 5);
+    button_data_10 += pow(2, 5);
   if (Ps3.data.button.cross) // ×
-    SW_data_10 += pow(2, 6);
+    button_data_10 += pow(2, 6);
   if (Ps3.data.button.square) // □
-    SW_data_10 += pow(2, 7);
+    button_data_10 += pow(2, 7);
 
   if (Ps3.data.button.l1) // L1
-    SW_data_10 += pow(2, 8);
+    button_data_10 += pow(2, 8);
   if (Ps3.data.button.l2) // L2
-    SW_data_10 += pow(2, 9);
+    button_data_10 += pow(2, 9);
   if (Ps3.data.button.l3) // L3
-    SW_data_10 += pow(2, 10);
+    button_data_10 += pow(2, 10);
 
   if (Ps3.data.button.r1) // R1
-    SW_data_10 += pow(2, 11);
+    button_data_10 += pow(2, 11);
   if (Ps3.data.button.r2) // R2
-    SW_data_10 += pow(2, 12);
+    button_data_10 += pow(2, 12);
   if (Ps3.data.button.r3) // R3
-    SW_data_10 += pow(2, 13);
+    button_data_10 += pow(2, 13);
 }
