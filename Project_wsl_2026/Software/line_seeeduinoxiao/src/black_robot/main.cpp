@@ -3,10 +3,10 @@
 
 #define LINE_SIDE_RIGHT_PIN 8 // 右サイド
 #define LINE_SIDE_LEFT_PIN 9  // 左サイド
-#define LINE_SIDE_BACK_PIN 10 // 後サイド
+#define LINE_SIDE_BACK_PIN 7  // 後サイド
 
-#define LINE_ANGEL_JUDGE_VALUE 700 // エンジェルライン判定用の値
-#define LINE_SIDE_JUDGE_VALUE 500  // サイドライン判定用の値
+#define LINE_ANGEL_JUDGE_VALUE 70 // エンジェルライン判定用の値
+#define LINE_SIDE_JUDGE_VALUE 790 // サイドライン判定用の値
 
 Multiplexer line_mux; // 定義
 
@@ -39,7 +39,7 @@ void loop()
   }
 
   /*サイドラインについて*/
-  if (analogRead(LINE_SIDE_RIGHT_PIN) > LINE_SIDE_JUDGE_VALUE) // 右サイドのラインセンサーがラインを見ているか
+  if (analogRead(LINE_SIDE_RIGHT_PIN) > LINE_SIDE_JUDGE_VALUE && analogRead(LINE_SIDE_RIGHT_PIN) < 1020) // 右サイドのラインセンサーがラインを見ているか
   {
     line_data_10 += pow(2, 16); // 右サイドのラインセンサーがラインを見ている場合は16ビット目に1をセット
     Serial.print(1);
@@ -47,7 +47,7 @@ void loop()
   else
     Serial.print(0);
 
-  if (analogRead(LINE_SIDE_LEFT_PIN) > LINE_SIDE_JUDGE_VALUE) // 右サイドのラインセンサーがラインを見ているか
+  if (analogRead(LINE_SIDE_LEFT_PIN) > LINE_SIDE_JUDGE_VALUE && analogRead(LINE_SIDE_LEFT_PIN) < 1020) // 右サイドのラインセンサーがラインを見ているか
   {
     line_data_10 += pow(2, 17); // 右サイドのラインセンサーがラインを見ている場合は17ビット目に1をセット
     Serial.print(1);
@@ -55,8 +55,13 @@ void loop()
   else
     Serial.print(0);
 
-  if (analogRead(LINE_SIDE_BACK_PIN) > LINE_SIDE_JUDGE_VALUE) // 右サイドのラインセンサーがラインを見ているか
-    //line_data_10 += pow(2, 18); // 右サイドのラインセンサーがラインを見ている場合は18ビット目に1をセット
+  if (analogRead(LINE_SIDE_BACK_PIN) > LINE_SIDE_JUDGE_VALUE && analogRead(LINE_SIDE_BACK_PIN) < 1020) // 右サイドのラインセンサーがラインを見ているか
+  {
+    line_data_10 += pow(2, 18); // 後サイドのラインセンサーがラインを見ている場合は18ビット目に1をセット
+    Serial.print(1);
+  }
+  else
+    Serial.print(0);
 
   /*送信*/
   Serial1.println(line_data_10); // teensyに送る
