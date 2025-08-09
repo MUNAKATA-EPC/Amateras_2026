@@ -31,6 +31,8 @@ void play_pc_print(int pc_print_mode);
 #define GYRO_CHECK_WITH_PC 3
 // シリアルですべてのカメラの状況を確認する
 #define CAM_CHECK_WITH_PC 4
+// シリアルですべてのps3の状況を確認する
+#define PS3_CHECK_WITH_PC 5
 
 // LCDにプリント用のプログラムを実行＊clearとshowは外部処理＊
 void play_lcd_print(int lcd_print_mode, int ahead_x, int ahead_y);
@@ -45,5 +47,7 @@ void play_lcd_print(int lcd_print_mode, int ahead_x, int ahead_y);
 #define GYRO_CHECK_WITH_LCD 3
 // LCDですべてのカメラの状況を確認する
 #define CAM_CHECK_WITH_LCD 4
+// LCDですべてのps3の状況を確認する
+#define PS3_CHECK_WITH_PC 5
 
 #endif

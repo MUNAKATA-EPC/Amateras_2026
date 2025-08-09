@@ -99,6 +99,23 @@ void play_pc_print(int pc_print_mode)
 
         break;
 
+    case PS3_CHECK_WITH_PC:
+        // Ps3について
+        Serial.print(" stick_left_deg: ");
+        Serial.print(get_Ps3_stick_left_deg());
+        Serial.print(" stick_left_distance: ");
+        Serial.print(get_Ps3_stick_left_distance());
+        Serial.print(" stick_right_deg: ");
+        Serial.print(get_Ps3_stick_right_deg());
+        Serial.print(" stick_right_distance: ");
+        Serial.print(get_Ps3_stick_right_distance());
+        for (int i = 0; i < 14; i++)
+            Serial.print(get_Ps3_button_data(i));
+
+        Serial.println();
+
+        break;
+
     default:
         Serial.println("error");
         break;
