@@ -1,6 +1,8 @@
 #include <Arduino.h>
 #include "multiplexer.hpp"
 
+/*黒ロボット用*/
+
 #define LINE_SIDE_RIGHT_PIN 8 // 右サイド
 #define LINE_SIDE_LEFT_PIN 9  // 左サイド
 #define LINE_SIDE_BACK_PIN 7  // 後サイド
