@@ -1,6 +1,8 @@
 #include <Arduino.h>
 #include "multiplexer.hpp"
 
+/*黒ロボット用*/
+
 Multiplexer ir_mux;
 
 const int IRsensor_pin[16] = {0, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1}; // 前から反時計回りに指定
