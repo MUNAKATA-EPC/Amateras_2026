@@ -17,6 +17,8 @@ void play_radicon(int motor_power)
 
     /*ロボット制御*/
     int motor_power_variable = map(get_Ps3_stick_left_distance(), 0, 128, 0, motor_power); // 左ステックの倒されようによってスピードを変える
+    if (!get_Ps3_button_circle())
+        motor_power_variable *= 0.75; // ◎ボタンが押されていないなら減速する
 
     if (is_LINE_exist()) // ラインがあるならば
     {
