@@ -17,7 +17,7 @@ void setup()
 {
   Serial.begin(115200); // 115200bpsでシリアル通信を開始
 
-  Ps3.attach(survey_data);               // PS3のどれが反応すると呼ばれる関数
+  Ps3.attach(data_update);               // PS3のどれが反応すると呼ばれる関数
   Ps3.attachOnConnect(connect_success);  // 接続されたときに呼び出す関数
   Ps3.attachOnDisconnect(connect_false); // 切断されたときに呼び出す関数
   Ps3.begin("E8:6B:EA:31:0A:3A");        // ps3_setupで取得したアドレスを記入
