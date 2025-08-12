@@ -1,6 +1,8 @@
 #include <Arduino.h>
 #include <Ps3Controller.h>
 
+/*m5stamp-picoのアドレスを取得する*/
+
 void setup()
 {
   Serial.begin(9600);

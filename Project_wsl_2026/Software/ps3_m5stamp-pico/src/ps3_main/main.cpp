@@ -1,6 +1,8 @@
 #include <Arduino.h>
 #include <Ps3Controller.h>
 
+/*ps3の情報をシリアル通信で送る*/
+
 int stick_lx, stick_ly, stick_rx, stick_ry; // それぞれのコントローラの情報が格納用(範囲は-128~127らしい)
 unsigned int button_data_10 = 0;            // SWの情報を10進数で格納用
 
@@ -9,7 +11,7 @@ void connect_success();
 // PS3が切断されると呼ばれる関数
 void connect_false();
 // PS3のどれが反応すると呼ばれる関数
-void survey_data();
+void data_update();
 
 void setup()
 {
@@ -53,7 +55,7 @@ void connect_false()
     ;
 }
 
-void survey_data()
+void data_update()
 {
   // アナログスティックの情報を取得
   stick_lx = Ps3.data.analog.stick.lx + 128; // 左スティックのX方向(範囲を0~255にする)
