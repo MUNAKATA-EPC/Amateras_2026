@@ -22,7 +22,7 @@ void play_radicon(int motor_power)
 
     if (is_LINE_exist()) // ラインがあるならば
     {
-        motors_move(get_LINE_deg() + 180, motor_power_variable); // ラインから逃れる動きをする
+        motors_move(get_LINE_memory_deg() + 180, motor_power_variable); // ラインから逃れる動きをする
     }
     else if (is_IR_exist() && get_Ps3_button_l3()) // IRボールがあってl3ボタンが押されたら
     {

@@ -27,11 +27,11 @@ void play_attacker(bool use_yellow_cam, bool use_blue_cam, int motor_power)
     {
         if (is_LINE_half_out())
         {
-            motors_move(get_LINE_deg() + 180, motor_power / 3); // ラインから逃れる動きをする
+            motors_move(get_LINE_memory_deg() + 180, motor_power / 3); // ラインから逃れる動きをする
         }
         else
         {
-            motors_move(get_LINE_deg() + 180, motor_power); // ラインから逃れる動きをする
+            motors_move(get_LINE_memory_deg() + 180, motor_power); // ラインから逃れる動きをする
         }
     }
     else

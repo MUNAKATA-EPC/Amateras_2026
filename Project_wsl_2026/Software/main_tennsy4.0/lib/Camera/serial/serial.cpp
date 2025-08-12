@@ -21,7 +21,7 @@ void Camera_init(HardwareSerial *serial, int baudrate)
     camera_serial = serial;
     camera_baudrate = baudrate;
     (*camera_serial).begin(camera_baudrate);
-    (*camera_serial).setTimeout(10);
+    (*camera_serial).setTimeout(50);
 }
 
 void Camera_update()

@@ -7,7 +7,7 @@ class Timer
 {
 private:
     int _reset_time = 0;         // リセット時の時間格納用
-    int _stop_time = 0;          // 停止時の時間格納用
+    int _stop_time = -1;          // 停止時の時間格納用
     int _now_time = 0;           //_reset_timeまたは_pause_timeからの時間格納用
     bool _is_timer_stop = false; // タイマーはストップされているかどうか
 

@@ -88,13 +88,13 @@ void loop()
       switch (get_selected_ui_mode())
       {
       case PD_USE_ONLY_GYRO_MODE:
-        play_attacker(false, false, 95); // ジャイロのみで動かす
+        play_defender(false, false, 95); // ジャイロのみで動かす
         break;
       case PD_USE_YELLOW_CAM_MODE:
-        play_attacker(true, false, 95); // カメラで動かす
+        play_defender(true, false, 95); // カメラで動かす
         break;
       case PD_USE_BLUE_CAM_MODE:
-        play_attacker(false, true, 95); // カメラで動かす
+        play_defender(false, true, 95); // カメラで動かす
         break;
       }
 
