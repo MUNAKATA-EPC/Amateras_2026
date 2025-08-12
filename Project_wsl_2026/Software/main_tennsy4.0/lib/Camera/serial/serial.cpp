@@ -2,8 +2,8 @@
 
 /*カメラからの情報をシリアル通信で受信する*/
 
-HardwareSerial *openmv_serial; // とりあえず定義
-int openmv_baudrate;           // ボートレート格納用
+HardwareSerial *camera_serial; // とりあえず定義
+int camera_baudrate;           // ボートレート格納用
 
 int field_deg = -1;       // コートの角度格納用
 bool field_exsit = false; // コートが見えるどうか
@@ -18,21 +18,21 @@ bool blue_goal_exsit = false; // 青色ゴールが見えるかどうか
 
 void Camera_init(HardwareSerial *serial, int baudrate)
 {
-    openmv_serial = serial;
-    openmv_baudrate = baudrate;
-    (*openmv_serial).begin(openmv_baudrate);
-    (*openmv_serial).setTimeout(10);
+    camera_serial = serial;
+    camera_baudrate = baudrate;
+    (*camera_serial).begin(camera_baudrate);
+    (*camera_serial).setTimeout(10);
 }
 
 void Camera_update()
 {
-    if ((*openmv_serial).available() > 0)
+    if ((*camera_serial).available() > 0)
     {
-        field_deg = (*openmv_serial).readStringUntil('a').toInt();            //'a'まで読む
-        yellow_goal_deg = (*openmv_serial).readStringUntil('b').toInt();      //'b'まで読む
-        yellow_goal_distance = (*openmv_serial).readStringUntil('c').toInt(); //'c'まで読む
-        blue_goal_deg = (*openmv_serial).readStringUntil('d').toInt();        //'d'まで読む
-        blue_goal_distance = (*openmv_serial).readStringUntil('e').toInt();   //'e'まで読む
+        field_deg = (*camera_serial).readStringUntil('a').toInt();            //'a'まで読む
+        yellow_goal_deg = (*camera_serial).readStringUntil('b').toInt();      //'b'まで読む
+        yellow_goal_distance = (*camera_serial).readStringUntil('c').toInt(); //'c'まで読む
+        blue_goal_deg = (*camera_serial).readStringUntil('d').toInt();        //'d'まで読む
+        blue_goal_distance = (*camera_serial).readStringUntil('e').toInt();   //'e'まで読む
 
         if (field_deg == -1)
             field_exsit = false; // 存在しない
