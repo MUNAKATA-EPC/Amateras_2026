@@ -21,7 +21,7 @@ void setup()
   LINE_init(&Serial5, 115200); // シリアル5を使いボートレート115200にする
 
   DSR1202_set_motormove_togglepin(5); // モータを動かすトグルスイッチのピン番号を設定
-  DSR1202_init(&Serial1, 115200);     // シリアル2を使いボートレート115200にする
+  DSR1202_init(&Serial1, 115200);     // シリアル1を使いボートレート115200にする
   motors_init(315, 45, 225, 135);     // モーターの設置角度を定義
 
   Camera_init(&Serial3, 115200); // シリアル3を使いボートレート115200にする
@@ -33,8 +33,8 @@ void setup()
   kicker_set_fetpin(2, 3); // キッカーのFETピンを設定
   kicker_init(700);        // クールダウン時間の定義
 
-  // Ps3_set_stick_adjust(5, 5, 5, 5);
-  // Ps3_init(&Serial2, 115200); // シリアル4を使いボートレート115200にする
+  Ps3_set_stick_adjust(5, 5, 5, 5);
+  Ps3_init(&Serial2, 115200); // シリアル2を使いボートレート115200にする
 
   SSD1306_init(&Wire1, 0x3C, 128, 64);
   SSD1306_clear();
@@ -51,8 +51,8 @@ void loop()
   LINE_compute_update(); // 更新2
   Camera_update();       // 更新
   BNO055_update();       // 更新
-  // Ps3_serial_update();   // 更新1
-  // Ps3_compute_update();  // 更新2
+  Ps3_serial_update();   // 更新1
+  Ps3_compute_update();  // 更新2
 
   ui_process(); // uiを実行
 
@@ -64,7 +64,7 @@ void loop()
   }
   else // 今選んだ
   {
-    play_pc_print(ALL_CHECK_WITH_PC); // 全て確認する
+    // play_pc_print(ALL_CHECK_WITH_PC); // 全て確認する
 
     switch (get_selected_ui_action())
     {

@@ -3,6 +3,7 @@
         "memory": "cpp",
         "random": "cpp",
         "executor": "cpp",
-        "future": "cpp"
+        "future": "cpp",
+        "cmath": "cpp"
     }
 }
