@@ -21,7 +21,7 @@ void DSR1202_init(HardwareSerial *serial, int baudrate)
     _serial = serial;
     _baudrate = baudrate;
     (*_serial).begin(_baudrate); // ボートレート定義
-    (*_serial).setTimeout(10);   // 10msでタイムアウトとする
+    (*_serial).setTimeout(50);   // 50msでタイムアウトとする
 }
 
 void DSR1202_break()

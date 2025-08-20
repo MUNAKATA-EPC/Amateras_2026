@@ -33,7 +33,7 @@ void setup()
   kicker_set_fetpin(2, 3); // キッカーのFETピンを設定
   kicker_init(700);        // クールダウン時間の定義
 
-  Ps3_set_stick_adjust(5, 5, 5, 5);
+  Ps3_set_stick_adjust(10, 10, 10, 10);
   Ps3_init(&Serial2, 115200); // シリアル2を使いボートレート115200にする
 
   SSD1306_init(&Wire1, 0x3C, 128, 64);
@@ -64,7 +64,7 @@ void loop()
   }
   else // 今選んだ
   {
-    // play_pc_print(ALL_CHECK_WITH_PC); // 全て確認する
+    play_pc_print(PS3_CHECK_WITH_PC); // 全て確認する
 
     switch (get_selected_ui_action())
     {

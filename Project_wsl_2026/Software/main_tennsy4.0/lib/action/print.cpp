@@ -74,9 +74,6 @@ void play_pc_print(int pc_print_mode)
         // ジャイロについて
         Serial.print(" bno_deg: ");
         Serial.print(get_BNO055_deg());
-        Serial.print(" pd_power: ");
-        PD_use_gyro(); // ジャイロで計算させる
-        Serial.print(get_PD_power());
 
         Serial.println();
 
@@ -109,8 +106,18 @@ void play_pc_print(int pc_print_mode)
         Serial.print(get_Ps3_stick_right_deg());
         Serial.print(" stick_right_distance: ");
         Serial.print(get_Ps3_stick_right_distance());
-        for (int i = 0; i < 14; i++)
-            Serial.print(get_Ps3_button_data(i));
+        Serial.print(" stick_left_move: ");
+        Serial.print(is_Ps3_stick_left_move());
+        Serial.print(" stick_lx: ");
+        Serial.print(get_Ps3_stick_lx());
+        Serial.print(" stick_ly: ");
+        Serial.print(get_Ps3_stick_ly());
+        Serial.print(" stick_right_move: ");
+        Serial.print(is_Ps3_stick_right_move());
+        Serial.print(" stick_rx: ");
+        Serial.print(get_Ps3_stick_rx());
+        Serial.print(" stick_ry: ");
+        Serial.print(get_Ps3_stick_ry());
 
         Serial.println();
 
@@ -165,8 +172,6 @@ void play_lcd_print(int lcd_print_mode, int ahead_x, int ahead_y)
     case GYRO_CHECK_WITH_LCD:
         // ジャイロについて
         SSD1306_write(1, 0 + ahead_x, 0 + ahead_y, "bno_deg: " + String(get_BNO055_deg()), false);
-        PD_use_gyro();
-        SSD1306_write(1, 0 + ahead_x, 10 + ahead_y, "pd_power: " + String(get_PD_power()), false);
 
         break;
 

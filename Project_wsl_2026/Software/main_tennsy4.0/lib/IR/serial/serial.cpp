@@ -15,7 +15,7 @@ void IR_init(HardwareSerial *serial, int baudrate)
     ir_serial = serial;
     ir_baudrate = baudrate;
     (*ir_serial).begin(ir_baudrate); // ボートレート定義
-    (*ir_serial).setTimeout(10);     // 10msでタイムアウトとする
+    (*ir_serial).setTimeout(50);     // 50msでタイムアウトとする
 }
 
 void IR_update()

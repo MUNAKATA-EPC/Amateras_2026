@@ -14,7 +14,7 @@ void LINE_init(HardwareSerial *serial, int baudrate)
     line_serial = serial;
     line_baudrate = baudrate;
     (*line_serial).begin(line_baudrate);
-    (*line_serial).setTimeout(10);
+    (*line_serial).setTimeout(50);
 }
 
 void LINE_serial_update()

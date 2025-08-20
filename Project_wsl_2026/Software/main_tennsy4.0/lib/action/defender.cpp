@@ -1,3 +1,5 @@
+#include "radicon.hpp"
+#include "attacker.hpp"
 #include "defender.hpp"
 
 /*守備用のプログラムを実行する*/
@@ -6,18 +8,9 @@ int old_line_memory_deg; // 昔のラインセンサーの角度格納用
 Timer ir_follow_timer;
 bool line_old_flag = false;
 
-// 角度における"差"を計算する関数
-int compute_deg_diff(int a, int b)
-{
-    int diff = (a - b + 360) % 360;
-    if (diff > 180)
-        diff = 360 - diff;
-    return diff;
-}
-
 void play_defender(bool use_yellow_cam, bool use_blue_cam, int motor_power)
 {
-    PD_use_gyro();
+    PD_use_gyro(0);
 
     if (is_LINE_exist())
     {

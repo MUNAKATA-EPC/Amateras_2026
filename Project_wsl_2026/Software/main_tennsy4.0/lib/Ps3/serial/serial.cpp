@@ -32,44 +32,60 @@ void Ps3_init(HardwareSerial *serial, int baudrate)
     ps3_serial = serial;
     ps3_baudrate = baudrate;
     (*ps3_serial).begin(ps3_baudrate); // ボートレート定義
-    (*ps3_serial).setTimeout(10);      // 10msでタイムアウトとする
+    (*ps3_serial).setTimeout(50);      // 50msでタイムアウトとする
 }
 
 void Ps3_serial_update()
 {
     if ((*ps3_serial).available() > 0)
     {
-        ps3_stick_lx = (*ps3_serial).readStringUntil('a').toInt() - 128; // 'a'まで読み、-128~127にする
-        if (abs(ps3_stick_lx) <= ps3_stick_lx_adjust)                    // 調整値以下ならば
-            ps3_stick_lx = 0;                                            // 0にする
+        // 左スティックのX方向を受信（-128~127にする）
+        int received_data_a = (*ps3_serial).readStringUntil('a').toInt() - 128;
+        if (received_data_a >= -128 && received_data_a <= 127) // 範囲外なら無視
+        {
+            ps3_stick_lx = received_data_a;               // 左スティックX方向に代入
+            if (abs(ps3_stick_lx) <= ps3_stick_lx_adjust) // 調整値以下ならば
+                ps3_stick_lx = 0;                         // 0にする
+        }
 
-        ps3_stick_ly = (*ps3_serial).readStringUntil('b').toInt() - 128; // 'b'まで読み、-128~127にする
-        if (abs(ps3_stick_ly) <= ps3_stick_ly_adjust)                    // 調整値以下ならば
-            ps3_stick_ly = 0;                                            // 0にする
+        // 左スティックのY方向を受信（-127~128にする）
+        int received_data_b = -((*ps3_serial).readStringUntil('b').toInt() - 128);
+        if (received_data_b >= -127 && received_data_b <= 128) // 範囲外なら無視
+        {
+            ps3_stick_ly = received_data_b;               // 左スティックY方向に代入
+            if (abs(ps3_stick_ly) <= ps3_stick_ly_adjust) // 調整値以下ならば
+                ps3_stick_ly = 0;                         // 0にする
+        }
 
-        ps3_stick_rx = (*ps3_serial).readStringUntil('c').toInt() - 128; // 'c'まで読み、-128~127にする
-        if (abs(ps3_stick_rx) <= ps3_stick_rx_adjust)                    // 調整値以下ならば
-            ps3_stick_rx = 0;                                            // 0にする
+        // 右スティックのX方向を受信（-128~127にする）
+        int received_data_c = (*ps3_serial).readStringUntil('c').toInt() - 128;
+        if (received_data_c >= -128 && received_data_c <= 127) // 範囲外なら無視
+        {
+            ps3_stick_rx = received_data_c;               // 右スティックX方向に代入
+            if (abs(ps3_stick_rx) <= ps3_stick_rx_adjust) // 調整値以下ならば
+                ps3_stick_rx = 0;                         // 0にする
+        }
 
-        ps3_stick_ry = (*ps3_serial).readStringUntil('d').toInt() - 128; // 'd'まで読み、-128~127にする
-        if (abs(ps3_stick_ry) <= ps3_stick_ry_adjust)                    // 調整値以下ならば
-            ps3_stick_ry = 0;                                            // 0にする
+        // 右スティックのY方向を受信（-127~128にする）
+        int received_data_d = -((*ps3_serial).readStringUntil('d').toInt() - 128);
+        if (received_data_d >= -127 && received_data_d <= 128) // 範囲外なら無視
+        {
+            ps3_stick_ry = received_data_d;               // 右スティックY方向に代入
+            if (abs(ps3_stick_ry) <= ps3_stick_ry_adjust) // 調整値以下ならば
+                ps3_stick_ry = 0;                         // 0にする
+        }
 
-        unsigned int sw_data_10 = (*ps3_serial).readStringUntil('e').toInt(); // 'e'まで読み、SWの情報を取得(10進数)
+        // ボタンの情報を受信（10進数）
+        unsigned int sw_data_10 = (*ps3_serial).readStringUntil('e').toInt();
 
-        int shift_num = 0; // 解析に使う変数
+        // ボタンをbit解析して格納
         for (int i = 0; i < 14; i++)
         {
-            shift_num = 1 << i; // 0001を左にiだけ移動させる
-
-            if ((shift_num & sw_data_10) > 0) // shift_numとsw_data_10の論理積が0より大きいならば
-            {
+            int shift_num = 1 << i; // 0001を左にiだけ移動
+            if ((shift_num & sw_data_10) > 0)
                 ps3_button_data[i] = true; // このSWは押されている
-            }
             else
-            {
                 ps3_button_data[i] = false; // このSWは押されていない
-            }
         }
     }
 }

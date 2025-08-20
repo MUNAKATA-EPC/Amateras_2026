@@ -21,4 +21,7 @@
 // 攻撃用のプログラムを実行
 void play_attacker(bool use_yellow_cam, bool use_blue_cam, int motor_power);
 
+// 角度における"差"を計算する関数
+int compute_deg_diff(int a, int b);
+
 #endif

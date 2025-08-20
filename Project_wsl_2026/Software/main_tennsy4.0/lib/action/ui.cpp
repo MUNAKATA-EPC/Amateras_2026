@@ -30,7 +30,7 @@ void ui_init()
 Timer my_ui_timer;         // UI用のタイマー
 bool ui_first_call = true; // 関数が最初に呼び出されたかを読む
 
-/*Actionについてのメモ*/
+/*actionについてのメモ*/
 // 攻撃する
 // #define ACTION_ATTACKER 0
 // 守備する
@@ -57,6 +57,17 @@ bool action_decided = false;         // Actionをユーザーが決定された�
 int mode_number = 0;
 bool mode_decided = false; // modeをユーザーが決定されたかどうか
 
+/*settingについてのメモ*/
+// ラジコンをするとき
+// アタッカーの自動化するかどうか
+// #define ATTACK_AUTO_INDEX 0
+// ラインの自動化するかどうか
+// #define LINE_AUTO_INDEX 1
+// キッカーの自動化するかどうか
+// #define KICK_AUTO_INDEX 2
+int setting_number = 0;
+bool setting_memory[3] = {false}; // 3つのsettingでどう選ばれたか記憶
+
 void ui_process()
 {
     lcd_enter_button.update(); // ボタンの状況を更新
@@ -69,7 +80,9 @@ void ui_process()
         if (!action_decided) // まだactionが決められていない
         {
             action_number = (action_number + 1 + 4) % 4;
-            mode_number = 0; // 初期化
+
+            mode_number = 0;    // 初期化
+            setting_number = 0; // 初期化
         }
         else if (!mode_decided) // まだmodeが決められていない
         {
@@ -79,6 +92,12 @@ void ui_process()
                 mode_number = (mode_number + 1 + 3) % 3;
             else // ラジコンなら
                 mode_number = (mode_number + 1 + 4) % 4;
+
+            setting_number = 0; // 初期化
+        }
+        else // 全部決めた後、、つまりsettingを選ぶとき
+        {
+            setting_number = (setting_number + 1 + 3) % 3;
         }
     }
 
@@ -111,9 +130,17 @@ void ui_process()
     if (lcd_enter_button.is_released())
     {
         if (!action_decided) // まだactionが決められていない
+        {
             action_decided = true;
+        }
         else if (!mode_decided) // まだmodeが決められていない
+        {
             mode_decided = true;
+        }
+        else // 全部決めた後、、つまりsettingを選ぶとき
+        {
+            setting_memory[setting_number] = (setting_memory[setting_number] + 1 + 2) % 2; // falseならtrue、trueならfalseにする
+        }
         /*if (lcd_enter_button.get_pushing_time() >= 600) // 600ms以上押されていたら
         {
             if (action_decided && mode_decided) // actionもmodeも決定されたなら
@@ -259,6 +286,24 @@ void ui_process()
                     SSD1306_write(1, 6, 10, "speed : 200cc", false);
                     break;
                 }
+
+                if (mode_decided) // modeが決められた
+                {
+                    if (setting_memory[0])
+                        SSD1306_write(1, 1, 25, "attack_auto : on", setting_number == 0);
+                    else
+                        SSD1306_write(1, 1, 25, "attack_auto : off", setting_number == 0);
+
+                    if (setting_memory[1])
+                        SSD1306_write(1, 1, 35, "line_auto : on", setting_number == 1);
+                    else
+                        SSD1306_write(1, 1, 35, "line_auto : off", setting_number == 1);
+
+                    if (setting_memory[2])
+                        SSD1306_write(1, 1, 45, "kick_auto : on", setting_number == 2);
+                    else
+                        SSD1306_write(1, 1, 45, "kick_auto : off", setting_number == 2);
+                }
             }
             break;
         }
@@ -269,7 +314,7 @@ void ui_process()
         }
         else // 決定された後
         {
-            SSD1306_write(2, 80, 40, "Run", true);
+            SSD1306_write(2, 92, 48, "Run", true);
         }
 
         if (!action_decided) // actionが決められていないなら
@@ -281,15 +326,21 @@ void ui_process()
 
 bool is_now_selecting_ui()
 {
-    return (!action_decided || !mode_decided);
+    return (!action_decided || !mode_decided); // どちらかが選ばれていないかどうか返す
 }
 
 int get_selected_ui_action()
 {
-    return action_number;
+    return action_number; // action_numberを返す
 }
 
 int get_selected_ui_mode()
 {
-    return mode_number;
+    return mode_number; // mode_numberを返す
+}
+
+int get_selected_ui_setting(int index)
+{
+    index = (index + 3) % 3;      // 0~2に収める
+    return setting_memory[index]; // index番目のsettingを返す
 }

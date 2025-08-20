@@ -33,7 +33,7 @@ int get_selected_ui_action();
 // ラジコンする
 #define ACTION_RADICON 3
 
-// 選ばれたActionの中でのモードを出力
+// 選ばれたActionの中でのmodeを出力
 int get_selected_ui_mode();
 /* ↓ 出力 */
 // 攻撃or守備をするとき
@@ -58,5 +58,16 @@ int get_selected_ui_mode();
 #define RADICON_100cc_MODE 1
 #define RADICON_150cc_MODE 2
 #define RADICON_200cc_MODE 3
+
+// 選ばれたmodeの中でのindex番目のsettingを出力
+int get_selected_ui_setting(int index);
+/* ↓ 入力 */
+// ラジコンをするとき
+// アタッカーの自動化するかどうか
+#define ATTACK_AUTO_INDEX 0
+// ラインの自動化するかどうか
+#define LINE_AUTO_INDEX 1
+// キッカーの自動化するかどうか
+#define KICK_AUTO_INDEX 2
 
 #endif

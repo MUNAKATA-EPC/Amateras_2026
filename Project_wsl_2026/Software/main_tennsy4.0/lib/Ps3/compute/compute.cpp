@@ -105,8 +105,7 @@ void Ps3_compute_update()
         double ps3_stick_left_deg_sub = degrees(atan2(get_Ps3_stick_ly(), get_Ps3_stick_lx()));                        // 左スティックの角度を求める
         ps3_stick_left_deg_sub = (ps3_stick_left_deg_sub < 0) ? ps3_stick_left_deg_sub + 360 : ps3_stick_left_deg_sub; // 0~360に直す
         ps3_stick_left_deg = (int)ps3_stick_left_deg_sub;                                                              // 左スティックの角度を格納
-        ps3_stick_left_deg = (ps3_stick_left_deg - 270 + 360) % 360;                                                   // 調整
-        ps3_stick_left_deg = (360 - ps3_stick_left_deg) % 360;                                                         // 調整
+        ps3_stick_left_deg = (ps3_stick_left_deg - 90 + 360) % 360;                                                      // 調整
 
         ps3_stick_left_distance = (int)sqrt(pow(get_Ps3_stick_lx(), 2) + pow(get_Ps3_stick_ly(), 2)); // 左スティックの距離を求める
         if (ps3_stick_left_distance > 128)                                                            // 128を超えたら128にする
@@ -123,8 +122,7 @@ void Ps3_compute_update()
         double ps3_stick_right_deg_sub = degrees(atan2(get_Ps3_stick_ry(), get_Ps3_stick_rx()));                           // 右スティックの角度を求める
         ps3_stick_right_deg_sub = (ps3_stick_right_deg_sub < 0) ? ps3_stick_right_deg_sub + 360 : ps3_stick_right_deg_sub; // 0~360に直す
         ps3_stick_right_deg = (int)ps3_stick_right_deg_sub;                                                                // 右スティックの角度を格納
-        ps3_stick_right_deg = (ps3_stick_right_deg - 270 + 360) % 360;                                                     // 調整
-        ps3_stick_right_deg = (360 - ps3_stick_right_deg) % 360;                                                           // 調整
+        ps3_stick_right_deg = (ps3_stick_right_deg - 90 + 360) % 360;                                                      // 調整
 
         ps3_stick_right_distance = (int)sqrt(pow(get_Ps3_stick_rx(), 2) + pow(get_Ps3_stick_ry(), 2)); // 右スティックの距離を求める
         if (ps3_stick_right_distance > 128)                                                            // 128を超えたら128にする
