@@ -5,7 +5,7 @@
 #include "LINE.hpp"
 
 // シリアル定義・開始
-void LINE_init(HardwareSerial *serial, int baudrate);
+void LINE_init(HardwareSerial *serial, uint32_t baudrate);
 
 // 更新
 void LINE_serial_update();
