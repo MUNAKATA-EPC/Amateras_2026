@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include "multiplexer.hpp"
 
-/*黒ロボット用*/
+/*白ロボット用*/
 
 const uint8_t head_byte = 0xAA; // 同期ヘッダー格納用
 
@@ -37,22 +37,22 @@ void loop()
   for (uint8_t i = 0; i < 16; i++)
   {
     if (line_mux.read(i) > LINE_ANGEL_JUDGE_VALUE) // ラインが見えたら
-      lines_data_bit_mask |= (1 << i);
+      lines_data_bit_mask |= (1UL << i);
   }
 
   /*サイドラインについて*/
-  int right_val = analogRead(LINE_SIDE_RIGHT_PIN); // 右サイドのラインセンサー
-  int left_val  = analogRead(LINE_SIDE_LEFT_PIN);  // 左サイドのラインセンサー
-  int back_val  = analogRead(LINE_SIDE_BACK_PIN);  // 後サイドのラインセンサー
+  uint32_t right_val = analogRead(LINE_SIDE_RIGHT_PIN); // 右サイドのラインセンサー
+  uint32_t left_val  = analogRead(LINE_SIDE_LEFT_PIN);  // 左サイドのラインセンサー
+  uint32_t back_val  = analogRead(LINE_SIDE_BACK_PIN);  // 後サイドのラインセンサー
 
   if (right_val > LINE_SIDE_JUDGE_VALUE && right_val < 1020) // 右サイドのラインセンサーがラインを見ているか
-    lines_data_bit_mask |= (1 << 16);
+    lines_data_bit_mask |= (1UL << 16);
 
   if (left_val > LINE_SIDE_JUDGE_VALUE && left_val < 1020) // 右サイドのラインセンサーがラインを見ているか
-    lines_data_bit_mask |= (1 << 17);
+    lines_data_bit_mask |= (1UL << 17);
 
   if (back_val > LINE_SIDE_JUDGE_VALUE && back_val < 1020) // 右サイドのラインセンサーがラインを見ているか
-    lines_data_bit_mask |= (1 << 18);
+    lines_data_bit_mask |= (1UL << 18);
 
   /*送信*/
   Serial1.write(head_byte);                 // teensyとの通信開始

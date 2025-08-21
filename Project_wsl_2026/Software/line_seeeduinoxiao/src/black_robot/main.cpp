@@ -37,18 +37,22 @@ void loop()
   for (uint8_t i = 0; i < 16; i++)
   {
     if (line_mux.read(i) > LINE_ANGEL_JUDGE_VALUE) // ラインが見えたら
-      lines_data_bit_mask |= (1 << i);
+      lines_data_bit_mask |= (1UL << i);
   }
 
   /*サイドラインについて*/
-  if (analogRead(LINE_SIDE_RIGHT_PIN) > LINE_SIDE_JUDGE_VALUE && analogRead(LINE_SIDE_RIGHT_PIN) < 1020) // 右サイドのラインセンサーがラインを見ているか
-    lines_data_bit_mask |= (1 << 16);
+  uint32_t right_val = analogRead(LINE_SIDE_RIGHT_PIN); // 右サイドのラインセンサー
+  uint32_t left_val  = analogRead(LINE_SIDE_LEFT_PIN);  // 左サイドのラインセンサー
+  uint32_t back_val  = analogRead(LINE_SIDE_BACK_PIN);  // 後サイドのラインセンサー
 
-  if (analogRead(LINE_SIDE_LEFT_PIN) > LINE_SIDE_JUDGE_VALUE && analogRead(LINE_SIDE_LEFT_PIN) < 1020) // 右サイドのラインセンサーがラインを見ているか
-    lines_data_bit_mask |= (1 << 17);
+  if (right_val > LINE_SIDE_JUDGE_VALUE && right_val < 1020) // 右サイドのラインセンサーがラインを見ているか
+    lines_data_bit_mask |= (1UL << 16);
 
-  if (analogRead(LINE_SIDE_BACK_PIN) > LINE_SIDE_JUDGE_VALUE && analogRead(LINE_SIDE_BACK_PIN) < 1020) // 右サイドのラインセンサーがラインを見ているか
-    lines_data_bit_mask |= (1 << 18);
+  if (left_val > LINE_SIDE_JUDGE_VALUE && left_val < 1020) // 右サイドのラインセンサーがラインを見ているか
+    lines_data_bit_mask |= (1UL << 17);
+
+  if (back_val > LINE_SIDE_JUDGE_VALUE && back_val < 1020) // 右サイドのラインセンサーがラインを見ているか
+    lines_data_bit_mask |= (1UL << 18);
 
   /*送信*/
   Serial1.write(head_byte);                 // teensyとの通信開始
@@ -60,11 +64,11 @@ void loop()
 
   Serial1.println(lines_data_bit_mask, BIN); // pcに送る
   Serial.print("l");
-  Serial.print(analogRead(LINE_SIDE_LEFT_PIN));
+  Serial.print(left_val);
   Serial.print("r");
-  Serial.print(analogRead(LINE_SIDE_RIGHT_PIN));
+  Serial.print(right_val);
   Serial.print("b");
-  Serial.println(analogRead(LINE_SIDE_BACK_PIN));
+  Serial.println(back_val);
 
   delay(10); // 10ms待機
 }
