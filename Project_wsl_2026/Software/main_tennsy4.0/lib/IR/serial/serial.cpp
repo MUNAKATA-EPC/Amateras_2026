@@ -2,15 +2,15 @@
 
 /*IRボールの状況をシリアル通信で受信する*/
 
+/*変数定義*/
 HardwareSerial *ir_serial; // とりあえず定義
-int ir_baudrate;           // ボートレート格納用
+uint32_t ir_baudrate;      // ボートレート格納用
 
-bool ir_exist = false; // IRボールがあるかどうか
+bool ir_exist = false;      // IRボールがあるかどうか
+int16_t ir_deg = -1;        // IRボールの角度格納用
+int16_t ir_distance = -1;   // IRボールの距離格納用
 
-int ir_deg = -1;      // IRボールの角度格納用
-int ir_distance = -1; // IRボールの距離格納用
-
-void IR_init(HardwareSerial *serial, int baudrate)
+void IR_init(HardwareSerial *serial, uint32_t baudrate)
 {
     ir_serial = serial;
     ir_baudrate = baudrate;
@@ -30,7 +30,6 @@ void IR_update()
         else
         {
             ir_exist = true; // 存在する
-
             ir_deg = (ir_deg - 359 + 360) % 360; // 調整
         }
     }
@@ -41,12 +40,12 @@ bool is_IR_exist()
     return ir_exist; // IRボールが存在するかどうかについてを返す
 }
 
-int get_IR_deg()
+int16_t get_IR_deg()
 {
     return ir_deg; // IRボールの角度を返す
 }
 
-int get_IR_distance()
+int16_t get_IR_distance()
 {
     return ir_distance; // IRボールの距離を返す
 }

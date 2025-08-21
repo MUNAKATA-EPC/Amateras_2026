@@ -19,9 +19,9 @@
 #include "ui.hpp"
 
 // 攻撃用のプログラムを実行
-void play_attacker(bool use_yellow_cam, bool use_blue_cam, int motor_power);
+void play_attacker(bool use_yellow_cam, bool use_blue_cam, int16_t motor_power);
 
 // 角度における"差"を計算する関数
-int compute_deg_diff(int a, int b);
+int16_t compute_deg_diff(int16_t a, int16_t b);
 
 #endif

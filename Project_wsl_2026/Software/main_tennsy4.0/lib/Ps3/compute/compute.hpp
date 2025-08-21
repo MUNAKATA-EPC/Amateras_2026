@@ -37,12 +37,12 @@ bool get_Ps3_button_r2();
 bool get_Ps3_button_r3();
 
 // 左スティックの角度を取得
-int get_Ps3_stick_left_deg();
+int16_t get_Ps3_stick_left_deg();
 // 左スティックの距離を取得
-int get_Ps3_stick_left_distance();
+int16_t get_Ps3_stick_left_distance();
 // 右スティックの角度を取得
-int get_Ps3_stick_right_deg();
+int16_t get_Ps3_stick_right_deg();
 // 右スティックの距離を取得
-int get_Ps3_stick_right_distance();
+int16_t get_Ps3_stick_right_distance();
 
 #endif

@@ -3,18 +3,18 @@
 /*DSR1202とシリアル通信し、DSR1202を制御する*/
 
 HardwareSerial *_serial; // とりあえず定義
-int _baudrate;           // ボートレート格納用
+uint32_t _baudrate;           // ボートレート格納用
 
-int DSR1202_motormove_toggle_pin = 0; // モータを動かすかどうかを決定するトグルスイッチのピン格納用
+uint8_t DSR1202_motormove_toggle_pin = 0; // モータを動かすかどうかを決定するトグルスイッチのピン格納用
 
-void DSR1202_set_motormove_togglepin(int pin)
+void DSR1202_set_motormove_togglepin(uint8_t pin)
 {
     DSR1202_motormove_toggle_pin = pin;
 
     motormove_toggle.set_pin(DSR1202_motormove_toggle_pin); // トグルスイッチのピン番号を設定
 }
 
-void DSR1202_init(HardwareSerial *serial, int baudrate)
+void DSR1202_init(HardwareSerial *serial, uint32_t baudrate)
 {
     motormove_toggle.init(); // トグルスイッチのピンを設定
 
@@ -29,7 +29,7 @@ void DSR1202_break()
     (*_serial).println("1R0002R0003R0004R000"); // モータを停止させる
 }
 
-void DSR1202_move(int value_1ch, int value_2ch, int value_3ch, int value_4ch)
+void DSR1202_move(uint8_t value_1ch, uint8_t value_2ch, uint8_t value_3ch, uint8_t value_4ch)
 {
     /*トグルスイッチがオフならば*/
 

@@ -3,14 +3,14 @@
 /*すべてのモータの合力が常に指定した値になるようにモーターを制御する*/
 
 /*モーターはすべて正で、まっすぐ進むようにする*/
-int motor_pid_sign[4] = {1, -1, -1, 1}; // モータを回転させるための符号を格納
+int8_t motor_pid_sign[4] = {1, -1, -1, 1}; // モータを回転させるための符号を格納
 
-int motor_deg[4];             // モータの設置角度を格納用
-int motor_move_power_main[4]; // モータのスケーリングされた出力格納用(移動のための出力)
-int motor_pd_power_main[4];   // モータのスケーリングされた出力格納用(PD制御のための出力)
-int motor_power_main[4];      // 最終的な出力格納用
+int16_t motor_deg[4];             // モータの設置角度を格納用
+int16_t motor_move_power_main[4]; // モータのスケーリングされた出力格納用(移動のための出力)
+int16_t motor_pd_power_main[4];   // モータのスケーリングされた出力格納用(PD制御のための出力)
+int16_t motor_power_main[4];      // 最終的な出力格納用
 
-void motors_init(int deg_1ch, int deg_2ch, int deg_3ch, int deg_4ch)
+void motors_init(int16_t deg_1ch, int16_t deg_2ch, int16_t deg_3ch, int16_t deg_4ch)
 {
     motor_deg[0] = deg_1ch;
     motor_deg[1] = deg_2ch;
@@ -18,81 +18,78 @@ void motors_init(int deg_1ch, int deg_2ch, int deg_3ch, int deg_4ch)
     motor_deg[3] = deg_4ch;
 }
 
-void motors_move(int deg, int abs_power)
+void motors_move(int16_t deg, int16_t abs_power)
 {
-    abs_power = abs(abs_power); // 一応絶対値にする（めんどくさいから絶対値にしている）
+    abs_power = abs(abs_power); // 一応絶対値にする
 
-    compute_motor_power(deg, 100); // 適当に100の出力での各モータの出力を計算する
+    compute_motor_power(deg, 100); // 適当に100の出力での各モータの出力を計算
 
-    double sum_x_power = 0; // x方向の出力の合計
-    double sum_y_power = 0; // y方向の出力の合計
-    for (int i = 0; i < 4; i++)
+    float sum_x_power = 0; // x方向の出力の合計
+    float sum_y_power = 0; // y方向の出力の合計
+    for (int8_t i = 0; i < 4; i++)
     {
-        sum_x_power += get_motor_x_power(i); // iチャンネルのモーターのx出力を加算
-        sum_y_power += get_motor_y_power(i); // iチャンネルのモーターのy出力を加算
+        sum_x_power += get_motor_x_power(i);
+        sum_y_power += get_motor_y_power(i);
     }
 
-    double power_xy = sqrt(pow(sum_x_power, 2) + pow(sum_y_power, 2)); // xy合力の出力を計算
+    float power_xy = sqrt(pow(sum_x_power, 2) + pow(sum_y_power, 2));
 
-    if (power_xy > 1e-6) // 0よりも大きいとき
+    if (power_xy > 1e-6)
     {
-        double scale_value = abs_power / power_xy; // 比率を求める
-        for (int i = 0; i < 4; i++)
+        float scale_value = float(abs_power) / power_xy;
+        for (int8_t i = 0; i < 4; i++)
         {
-            motor_move_power_main[i] = int(get_motor_power(i) * scale_value);                      // スケーリングしてmotor_power_main[]に格納
-            motor_move_power_main[i] = constrain(motor_move_power_main[i], -abs_power, abs_power); // 一応納める
+            motor_move_power_main[i] = int16_t(get_motor_power(i) * scale_value);
+            motor_move_power_main[i] = constrain(motor_move_power_main[i], -abs_power, abs_power);
         }
     }
-    else // 0で割ってはいけないので
+    else
     {
-        for (int i = 0; i < 4; i++)
+        for (int8_t i = 0; i < 4; i++)
         {
-            motor_move_power_main[i] = 0; // 出力をゼロに
+            motor_move_power_main[i] = 0;
         }
     }
 
-    for (int i = 0; i < 4; i++)
+    for (int8_t i = 0; i < 4; i++)
     {
-        motor_power_main[i] = motor_move_power_main[i] + get_PD_power() * motor_pid_sign[i]; // 移動-PD制御で最終的な出力を出す
-        motor_power_main[i] = constrain(motor_power_main[i], -abs_power, abs_power);         // 一応丸める
+        motor_power_main[i] = motor_move_power_main[i] + get_PD_power() * motor_pid_sign[i];
+        motor_power_main[i] = constrain(motor_power_main[i], -abs_power, abs_power);
     }
 
-    DSR1202_move(motor_power_main[0], motor_power_main[1], motor_power_main[2], motor_power_main[3]); // モータを動かす
+    DSR1202_move(motor_power_main[0], motor_power_main[1], motor_power_main[2], motor_power_main[3]);
 }
 
 /*ここのファイル内だけで使う関数*/
 
-double motor_move_power_sub[4]; // 計算したモータ出力
-double motor_x_power[4];        // モータ出力をx方向に分解した出力
-double motor_y_power[4];        // モータ出力をy方向に分解した出力
+float motor_move_power_sub[4]; // 計算したモータ出力
+float motor_x_power[4];        // モータ出力をx方向に分解
+float motor_y_power[4];        // モータ出力をy方向に分解
 
-void compute_motor_power(int deg, int power)
+void compute_motor_power(int16_t deg, int16_t power)
 {
-    for (int i = 0; i < 4; i++)
+    for (int8_t i = 0; i < 4; i++)
     {
-        // sin(進みたい角度 - モータ角度) × powerがモータごとの必要出力となる
         motor_move_power_sub[i] = sin(radians(deg - motor_deg[i])) * power;
 
-        // タイヤの接線方向（モータ角度+90度方向）に力が働くので、その方向に分解
-        int power_deg = motor_deg[i] + 90;
+        int16_t power_deg = motor_deg[i] + 90;
 
-        // モータの出力をx,y方向に分解した値を計算
         motor_x_power[i] = cos(radians(power_deg)) * motor_move_power_sub[i];
         motor_y_power[i] = sin(radians(power_deg)) * motor_move_power_sub[i];
     }
 }
 
-double get_motor_power(int index)
+float get_motor_power(int8_t index)
 {
     return motor_move_power_sub[index];
 }
 
-double get_motor_x_power(int index)
+float get_motor_x_power(int8_t index)
 {
     return motor_x_power[index];
 }
 
-double get_motor_y_power(int index)
+float get_motor_y_power(int8_t index)
 {
     return motor_y_power[index];
 }

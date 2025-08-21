@@ -18,6 +18,6 @@
 // uiについて
 #include "ui.hpp"
 // 守備用のプログラムを実行
-void play_defender(bool use_yellow_cam, bool use_blue_cam, int motor_power);
+void play_defender(bool use_yellow_cam, bool use_blue_cam, int16_t motor_power);
 
 #endif

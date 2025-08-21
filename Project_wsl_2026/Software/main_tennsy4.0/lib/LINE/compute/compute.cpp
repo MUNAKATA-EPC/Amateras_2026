@@ -1,94 +1,83 @@
 #include "compute.hpp"
 
-/* 得たラインセンサーの情報をもとに計算 記憶する方式（Memory版）と瞬間計算方式（版）がある */
+/*=== ノーマル版 ===*/
+int16_t line_deg = -1;        // ラインの角度格納用（整数）
+bool old_LINE_exist = false;   // 前回ラインがあったかどうか
 
-/*=== 通常版（瞬間計算）用変数 ===*/
-double line_deg = -1;
-bool old_LINE_exist = false;
-
-/*=== Memory版（記録計算）用変数 ===*/
-double line_memory_deg = -1;
+/*=== Memory版 ===*/
+int16_t line_memory_deg = -1; 
 bool is_LINE_memory_exist[16] = {false}; // Memory版用記録配列
 
-/*=== 共通変数 ===*/
-int first_triggered_pin = -1;
-bool line_half_out = false;
+/*=== 共通 ===*/
+int8_t first_triggered_pin = -1; // 最初に反応したピン
+bool line_half_out = false;      // half_out判定用
 
 /*=== 関数 ===*/
-// ノーマル版
-int get_LINE_deg()
+// ノーマル版の角度取得
+int16_t get_LINE_deg()
 {
-    return (int)line_deg;
+    return line_deg;
 }
 
-// メモリ版
-int get_LINE_memory_deg()
+// Memory版の角度取得
+int16_t get_LINE_memory_deg()
 {
-    return (int)line_memory_deg;
+    return line_memory_deg;
 }
 
-// ハーフアウト判定について
-int get_first_triggered_pin()
+// 最初に反応したピン
+int8_t get_first_triggered_pin()
 {
     return first_triggered_pin;
 }
+
+// half_out判定
 bool is_LINE_half_out()
 {
     return line_half_out;
 }
 
-// サイドラインについて
+// サイドライン右
 bool get_LINE_side_right()
 {
     return get_LINE_data(16);
 }
 
+// サイドライン左
 bool get_LINE_side_left()
 {
     return get_LINE_data(17);
 }
 
+// サイドライン後ろ
 bool get_LINE_side_back()
 {
     return get_LINE_data(18);
 }
 
-/*=== Half Out 判定関数 ===*/
-bool check_half_out(int base_pin)
+/*=== half_out判定関数 ===*/
+bool check_half_out(uint8_t base_pin)
 {
-    int pinA = (base_pin + 4) % 16;
+    uint8_t pinA = (base_pin + 4) % 16;
 
-    // pinAの次からbase_pinまで時計回りに7つのセンサーを調べる
-    for (int i = 1; i <= 7; i++)
+    for (uint8_t i = 1; i <= 7; i++)
     {
-        int check_pin = (pinA + i) % 16;
-        if (check_pin == base_pin)
-        {
-            // base_pinに戻ったら終了（何も見つからなかった）
-            break;
-        }
-        if (get_LINE_data(check_pin))
-            return true;
+        uint8_t check_pin = (pinA + i) % 16;
+        if (check_pin == base_pin) break;
+        if (get_LINE_data(check_pin)) return true;
     }
 
-    // pinAの前からbase_pinまで反時計回りに7つのセンサーを調べる
-    for (int i = 1; i <= 7; i++)
+    for (uint8_t i = 1; i <= 7; i++)
     {
-        int check_pin = (pinA - i + 16) % 16;
-        if (check_pin == base_pin)
-        {
-            // base_pinに戻ったら終了（何も見つからなかった）
-            break;
-        }
-        if (get_LINE_data(check_pin))
-            return true;
+        uint8_t check_pin = (pinA - i + 16) % 16;
+        if (check_pin == base_pin) break;
+        if (get_LINE_data(check_pin)) return true;
     }
 
     return false;
 }
 
-
-/*=== update（ノーマル＆メモリ 同時計算） ===*/
+/*=== update関数（ノーマル＆Memory 同時計算） ===*/
 void LINE_compute_update()
 {
     /*--- ノーマル版計算 ---*/
@@ -98,81 +87,55 @@ void LINE_compute_update()
     }
     else
     {
-        double line_x = 0, line_y = 0;
-        for (int i = 0; i < 16; i++)
+        float line_x = 0.0f, line_y = 0.0f;
+        for (uint8_t i = 0; i < 16; i++)
         {
             if (get_LINE_data(i))
             {
-                line_x += cos(radians(22.5 * i));
-                line_y += sin(radians(22.5 * i));
+                line_x += cosf(radians(22.5f * i));
+                line_y += sinf(radians(22.5f * i));
             }
         }
-        if (get_LINE_data(16))
-        {
-            line_x += cos(radians(270));
-            line_y += sin(radians(270));
-        }
-        if (get_LINE_data(17))
-        {
-            line_x += cos(radians(90));
-            line_y += sin(radians(90));
-        }
-        if (get_LINE_data(18))
-        {
-            line_x += cos(radians(180));
-            line_y += sin(radians(180));
-        }
+        if (get_LINE_data(16)) { line_x += cosf(radians(270.0f)); line_y += sinf(radians(270.0f)); }
+        if (get_LINE_data(17)) { line_x += cosf(radians(90.0f));  line_y += sinf(radians(90.0f));  }
+        if (get_LINE_data(18)) { line_x += cosf(radians(180.0f)); line_y += sinf(radians(180.0f)); }
 
-        line_deg = degrees(atan2(line_y, line_x));
-        if (line_deg < 0)
-            line_deg += 360;
+        // float 計算結果を整数に丸める
+        line_deg = (int16_t)roundf(degrees(atan2f(line_y, line_x)));
+        if (line_deg < 0) line_deg += 360;
     }
 
     /*--- Memory版計算 ---*/
     if (!is_LINE_exist())
     {
-        for (int i = 0; i < 16; i++)
-            is_LINE_memory_exist[i] = false;
+        for (uint8_t i = 0; i < 16; i++) is_LINE_memory_exist[i] = false;
         line_memory_deg = -1;
     }
     else
     {
-        double line_x = 0, line_y = 0;
-        for (int i = 0; i < 16; i++)
+        float line_x = 0.0f, line_y = 0.0f;
+        for (uint8_t i = 0; i < 16; i++)
         {
-            if (get_LINE_data(i))
-                is_LINE_memory_exist[i] = true;
+            if (get_LINE_data(i)) is_LINE_memory_exist[i] = true;
         }
-        for (int i = 0; i < 16; i++)
+        for (uint8_t i = 0; i < 16; i++)
         {
-            line_x += cos(radians(22.5 * i)) * is_LINE_memory_exist[i];
-            line_y += sin(radians(22.5 * i)) * is_LINE_memory_exist[i];
+            line_x += cosf(radians(22.5f * i)) * is_LINE_memory_exist[i];
+            line_y += sinf(radians(22.5f * i)) * is_LINE_memory_exist[i];
         }
-        if (get_LINE_data(16))
-        {
-            line_x += cos(radians(270));
-            line_y += sin(radians(270));
-        }
-        if (get_LINE_data(17))
-        {
-            line_x += cos(radians(90));
-            line_y += sin(radians(90));
-        }
-        if (get_LINE_data(18))
-        {
-            line_x += cos(radians(180));
-            line_y += sin(radians(180));
-        }
+        if (get_LINE_data(16)) { line_x += cosf(radians(270.0f)); line_y += sinf(radians(270.0f)); }
+        if (get_LINE_data(17)) { line_x += cosf(radians(90.0f));  line_y += sinf(radians(90.0f));  }
+        if (get_LINE_data(18)) { line_x += cosf(radians(180.0f)); line_y += sinf(radians(180.0f)); }
 
-        line_memory_deg = degrees(atan2(line_y, line_x));
-        if (line_memory_deg < 0)
-            line_memory_deg += 360;
+        line_memory_deg = (int16_t)roundf(degrees(atan2f(line_y, line_x)));
+        if (line_memory_deg < 0) line_memory_deg += 360;
     }
 
-    /*--- 最初のピン判定（共通） ---*/
+    /*--- 最初に反応したピンを記録 ---*/
     if (!old_LINE_exist && is_LINE_exist())
     {
-        for (int i = 0; i < 16; i++)
+        first_triggered_pin = -1;
+        for (uint8_t i = 0; i < 16; i++)
         {
             if (get_LINE_data(i))
             {
@@ -183,9 +146,9 @@ void LINE_compute_update()
     }
     old_LINE_exist = is_LINE_exist();
 
-    /*--- half_out 判定（共通） ---*/
+    /*--- half_out判定 ---*/
     if (first_triggered_pin != -1)
-        line_half_out = check_half_out(first_triggered_pin);
+        line_half_out = check_half_out((uint8_t)first_triggered_pin);
     else
         line_half_out = false;
 }

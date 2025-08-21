@@ -4,7 +4,7 @@
 
 /*ラジコン用のプログラムを実行する*/
 
-void play_radicon(int motor_power)
+void play_radicon(int16_t motor_power)
 {
     /*PD制御*/
     if (is_Ps3_stick_right_move()) // 右ステックが倒されたならば

@@ -4,11 +4,11 @@
 
 /*守備用のプログラムを実行する*/
 
-int old_line_memory_deg; // 昔のラインセンサーの角度格納用
+int16_t old_line_memory_deg; // 昔のラインセンサーの角度格納用
 Timer ir_follow_timer;
 bool line_old_flag = false;
 
-void play_defender(bool use_yellow_cam, bool use_blue_cam, int motor_power)
+void play_defender(bool use_yellow_cam, bool use_blue_cam, int16_t motor_power)
 {
     PD_use_gyro(0);
 

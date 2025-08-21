@@ -6,11 +6,11 @@
 class Toggle
 {
 private:
-    int _toggle_pin = 0; // ボタンのピン番号格納用
+    uint8_t _toggle_pin = 0; // ボタンのピン番号格納用
 
 public:
     // 使うボタンのピン番号を設定する
-    void set_pin(int pin);
+    void set_pin(uint8_t pin);
 
     // ボタンを初期化する（ピンモードを設定する）
     void init();

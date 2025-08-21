@@ -7,17 +7,17 @@
 class Button
 {
 private:
-    int _button_pin = 0;                // ボタンのピン番号格納用
-    int _button_pinmode = INPUT_PULLUP; // ボタンのピンモード格納用
+    uint8_t _button_pin = 0;           // ボタンのピン番号格納用
+    uint8_t _button_pinmode = INPUT_PULLUP; // ボタンのピンモード格納用
 
-    int _button_count = 0; // ボタンが押されている回数格納用
+    int8_t _button_count = 0; // ボタンが押されている回数格納用
 
-    Timer _pushing_timer;  // 押されている時間計測用
-    int _pushing_time = 0; // 押されている間の時間格納用
+    Timer _pushing_timer;     // 押されている時間計測用
+    uint16_t _pushing_time = 0; // 押されている間の時間格納用
 
 public:
     // 使うボタンのピン番号・ピンモードを設定する
-    void set_pin(int pin, int pinmode);
+    void set_pin(uint8_t pin, uint8_t pinmode);
 
     // ボタンを初期化する（ピンモードを設定する）
     void init();
@@ -32,7 +32,7 @@ public:
     bool is_released();
 
     // 前回ボタンがどのくらい押されていた、または今押されているボタンが今までどのくらい押され続けてきたか出力
-    int get_pushing_time();
+    uint16_t get_pushing_time();
 
     // リセットする
     void reset_pushing_time();
@@ -46,3 +46,4 @@ extern Button lcd_right_button; // 右ボタン
 extern Button lcd_left_button;  // 左ボタン
 
 #endif
+

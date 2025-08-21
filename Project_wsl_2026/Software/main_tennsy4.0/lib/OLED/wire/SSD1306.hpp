@@ -7,7 +7,7 @@
 #include "timer.hpp"
 
 // I2C定義・開始
-void SSD1306_init(TwoWire *wire, uint8_t adress, int width, int height);
+void SSD1306_init(TwoWire *wire, uint8_t adress, uint8_t width, uint8_t height);
 
 // 表示をすべて消す
 void SSD1306_clear();
@@ -16,24 +16,24 @@ void SSD1306_clear();
 void SSD1306_show();
 
 // 文字をプリントさせる
-void SSD1306_write(int size, double ahead_x, double ahead_y, String Sentence, bool black);
+void SSD1306_write(uint8_t size, uint8_t ahead_x, uint8_t ahead_y, const char *Sentence, bool black);
 
 // ビットマップを表示する
-void SSD1306_bitmap(double x, double y, const unsigned char *bitmap, int width, int height, bool black);
+void SSD1306_bitmap(uint8_t x, uint8_t y, const uint8_t *bitmap, uint8_t width, uint8_t height, bool black);
 
 // ラインを引く
-void SSD1306_line(double start_x, double start_y, double end_x, double end_y, bool black);
+void SSD1306_line(uint8_t start_x, uint8_t start_y, uint8_t end_x, uint8_t end_y, bool black);
 
 // 直線y=ax+bを引く（y軸は上向きを正としている）
-void SSD1306_function_line(double origin_x, double origin_y, double a, double b, bool black);
+void SSD1306_function_line(uint8_t origin_x, uint8_t origin_y, double a, double b, bool black);
 
-//  円を描画する
-void SSD1306_circle(double point_x, double point_y, double circle_r, bool fill, bool black);
+// 円を描画する
+void SSD1306_circle(uint8_t point_x, uint8_t point_y, uint8_t circle_r, bool fill, bool black);
 
 // 矩形を描画する
-void SSD1306_rect(double topleft_x, double topleft_y, double width, double height, double corner_r, bool fill, bool black);
+void SSD1306_rect(uint8_t topleft_x, uint8_t topleft_y, uint8_t width, uint8_t height, uint8_t corner_r, bool fill, bool black);
 
 // 三角形を描画する
-void SSD1306_triangle(double point1_x, double point1_y, double point2_x, double point2_y, double point3_x, double point3_y, bool fill, bool black);
+void SSD1306_triangle(uint8_t point1_x, uint8_t point1_y, uint8_t point2_x, uint8_t point2_y, uint8_t point3_x, uint8_t point3_y, bool fill, bool black);
 
 #endif

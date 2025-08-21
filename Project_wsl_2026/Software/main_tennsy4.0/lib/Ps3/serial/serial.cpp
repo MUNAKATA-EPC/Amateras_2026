@@ -5,7 +5,7 @@
 const uint8_t head_byte = 0xAA; // 同期ヘッダー格納用
 
 HardwareSerial *ps3_serial; // とりあえず定義
-uint16_t ps3_baudrate;      // ボートレート格納用
+uint32_t ps3_baudrate;      // ボートレート格納用
 
 int8_t ps3_stick_lx = 0;        // PS3の左スティックのX方向格納用
 int8_t ps3_stick_lx_adjust = 0; // PS3の左スティックの調整値格納用
@@ -29,7 +29,7 @@ void Ps3_set_stick_adjust(int8_t lx_adjust, int8_t ly_adjust, int8_t rx_adjust, 
     ps3_stick_ry_adjust = ry_adjust; // 右スティックのY方向の調整値を設定
 }
 
-void Ps3_init(HardwareSerial *serial, uint16_t baudrate)
+void Ps3_init(HardwareSerial *serial, uint32_t baudrate)
 {
     ps3_serial = serial;
     ps3_baudrate = baudrate;
@@ -96,7 +96,7 @@ int8_t get_Ps3_stick_ry()
     return 0; // 調整値以下なので0を返す
 }
 
-bool get_Ps3_button_data(int index)
+bool get_Ps3_button_data(uint8_t index)
 {
     return ((1 << index) & ps3_buttons_data_bit_mask) > 0; // index分だけシフトした1との論理積が0よりも大きかったらそのbitは1
 }

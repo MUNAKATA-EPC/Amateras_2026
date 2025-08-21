@@ -4,22 +4,23 @@
 #include <Arduino.h>
 #include "timer.hpp"
 
-/*キッカー*/
+/* キッカー */
 
 // キッカーのピン番号を設定
-void kicker_set_fetpin(int kick_pin, int charge_pin);
+void kicker_set_fetpin(int16_t kick_pin, int16_t charge_pin);
+
 // キッカーのクールダウンの時間を設定・開始
-void kicker_init(int cooldown_time);
+void kicker_init(int16_t cooldown_time);
 
 // キックする（クールダウンタイム中は蹴らない）
 void kicker_kick(bool kick_signal);
 
-/*キャッチセンサー*/
+/* キャッチセンサー */
 
 // キャッチセンサーのピン設定・開始
-void catchsensor_init(int pin);
+void catchsensor_init(int16_t pin);
 
-// キャッチセンサーは反応しているかどうか
+// キャッチセンサーの値を取得
 unsigned int get_catchsensor();
 
 #endif

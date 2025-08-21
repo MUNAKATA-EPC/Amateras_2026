@@ -2,7 +2,7 @@
 
 /*パソコンにシリアルプリント用のプログラムを実行する*/
 
-void play_pc_print(int pc_print_mode)
+void play_pc_print(uint8_t pc_print_mode)
 {
     switch (pc_print_mode)
     {
@@ -131,57 +131,80 @@ void play_pc_print(int pc_print_mode)
 
 /*LCDにプリントさせる用のプログラムを実行する*/
 
-void play_lcd_print(int lcd_print_mode, int ahead_x, int ahead_y)
+void play_lcd_print(uint8_t lcd_print_mode, uint8_t ahead_x, uint8_t ahead_y)
 {
-    String line_print_data = ""; // LINE_CHECK_WITH_LCDで使う
+    char buf[64];             // 十分なバッファサイズを確保
+    char line_print_data[64]; // LINEデータ用
 
     switch (lcd_print_mode)
     {
     case IR_LINE_GYRO_CHECK_WITH_LCD:
         // IRについて
-        SSD1306_write(1, 0 + ahead_x, 0 + ahead_y, "ir_deg: " + String(get_IR_deg()), false);
-        SSD1306_write(1, 0 + ahead_x, 10 + ahead_y, "ir_dis:" + String(get_IR_distance()), false);
-        // LINEについて
-        SSD1306_write(1, 0 + ahead_x, 20 + ahead_y, "line_deg: " + String(get_LINE_deg()), false);
-        SSD1306_write(1, 0 + ahead_x, 30 + ahead_y, "line_side: " + String(get_LINE_side_right()) + String(get_LINE_side_left()) + String(get_LINE_side_back()), false);
-        // ジャイロについて
-        SSD1306_write(1, 0 + ahead_x, 40 + ahead_y, "bno_deg: " + String(get_BNO055_deg()), false);
-        SSD1306_write(1, 0 + ahead_x, 50 + ahead_y, "pd_power: " + String(get_PD_power()), false);
+        sprintf(buf, "ir_deg: %d", get_IR_deg());
+        SSD1306_write(1, 0 + ahead_x, 0 + ahead_y, buf, false);
+        sprintf(buf, "ir_dis: %d", get_IR_distance());
+        SSD1306_write(1, 0 + ahead_x, 10 + ahead_y, buf, false);
 
+        // LINEについて
+        sprintf(buf, "line_deg: %d", get_LINE_deg());
+        SSD1306_write(1, 0 + ahead_x, 20 + ahead_y, buf, false);
+        line_print_data[0] = '\0';
+        for (int i = 0; i < 19; i++)
+        {
+            char tmp[4];
+            sprintf(tmp, "%d", get_LINE_data(i));
+            strcat(line_print_data, tmp);
+        }
+        sprintf(buf, "line_side: %s", line_print_data);
+        SSD1306_write(1, 0 + ahead_x, 30 + ahead_y, buf, false);
+
+        // ジャイロについて
+        sprintf(buf, "bno_deg: %d", get_BNO055_deg());
+        SSD1306_write(1, 0 + ahead_x, 40 + ahead_y, buf, false);
+        sprintf(buf, "pd_power: %d", get_PD_power());
+        SSD1306_write(1, 0 + ahead_x, 50 + ahead_y, buf, false);
         break;
 
     case IR_CHECK_WITH_LCD:
-        // IRserialについて
-        SSD1306_write(1, 0 + ahead_x, 0 + ahead_y, "ir_deg: " + String(get_IR_deg()), false);
-        SSD1306_write(1, 0 + ahead_x, 10 + ahead_y, "dis_deg:" + String(get_IR_distance()), false);
-        // IRcomputeについて
-        SSD1306_write(1, 0 + ahead_x, 20 + ahead_y, "mawari_deg: " + String(get_IR_mawarikomi_deg()), false);
-        SSD1306_write(1, 0 + ahead_x, 30 + ahead_y, "follow_deg:" + String(get_IR_follow_deg(0)), false);
-
+        sprintf(buf, "ir_deg: %d", get_IR_deg());
+        SSD1306_write(1, 0 + ahead_x, 0 + ahead_y, buf, false);
+        sprintf(buf, "dis_deg: %d", get_IR_distance());
+        SSD1306_write(1, 0 + ahead_x, 10 + ahead_y, buf, false);
+        sprintf(buf, "mawari_deg: %d", get_IR_mawarikomi_deg());
+        SSD1306_write(1, 0 + ahead_x, 20 + ahead_y, buf, false);
+        sprintf(buf, "follow_deg: %d", get_IR_follow_deg(0));
+        SSD1306_write(1, 0 + ahead_x, 30 + ahead_y, buf, false);
         break;
 
     case LINE_CHECK_WITH_LCD:
-        // LINEselial・computeについて
-        SSD1306_write(1, 0 + ahead_x, 0 + ahead_y, "line_deg: " + String(get_LINE_deg()), false);
-        for (int i = 0; i < 19; i++)
-            line_print_data = line_print_data + String(get_LINE_data(i));
-        SSD1306_write(1, 0 + ahead_x, 10 + ahead_y, "line_data: " + line_print_data, false);
+        sprintf(buf, "line_deg: %d", get_LINE_deg());
+        SSD1306_write(1, 0 + ahead_x, 0 + ahead_y, buf, false);
 
+        line_print_data[0] = '\0';
+        for (int i = 0; i < 19; i++)
+        {
+            char tmp[4];
+            sprintf(tmp, "%d", get_LINE_data(i));
+            strcat(line_print_data, tmp);
+        }
+        sprintf(buf, "line_data: %s", line_print_data);
+        SSD1306_write(1, 0 + ahead_x, 10 + ahead_y, buf, false);
         break;
 
     case GYRO_CHECK_WITH_LCD:
-        // ジャイロについて
-        SSD1306_write(1, 0 + ahead_x, 0 + ahead_y, "bno_deg: " + String(get_BNO055_deg()), false);
-
+        sprintf(buf, "bno_deg: %d", get_BNO055_deg());
+        SSD1306_write(1, 0 + ahead_x, 0 + ahead_y, buf, false);
         break;
 
     case CAM_CHECK_WITH_LCD:
-        // カメラについて
-        SSD1306_write(1, 0 + ahead_x, 0 + ahead_y, "yellow_deg: " + String(get_yellow_goal_deg()), false);
-        SSD1306_write(1, 0 + ahead_x, 10 + ahead_y, "yellow_dis: " + String(get_yellow_goal_distance()), false);
-        SSD1306_write(1, 0 + ahead_x, 20 + ahead_y, "blue_deg: " + String(get_blue_goal_deg()), false);
-        SSD1306_write(1, 0 + ahead_x, 30 + ahead_y, "blue_dis: " + String(get_blue_goal_distance()), false);
-
+        sprintf(buf, "yellow_deg: %d", get_yellow_goal_deg());
+        SSD1306_write(1, 0 + ahead_x, 0 + ahead_y, buf, false);
+        sprintf(buf, "yellow_dis: %d", get_yellow_goal_distance());
+        SSD1306_write(1, 0 + ahead_x, 10 + ahead_y, buf, false);
+        sprintf(buf, "blue_deg: %d", get_blue_goal_deg());
+        SSD1306_write(1, 0 + ahead_x, 20 + ahead_y, buf, false);
+        sprintf(buf, "blue_dis: %d", get_blue_goal_distance());
+        SSD1306_write(1, 0 + ahead_x, 30 + ahead_y, buf, false);
         break;
 
     default:

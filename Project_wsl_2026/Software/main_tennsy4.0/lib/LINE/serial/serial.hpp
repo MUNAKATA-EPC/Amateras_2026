@@ -6,12 +6,14 @@
 
 // シリアル定義・開始
 void LINE_init(HardwareSerial *serial, int baudrate);
+
 // 更新
 void LINE_serial_update();
 
 // ラインが存在するかどうか
 bool is_LINE_exist();
+
 // LINEのデータを出力
-int get_LINE_data(int index);
+bool get_LINE_data(uint8_t index);
 
 #endif

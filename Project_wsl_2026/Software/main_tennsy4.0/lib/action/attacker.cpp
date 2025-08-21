@@ -3,15 +3,15 @@
 /*攻撃用のプログラムを実行する*/
 
 // 角度における"差"を計算する関数
-int compute_deg_diff(int a, int b)
+int16_t compute_deg_diff(int16_t a, int16_t b)
 {
-    int diff = (a - b + 360) % 360;
+    int16_t diff = (a - b + 360) % 360;
     if (diff > 180)
         diff = 360 - diff;
     return diff;
 }
 
-void play_attacker(bool use_yellow_cam, bool use_blue_cam, int motor_power)
+void play_attacker(bool use_yellow_cam, bool use_blue_cam, int16_t motor_power)
 {
     /*PD制御*/
     if (use_yellow_cam)

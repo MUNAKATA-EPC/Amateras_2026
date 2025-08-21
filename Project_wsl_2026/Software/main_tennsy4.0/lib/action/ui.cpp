@@ -2,10 +2,12 @@
 
 /*uiを実行する*/
 
-int lcd_enter_pin = 0, lcd_left_pin = 0, lcd_right_pin = 0;             // LCDを動かすためのButtonのピン番号格納用
-int lcd_enter_pinmode = 0, lcd_left_pinmode = 0, lcd_right_pinmode = 0; // LCDを動かすためのButtonのピンモード格納用
+// LCDを動かすためのButtonのピン番号格納用
+int8_t lcd_enter_pin = 0, lcd_left_pin = 0, lcd_right_pin = 0;
+// LCDを動かすためのButtonのピンモード格納用
+int8_t lcd_enter_pinmode = 0, lcd_left_pinmode = 0, lcd_right_pinmode = 0;
 
-void ui_set_lcdpin(int enter_pin, int enter_pinmode, int left_pin, int left_pinmode, int right_pin, int right_pinmode)
+void ui_set_lcdpin(int8_t enter_pin, int8_t enter_pinmode, int8_t left_pin, int8_t left_pinmode, int8_t right_pin, int8_t right_pinmode)
 {
     lcd_enter_pin = enter_pin;
     lcd_left_pin = left_pin;
@@ -37,8 +39,8 @@ bool ui_first_call = true; // 関数が最初に呼び出されたかを読む
 // #define ACTION_DEFENDER 1
 // テスト(確認)する
 // #define ACTION_TEST 2
-int action_number = ACTION_ATTACKER; // とりあえず攻撃するを格納
-bool action_decided = false;         // Actionをユーザーが決定されたかどうか
+int8_t action_number = -1;   // 未選択時は-1
+bool action_decided = false; // Actionをユーザーが決定されたかどうか
 
 /*modeについてのメモ*/
 // 攻撃or守備をするとき
@@ -54,7 +56,7 @@ bool action_decided = false;         // Actionをユーザーが決定された�
 // #define TEST_PD_GYRO_MODE 1
 // カメラでのPD制御のテストを行うモード
 // #define TEST_PD_CAM_MODE 2
-int mode_number = 0;
+int8_t mode_number = -1;   // 未選択時は-1
 bool mode_decided = false; // modeをユーザーが決定されたかどうか
 
 /*settingについてのメモ*/
@@ -65,7 +67,7 @@ bool mode_decided = false; // modeをユーザーが決定されたかどうか
 // #define LINE_AUTO_INDEX 1
 // キッカーの自動化するかどうか
 // #define KICK_AUTO_INDEX 2
-int setting_number = 0;
+int8_t setting_number = 0;
 bool setting_memory[3] = {false}; // 3つのsettingでどう選ばれたか記憶
 
 void ui_process()
@@ -80,8 +82,7 @@ void ui_process()
         if (!action_decided) // まだactionが決められていない
         {
             action_number = (action_number + 1 + 4) % 4;
-
-            mode_number = 0;    // 初期化
+            mode_number = -1;   // 初期化
             setting_number = 0; // 初期化
         }
         else if (!mode_decided) // まだmodeが決められていない
@@ -110,21 +111,9 @@ void ui_process()
         }
         else if (action_decided) // actionが決められていたら
         {
-            action_decided = false; // actinoをもう一度決めれるようにする
+            action_decided = false; // actionをもう一度決めれるようにする
         }
     }
-    /*if (lcd_left_button.is_released())
-    {
-        if (!action_decided) // まだactionが決められていない
-            action_number = (action_number - 1 + 3) % 3;
-        else if (!mode_decided) // まだmodeが決められていない
-        {
-            if (action_number == ACTION_ATTACKER || action_number == ACTION_DEFENDER) // 攻撃か守備なら
-                mode_number = (mode_number - 1 + 2) % 2;
-            else // 確認なら
-                mode_number = (mode_number - 1 + 3) % 3;
-        }
-    }*/
 
     // 決定ボタンが押された場合
     if (lcd_enter_button.is_released())
@@ -139,27 +128,8 @@ void ui_process()
         }
         else // 全部決めた後、、つまりsettingを選ぶとき
         {
-            setting_memory[setting_number] = (setting_memory[setting_number] + 1 + 2) % 2; // falseならtrue、trueならfalseにする
+            setting_memory[setting_number] = !setting_memory[setting_number]; // falseならtrue、trueならfalseにする
         }
-        /*if (lcd_enter_button.get_pushing_time() >= 600) // 600ms以上押されていたら
-        {
-            if (action_decided && mode_decided) // actionもmodeも決定されたなら
-            {
-                mode_decided = false; // modeをもう一度決めれるようにする
-            }
-            else if (action_decided) // actionが決められていたら
-            {
-                action_decided = false; // actinoをもう一度決めれるようにする
-            }
-            lcd_enter_button.reset_pushing_time(); // 押されている時間をリセット
-        }
-        else
-        {
-            if (!action_decided) // まだactionが決められていない
-                action_decided = true;
-            else if (!mode_decided) // まだmodeが決められていない
-                mode_decided = true;
-        }*/
     }
 
     /*LCDに表示*/
@@ -171,35 +141,27 @@ void ui_process()
     if (my_ui_timer.get_time() >= 50) // 50ms経ってactionまたはmodeが決められていないなら
     {
         my_ui_timer.reset(); // リセット
-
-        SSD1306_clear(); // LCDを初期化する
+        SSD1306_clear();     // LCDを初期化する
 
         // actionについて
         switch (action_number)
         {
         case ACTION_ATTACKER:
             SSD1306_write(1, 0, 0, "Action-Attacker", false);
-
             if (action_decided) // actionが決められた
             {
-                // modeについて
                 switch (mode_number)
                 {
                 case PD_USE_ONLY_GYRO_MODE:
                     SSD1306_write(1, 6, 10, "PD : Use only gyro", false);
-
                     play_lcd_print(GYRO_CHECK_WITH_LCD, 1, 25);
                     break;
-
                 case PD_USE_YELLOW_CAM_MODE:
                     SSD1306_write(1, 6, 10, "PD : Use yellow cam", false);
-
                     play_lcd_print(CAM_CHECK_WITH_LCD, 1, 25);
                     break;
-
                 case PD_USE_BLUE_CAM_MODE:
                     SSD1306_write(1, 6, 10, "PD : Use blue cam", false);
-
                     play_lcd_print(CAM_CHECK_WITH_LCD, 1, 25);
                     break;
                 }
@@ -208,27 +170,20 @@ void ui_process()
 
         case ACTION_DEFENDER:
             SSD1306_write(1, 0, 0, "Action-Defender", false);
-
-            if (action_decided) // actionが決められた
+            if (action_decided)
             {
-                // modeについて
                 switch (mode_number)
                 {
                 case PD_USE_ONLY_GYRO_MODE:
                     SSD1306_write(1, 6, 10, "PD : Use only gyro", false);
-
                     play_lcd_print(GYRO_CHECK_WITH_LCD, 1, 25);
                     break;
-
                 case PD_USE_YELLOW_CAM_MODE:
                     SSD1306_write(1, 6, 10, "PD : Use yellow cam", false);
-
                     play_lcd_print(CAM_CHECK_WITH_LCD, 1, 25);
                     break;
-
                 case PD_USE_BLUE_CAM_MODE:
                     SSD1306_write(1, 6, 10, "PD : Use blue cam", false);
-
                     play_lcd_print(CAM_CHECK_WITH_LCD, 1, 25);
                     break;
                 }
@@ -237,25 +192,19 @@ void ui_process()
 
         case ACTION_TEST:
             SSD1306_write(1, 0, 0, "Action-Test", false);
-
-            if (action_decided) // actionが決められた
+            if (action_decided)
             {
-                // modeについて
                 switch (mode_number)
                 {
                 case TEST_KICKER_MODE:
                     SSD1306_write(1, 6, 10, "check : kicker", false);
                     break;
-
                 case TEST_MONITOR_MODE:
                     SSD1306_write(1, 6, 10, "check : monitor", false);
-
                     play_lcd_print(GYRO_CHECK_WITH_LCD, 1, 25);
                     break;
-
                 case TEST_PD_MODE:
                     SSD1306_write(1, 6, 10, "check : PD", false);
-
                     play_lcd_print(CAM_CHECK_WITH_LCD, 1, 25);
                     break;
                 }
@@ -264,30 +213,25 @@ void ui_process()
 
         case ACTION_RADICON:
             SSD1306_write(1, 0, 0, "Action-Radicon", false);
-
-            if (action_decided) // actionが決められた
+            if (action_decided)
             {
-                // modeについて
                 switch (mode_number)
                 {
                 case RADICON_50cc_MODE:
                     SSD1306_write(1, 6, 10, "speed : 50cc", false);
                     break;
-
                 case RADICON_100cc_MODE:
                     SSD1306_write(1, 6, 10, "speed : 100cc", false);
                     break;
-
                 case RADICON_150cc_MODE:
                     SSD1306_write(1, 6, 10, "speed : 150cc", false);
                     break;
-
                 case RADICON_200cc_MODE:
                     SSD1306_write(1, 6, 10, "speed : 200cc", false);
                     break;
                 }
 
-                if (mode_decided) // modeが決められた
+                if (mode_decided)
                 {
                     if (setting_memory[0])
                         SSD1306_write(1, 1, 25, "attack_auto : on", setting_number == 0);
@@ -329,18 +273,18 @@ bool is_now_selecting_ui()
     return (!action_decided || !mode_decided); // どちらかが選ばれていないかどうか返す
 }
 
-int get_selected_ui_action()
+int8_t get_selected_ui_action()
 {
     return action_number; // action_numberを返す
 }
 
-int get_selected_ui_mode()
+int8_t get_selected_ui_mode()
 {
     return mode_number; // mode_numberを返す
 }
 
-int get_selected_ui_setting(int index)
+bool get_selected_ui_setting(uint8_t index)
 {
-    index = (index + 3) % 3;      // 0~2に収める
+    index = index % 3;            // 0~2に収める
     return setting_memory[index]; // index番目のsettingを返す
 }

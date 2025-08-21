@@ -22,13 +22,13 @@ void LINE_serial_update()
     if ((*line_serial).available() > 0)
     {
         // 情報を10進数で受信->2進数に直す
-        unsigned int data_10 = (*line_serial).readStringUntil('\n').toInt(); // 16個(エンジェル)+3個(右・左・後)のデータを受信
+        uint32_t data_10 = (*line_serial).readStringUntil('\n').toInt(); // 16個(エンジェル)+3個(右・左・後)のデータを受信
 
         bool line_flag = false; // ラインの反応を見るフラグ
-        int shift_num;          // 解析に使う変数
-        for (int i = 0; i < 19; i++)
+        uint32_t shift_num;     // 解析に使う変数
+        for (uint8_t i = 0; i < 19; i++)
         {
-            shift_num = 1 << i; // 0001を左にiだけ移動させる
+            shift_num = 1UL << i; // 0001を左にiだけ移動させる
 
             if ((shift_num & data_10) > 0) // shift_numとdata_10の論理積が0より大きいならば
             {
@@ -41,17 +41,14 @@ void LINE_serial_update()
             }
         }
 
-        if (line_flag)
-            line_exist = true; // 存在する
-        else
-            line_exist = false; // 存在しない
+        line_exist = line_flag; // 存在するかどうか
     }
 }
 
-int get_LINE_data(int index)
+bool get_LINE_data(uint8_t index)
 {
-    if (index < 0 || index > 18)
-        return 0; // 範囲外のデータ請求ならば0を返す
+    if (index > 18)
+        return false; // 範囲外のデータ請求ならばfalseを返す
     else
         return line_data[index]; // index番目のラインセンサーの状況を返す
 }

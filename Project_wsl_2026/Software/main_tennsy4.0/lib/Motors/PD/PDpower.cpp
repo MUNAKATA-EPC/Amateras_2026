@@ -11,91 +11,66 @@
 #define GOAL_P_GAIN 0.35
 #define GOAL_D_GAIN 0.02
 
-int pd_power; // PD制御の出力格納用
+int16_t pd_power = 0; // PD制御の出力格納用
+double p_power = 0.0, d_power = 0.0; // P・Dそれぞれの出力格納
 
-double p_power, d_power; // P・Dそれぞれの出力格納
+int16_t now_gyro_value = 0;    // 今の角度格納用(-180~180)
+int16_t old_gyro_value = 0;    // 昔の角度格納用(-180~180)
+int16_t gap_of_gyro_value = 0; // 今と昔の差格納用(-180~180)
 
-int now_gyro_value = 0;    // 今の角度格納用(-180~180)
-int old_gyro_value = 0;    // 昔の角度格納用(-180~180)
-int gap_of_gyro_value = 0; // 今と昔の差格納用(-180~180)
+Timer gyro_timer;             // ジャイロ用のタイマーを定義
+bool gyro_first_call = true;  // 関数が最初に呼び出されたかを読む
 
-Timer gyro_timer;            // ジャイロ用のタイマーを定義
-bool gyro_first_call = true; // 関数が最初に呼び出されたかを読む
-
-void PD_use_gyro(int target_deg)
+void PD_use_gyro(int16_t target_deg)
 {
-    int deg = get_BNO055_deg();
+    int16_t deg = get_BNO055_deg();
     deg = (deg + target_deg + 360) % 360;
+    now_gyro_value = (deg < 180) ? deg : deg - 360;
 
-    now_gyro_value = (deg < 180) ? deg : deg - 360; // degの角度を-180~180にして保存
+    gap_of_gyro_value = now_gyro_value - old_gyro_value;
+    if (gap_of_gyro_value > 180) gap_of_gyro_value -= 360;
+    if (gap_of_gyro_value < -180) gap_of_gyro_value += 360;
 
-    gap_of_gyro_value = now_gyro_value - old_gyro_value; // 差を計算
-    if (gap_of_gyro_value > 180)
-        gap_of_gyro_value -= 360; // 補正
-    if (gap_of_gyro_value < -180)
-        gap_of_gyro_value += 360; // 補正
+    old_gyro_value = now_gyro_value;
 
-    old_gyro_value = now_gyro_value; // BNO055の昔の角度を-180~180にして保存
+    // P制御
+    p_power = now_gyro_value * GYRO_P_GAIN;
 
-    /*P制御について*/
-    p_power = now_gyro_value * GYRO_P_GAIN; // 角度のずれ様によって比例制御
-
-    /*D制御について*/
+    // D制御
     if (gyro_first_call)
     {
-        gyro_timer.reset();      // タイマーをリセット
-        gyro_first_call = false; // 次からは初回ではない
-
-        d_power = 0.0; // 最初の呼び出しなので値は0
+        gyro_timer.reset();
+        gyro_first_call = false;
+        d_power = 0.0;
     }
     else
     {
-        double gyro_timer_sec = gyro_timer.get_time() / 1000.0; // msからsに変える
-
-        if (gyro_timer_sec > 1e-6)
-        {
-            d_power = GYRO_D_GAIN * gap_of_gyro_value / gyro_timer_sec; // deg/sec * GYRO_D_GAINでD制御の出力を求める
-        }
-        else
-        {
-            d_power = 0.0; // 除算はだめなので0にする
-        }
-
-        gyro_timer.reset(); // タイマーをリセット
+        double gyro_timer_sec = gyro_timer.get_time() / 1000.0;
+        d_power = (gyro_timer_sec > 1e-6) ? GYRO_D_GAIN * gap_of_gyro_value / gyro_timer_sec : 0.0;
+        gyro_timer.reset();
     }
 
-    /*合計*/
-    pd_power = (int)(p_power + d_power);       // それぞれの出力を足し合わせる
-    pd_power = constrain(pd_power, -100, 100); // 一応-100~100に収める
+    pd_power = (int16_t)constrain(p_power + d_power, -100, 100);
 }
 
-double yellow_goal_p_power, yellow_goal_d_power; // P成分・D成分
-
-int now_yellow_goal_value = 0;    // 今の黄色ゴール角度
-int old_yellow_goal_value = 0;    // 前回の黄色ゴール角度
-int gap_of_yellow_goal_value = 0; // 今と前回の差
-
-Timer yellow_goal_timer;            // タイマー
-bool yellow_goal_first_call = true; // 最初の呼び出しかどうか
+// 黄色ゴールPD制御
+double yellow_goal_p_power = 0.0, yellow_goal_d_power = 0.0;
+int16_t now_yellow_goal_value = 0, old_yellow_goal_value = 0, gap_of_yellow_goal_value = 0;
+Timer yellow_goal_timer;
+bool yellow_goal_first_call = true;
 
 void PD_use_yellow_goal()
 {
     if (is_yellow_goal_exist())
     {
-        now_yellow_goal_value = (get_yellow_goal_deg() < 180) ? get_yellow_goal_deg() : get_yellow_goal_deg() - 360; // 現在の角度
-
-        gap_of_yellow_goal_value = now_yellow_goal_value - old_yellow_goal_value; // 差を計算
-        if (gap_of_yellow_goal_value > 180)
-            gap_of_yellow_goal_value -= 360; // 補正
-        if (gap_of_yellow_goal_value < -180)
-            gap_of_yellow_goal_value += 360; // 補正
-
+        now_yellow_goal_value = (get_yellow_goal_deg() < 180) ? get_yellow_goal_deg() : get_yellow_goal_deg() - 360;
+        gap_of_yellow_goal_value = now_yellow_goal_value - old_yellow_goal_value;
+        if (gap_of_yellow_goal_value > 180) gap_of_yellow_goal_value -= 360;
+        if (gap_of_yellow_goal_value < -180) gap_of_yellow_goal_value += 360;
         old_yellow_goal_value = now_yellow_goal_value;
 
-        /*P制御*/
         yellow_goal_p_power = now_yellow_goal_value * GOAL_P_GAIN;
 
-        /*D制御*/
         if (yellow_goal_first_call)
         {
             yellow_goal_timer.reset();
@@ -105,59 +80,37 @@ void PD_use_yellow_goal()
         else
         {
             double yellow_timer_sec = yellow_goal_timer.get_time() / 1000.0;
-
-            if (yellow_timer_sec > 1e-6)
-            {
-                yellow_goal_d_power = GOAL_D_GAIN * gap_of_yellow_goal_value / yellow_timer_sec;
-            }
-            else
-            {
-                yellow_goal_d_power = 0.0;
-            }
-
+            yellow_goal_d_power = (yellow_timer_sec > 1e-6) ? GOAL_D_GAIN * gap_of_yellow_goal_value / yellow_timer_sec : 0.0;
             yellow_goal_timer.reset();
         }
 
-        /*合計*/
-        pd_power = (int)(yellow_goal_p_power + yellow_goal_d_power);
-        pd_power = constrain(pd_power, -100, 100);
+        pd_power = (int16_t)constrain(yellow_goal_p_power + yellow_goal_d_power, -100, 100);
     }
     else
     {
-        yellow_goal_first_call = true; // 次に見えたときに初回処理させる
-
-        // ゴールが見えないのでジャイロで処理する
+        yellow_goal_first_call = true;
         PD_use_gyro(0);
     }
 }
 
-double blue_goal_p_power, blue_goal_d_power; // P成分・D成分
-
-int now_blue_goal_value = 0;    // 今の青色ゴール角度
-int old_blue_goal_value = 0;    // 前回の青色ゴール角度
-int gap_of_blue_goal_value = 0; // 今と前回の差
-
-Timer blue_goal_timer;            // タイマー
-bool blue_goal_first_call = true; // 最初の呼び出しかどうか
+// 青色ゴールPD制御
+double blue_goal_p_power = 0.0, blue_goal_d_power = 0.0;
+int16_t now_blue_goal_value = 0, old_blue_goal_value = 0, gap_of_blue_goal_value = 0;
+Timer blue_goal_timer;
+bool blue_goal_first_call = true;
 
 void PD_use_blue_goal()
 {
     if (is_blue_goal_exist())
     {
-        now_blue_goal_value = (get_blue_goal_deg() < 180) ? get_blue_goal_deg() : get_blue_goal_deg() - 360; // 現在の角度
-
-        gap_of_blue_goal_value = now_blue_goal_value - old_blue_goal_value; // 差を計算
-        if (gap_of_blue_goal_value > 180)
-            gap_of_blue_goal_value -= 360; // 補正
-        if (gap_of_blue_goal_value < -180)
-            gap_of_blue_goal_value += 360; // 補正
-
+        now_blue_goal_value = (get_blue_goal_deg() < 180) ? get_blue_goal_deg() : get_blue_goal_deg() - 360;
+        gap_of_blue_goal_value = now_blue_goal_value - old_blue_goal_value;
+        if (gap_of_blue_goal_value > 180) gap_of_blue_goal_value -= 360;
+        if (gap_of_blue_goal_value < -180) gap_of_blue_goal_value += 360;
         old_blue_goal_value = now_blue_goal_value;
 
-        /*P制御*/
         blue_goal_p_power = now_blue_goal_value * GOAL_P_GAIN;
 
-        /*D制御*/
         if (blue_goal_first_call)
         {
             blue_goal_timer.reset();
@@ -167,33 +120,20 @@ void PD_use_blue_goal()
         else
         {
             double blue_timer_sec = blue_goal_timer.get_time() / 1000.0;
-
-            if (blue_timer_sec > 1e-6)
-            {
-                blue_goal_d_power = GOAL_D_GAIN * gap_of_blue_goal_value / blue_timer_sec;
-            }
-            else
-            {
-                blue_goal_d_power = 0.0;
-            }
-
+            blue_goal_d_power = (blue_timer_sec > 1e-6) ? GOAL_D_GAIN * gap_of_blue_goal_value / blue_timer_sec : 0.0;
             blue_goal_timer.reset();
         }
 
-        /*合計*/
-        pd_power = (int)(blue_goal_p_power + blue_goal_d_power);
-        pd_power = constrain(pd_power, -100, 100);
+        pd_power = (int16_t)constrain(blue_goal_p_power + blue_goal_d_power, -100, 100);
     }
     else
     {
-        blue_goal_first_call = true; // 次に見えたときに初回処理させる
-
-        // ゴールが見えないのでジャイロで処理する
+        blue_goal_first_call = true;
         PD_use_gyro(0);
     }
 }
 
-int get_PD_power()
+int16_t get_PD_power()
 {
-    return -pd_power; // 計算したPD出力を返す
+    return -pd_power;
 }

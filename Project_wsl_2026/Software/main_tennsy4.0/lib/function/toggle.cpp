@@ -1,14 +1,12 @@
 #include "toggle.hpp"
 
-/*トグルスイッチが使いやすくなる関数*/
-
 /*トグルを定義*/
 Toggle motormove_toggle;  // モータを動かす選択用
 Toggle goal_select_toggle; // ゴール選択用
 
-void Toggle::set_pin(int pin)
+void Toggle::set_pin(uint8_t pin)
 {
-    _toggle_pin = pin;
+    _toggle_pin = pin; // ピン番号を格納
 }
 
 void Toggle::init()
