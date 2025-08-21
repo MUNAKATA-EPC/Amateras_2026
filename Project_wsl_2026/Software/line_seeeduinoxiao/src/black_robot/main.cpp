@@ -31,6 +31,8 @@ void setup()
 
 void loop()
 {
+  lines_data_bit_mask = 0; // 初期化
+
   /*エンジェルラインについて*/
   for (uint8_t i = 0; i < 16; i++)
   {
