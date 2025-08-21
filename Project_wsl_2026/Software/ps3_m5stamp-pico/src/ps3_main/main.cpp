@@ -3,8 +3,10 @@
 
 /*ps3の情報をシリアル通信で送る*/
 
-int stick_lx, stick_ly, stick_rx, stick_ry; // それぞれのコントローラの情報が格納用(範囲は-128~127らしい)
-unsigned int button_data_10 = 0;            // SWの情報を10進数で格納用
+const uint8_t head_byte = 0xAA; // 同期ヘッダー格納用
+
+int8_t stick_lx, stick_ly, stick_rx, stick_ry; // それぞれのコントローラの情報が格納用(範囲は-128~127)
+uint16_t buttons_data_bit_mask = 0;            // ボタンは14個なので16bitで足りる
 
 // PS3が接続されると呼ばれる関数
 void connect_success();
@@ -21,6 +23,8 @@ void setup()
   Ps3.attachOnConnect(connect_success);  // 接続されたときに呼び出す関数
   Ps3.attachOnDisconnect(connect_false); // 切断されたときに呼び出す関数
   Ps3.begin("E8:6B:EA:31:0A:3A");        // ps3_setupで取得したアドレスを記入
+  // 白コントローラー : E8:6B:EA:31:0A:3A
+  // 黒コントローラー : 4C:75:25:C4:14:F2
 
   while (!Ps3.isConnected()) // 接続されるまで待つ
     ;
@@ -28,16 +32,15 @@ void setup()
 
 void loop()
 {
-  Serial.println(stick_lx); // 左スティックのX方向
-  Serial.print("a");
-  Serial.println(stick_ly); // 左スティックのY方向
-  Serial.print("b");
-  Serial.println(stick_rx); // 右スティックのX方向
-  Serial.print("c");
-  Serial.println(stick_ry); // 右スティックのY方向
-  Serial.print("d");
-  Serial.println(button_data_10); // buttonの情報を送信
-  Serial.print("e");
+  Serial.write(head_byte);                  // teensyとの通信開始
+  Serial.write(stick_lx);                   // 左ステックのx座標を送信
+  Serial.write(stick_ly);                   // 左ステックのy座標を送信
+  Serial.write(stick_rx);                   // 右ステックのx座標を送信
+  Serial.write(stick_ry);                   // 右ステックのy座標を送信
+  Serial.write(buttons_data_bit_mask);      // 2byteのデータなので下位の1byteのみ送信
+  Serial.write(buttons_data_bit_mask >> 8); // 8bit分右にシフトして上位の1byteを送信
+
+  Serial.flush(); // 送信バッファがなくなるまで、つまり全て送信するまで待つ
 
   delay(10); // 10ms待機
 }
@@ -58,43 +61,43 @@ void connect_false()
 void data_update()
 {
   // アナログスティックの情報を取得
-  stick_lx = Ps3.data.analog.stick.lx + 128; // 左スティックのX方向(範囲を0~255にする)
-  stick_ly = Ps3.data.analog.stick.ly + 128; // 左スティックのY方向(範囲を0~255にする)
-  stick_rx = Ps3.data.analog.stick.rx + 128; // 右スティックのX方向(範囲を0~255にする)
-  stick_ry = Ps3.data.analog.stick.ry + 128; // 右スティックのY方向(範囲を0~255にする)
+  stick_lx = Ps3.data.analog.stick.lx; // 左スティックのX方向
+  stick_ly = Ps3.data.analog.stick.ly; // 左スティックのY方向
+  stick_rx = Ps3.data.analog.stick.rx; // 右スティックのX方向
+  stick_ry = Ps3.data.analog.stick.ry; // 右スティックのY方向
 
   // ボタンの情報を取得(押されたら加算)
-  button_data_10 = 0; // 初期化
+  buttons_data_bit_mask = 0; // 初期化
 
   if (Ps3.data.button.up) // 上
-    button_data_10 += pow(2, 0);
+    buttons_data_bit_mask |= (1 << 0);
   if (Ps3.data.button.down) // 下
-    button_data_10 += pow(2, 1);
+    buttons_data_bit_mask |= (1 << 1);
   if (Ps3.data.button.left) // 左
-    button_data_10 += pow(2, 2);
+    buttons_data_bit_mask |= (1 << 2);
   if (Ps3.data.button.right) // 右
-    button_data_10 += pow(2, 3);
+    buttons_data_bit_mask |= (1 << 3);
 
   if (Ps3.data.button.triangle) // △
-    button_data_10 += pow(2, 4);
+    buttons_data_bit_mask |= (1 << 4);
   if (Ps3.data.button.circle) // ○
-    button_data_10 += pow(2, 5);
+    buttons_data_bit_mask |= (1 << 5);
   if (Ps3.data.button.cross) // ×
-    button_data_10 += pow(2, 6);
+    buttons_data_bit_mask |= (1 << 6);
   if (Ps3.data.button.square) // □
-    button_data_10 += pow(2, 7);
+    buttons_data_bit_mask |= (1 << 7);
 
   if (Ps3.data.button.l1) // L1
-    button_data_10 += pow(2, 8);
+    buttons_data_bit_mask |= (1 << 8);
   if (Ps3.data.button.l2) // L2
-    button_data_10 += pow(2, 9);
+    buttons_data_bit_mask |= (1 << 9);
   if (Ps3.data.button.l3) // L3
-    button_data_10 += pow(2, 10);
+    buttons_data_bit_mask |= (1 << 10);
 
   if (Ps3.data.button.r1) // R1
-    button_data_10 += pow(2, 11);
+    buttons_data_bit_mask |= (1 << 11);
   if (Ps3.data.button.r2) // R2
-    button_data_10 += pow(2, 12);
+    buttons_data_bit_mask |= (1 << 12);
   if (Ps3.data.button.r3) // R3
-    button_data_10 += pow(2, 13);
+    buttons_data_bit_mask |= (1 << 13);
 }
