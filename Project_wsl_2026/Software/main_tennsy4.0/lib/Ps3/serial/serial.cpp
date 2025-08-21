@@ -19,7 +19,7 @@ int8_t ps3_stick_rx_adjust = 0; // PS3の右スティックのx方向調整値�
 int8_t ps3_stick_ry = 0;        // PS3の右スティックのY方向格納用
 int8_t ps3_stick_ry_adjust = 0; // PS3の右スティックのY方向調整値格納用
 
-uint16_t ps3_buttons_data_byte_mask = 0; // 14個のボタンの状況格納用
+uint16_t ps3_buttons_data_bit_mask = 0; // 14個のボタンの状況格納用
 
 void Ps3_set_stick_adjust(int8_t lx_adjust, int8_t ly_adjust, int8_t rx_adjust, int8_t ry_adjust)
 {
@@ -53,7 +53,7 @@ void Ps3_serial_update()
 
                 uint8_t low = (*ps3_serial).read();             // ボタンの下位バイトを読み取る
                 uint8_t high = (*ps3_serial).read();            // ボタンの上位バイトを読み取る
-                ps3_buttons_data_byte_mask = (high << 8) | low; // 上位バイトと下位バイトをつなげる
+                ps3_buttons_data_bit_mask = (high << 8) | low; // 上位バイトと下位バイトをつなげる
             }
         }
         else // そうでないならゴミのバッファ
@@ -98,7 +98,7 @@ int8_t get_Ps3_stick_ry()
 
 bool get_Ps3_button_data(int index)
 {
-    return ((1 << index) & ps3_buttons_data_byte_mask) > 0; // index分だけシフトした1との論理積が0よりも大きかったらそのbitは1
+    return ((1 << index) & ps3_buttons_data_bit_mask) > 0; // index分だけシフトした1との論理積が0よりも大きかったらそのbitは1
 }
 
 bool is_Ps3_stick_left_move()
