@@ -3,6 +3,8 @@
 
 /*黒ロボット用*/
 
+const uint8_t head_byte = 0xAA; // 同期ヘッダー格納用
+
 #define LINE_SIDE_RIGHT_PIN 8 // 右サイド
 #define LINE_SIDE_LEFT_PIN 9  // 左サイド
 #define LINE_SIDE_BACK_PIN 7  // 後サイド
@@ -11,6 +13,8 @@
 #define LINE_SIDE_JUDGE_VALUE 790 // サイドライン判定用の値
 
 Multiplexer line_mux; // 定義
+
+uint32_t lines_data_bit_mask; // 16+3個のラインセンサーの状況格納用
 
 void setup()
 {
@@ -28,55 +32,37 @@ void setup()
 void loop()
 {
   /*エンジェルラインについて*/
-  unsigned int line_data_10 = 0; // 変換した10進数のデータ格納用
-  for (int i = 0; i < 16; i++)
+  for (uint8_t i = 0; i < 16; i++)
   {
     if (line_mux.read(i) > LINE_ANGEL_JUDGE_VALUE) // ラインが見えたら
-    {
-      line_data_10 += pow(2, i);
-      Serial.print(1);
-    }
-    else
-      Serial.print(0);
+      lines_data_bit_mask |= (1 << i);
   }
 
   /*サイドラインについて*/
   if (analogRead(LINE_SIDE_RIGHT_PIN) > LINE_SIDE_JUDGE_VALUE && analogRead(LINE_SIDE_RIGHT_PIN) < 1020) // 右サイドのラインセンサーがラインを見ているか
-  {
-    line_data_10 += pow(2, 16); // 右サイドのラインセンサーがラインを見ている場合は16ビット目に1をセット
-    Serial.print(1);
-  }
-  else
-    Serial.print(0);
+    lines_data_bit_mask |= (1 << 16);
 
   if (analogRead(LINE_SIDE_LEFT_PIN) > LINE_SIDE_JUDGE_VALUE && analogRead(LINE_SIDE_LEFT_PIN) < 1020) // 右サイドのラインセンサーがラインを見ているか
-  {
-    line_data_10 += pow(2, 17); // 右サイドのラインセンサーがラインを見ている場合は17ビット目に1をセット
-    Serial.print(1);
-  }
-  else
-    Serial.print(0);
+    lines_data_bit_mask |= (1 << 17);
 
   if (analogRead(LINE_SIDE_BACK_PIN) > LINE_SIDE_JUDGE_VALUE && analogRead(LINE_SIDE_BACK_PIN) < 1020) // 右サイドのラインセンサーがラインを見ているか
-  {
-    line_data_10 += pow(2, 18); // 後サイドのラインセンサーがラインを見ている場合は18ビット目に1をセット
-    Serial.print(1);
-  }
-  else
-    Serial.print(0);
+    lines_data_bit_mask |= (1 << 18);
 
   /*送信*/
-  Serial1.println(line_data_10); // teensyに送る
-  Serial1.flush();
+  Serial1.write(head_byte);                 // teensyとの通信開始
+  Serial1.write(lines_data_bit_mask);       // 3byteのデータなので下位の1byteのみ送信
+  Serial1.write(lines_data_bit_mask >> 8);  // 3byteのデータなので中位の1byteのみ送信
+  Serial1.write(lines_data_bit_mask >> 16); // 3byteのデータなので上位の1byteを送信
 
-  // Serial.println(line_data_10);  // pcに送る
+  Serial1.flush(); // 送信バッファがなくなるまで、つまり全て送信するまで待つ
+
+  Serial1.println(lines_data_bit_mask, BIN); // pcに送る
   Serial.print("l");
   Serial.print(analogRead(LINE_SIDE_LEFT_PIN));
   Serial.print("r");
   Serial.print(analogRead(LINE_SIDE_RIGHT_PIN));
   Serial.print("b");
   Serial.println(analogRead(LINE_SIDE_BACK_PIN));
-  Serial1.flush();
 
   delay(10); // 10ms待機
 }
