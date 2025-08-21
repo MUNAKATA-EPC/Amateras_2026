@@ -49,10 +49,11 @@ void LINE_serial_update()
 
 bool get_LINE_data(uint8_t index)
 {
-    return ((1 << index) & lines_data_bit_mask) > 0; // index分だけシフトした1との論理積が0よりも大きかったらそのbitは1
+    return ((1UL << index) & lines_data_bit_mask) > 0; // index分だけシフトした1との論理積が0よりも大きかったらそのbitは1
+    // 1ULはマイコンが16bitの時のため1と同じ意味
 }
 
 bool is_LINE_exist()
 {
-    return line_exist; // ラインが有るかどうかを返す
+    return line_exist; // ラインがあるかどうかを返す
 }
