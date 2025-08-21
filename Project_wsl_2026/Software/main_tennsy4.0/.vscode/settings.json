@@ -4,6 +4,7 @@
         "random": "cpp",
         "executor": "cpp",
         "future": "cpp",
-        "cmath": "cpp"
+        "cmath": "cpp",
+        "*.tpp": "cpp"
     }
 }

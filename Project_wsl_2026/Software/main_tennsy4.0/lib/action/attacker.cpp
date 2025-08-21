@@ -43,11 +43,11 @@ void play_attacker(bool use_yellow_cam, bool use_blue_cam, int16_t motor_power)
             if (compute_deg_diff(get_LINE_deg(), get_IR_deg()) < 60) // ラインの角度とIRの角度同じくらいの方向だった場合
             {
                 // ゴールの接線方向もしくはラインの接線方向を計算（2通り）
-                int defence_sessen_deg1 = (get_LINE_deg() + 90 + 360) % 360;
-                int defence_sessen_deg2 = (get_LINE_deg() - 90 + 360) % 360;
+                int16_t defence_sessen_deg1 = (get_LINE_deg() + 90 + 360) % 360;
+                int16_t defence_sessen_deg2 = (get_LINE_deg() - 90 + 360) % 360;
 
-                int diff_of_sessen1 = compute_deg_diff(defence_sessen_deg1, get_IR_deg()); // 差を計算
-                int diff_of_sessen2 = compute_deg_diff(defence_sessen_deg2, get_IR_deg()); // 差を計算
+                int16_t diff_of_sessen1 = compute_deg_diff(defence_sessen_deg1, get_IR_deg()); // 差を計算
+                int16_t diff_of_sessen2 = compute_deg_diff(defence_sessen_deg2, get_IR_deg()); // 差を計算
 
                 if (diff_of_sessen1 < diff_of_sessen2) // sessen_deg1のほうがボールの方向との差が小さいなら
                 {

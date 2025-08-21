@@ -3,54 +3,40 @@
 /*LINEセンサーの状況をシリアル通信で受信する*/
 
 HardwareSerial *line_serial; // とりあえず定義
-int line_baudrate;           // ボートレート格納用
+uint32_t line_baudrate;      // ボートレート格納用
 
 bool line_exist = false; // ラインがあるかどうか
 
-bool line_data[19] = {0}; // 受信した19個のデータ格納用
+uint16_t lines_data_bit_mask = 0; // 16個のラインセンサーの状況格納用
 
-void LINE_init(HardwareSerial *serial, int baudrate)
+void LINE_init(HardwareSerial *serial, uint32_t baudrate)
 {
     line_serial = serial;
     line_baudrate = baudrate;
     (*line_serial).begin(line_baudrate);
-    (*line_serial).setTimeout(50);
 }
 
 void LINE_serial_update()
 {
     if ((*line_serial).available() > 0)
     {
-        // 情報を10進数で受信->2進数に直す
-        uint32_t data_10 = (*line_serial).readStringUntil('\n').toInt(); // 16個(エンジェル)+3個(右・左・後)のデータを受信
+        uint8_t low = (*line_serial).read();     // ボタンの下位バイトを読み取る
+        uint8_t high = (*line_serial).read();    // ボタンの上位バイトを読み取る
+        lines_data_bit_mask = (high << 8) | low; // 上位バイトと下位バイトをつなげる
 
-        bool line_flag = false; // ラインの反応を見るフラグ
-        uint32_t shift_num;     // 解析に使う変数
-        for (uint8_t i = 0; i < 19; i++)
-        {
-            shift_num = 1UL << i; // 0001を左にiだけ移動させる
+        if (lines_data_bit_mask > 0) // 一個でも1があったら0より大きくなる
+            line_exist = true;
+        else
+            line_exist = false;
 
-            if ((shift_num & data_10) > 0) // shift_numとdata_10の論理積が0より大きいならば
-            {
-                line_flag = true;    // 反応したら旗を立てる
-                line_data[i] = true; // i番目のセンサーは反応している
-            }
-            else
-            {
-                line_data[i] = false; // i番目のセンサーは反応していない
-            }
-        }
-
-        line_exist = line_flag; // 存在するかどうか
+        while ((*line_serial).available())
+            (*line_serial).read(); // 残りのブッファを捨てる
     }
 }
 
 bool get_LINE_data(uint8_t index)
 {
-    if (index > 18)
-        return false; // 範囲外のデータ請求ならばfalseを返す
-    else
-        return line_data[index]; // index番目のラインセンサーの状況を返す
+    return ((1 << index) & lines_data_bit_mask) > 0; // index分だけシフトした1との論理積が0よりも大きかったらそのbitは1
 }
 
 bool is_LINE_exist()
