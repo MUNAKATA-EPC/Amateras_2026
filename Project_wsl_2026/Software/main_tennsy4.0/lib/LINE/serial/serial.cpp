@@ -50,7 +50,7 @@ void LINE_serial_update()
 bool get_LINE_data(uint8_t index)
 {
     return ((1UL << index) & lines_data_bit_mask) > 0; // index分だけシフトした1との論理積が0よりも大きかったらそのbitは1
-    // 1ULはマイコンが16bitの時のため1と同じ意味
+    // 1ULはオーバーフロー防止、1と同義
 }
 
 bool is_LINE_exist()
