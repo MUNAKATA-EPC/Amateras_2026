@@ -3,11 +3,11 @@
 /*uiを実行する*/
 
 // LCDを動かすためのButtonのピン番号格納用
-uint8_t lcd_enter_pin = 0, lcd_left_pin = 0, lcd_right_pin = 0;
+int lcd_enter_pin = 0, lcd_left_pin = 0, lcd_right_pin = 0;
 // LCDを動かすためのButtonのピンモード格納用
-uint8_t lcd_enter_pinmode = 0, lcd_left_pinmode = 0, lcd_right_pinmode = 0;
+int lcd_enter_pinmode = 0, lcd_left_pinmode = 0, lcd_right_pinmode = 0;
 
-void ui_set_lcdpin(uint8_t enter_pin, uint8_t enter_pinmode, uint8_t left_pin, uint8_t left_pinmode, uint8_t right_pin, uint8_t right_pinmode)
+void ui_set_lcdpin(int enter_pin, int enter_pinmode, int left_pin, int left_pinmode, int right_pin, int right_pinmode)
 {
     lcd_enter_pin = enter_pin;
     lcd_left_pin = left_pin;
@@ -39,7 +39,7 @@ bool ui_first_call = true; // 関数が最初に呼び出されたかを読む
 // #define ACTION_DEFENDER 1
 // テスト(確認)する
 // #define ACTION_TEST 2
-uint8_t action_number = 0; 
+int action_number = 0;
 bool action_decided = false; // Actionをユーザーが決定されたかどうか
 
 /*modeについてのメモ*/
@@ -56,7 +56,7 @@ bool action_decided = false; // Actionをユーザーが決定されたかどう
 // #define TEST_PD_GYRO_MODE 1
 // カメラでのPD制御のテストを行うモード
 // #define TEST_PD_CAM_MODE 2
-uint8_t mode_number = 0;  
+int mode_number = 0;
 bool mode_decided = false; // modeをユーザーが決定されたかどうか
 
 /*settingについてのメモ*/
@@ -67,7 +67,7 @@ bool mode_decided = false; // modeをユーザーが決定されたかどうか
 // #define LINE_AUTO_INDEX 1
 // キッカーの自動化するかどうか
 // #define KICK_AUTO_INDEX 2
-uint8_t setting_number = 0;
+int setting_number = 0;
 bool setting_memory[3] = {false}; // 3つのsettingでどう選ばれたか記憶
 
 void ui_process()
@@ -82,7 +82,7 @@ void ui_process()
         if (!action_decided) // まだactionが決められていない
         {
             action_number = (action_number + 1 + 4) % 4;
-            mode_number = 0;   // 初期化
+            mode_number = 0;    // 初期化
             setting_number = 0; // 初期化
         }
         else if (!mode_decided) // まだmodeが決められていない
@@ -273,17 +273,17 @@ bool is_now_selecting_ui()
     return (!action_decided || !mode_decided); // どちらかが選ばれていないかどうか返す
 }
 
-uint8_t get_selected_ui_action()
+int get_selected_ui_action()
 {
     return action_number; // action_numberを返す
 }
 
-uint8_t get_selected_ui_mode()
+int get_selected_ui_mode()
 {
     return mode_number; // mode_numberを返す
 }
 
-bool get_selected_ui_setting(uint8_t index)
+bool get_selected_ui_setting(int index)
 {
     index = index % 3;            // 0~2に収める
     return setting_memory[index]; // index番目のsettingを返す

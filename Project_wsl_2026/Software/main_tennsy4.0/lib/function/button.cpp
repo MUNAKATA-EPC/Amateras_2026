@@ -6,7 +6,7 @@ Button lcd_enter_button; // 決定ボタン
 Button lcd_right_button; // 右ボタン
 Button lcd_left_button;  // 左ボタン
 
-void Button::set_pin(uint8_t pin, uint8_t pinmode)
+void Button::set_pin(int pin, int pinmode)
 {
     _button_pin = pin;         // ピン番号を格納
     _button_pinmode = pinmode; // ピンモードを格納
@@ -64,7 +64,7 @@ bool Button::is_released()
     return _button_count == -1; // _button_countが-1なら離された直後
 }
 
-uint16_t Button::get_pushing_time()
+int Button::get_pushing_time()
 {
     return _pushing_time; // 押されている時間を返す
 }

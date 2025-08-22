@@ -1,11 +1,11 @@
 #include "compute.hpp"
 
 /*=== ノーマル版 ===*/
-int16_t line_deg = -1;        // ラインの角度格納用（整数）
+int line_deg = -1;        // ラインの角度格納用（整数）
 bool old_LINE_exist = false;   // 前回ラインがあったかどうか
 
 /*=== Memory版 ===*/
-int16_t line_memory_deg = -1; 
+int line_memory_deg = -1; 
 bool is_LINE_memory_exist[16] = {false}; // Memory版用記録配列
 
 /*=== 共通 ===*/
@@ -14,13 +14,13 @@ bool line_half_out = false;      // half_out判定用
 
 /*=== 関数 ===*/
 // ノーマル版の角度取得
-int16_t get_LINE_deg()
+int get_LINE_deg()
 {
     return line_deg;
 }
 
 // Memory版の角度取得
-int16_t get_LINE_memory_deg()
+int get_LINE_memory_deg()
 {
     return line_memory_deg;
 }
@@ -101,7 +101,7 @@ void LINE_compute_update()
         if (get_LINE_data(18)) { line_x += cosf(radians(180.0f)); line_y += sinf(radians(180.0f)); }
 
         // float 計算結果を整数に丸める
-        line_deg = (int16_t)roundf(degrees(atan2f(line_y, line_x)));
+        line_deg = (int)roundf(degrees(atan2f(line_y, line_x)));
         if (line_deg < 0) line_deg += 360;
     }
 
@@ -127,7 +127,7 @@ void LINE_compute_update()
         if (get_LINE_data(17)) { line_x += cosf(radians(90.0f));  line_y += sinf(radians(90.0f));  }
         if (get_LINE_data(18)) { line_x += cosf(radians(180.0f)); line_y += sinf(radians(180.0f)); }
 
-        line_memory_deg = (int16_t)roundf(degrees(atan2f(line_y, line_x)));
+        line_memory_deg = (int)roundf(degrees(atan2f(line_y, line_x)));
         if (line_memory_deg < 0) line_memory_deg += 360;
     }
 

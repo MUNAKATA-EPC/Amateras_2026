@@ -4,14 +4,14 @@
 
 Adafruit_BNO055* bno = nullptr;  // BNO055のインスタンス
 
-int16_t bno_reset_pin = 0;                // リセットスイッチのピン番号
-int16_t bno_reset_pinmode = INPUT_PULLUP; // リセットスイッチのピンモード
+int bno_reset_pin = 0;                // リセットスイッチのピン番号
+int bno_reset_pinmode = INPUT_PULLUP; // リセットスイッチのピンモード
 
-int16_t bno_normal_deg = 0; // BNO055からの生データ格納用
-int16_t bno_reset_deg = 0;  // リセットスイッチが押されたときの角度
-int16_t bno_deg = 0;        // 補正後の角度格納用
+int bno_normal_deg = 0; // BNO055からの生データ格納用
+int bno_reset_deg = 0;  // リセットスイッチが押されたときの角度
+int bno_deg = 0;        // 補正後の角度格納用
 
-void BNO055_set_resetpin(int16_t pin, int16_t pinmode)
+void BNO055_set_resetpin(int pin, int pinmode)
 {
     bno_reset_pin = pin;
     bno_reset_pinmode = pinmode;
@@ -41,17 +41,17 @@ void BNO055_init(TwoWire* wire, uint8_t address)
 void BNO055_update()
 {
     imu::Vector<3> euler = (*bno).getVector(Adafruit_BNO055::VECTOR_EULER);
-    bno_normal_deg = static_cast<int16_t>(euler.x()); // X軸の角度
+    bno_normal_deg = euler.x(); // X軸の角度
 
     bno_reset_button.update();
     if (bno_reset_button.is_released()) // リセットボタンが押されたら
         bno_reset_deg = bno_normal_deg;
 
     // 補正後の角度 (-180〜180)
-    bno_deg = (int16_t)((bno_normal_deg - bno_reset_deg + 360) % 360);
+    bno_deg = (int)((bno_normal_deg - bno_reset_deg + 360) % 360);
 }
 
-int16_t get_BNO055_deg()
+int get_BNO055_deg()
 {
     return bno_deg;
 }

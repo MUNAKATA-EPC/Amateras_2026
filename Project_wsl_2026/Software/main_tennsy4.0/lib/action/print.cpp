@@ -2,7 +2,7 @@
 
 /*パソコンにシリアルプリント用のプログラムを実行する*/
 
-void play_pc_print(uint8_t pc_print_mode)
+void play_pc_print(int pc_print_mode)
 {
     switch (pc_print_mode)
     {
@@ -131,7 +131,7 @@ void play_pc_print(uint8_t pc_print_mode)
 
 /*LCDにプリントさせる用のプログラムを実行する*/
 
-void play_lcd_print(uint8_t lcd_print_mode, uint8_t ahead_x, uint8_t ahead_y)
+void play_lcd_print(int lcd_print_mode, int ahead_x, int ahead_y)
 {
     char buf[64];             // 十分なバッファサイズを確保
     char line_print_data[64]; // LINEデータ用
@@ -149,7 +149,7 @@ void play_lcd_print(uint8_t lcd_print_mode, uint8_t ahead_x, uint8_t ahead_y)
         sprintf(buf, "line_deg: %d", get_LINE_deg());
         SSD1306_write(1, 0 + ahead_x, 20 + ahead_y, buf, false);
         line_print_data[0] = '\0';
-        for (int i = 0; i < 19; i++)
+        for (int i = 16; i <= 18; i++)
         {
             char tmp[4];
             sprintf(tmp, "%d", get_LINE_data(i));

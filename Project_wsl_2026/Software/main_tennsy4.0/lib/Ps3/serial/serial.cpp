@@ -46,13 +46,13 @@ void Ps3_serial_update()
             {
                 (*ps3_serial).read(); // 同期ヘッダーを捨てる
 
-                ps3_stick_lx = (*ps3_serial).read(); // 左ステックのx座標を読み取る
-                ps3_stick_ly = (*ps3_serial).read(); // 左ステックのy座標を読み取る
-                ps3_stick_rx = (*ps3_serial).read(); // 右ステックのx座標を読み取る
-                ps3_stick_ry = (*ps3_serial).read(); // 右ステックのy座標を読み取る
+                ps3_stick_lx = (*ps3_serial).read();                // 左ステックのx座標を読み取る(-128~127)
+                ps3_stick_ly = (int8_t)(-(*ps3_serial).read() - 1); // 左ステックのy座標を読み取る(-128~127)
+                ps3_stick_rx = (*ps3_serial).read();                // 右ステックのx座標を読み取る(-128~127)
+                ps3_stick_ry = (int8_t)(-(*ps3_serial).read() - 1); // 右ステックのy座標を読み取る(-128~127)
 
-                uint8_t low = (*ps3_serial).read();             // ボタンの下位バイトを読み取る
-                uint8_t high = (*ps3_serial).read();            // ボタンの上位バイトを読み取る
+                uint8_t low = (*ps3_serial).read();            // ボタンの下位バイトを読み取る
+                uint8_t high = (*ps3_serial).read();           // ボタンの上位バイトを読み取る
                 ps3_buttons_data_bit_mask = (high << 8) | low; // 上位バイトと下位バイトをつなげる
             }
         }

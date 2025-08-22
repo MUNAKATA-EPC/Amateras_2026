@@ -19,6 +19,6 @@
 #include "ui.hpp"
 
 // ラジコン用のプログラムを実行
-void play_radicon(int16_t motor_power);
+void play_radicon(int motor_power);
 
 #endif

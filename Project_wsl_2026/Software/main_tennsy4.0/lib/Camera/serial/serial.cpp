@@ -4,20 +4,20 @@
 
 /*変数定義*/
 HardwareSerial *camera_serial; // とりあえず定義
-uint32_t camera_baudrate;      // ボートレート格納用
+int camera_baudrate;      // ボートレート格納用
 
-int16_t field_deg = -1;       // コートの角度格納用
+int field_deg = -1;       // コートの角度格納用
 bool field_exsit = false;     // コートが見えるどうか
 
-int16_t yellow_goal_deg = -1;       // 黄色ゴールの角度格納用
-int16_t yellow_goal_distance = -1;  // 黄色ゴールの距離格納用
+int yellow_goal_deg = -1;       // 黄色ゴールの角度格納用
+int yellow_goal_distance = -1;  // 黄色ゴールの距離格納用
 bool yellow_goal_exsit = false;     // 黄色ゴールが見えるかどうか
 
-int16_t blue_goal_deg = -1;       // 青色ゴールの角度格納用
-int16_t blue_goal_distance = -1;  // 青色ゴールの距離格納用
+int blue_goal_deg = -1;       // 青色ゴールの角度格納用
+int blue_goal_distance = -1;  // 青色ゴールの距離格納用
 bool blue_goal_exsit = false;     // 青色ゴールが見えるかどうか
 
-void Camera_init(HardwareSerial *serial, uint32_t baudrate)
+void Camera_init(HardwareSerial *serial, int baudrate)
 {
     camera_serial = serial;
     camera_baudrate = baudrate;
@@ -46,7 +46,7 @@ bool is_field_exist()
     return field_exsit; // コートが見えるかどうかについてを返す
 }
 
-int16_t get_field_deg()
+int get_field_deg()
 {
     return field_deg; // コートの角度を返す
 }
@@ -56,12 +56,12 @@ bool is_yellow_goal_exist()
     return yellow_goal_exsit; // 黄色ゴールが見えるかどうかについて返す
 }
 
-int16_t get_yellow_goal_deg()
+int get_yellow_goal_deg()
 {
     return yellow_goal_deg; // 黄色ゴールの角度を返す
 }
 
-int16_t get_yellow_goal_distance()
+int get_yellow_goal_distance()
 {
     return yellow_goal_distance; // 黄色ゴールの距離を返す
 }
@@ -71,12 +71,12 @@ bool is_blue_goal_exist()
     return blue_goal_exsit; // 青色ゴールが見えるかどうかについて返す
 }
 
-int16_t get_blue_goal_deg()
+int get_blue_goal_deg()
 {
     return blue_goal_deg; // 青色ゴールの角度を返す
 }
 
-int16_t get_blue_goal_distance()
+int get_blue_goal_distance()
 {
     return blue_goal_distance; // 青色ゴールの距離を返す
 }

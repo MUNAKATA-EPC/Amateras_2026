@@ -4,11 +4,11 @@
 
 /*守備用のプログラムを実行する*/
 
-int16_t old_line_memory_deg; // 昔のラインセンサーの角度格納用
+int old_line_memory_deg; // 昔のラインセンサーの角度格納用
 Timer ir_follow_timer;
 bool line_old_flag = false;
 
-void play_defender(bool use_yellow_cam, bool use_blue_cam, int16_t motor_power)
+void play_defender(bool use_yellow_cam, bool use_blue_cam, int motor_power)
 {
     PD_use_gyro(0);
 
@@ -37,11 +37,11 @@ void play_defender(bool use_yellow_cam, bool use_blue_cam, int16_t motor_power)
             if (is_IR_exist())
             {
                 // ゴールの接線方向もしくはラインの接線方向を計算（2通り）
-                int16_t defence_sessen_deg1 = (is_yellow_goal_exist()) ? (get_yellow_goal_deg() + 90 + 360) % 360 : (old_line_memory_deg + 90 + 360) % 360;
-                int16_t defence_sessen_deg2 = (is_yellow_goal_exist()) ? (get_yellow_goal_deg() - 90 + 360) % 360 : (old_line_memory_deg - 90 + 360) % 360;
+                int defence_sessen_deg1 = (is_yellow_goal_exist()) ? (get_yellow_goal_deg() + 90 + 360) % 360 : (old_line_memory_deg + 90 + 360) % 360;
+                int defence_sessen_deg2 = (is_yellow_goal_exist()) ? (get_yellow_goal_deg() - 90 + 360) % 360 : (old_line_memory_deg - 90 + 360) % 360;
 
-                int16_t diff_of_sessen1 = compute_deg_diff(defence_sessen_deg1, get_IR_deg()); // 差を計算
-                int16_t diff_of_sessen2 = compute_deg_diff(defence_sessen_deg2, get_IR_deg()); // 差を計算
+                int diff_of_sessen1 = compute_deg_diff(defence_sessen_deg1, get_IR_deg()); // 差を計算
+                int diff_of_sessen2 = compute_deg_diff(defence_sessen_deg2, get_IR_deg()); // 差を計算
 
                 if (diff_of_sessen1 < diff_of_sessen2) // sessen_deg1のほうがボールの方向との差が小さいなら
                 {

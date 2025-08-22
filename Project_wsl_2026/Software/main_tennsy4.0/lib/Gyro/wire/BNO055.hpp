@@ -11,7 +11,7 @@
 #include "timer.hpp"
 
 // BNO055リセットボタンのピン番号とモードを設定
-void BNO055_set_resetpin(int16_t pin, int16_t pinmode);
+void BNO055_set_resetpin(int pin, int pinmode);
 
 // I2C通信の初期化
 void BNO055_init(TwoWire *wire, uint8_t address);
@@ -20,6 +20,6 @@ void BNO055_init(TwoWire *wire, uint8_t address);
 void BNO055_update();
 
 // 計算した角度を取得
-int16_t get_BNO055_deg();
+int get_BNO055_deg();
 
 #endif

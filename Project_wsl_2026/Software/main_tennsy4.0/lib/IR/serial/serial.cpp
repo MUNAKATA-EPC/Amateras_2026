@@ -2,13 +2,14 @@
 
 /*IRボールの状況をシリアル通信で受信する*/
 
-/*変数定義*/
+const uint8_t head_byte = 0xAA; // 同期ヘッダー格納用
+
 HardwareSerial *ir_serial; // とりあえず定義
 uint32_t ir_baudrate;      // ボートレート格納用
 
-bool ir_exist = false;      // IRボールがあるかどうか
-int16_t ir_deg = -1;        // IRボールの角度格納用
-int16_t ir_distance = -1;   // IRボールの距離格納用
+bool ir_exist = false;    // IRボールがあるかどうか
+int16_t ir_deg = -1;      // IRボールの角度格納用
+int16_t ir_distance = -1; // IRボールの距離格納用
 
 void IR_init(HardwareSerial *serial, uint32_t baudrate)
 {
@@ -20,17 +21,35 @@ void IR_init(HardwareSerial *serial, uint32_t baudrate)
 
 void IR_update()
 {
-    if ((*ir_serial).available() > 0)
+    if ((*ir_serial).available()) // 受信バッファが溜まっているなら
     {
-        ir_deg = (*ir_serial).readStringUntil('a').toInt();      // 'a'まで読む
-        ir_distance = (*ir_serial).readStringUntil('b').toInt(); //'b'まで読む
-
-        if (ir_deg == -1)
-            ir_exist = false; // 存在しない
-        else
+        if ((*ir_serial).peek() == head_byte) // 最初のブッファが同期ヘッダーなら
         {
-            ir_exist = true; // 存在する
-            ir_deg = (ir_deg - 359 + 360) % 360; // 調整
+            if ((*ir_serial).available() >= 4 + 1) // seeeduinoxiaoからの4つのデータと1つの同期ヘッダーが溜まっているなら
+            {
+                (*ir_serial).read(); // 同期ヘッダーを捨てる
+
+                uint8_t low1 = (*ir_serial).read();      // ボールの角度の下位バイトを読み取る
+                uint8_t high1 = (*ir_serial).read();     // ボールの角度の上位バイトを読み取る
+                ir_deg = (int16_t)((high1 << 8) | low1); // 上位バイトと下位バイトをつなげる(もともとはint16_tなのでキャストで戻す)
+
+                uint8_t low2 = (*ir_serial).read();           // ボールの距離の下位バイトを読み取る
+                uint8_t high2 = (*ir_serial).read();          // ボールの距離の上位バイトを読み取る
+                ir_distance = (int16_t)((high2 << 8) | low2); // 上位バイトと下位バイトをつなげる(もともとはint16_tなのでキャストで戻す)
+
+                if (ir_deg == -1)
+                    ir_exist = false;
+                else
+                {
+                    ir_exist = true;
+                    ir_deg = (ir_deg - 359 + 360) % 360; // 調整
+                }
+            }
+        }
+        else // そうでないならゴミのバッファ
+        {
+            while ((*ir_serial).available())
+                (*ir_serial).read(); // ブッファを捨てる
         }
     }
 }

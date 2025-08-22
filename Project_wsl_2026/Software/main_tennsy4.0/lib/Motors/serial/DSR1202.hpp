@@ -5,14 +5,14 @@
 #include "Motors.hpp"
 
 // モータ用のトグルスイッチのピン番号を設定
-void DSR1202_set_motormove_togglepin(uint8_t pin);
+void DSR1202_set_motormove_togglepin(int pin);
 
 // シリアル定義・開始
-void DSR1202_init(HardwareSerial *serial, uint32_t baudrate);
+void DSR1202_init(HardwareSerial *serial, int baudrate);
 
 // すべてのモーターを停止させる
 void DSR1202_break();
 // それぞれのチャンネルを動かす
-void DSR1202_move(int8_t value_1ch, int8_t value_2ch, int8_t value_3ch, int8_t value_4ch);
+void DSR1202_move(int value_1ch, int value_2ch, int value_3ch, int value_4ch);
 
 #endif

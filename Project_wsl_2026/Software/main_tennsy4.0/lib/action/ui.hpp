@@ -10,7 +10,7 @@
 #include "print.hpp"
 
 // LCDを動かすButtonのピンを定義
-void ui_set_lcdpin(uint8_t enter_pin, uint8_t enter_pinmode, uint8_t left_pin, uint8_t left_pinmode, uint8_t right_pin, uint8_t right_pinmode);
+void ui_set_lcdpin(int enter_pin, int enter_pinmode, int left_pin, int left_pinmode, int right_pin, int right_pinmode);
 
 // uiで使うButtonの設定
 void ui_init();
@@ -22,7 +22,7 @@ void ui_process();
 bool is_now_selecting_ui();
 
 // 攻撃か守備かテストかを出力
-uint8_t get_selected_ui_action();
+int get_selected_ui_action();
 /* ↓ 出力 */
 // 攻撃する
 #define ACTION_ATTACKER 0
@@ -34,7 +34,7 @@ uint8_t get_selected_ui_action();
 #define ACTION_RADICON 3
 
 // 選ばれたActionの中でのmodeを出力
-uint8_t get_selected_ui_mode();
+int get_selected_ui_mode();
 /* ↓ 出力 */
 // 攻撃or守備をするとき
 //  PD制御でジャイロだけ使うモード
@@ -60,7 +60,7 @@ uint8_t get_selected_ui_mode();
 #define RADICON_200cc_MODE 3
 
 // 選ばれたmodeの中でのindex番目のsettingを出力
-bool get_selected_ui_setting(uint8_t index);
+bool get_selected_ui_setting(int index);
 /* ↓ 入力 */
 // ラジコンをするとき
 // アタッカーの自動化するかどうか

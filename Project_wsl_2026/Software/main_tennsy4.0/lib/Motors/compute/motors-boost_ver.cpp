@@ -3,14 +3,14 @@
 /*計算して指定した出力・方向に全力で動くようにモーターを制御する*/
 
 /*モーターはすべて正で、右回転するようにする*/
-int8_t motor_move_sign[4] = {1, -1, -1, 1}; // モータを移動させるための符号を格納
+int motor_move_sign[4] = {1, -1, -1, 1}; // モータを移動させるための符号を格納
 
-int16_t motor_deg[4];        // モータの設置角度を格納用
+int motor_deg[4];        // モータの設置角度を格納用
 float motor_move_power[4];   // モータの出力格納用(移動のための出力)->これをスケーリングし、最大にする
-int16_t motor_pd_power[4];   // モータの出力格納用(PD制御のための出力)
-int16_t motor_power_main[4]; // 最終的な出力格納用
+int motor_pd_power[4];   // モータの出力格納用(PD制御のための出力)
+int motor_power_main[4]; // 最終的な出力格納用
 
-void motors_init(int16_t deg_1ch, int16_t deg_2ch, int16_t deg_3ch, int16_t deg_4ch)
+void motors_init(int deg_1ch, int deg_2ch, int deg_3ch, int deg_4ch)
 {
     motor_deg[0] = deg_1ch + 90;
     motor_deg[1] = deg_2ch + 90;
@@ -18,7 +18,7 @@ void motors_init(int16_t deg_1ch, int16_t deg_2ch, int16_t deg_3ch, int16_t deg_
     motor_deg[3] = deg_4ch + 90;
 }
 
-void motors_move(int16_t deg, int16_t abs_power)
+void motors_move(int deg, int abs_power)
 {
     abs_power = abs(abs_power);    // 一応絶対値にする
     compute_motor_power(deg, 100); // 移動のための出力を計算
@@ -31,7 +31,7 @@ void motors_move(int16_t deg, int16_t abs_power)
             max_move_power = tmp;
     }
 
-    int16_t pd_power = get_PD_power();
+    int pd_power = get_PD_power();
 
     // PDを考慮したスケーリング可能最大値を計算
     float max_allowed_move = abs_power - abs(pd_power);
@@ -46,7 +46,7 @@ void motors_move(int16_t deg, int16_t abs_power)
     DSR1202_move(motor_power_main[0], motor_power_main[1], motor_power_main[2], motor_power_main[3]);
 }
 
-void motors_only_PD(int16_t max_pd_power)
+void motors_only_PD(int max_pd_power)
 {
     for (int i = 0; i < 4; i++) // 最終的な計算
     {
@@ -64,7 +64,7 @@ void motors_break()
 
 /*ここのファイル内だけで使う関数*/
 
-void compute_motor_power(int16_t deg, int16_t power)
+void compute_motor_power(int deg, int power)
 {
     deg = 360 - deg;
     for (int i = 0; i < 4; i++)
@@ -73,7 +73,7 @@ void compute_motor_power(int16_t deg, int16_t power)
     }
 }
 
-float get_motor_power(int8_t index)
+float get_motor_power(int index)
 {
     return motor_move_power[index];
 }

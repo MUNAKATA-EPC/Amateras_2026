@@ -19,6 +19,6 @@
 #include "ui.hpp"
 
 // 動作確認用のプログラムを実行
-void play_test(uint8_t test_mode);
+void play_test(int test_mode);
 
 #endif

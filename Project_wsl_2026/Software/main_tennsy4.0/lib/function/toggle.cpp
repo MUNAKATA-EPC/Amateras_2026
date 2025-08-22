@@ -4,7 +4,7 @@
 Toggle motormove_toggle;  // モータを動かす選択用
 Toggle goal_select_toggle; // ゴール選択用
 
-void Toggle::set_pin(uint8_t pin)
+void Toggle::set_pin(int pin)
 {
     _toggle_pin = pin; // ピン番号を格納
 }

@@ -2,8 +2,8 @@
 
 /*PD制御の出力値を計算する*/
 
-#define GYRO_P_GAIN 0.6
-#define GYRO_D_GAIN 0.02
+#define GYRO_P_GAIN 0.8
+#define GYRO_D_GAIN 0.06
 
 #define GYRO_TARGET_P_GAIN 0.6
 #define GYRO_TARGET_D_GAIN 0.02
@@ -11,19 +11,19 @@
 #define GOAL_P_GAIN 0.35
 #define GOAL_D_GAIN 0.02
 
-int16_t pd_power = 0; // PD制御の出力格納用
+int pd_power = 0; // PD制御の出力格納用
 double p_power = 0.0, d_power = 0.0; // P・Dそれぞれの出力格納
 
-int16_t now_gyro_value = 0;    // 今の角度格納用(-180~180)
-int16_t old_gyro_value = 0;    // 昔の角度格納用(-180~180)
-int16_t gap_of_gyro_value = 0; // 今と昔の差格納用(-180~180)
+int now_gyro_value = 0;    // 今の角度格納用(-180~180)
+int old_gyro_value = 0;    // 昔の角度格納用(-180~180)
+int gap_of_gyro_value = 0; // 今と昔の差格納用(-180~180)
 
 Timer gyro_timer;             // ジャイロ用のタイマーを定義
 bool gyro_first_call = true;  // 関数が最初に呼び出されたかを読む
 
-void PD_use_gyro(int16_t target_deg)
+void PD_use_gyro(int target_deg)
 {
-    int16_t deg = get_BNO055_deg();
+    int deg = get_BNO055_deg();
     deg = (deg + target_deg + 360) % 360;
     now_gyro_value = (deg < 180) ? deg : deg - 360;
 
@@ -50,12 +50,12 @@ void PD_use_gyro(int16_t target_deg)
         gyro_timer.reset();
     }
 
-    pd_power = (int16_t)constrain(p_power + d_power, -100, 100);
+    pd_power = (int)constrain(p_power + d_power, -100, 100);
 }
 
 // 黄色ゴールPD制御
 double yellow_goal_p_power = 0.0, yellow_goal_d_power = 0.0;
-int16_t now_yellow_goal_value = 0, old_yellow_goal_value = 0, gap_of_yellow_goal_value = 0;
+int now_yellow_goal_value = 0, old_yellow_goal_value = 0, gap_of_yellow_goal_value = 0;
 Timer yellow_goal_timer;
 bool yellow_goal_first_call = true;
 
@@ -84,7 +84,7 @@ void PD_use_yellow_goal()
             yellow_goal_timer.reset();
         }
 
-        pd_power = (int16_t)constrain(yellow_goal_p_power + yellow_goal_d_power, -100, 100);
+        pd_power = (int)constrain(yellow_goal_p_power + yellow_goal_d_power, -100, 100);
     }
     else
     {
@@ -95,7 +95,7 @@ void PD_use_yellow_goal()
 
 // 青色ゴールPD制御
 double blue_goal_p_power = 0.0, blue_goal_d_power = 0.0;
-int16_t now_blue_goal_value = 0, old_blue_goal_value = 0, gap_of_blue_goal_value = 0;
+int now_blue_goal_value = 0, old_blue_goal_value = 0, gap_of_blue_goal_value = 0;
 Timer blue_goal_timer;
 bool blue_goal_first_call = true;
 
@@ -124,7 +124,7 @@ void PD_use_blue_goal()
             blue_goal_timer.reset();
         }
 
-        pd_power = (int16_t)constrain(blue_goal_p_power + blue_goal_d_power, -100, 100);
+        pd_power = (int)constrain(blue_goal_p_power + blue_goal_d_power, -100, 100);
     }
     else
     {
@@ -133,7 +133,7 @@ void PD_use_blue_goal()
     }
 }
 
-int16_t get_PD_power()
+int get_PD_power()
 {
     return -pd_power;
 }

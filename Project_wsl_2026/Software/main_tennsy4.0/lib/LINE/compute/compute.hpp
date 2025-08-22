@@ -15,9 +15,9 @@ bool get_LINE_side_back();  // 後サイドの状況を取得
 
 // === 角度取得 ===
 // ノーマル版の角度を取得 (-1.0f で未使用)
-int16_t get_LINE_deg();
+int get_LINE_deg();
 // メモリ版の角度を取得 (-1.0f で未使用)
-int16_t get_LINE_memory_deg();
+int get_LINE_memory_deg();
 
 // === 最初に反応したピン（共通） ===
 // -1 で未使用

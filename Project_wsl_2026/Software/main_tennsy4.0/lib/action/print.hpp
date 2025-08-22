@@ -19,7 +19,7 @@
 #include "ui.hpp"
 
 // パソコンにシリアルプリント用のプログラムを実行
-void play_pc_print(uint8_t pc_print_mode);
+void play_pc_print(int pc_print_mode);
 /* ↓ 入力 */
 // シリアルですべてのセンサーの状況を確認する
 #define ALL_CHECK_WITH_PC 0
@@ -35,7 +35,7 @@ void play_pc_print(uint8_t pc_print_mode);
 #define PS3_CHECK_WITH_PC 5
 
 // LCDにプリント用のプログラムを実行＊clearとshowは外部処理＊
-void play_lcd_print(uint8_t lcd_print_mode, uint8_t ahead_x, uint8_t ahead_y);
+void play_lcd_print(int lcd_print_mode, int ahead_x, int ahead_y);
 /* ↓ 入力 */
 // LCDでIRとLINEとジャイロの状況を確認する
 #define IR_LINE_GYRO_CHECK_WITH_LCD 0

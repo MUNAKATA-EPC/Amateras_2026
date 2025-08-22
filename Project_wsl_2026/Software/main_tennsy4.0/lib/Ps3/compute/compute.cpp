@@ -2,11 +2,11 @@
 
 /*ps3のデータを加工する*/
 
-int16_t ps3_stick_left_deg = -1;     // 左スティックの角度格納用
-int16_t ps3_stick_left_distance = 0; // 左スティックの距離格納用
+int ps3_stick_left_deg = -1;     // 左スティックの角度格納用
+int ps3_stick_left_distance = 0; // 左スティックの距離格納用
 
-int16_t ps3_stick_right_deg = -1;     // 右スティックの角度格納用
-int16_t ps3_stick_right_distance = 0; // 右スティックの距離格納用
+int ps3_stick_right_deg = -1;     // 右スティックの角度格納用
+int ps3_stick_right_distance = 0; // 右スティックの距離格納用
 
 bool get_Ps3_button_up()
 {
@@ -78,22 +78,22 @@ bool get_Ps3_button_r3()
     return get_Ps3_button_data(13); // 13個目のデータを返す
 }
 
-int16_t get_Ps3_stick_left_deg()
+int get_Ps3_stick_left_deg()
 {
     return ps3_stick_left_deg; // 左スティックの角度を返す
 }
 
-int16_t get_Ps3_stick_left_distance()
+int get_Ps3_stick_left_distance()
 {
     return ps3_stick_left_distance; // 左スティックの距離を返す
 }
 
-int16_t get_Ps3_stick_right_deg()
+int get_Ps3_stick_right_deg()
 {
     return ps3_stick_right_deg; // 右スティックの角度を返す
 }
 
-int16_t get_Ps3_stick_right_distance()
+int get_Ps3_stick_right_distance()
 {
     return ps3_stick_right_distance; // 右スティックの距離を返す
 }

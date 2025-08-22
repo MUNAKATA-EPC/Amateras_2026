@@ -3,15 +3,15 @@
 /*攻撃用のプログラムを実行する*/
 
 // 角度における"差"を計算する関数
-int16_t compute_deg_diff(int16_t a, int16_t b)
+int compute_deg_diff(int a, int b)
 {
-    int16_t diff = (a - b + 360) % 360;
+    int diff = (a - b + 360) % 360;
     if (diff > 180)
         diff = 360 - diff;
     return diff;
 }
 
-void play_attacker(bool use_yellow_cam, bool use_blue_cam, int16_t motor_power)
+void play_attacker(bool use_yellow_cam, bool use_blue_cam, int motor_power)
 {
     /*PD制御*/
     if (use_yellow_cam)
@@ -40,14 +40,15 @@ void play_attacker(bool use_yellow_cam, bool use_blue_cam, int16_t motor_power)
         }
         else // ハーフアウト前でIRボールがあるなら
         {
+            /*
             if (compute_deg_diff(get_LINE_deg(), get_IR_deg()) < 60) // ラインの角度とIRの角度同じくらいの方向だった場合
             {
                 // ゴールの接線方向もしくはラインの接線方向を計算（2通り）
-                int16_t defence_sessen_deg1 = (get_LINE_deg() + 90 + 360) % 360;
-                int16_t defence_sessen_deg2 = (get_LINE_deg() - 90 + 360) % 360;
+                int defence_sessen_deg1 = (get_LINE_deg() + 90 + 360) % 360;
+                int defence_sessen_deg2 = (get_LINE_deg() - 90 + 360) % 360;
 
-                int16_t diff_of_sessen1 = compute_deg_diff(defence_sessen_deg1, get_IR_deg()); // 差を計算
-                int16_t diff_of_sessen2 = compute_deg_diff(defence_sessen_deg2, get_IR_deg()); // 差を計算
+                int diff_of_sessen1 = compute_deg_diff(defence_sessen_deg1, get_IR_deg()); // 差を計算
+                int diff_of_sessen2 = compute_deg_diff(defence_sessen_deg2, get_IR_deg()); // 差を計算
 
                 if (diff_of_sessen1 < diff_of_sessen2) // sessen_deg1のほうがボールの方向との差が小さいなら
                 {
@@ -60,8 +61,10 @@ void play_attacker(bool use_yellow_cam, bool use_blue_cam, int16_t motor_power)
             }
             else // ラインの角度とは反対の位置にIRボールがある場合
             {
-                motors_move(get_IR_deg(), motor_power / 1.6);
+                motors_move(get_IR_deg(), motor_power / 1);
             }
+            */
+            motors_move(get_LINE_deg() + 180, motor_power / 1);
         }
     }
     else
@@ -78,7 +81,7 @@ void play_attacker(bool use_yellow_cam, bool use_blue_cam, int16_t motor_power)
             {
                 if ((get_IR_deg() < 80) || (get_IR_deg() > 280))
                 {
-                    motors_move(get_IR_hirei_deg(2.58), motor_power);
+                    motors_move(get_IR_hirei_deg(2.6), motor_power);
                 }
                 else
                 {

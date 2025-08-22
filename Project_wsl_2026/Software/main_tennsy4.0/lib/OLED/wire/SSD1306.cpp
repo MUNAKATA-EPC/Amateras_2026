@@ -4,10 +4,10 @@
 
 Adafruit_SSD1306 *display = nullptr; // とりあえず定義
 
-uint8_t display_width = 128; // displayの横幅格納用
-uint8_t display_height = 64; // displayの縦幅格納用
+int display_width = 128; // displayの横幅格納用
+int display_height = 64; // displayの縦幅格納用
 
-void SSD1306_init(TwoWire *wire, uint8_t adress, uint8_t width, uint8_t height)
+void SSD1306_init(TwoWire *wire, int adress, int width, int height)
 {
     display_width = width;
     display_height = height;
@@ -41,7 +41,7 @@ void SSD1306_show()
     (*display).display();
 }
 
-void SSD1306_write(uint8_t size, uint8_t ahead_x, uint8_t ahead_y, const char *Sentence, bool black)
+void SSD1306_write(int size, int ahead_x, int ahead_y, const char *Sentence, bool black)
 {
     // テキスト表示
     (*display).setTextSize(size);
@@ -57,7 +57,7 @@ void SSD1306_write(uint8_t size, uint8_t ahead_x, uint8_t ahead_y, const char *S
     (*display).println(Sentence);
 }
 
-void SSD1306_bitmap(uint8_t x, uint8_t y, const uint8_t *bitmap, uint8_t width, uint8_t height, bool black)
+void SSD1306_bitmap(int x, int y, const uint8_t *bitmap, int width, int height, bool black)
 {
     // ビットマップを表示
     if (!black)
@@ -70,7 +70,7 @@ void SSD1306_bitmap(uint8_t x, uint8_t y, const uint8_t *bitmap, uint8_t width, 
     }
 }
 
-void SSD1306_line(uint8_t start_x, uint8_t start_y, uint8_t end_x, uint8_t end_y, bool black)
+void SSD1306_line(int start_x, int start_y, int end_x, int end_y, bool black)
 {
     // ラインを描画
     if (!black)
@@ -83,13 +83,13 @@ void SSD1306_line(uint8_t start_x, uint8_t start_y, uint8_t end_x, uint8_t end_y
     }
 }
 
-void SSD1306_function_line(uint8_t origin_x, uint8_t origin_y, double a, double b, bool black)
+void SSD1306_function_line(int origin_x, int origin_y, double a, double b, bool black)
 {
     // 計算
-    uint8_t start_x = 0;                                              // x = 0の時について
+    int start_x = 0;                                              // x = 0の時について
     int16_t start_y = a * start_x - a * origin_x + b + origin_y;      // x = 0の時のyを求める
     start_y = -start_y + display_height - 1;                          // 縦方向が正になるように調整
-    uint8_t end_x = display_width - 1;                                 // x = SSD1306_WIDTH - 1の時について
+    int end_x = display_width - 1;                                 // x = SSD1306_WIDTH - 1の時について
     int16_t end_y = a * end_x - a * origin_x + b + origin_y;           // x = SSD1306_WIDTH - 1の時のyを求める
     end_y = -end_y + display_height - 1;                               // 縦方向が正になるように調整
     // ラインを描画
@@ -103,7 +103,7 @@ void SSD1306_function_line(uint8_t origin_x, uint8_t origin_y, double a, double 
     }
 }
 
-void SSD1306_circle(uint8_t point_x, uint8_t point_y, uint8_t circle_r, bool fill, bool black)
+void SSD1306_circle(int point_x, int point_y, int circle_r, bool fill, bool black)
 {
     // 円を描画
     if (!black)
@@ -130,7 +130,7 @@ void SSD1306_circle(uint8_t point_x, uint8_t point_y, uint8_t circle_r, bool fil
     }
 }
 
-void SSD1306_rect(uint8_t topleft_x, uint8_t topleft_y, uint8_t width, uint8_t height, uint8_t corner_r, bool fill, bool black)
+void SSD1306_rect(int topleft_x, int topleft_y, int width, int height, int corner_r, bool fill, bool black)
 {
     // 矩形を描画
     if (!black)
@@ -157,7 +157,7 @@ void SSD1306_rect(uint8_t topleft_x, uint8_t topleft_y, uint8_t width, uint8_t h
     }
 }
 
-void SSD1306_triangle(uint8_t point1_x, uint8_t point1_y, uint8_t point2_x, uint8_t point2_y, uint8_t point3_x, uint8_t point3_y, bool fill, bool black)
+void SSD1306_triangle(int point1_x, int point1_y, int point2_x, int point2_y, int point3_x, int point3_y, bool fill, bool black)
 {
     // 三角形を描画
     if (!black)
