@@ -29,7 +29,7 @@ void DSR1202_break()
     (*_serial).println("1R0002R0003R0004R000"); // モータを停止させる
 }
 
-void DSR1202_move(uint8_t value_1ch, uint8_t value_2ch, uint8_t value_3ch, uint8_t value_4ch)
+void DSR1202_move(int8_t value_1ch, int8_t value_2ch, int8_t value_3ch, int8_t value_4ch)
 {
     /*トグルスイッチがオフならば*/
 
