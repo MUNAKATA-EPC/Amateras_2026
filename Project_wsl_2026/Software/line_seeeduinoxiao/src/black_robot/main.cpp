@@ -2,9 +2,6 @@
 #include "multiplexer.hpp"
 
 /*黒ロボット用*/
-
-const uint8_t head_byte = 0xAA; // 同期ヘッダー格納用
-
 #define LINE_SIDE_RIGHT_PIN 8 // 右サイド
 #define LINE_SIDE_LEFT_PIN 9  // 左サイド
 #define LINE_SIDE_BACK_PIN 7  // 後サイド
@@ -12,9 +9,11 @@ const uint8_t head_byte = 0xAA; // 同期ヘッダー格納用
 #define LINE_ANGEL_JUDGE_VALUE 70 // エンジェルライン判定用の値
 #define LINE_SIDE_JUDGE_VALUE 790 // サイドライン判定用の値
 
-Multiplexer line_mux; // 定義
+const uint8_t head_byte = 0xAA; // 同期ヘッダー格納用
 
 uint32_t lines_data_bit_mask; // 16+3個のラインセンサーの状況格納用
+
+Multiplexer line_mux; // 定義
 
 void setup()
 {
