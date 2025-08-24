@@ -29,8 +29,7 @@ void ui_init()
     lcd_right_button.init();
 }
 
-Timer my_ui_timer;         // UI用のタイマー
-bool ui_first_call = true; // 関数が最初に呼び出されたかを読む
+Timer my_ui_timer; // UI用のタイマー
 
 /*actionについてのメモ*/
 // 攻撃する
@@ -133,12 +132,7 @@ void ui_process()
     }
 
     /*LCDに表示*/
-    if (ui_first_call)
-    {
-        ui_first_call = false; // 次回からは初めてではない
-        my_ui_timer.reset();   // リセットする
-    }
-    if (my_ui_timer.get_time() >= 50) // 50ms経ってactionまたはmodeが決められていないなら
+    if (my_ui_timer.get_time() >= 50 || !my_ui_timer.is_called_this_timer()) // 50ms経つかタイマーが呼ばれたことがなかったならば
     {
         my_ui_timer.reset(); // リセット
         SSD1306_clear();     // LCDを初期化する

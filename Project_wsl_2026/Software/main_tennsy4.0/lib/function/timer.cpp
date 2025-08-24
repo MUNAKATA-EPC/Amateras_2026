@@ -10,6 +10,9 @@ void Timer::reset() /// タイマーを初期化、0からカウントを始め�
 
 int Timer::get_time() // タイマーからの時間を取得
 {
+    if (!_first_call) // 今まで呼ばれたことがなかったなら
+        _first_call = true;
+
     if (!_is_timer_stop) // タイマーが起動している場合
     {
         _now_time = millis() - _reset_time; // タイマーの時間更新
@@ -43,4 +46,9 @@ void Timer::start() // タイマーを再開させる
 bool Timer::is_timer_stop() // タイマーは一時停止されているかどうか
 {
     return _is_timer_stop;
+}
+
+bool Timer::is_called_this_timer() // 今まででこのタイマーは使われてきたかどうか
+{
+    return _first_call;
 }

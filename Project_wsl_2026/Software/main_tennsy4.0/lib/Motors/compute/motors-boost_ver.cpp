@@ -5,10 +5,10 @@
 /*モーターはすべて正で、右回転するようにする*/
 int motor_move_sign[4] = {1, -1, -1, 1}; // モータを移動させるための符号を格納
 
-int motor_deg[4];             // モータの設置角度を格納用
-double motor_move_power[4];   // モータの出力格納用(移動のための出力)->これをスケーリングし、最大にする
-int motor_pd_power[4];        // モータの出力格納用(PD制御のための出力)
-int motor_power_main[4];      // 最終的な出力格納用
+double motor_deg[4];        // モータの設置角度を格納用
+double motor_move_power[4]; // モータの出力格納用(移動のための出力)->これをスケーリングし、最大にする
+double motor_pd_power[4];   // モータの出力格納用(PD制御のための出力)
+double motor_power_main[4]; // 最終的な出力格納用
 
 void motors_init(int deg_1ch, int deg_2ch, int deg_3ch, int deg_4ch)
 {
@@ -23,27 +23,32 @@ void motors_move(int deg, int abs_power)
     abs_power = abs(abs_power);    // 一応絶対値にする
     compute_motor_power(deg, 100); // 移動のための出力を計算
 
-    double max_move_power = 0;
+    double pd_power = get_PD_power();
+
+    // 移動＋回転を合成したときの最大値を求める
+    double max_mix_power = 0;
     for (int i = 0; i < 4; i++)
     {
-        double tmp = fabs(motor_move_power[i] * motor_move_sign[i]); // 絶対値を取る
-        if (tmp > max_move_power)
-            max_move_power = tmp;
+        double tmp = fabs(motor_move_power[i] * motor_move_sign[i] + pd_power);
+        if (tmp > max_mix_power)
+            max_mix_power = tmp;
     }
 
-    int pd_power = get_PD_power();
-
-    // PDを考慮したスケーリング可能最大値を計算
-    double max_allowed_move = abs_power - abs(pd_power);
-    double scale = (max_move_power == 0) ? 0 : max_allowed_move / max_move_power;
+    // 移動と回転を合成してからスケーリング
+    double scale = (max_mix_power == 0) ? 0 : (double)abs_power / max_mix_power;
 
     for (int i = 0; i < 4; i++)
     {
-        motor_power_main[i] = (int)(motor_move_power[i] * scale * motor_move_sign[i] + pd_power);
+        motor_power_main[i] =
+            (motor_move_power[i] * motor_move_sign[i] + pd_power) * scale;
         motor_power_main[i] = constrain(motor_power_main[i], -abs_power, abs_power); // 念のため
     }
 
-    DSR1202_move(motor_power_main[0], motor_power_main[1], motor_power_main[2], motor_power_main[3]);
+    DSR1202_move(
+        (int)motor_power_main[0],
+        (int)motor_power_main[1],
+        (int)motor_power_main[2],
+        (int)motor_power_main[3]);
 }
 
 void motors_only_PD(int max_pd_power)
@@ -54,7 +59,11 @@ void motors_only_PD(int max_pd_power)
         motor_power_main[i] = constrain(motor_power_main[i], -max_pd_power, max_pd_power); // 一応丸める
     }
 
-    DSR1202_move(motor_power_main[0], motor_power_main[1], motor_power_main[2], motor_power_main[3]); // モータを動かす
+    DSR1202_move(
+        (int)motor_power_main[0],
+        (int)motor_power_main[1],
+        (int)motor_power_main[2],
+        (int)motor_power_main[3]); // モータを動かす
 }
 
 void motors_break()
@@ -69,7 +78,7 @@ void compute_motor_power(int deg, int power)
     deg = 360 - deg;
     for (int i = 0; i < 4; i++)
     {
-        motor_move_power[i] = sin(radians(deg - motor_deg[i])) * power; // floatで計算
+        motor_move_power[i] = sin(radians(deg - motor_deg[i])) * power; // doubleで計算
     }
 }
 

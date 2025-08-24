@@ -7,8 +7,7 @@ int fet2_charge_pin = 0; // fet2につないだピン
 
 int kicker_cooldown_time = 1000; // クールダウンタイム
 
-Timer my_cooldown_timer;       // クールダウン用タイマー
-bool kicker_first_call = true; // 最初の呼び出しかどうか
+Timer my_cooldown_timer; // クールダウン用タイマー
 
 void kicker_set_fetpin(int kick_pin, int charge_pin)
 {
@@ -28,13 +27,7 @@ void kicker_init(int cooldown_time)
 
 void kicker_kick(bool kick_signal)
 {
-    if (kicker_first_call)
-    {
-        kicker_first_call = false;
-        my_cooldown_timer.reset();
-    }
-
-    if (kick_signal && my_cooldown_timer.get_time() > kicker_cooldown_time)
+    if (kick_signal && (my_cooldown_timer.get_time() > kicker_cooldown_time || !my_cooldown_timer.is_called_this_timer()))
     {
         digitalWrite(fet1_kick_pin, HIGH);
         digitalWrite(fet2_charge_pin, LOW);

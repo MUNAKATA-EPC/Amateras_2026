@@ -6,10 +6,11 @@
 class Timer
 {
 private:
-    int _reset_time = 0;         // リセット時の時間格納用
-    int _stop_time = -1;          // 停止時の時間格納用
-    int _now_time = 0;           //_reset_timeまたは_pause_timeからの時間格納用
-    bool _is_timer_stop = false;      // タイマーはストップされているかどうか
+    unsigned long _reset_time = 0; // リセット時の時間格納用
+    unsigned long _stop_time = -1; // 停止時の時間格納用
+    unsigned long _now_time = 0;   //_reset_timeまたは_pause_timeからの時間格納用
+    bool _first_call = false;      // タイマーがいままでで呼ばれたかどうか
+    bool _is_timer_stop = false;   // タイマーはストップされているかどうか
 
 public:
     // タイマーを初期化、0からカウントを始める
@@ -26,7 +27,9 @@ public:
 
     // タイマーは一時停止されているかどうか
     bool is_timer_stop();
+
+    // 今まででこのタイマーは使われているかどうか
+    bool is_called_this_timer();
 };
 
 #endif
-
