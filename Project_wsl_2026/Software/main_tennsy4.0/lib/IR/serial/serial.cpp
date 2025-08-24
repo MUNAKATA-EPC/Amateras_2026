@@ -21,35 +21,32 @@ void IR_init(HardwareSerial *serial, uint32_t baudrate)
 
 void IR_update()
 {
-    if ((*ir_serial).available()) // 受信バッファが溜まっているなら
+    // バッファに1フレーム分以上ある限りループ（4バイトデータ + 1同期ヘッダー）
+    while ((*ir_serial).available() >= 4 + 1) // seeeduinoxiaoからの4つのデータと1つの同期ヘッダーが溜まっているなら
     {
         if ((*ir_serial).peek() == head_byte) // 最初のブッファが同期ヘッダーなら
         {
-            if ((*ir_serial).available() >= 4 + 1) // seeeduinoxiaoからの4つのデータと1つの同期ヘッダーが溜まっているなら
+            (*ir_serial).read(); // 同期ヘッダーを捨てる
+
+            uint8_t low1 = (*ir_serial).read();                        // ボールの角度の下位バイトを読み取る
+            uint8_t high1 = (*ir_serial).read();                       // ボールの角度の上位バイトを読み取る
+            ir_deg = int16_t((uint16_t(high1) << 8) | uint16_t(low1)); // 上位バイトと下位バイトをつなげる(もともとはint16_tなのでキャストで戻す)
+
+            uint8_t low2 = (*ir_serial).read();                             // ボールの距離の下位バイトを読み取る
+            uint8_t high2 = (*ir_serial).read();                            // ボールの距離の上位バイトを読み取る
+            ir_distance = int16_t((uint16_t(high2) << 8) | uint16_t(low2)); // 上位バイトと下位バイトをつなげる(もともとはint16_tなのでキャストで戻す)
+
+            if (ir_deg == -1)
+                ir_exist = false;
+            else
             {
-                (*ir_serial).read(); // 同期ヘッダーを捨てる
-
-                uint8_t low1 = (*ir_serial).read();      // ボールの角度の下位バイトを読み取る
-                uint8_t high1 = (*ir_serial).read();     // ボールの角度の上位バイトを読み取る
-                ir_deg = (int16_t)((high1 << 8) | low1); // 上位バイトと下位バイトをつなげる(もともとはint16_tなのでキャストで戻す)
-
-                uint8_t low2 = (*ir_serial).read();           // ボールの距離の下位バイトを読み取る
-                uint8_t high2 = (*ir_serial).read();          // ボールの距離の上位バイトを読み取る
-                ir_distance = (int16_t)((high2 << 8) | low2); // 上位バイトと下位バイトをつなげる(もともとはint16_tなのでキャストで戻す)
-
-                if (ir_deg == -1)
-                    ir_exist = false;
-                else
-                {
-                    ir_exist = true;
-                    ir_deg = (ir_deg - 359 + 360) % 360; // 調整
-                }
+                ir_exist = true;
+                ir_deg = (ir_deg - 359 + 360) % 360; // 調整
             }
         }
         else // そうでないならゴミのバッファ
         {
-            while ((*ir_serial).available())
-                (*ir_serial).read(); // ブッファを捨てる
+            (*ir_serial).read(); // ブッファを捨てる
         }
     }
 }

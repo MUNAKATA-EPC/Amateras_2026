@@ -38,28 +38,25 @@ void Ps3_init(HardwareSerial *serial, uint32_t baudrate)
 
 void Ps3_serial_update()
 {
-    if ((*ps3_serial).available()) // 受信バッファが溜まっているなら
+    // バッファに1フレーム分以上ある限りループ（6バイトデータ + 1同期ヘッダー）
+    while ((*ps3_serial).available() >= 6 + 1) // m5stamp-picoからの6つのデータと1つの同期ヘッダーが溜まっているなら
     {
         if ((*ps3_serial).peek() == head_byte) // 最初のブッファが同期ヘッダーなら
         {
-            if ((*ps3_serial).available() >= 6 + 1) // m5stamp-picoからの6つのデータと1つの同期ヘッダーが溜まっているなら
-            {
-                (*ps3_serial).read(); // 同期ヘッダーを捨てる
+            (*ps3_serial).read(); // 同期ヘッダーを捨てる
 
-                ps3_stick_lx = (*ps3_serial).read();                // 左ステックのx座標を読み取る(-128~127)
-                ps3_stick_ly = (int8_t)(-(*ps3_serial).read() - 1); // 左ステックのy座標を読み取る(-128~127)
-                ps3_stick_rx = (*ps3_serial).read();                // 右ステックのx座標を読み取る(-128~127)
-                ps3_stick_ry = (int8_t)(-(*ps3_serial).read() - 1); // 右ステックのy座標を読み取る(-128~127)
+            ps3_stick_lx = (*ps3_serial).read();                // 左ステックのx座標を読み取る(-128~127)
+            ps3_stick_ly = (int8_t)(-(*ps3_serial).read() - 1); // 左ステックのy座標を読み取る(-128~127)
+            ps3_stick_rx = (*ps3_serial).read();                // 右ステックのx座標を読み取る(-128~127)
+            ps3_stick_ry = (int8_t)(-(*ps3_serial).read() - 1); // 右ステックのy座標を読み取る(-128~127)
 
-                uint8_t low = (*ps3_serial).read();            // ボタンの下位バイトを読み取る
-                uint8_t high = (*ps3_serial).read();           // ボタンの上位バイトを読み取る
-                ps3_buttons_data_bit_mask = (high << 8) | low; // 上位バイトと下位バイトをつなげる
-            }
+            uint8_t low = (*ps3_serial).read();                                // ボタンの下位バイトを読み取る
+            uint8_t high = (*ps3_serial).read();                               // ボタンの上位バイトを読み取る
+            ps3_buttons_data_bit_mask = (uint16_t(high) << 8) | uint16_t(low); // 上位バイトと下位バイトをつなげる
         }
         else // そうでないならゴミのバッファ
         {
-            while ((*ps3_serial).available())
-                (*ps3_serial).read(); // ブッファを捨てる
+            (*ps3_serial).read(); // ブッファを捨てる
         }
     }
 }
