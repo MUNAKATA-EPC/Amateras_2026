@@ -23,6 +23,6 @@ void motors_break();
 void compute_motor_power(int deg, int power);
 
 // index番目のモータの合力の大きさを返す
-float get_motor_power(int index);
+double get_motor_power(int index);
 
 #endif

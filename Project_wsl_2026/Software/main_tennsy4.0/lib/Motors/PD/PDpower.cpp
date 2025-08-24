@@ -2,8 +2,8 @@
 
 /*PD制御の出力値を計算する*/
 
-#define GYRO_P_GAIN 0.8
-#define GYRO_D_GAIN 0.06
+#define GYRO_P_GAIN 0.6
+#define GYRO_D_GAIN 0.02
 
 #define GYRO_TARGET_P_GAIN 0.6
 #define GYRO_TARGET_D_GAIN 0.02

@@ -24,19 +24,19 @@ void motors_move(int deg, int abs_power)
 
     compute_motor_power(deg, 100); // 適当に100の出力での各モータの出力を計算
 
-    float sum_x_power = 0; // x方向の出力の合計
-    float sum_y_power = 0; // y方向の出力の合計
+    double sum_x_power = 0; // x方向の出力の合計
+    double sum_y_power = 0; // y方向の出力の合計
     for (int i = 0; i < 4; i++)
     {
         sum_x_power += get_motor_x_power(i);
         sum_y_power += get_motor_y_power(i);
     }
 
-    float power_xy = sqrt(pow(sum_x_power, 2) + pow(sum_y_power, 2));
+    double power_xy = sqrt(pow(sum_x_power, 2) + pow(sum_y_power, 2));
 
-    if (power_xy > 1e-6)
+    if (power_xy > 1e-9)
     {
-        float scale_value = float(abs_power) / power_xy;
+        double scale_value = double(abs_power) / power_xy;
         for (int i = 0; i < 4; i++)
         {
             motor_move_power_main[i] = int(get_motor_power(i) * scale_value);
@@ -62,9 +62,9 @@ void motors_move(int deg, int abs_power)
 
 /*ここのファイル内だけで使う関数*/
 
-float motor_move_power_sub[4]; // 計算したモータ出力
-float motor_x_power[4];        // モータ出力をx方向に分解
-float motor_y_power[4];        // モータ出力をy方向に分解
+double motor_move_power_sub[4]; // 計算したモータ出力
+double motor_x_power[4];        // モータ出力をx方向に分解
+double motor_y_power[4];        // モータ出力をy方向に分解
 
 void compute_motor_power(int deg, int power)
 {
@@ -79,17 +79,17 @@ void compute_motor_power(int deg, int power)
     }
 }
 
-float get_motor_power(int index)
+double get_motor_power(int index)
 {
     return motor_move_power_sub[index];
 }
 
-float get_motor_x_power(int index)
+double get_motor_x_power(int index)
 {
     return motor_x_power[index];
 }
 
-float get_motor_y_power(int index)
+double get_motor_y_power(int index)
 {
     return motor_y_power[index];
 }

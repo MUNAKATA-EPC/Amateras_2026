@@ -81,16 +81,16 @@ void play_attacker(bool use_yellow_cam, bool use_blue_cam, int motor_power)
             {
                 if ((get_IR_deg() < 80) || (get_IR_deg() > 280))
                 {
-                    motors_move(get_IR_hirei_deg(2.6), motor_power);
+                    motors_move(get_IR_hirei_deg(2.7), motor_power);
                 }
                 else
                 {
-                    motors_move(get_IR_mawarikomi_deg(), motor_power);
+                    motors_move(get_IR_sessen_deg(100, -180), motor_power);
                 }
             }
             else
             {
-                motors_move(get_IR_follow_deg(0), motor_power);
+                motors_move(get_IR_sessen_deg(100, -180), motor_power);
             }
         }
         else

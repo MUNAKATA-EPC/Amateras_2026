@@ -7,6 +7,9 @@
 // 回り込む角度を出力
 int get_IR_mawarikomi_deg();
 
+// ボールの接線角度を計算し、回り込みに最適な方を出力
+int get_IR_sessen_deg(double R, double dist_adjust_value);
+
 // IRボールに近寄る角度を出力
 int get_IR_follow_deg(int follow_target_offset);
 

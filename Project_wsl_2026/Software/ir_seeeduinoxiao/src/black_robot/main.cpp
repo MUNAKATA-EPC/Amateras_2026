@@ -72,11 +72,11 @@ void loop()
   }
 
   /*送信*/
-  Serial1.write(head_byte);            // teensyとの通信開始
-  Serial1.write(IRball_deg);           // 2byteのデータなので下位の1byteのみ送信
-  Serial1.write(IRball_deg >> 8);      // 2byteのデータなので上位の1byteのみ送信
-  Serial1.write(IRball_distance);      // 2byteのデータなので下位の1byteのみ送信
-  Serial1.write(IRball_distance >> 8); // 2byteのデータなので上位の1byteのみ送信
+  Serial1.write(head_byte);                       // teensyとの通信開始
+  Serial1.write((uint8_t)IRball_deg);             // 2byteのデータなので下位の1byteのみ送信
+  Serial1.write((uint8_t)(IRball_deg >> 8));      // 2byteのデータなので上位の1byteのみ送信
+  Serial1.write((uint8_t)IRball_distance);        // 2byteのデータなので下位の1byteのみ送信
+  Serial1.write((uint8_t)(IRball_distance >> 8)); // 2byteのデータなので上位の1byteのみ送信
 
   Serial1.flush(); // 送信バッファがなくなるまで、つまり全て送信するまで待つ
 

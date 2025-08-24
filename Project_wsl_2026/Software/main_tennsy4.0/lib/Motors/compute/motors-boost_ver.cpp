@@ -5,10 +5,10 @@
 /*モーターはすべて正で、右回転するようにする*/
 int motor_move_sign[4] = {1, -1, -1, 1}; // モータを移動させるための符号を格納
 
-int motor_deg[4];        // モータの設置角度を格納用
-float motor_move_power[4];   // モータの出力格納用(移動のための出力)->これをスケーリングし、最大にする
-int motor_pd_power[4];   // モータの出力格納用(PD制御のための出力)
-int motor_power_main[4]; // 最終的な出力格納用
+int motor_deg[4];             // モータの設置角度を格納用
+double motor_move_power[4];   // モータの出力格納用(移動のための出力)->これをスケーリングし、最大にする
+int motor_pd_power[4];        // モータの出力格納用(PD制御のための出力)
+int motor_power_main[4];      // 最終的な出力格納用
 
 void motors_init(int deg_1ch, int deg_2ch, int deg_3ch, int deg_4ch)
 {
@@ -23,10 +23,10 @@ void motors_move(int deg, int abs_power)
     abs_power = abs(abs_power);    // 一応絶対値にする
     compute_motor_power(deg, 100); // 移動のための出力を計算
 
-    float max_move_power = 0;
+    double max_move_power = 0;
     for (int i = 0; i < 4; i++)
     {
-        float tmp = abs(motor_move_power[i] * motor_move_sign[i]); // 絶対値を取る
+        double tmp = fabs(motor_move_power[i] * motor_move_sign[i]); // 絶対値を取る
         if (tmp > max_move_power)
             max_move_power = tmp;
     }
@@ -34,12 +34,12 @@ void motors_move(int deg, int abs_power)
     int pd_power = get_PD_power();
 
     // PDを考慮したスケーリング可能最大値を計算
-    float max_allowed_move = abs_power - abs(pd_power);
-    float scale = (max_move_power == 0) ? 0 : max_allowed_move / max_move_power;
+    double max_allowed_move = abs_power - abs(pd_power);
+    double scale = (max_move_power == 0) ? 0 : max_allowed_move / max_move_power;
 
     for (int i = 0; i < 4; i++)
     {
-        motor_power_main[i] = motor_move_power[i] * scale * motor_move_sign[i] + pd_power;
+        motor_power_main[i] = (int)(motor_move_power[i] * scale * motor_move_sign[i] + pd_power);
         motor_power_main[i] = constrain(motor_power_main[i], -abs_power, abs_power); // 念のため
     }
 
@@ -69,11 +69,11 @@ void compute_motor_power(int deg, int power)
     deg = 360 - deg;
     for (int i = 0; i < 4; i++)
     {
-        motor_move_power[i] = sinf(radians(deg - motor_deg[i])) * power; // floatで計算
+        motor_move_power[i] = sin(radians(deg - motor_deg[i])) * power; // floatで計算
     }
 }
 
-float get_motor_power(int index)
+double get_motor_power(int index)
 {
     return motor_move_power[index];
 }

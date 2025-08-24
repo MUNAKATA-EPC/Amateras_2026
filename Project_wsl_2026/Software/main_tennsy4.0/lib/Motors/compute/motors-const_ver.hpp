@@ -17,12 +17,12 @@ void motors_move(int deg, int abs_power);
 void compute_motor_power(int deg, int power);
 
 // index番目のモータの合力の大きさを返す
-float get_motor_power(int index);
+double get_motor_power(int index);
 
 // index番目のモータの出力をx方向に分解した値を返す
-float get_motor_x_power(int index);
+double get_motor_x_power(int index);
 
 // index番目のモータの出力をy方向に分解した値を返す
-float get_motor_y_power(int index);
+double get_motor_y_power(int index);
 
 #endif

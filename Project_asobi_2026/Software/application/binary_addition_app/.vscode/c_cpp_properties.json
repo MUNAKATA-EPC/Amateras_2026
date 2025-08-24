@@ -1,0 +1,26 @@
+{
+    "configurations": [
+        {
+            "name": "Win32",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "C:/mingw-w64-v11.0.0/mingw64/include/c++/x86_64-w64-mingw32",
+                "C:/mingw-w64-v11.0.0/mingw64/include/c++/backward",
+                "C:/mingw-w64-v11.0.0/mingw64/include",
+                "C:/mingw-w64-v11.0.0/mingw64/x86_64-w64-mingw32/include"
+            ],
+            // 以下のパスは存在しないため、削除しました
+            // "C:/mingw-w64-v11.0.0/mingw64/include/c++/11.0.0",
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "compilerPath": "C:/mingw-w64-v11.0.0/mingw64/bin/g++.exe",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "windows-gcc-x64"
+        }
+    ],
+    "version": 4
+}
