@@ -64,24 +64,24 @@ void play_attacker(bool use_yellow_cam, bool use_blue_cam, int motor_power)
                 motors_move(get_IR_deg(), motor_power / 1);
             }
             */
-            motors_move(get_LINE_deg() + 180, motor_power / 1);
+            motors_move(get_LINE_memory_deg() + 180, motor_power);
         }
     }
     else
     {
         if (is_IR_exist()) // IRボールがあるならば
         {
-            if ((get_IR_deg() < 3) || (get_IR_deg() > 357))
+            if ((get_IR_deg() <= 3) || (get_IR_deg() >= 357)) // 前にブールがあるならば
             {
                 kicker_kick(get_IR_distance() < 300); // 前付近で近くのボールがあったら蹴る
 
                 motors_move(0, motor_power); // 前進する
             }
-            else if (get_IR_distance() < 300) // 近く
+            else if ((get_IR_deg() <= 80) || (get_IR_deg() >= 280)) // 前付近にボールがあるならば
             {
-                if ((get_IR_deg() < 80) || (get_IR_deg() > 280))
+                if (get_IR_distance() < 300)
                 {
-                    motors_move(get_IR_hirei_deg(2.7), motor_power);
+                    motors_move(get_IR_hirei_deg(2.58), motor_power);
                 }
                 else
                 {

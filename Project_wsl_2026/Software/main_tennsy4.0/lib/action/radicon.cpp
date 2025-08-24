@@ -31,26 +31,26 @@ void play_radicon(int motor_power)
     {
         motors_move((get_Ps3_stick_left_deg() + get_BNO055_deg() + 360) % 360, motor_power_variable); // 左ステックの方向へ行く
     }
-    else if (is_IR_exist() && (get_Ps3_button_l1() || get_Ps3_button_l2()) && get_selected_ui_setting(ATTACK_AUTO_INDEX)) // IRボールがあってl3ボタンが押されsettingが有効ならば
+    else if (is_IR_exist() && (get_Ps3_button_l1() || get_Ps3_button_l2()) && get_selected_ui_setting(ATTACK_AUTO_INDEX)) // IRボールがあってl3ボタンが押されsettingで有効ならば
     {
-        if ((get_IR_deg() < 3) || (get_IR_deg() > 357))
+        if ((get_IR_deg() <= 3) || (get_IR_deg() >= 357)) // 前にボールがあるならば
         {
             motors_move(0, motor_power); // 前進する
         }
-        else if (get_IR_distance() < 300) // 近く
+        else if ((get_IR_deg() <= 80) || (get_IR_deg() >= 280)) // 前付近にボールがあるならば
         {
-            if ((get_IR_deg() < 80) || (get_IR_deg() > 280))
+            if (get_IR_distance() < 300)
             {
                 motors_move(get_IR_hirei_deg(2.58), motor_power);
             }
             else
             {
-                motors_move(get_IR_mawarikomi_deg(), motor_power);
+                motors_move(get_IR_sessen_deg(100, -180), motor_power);
             }
         }
         else
         {
-            motors_move(get_IR_follow_deg(0), motor_power);
+            motors_move(get_IR_sessen_deg(100, -180), motor_power);
         }
     }
     else
