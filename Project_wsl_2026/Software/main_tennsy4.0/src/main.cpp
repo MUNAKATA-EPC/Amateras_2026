@@ -31,7 +31,7 @@ void setup()
 
   catchsensor_init(A6);    // キャッチセンサーのピンを設定
   kicker_set_fetpin(2, 3); // キッカーのFETピンを設定
-  kicker_init(700);        // クールダウン時間の定義
+  kicker_init(1800);       // クールダウン時間の定義
 
   Ps3_set_stick_adjust(10, 10, 10, 10);
   Ps3_init(&Serial2, 115200); // シリアル2を使いボートレート115200にする
