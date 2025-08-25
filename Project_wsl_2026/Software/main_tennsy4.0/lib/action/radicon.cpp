@@ -21,7 +21,11 @@ void play_radicon(int motor_power)
         kicker_kick(false); // 蹴らない
 
     /*ロボット制御*/
-    int motor_power_variable = map(get_Ps3_stick_left_distance(), 0, 128, 0, motor_power); // 左ステックの倒されようによってスピードを変える
+    int motor_power_variable;
+    if (get_Ps3_button_circle())
+        motor_power_variable = 99; // 〇ボタンが押されたら99で動かす
+    else
+        motor_power_variable = map(get_Ps3_stick_left_distance(), 0, 128, 0, motor_power); // 左ステックの倒されようによってスピードを変える
 
     if (is_LINE_exist() && get_selected_ui_setting(LINE_AUTO_INDEX)) // ラインがあるかつsettingで有効ならば
     {

@@ -39,8 +39,7 @@ void motors_move(int deg, int abs_power)
 
     for (int i = 0; i < 4; i++)
     {
-        motor_power_main[i] =
-            (motor_move_power[i] * motor_move_sign[i] + pd_power) * scale;
+        motor_power_main[i] = (motor_move_power[i] * motor_move_sign[i] + pd_power) * scale;
         motor_power_main[i] = constrain(motor_power_main[i], -abs_power, abs_power); // 念のため
     }
 

@@ -2,13 +2,13 @@
 
 /*PD制御の出力値を計算する*/
 
-#define GYRO_P_GAIN 0.72
-#define GYRO_D_GAIN 0.08
+#define GYRO_P_GAIN 0.78
+#define GYRO_D_GAIN 0.025
 
 #define GYRO_TARGET_P_GAIN 0.6
 #define GYRO_TARGET_D_GAIN 0.02
 
-#define GOAL_P_GAIN 0.35
+#define GOAL_P_GAIN 0.6
 #define GOAL_D_GAIN 0.02
 
 double pd_power_double = 0.0;       // PD制御の出力格納用(double版)

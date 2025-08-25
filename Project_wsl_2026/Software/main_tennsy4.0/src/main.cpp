@@ -49,7 +49,7 @@ void loop()
   IR_update();           // 更新
   LINE_serial_update();  // 更新1
   LINE_compute_update(); // 更新2
-  // Camera_update();       // 更新
+  Camera_update();       // 更新
   BNO055_update();      // 更新
   Ps3_serial_update();  // 更新1
   Ps3_compute_update(); // 更新2
