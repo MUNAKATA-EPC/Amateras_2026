@@ -97,7 +97,7 @@ void ui_process()
         }
         else // 全部決めた後、、つまりsettingを選ぶとき
         {
-            setting_number = (setting_number + 1 + 3) % 3;
+            setting_memory[setting_number] = !setting_memory[setting_number]; // falseならtrue、trueならfalseにする
         }
     }
 
@@ -127,7 +127,7 @@ void ui_process()
         }
         else // 全部決めた後、、つまりsettingを選ぶとき
         {
-            setting_memory[setting_number] = !setting_memory[setting_number]; // falseならtrue、trueならfalseにする
+            setting_number = (setting_number + 1 + 3) % 3;
         }
     }
 
