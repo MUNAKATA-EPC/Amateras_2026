@@ -48,17 +48,17 @@ void LINE_compute_update()
             line_x += cos(radians(22.5 * i)) * is_LINE_memory_exist[i];
             line_y += sin(radians(22.5 * i)) * is_LINE_memory_exist[i];
         }
-        if (get_LINE_data(16))
+        if (get_LINE_side_right())
         {
             line_x += cos(radians(270.0));
             line_y += sin(radians(270.0));
         }
-        if (get_LINE_data(17))
+        if (get_LINE_side_left())
         {
             line_x += cos(radians(90.0));
             line_y += sin(radians(90.0));
         }
-        if (get_LINE_data(18))
+        if (get_LINE_side_back())
         {
             line_x += cos(radians(180.0));
             line_y += sin(radians(180.0));
