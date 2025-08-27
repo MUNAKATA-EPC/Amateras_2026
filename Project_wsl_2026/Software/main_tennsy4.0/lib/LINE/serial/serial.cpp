@@ -16,6 +16,7 @@ void LINE_init(HardwareSerial *serial, uint32_t baudrate)
     line_serial = serial;
     line_baudrate = baudrate;
     (*line_serial).begin(line_baudrate);
+    (*line_serial).setTimeout(10);
 }
 
 void LINE_serial_update()
@@ -42,6 +43,11 @@ void LINE_serial_update()
             (*line_serial).read(); // ブッファを捨てる
         }
     }
+
+    /*while ((*line_serial).available() > 0)
+    {
+        lines_data_bit_mask = (*line_serial).readStringUntil('\n').toInt();
+    }*/
 }
 
 bool get_LINE_data(uint8_t index)

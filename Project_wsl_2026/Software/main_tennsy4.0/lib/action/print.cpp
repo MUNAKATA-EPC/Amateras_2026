@@ -20,7 +20,7 @@ void play_pc_print(int pc_print_mode)
         Serial.print("b");
         Serial.print(get_LINE_side_back());
         Serial.print(" line_deg: ");
-        Serial.print(get_LINE_deg());
+        Serial.print(get_LINE_memory_deg());
         // ジャイロについて
         Serial.print(" bno_deg: ");
         Serial.print(get_BNO055_deg());
@@ -64,7 +64,7 @@ void play_pc_print(int pc_print_mode)
         Serial.print("b");
         Serial.print(get_LINE_side_back());
         Serial.print(" line_deg: ");
-        Serial.print(get_LINE_deg());
+        Serial.print(get_LINE_memory_deg());
 
         Serial.println();
 
@@ -146,7 +146,7 @@ void play_lcd_print(int lcd_print_mode, int ahead_x, int ahead_y)
         SSD1306_write(1, 0 + ahead_x, 10 + ahead_y, buf, false);
 
         // LINEについて
-        sprintf(buf, "line_deg: %d", get_LINE_deg());
+        sprintf(buf, "line_deg: %d", get_LINE_memory_deg());
         SSD1306_write(1, 0 + ahead_x, 20 + ahead_y, buf, false);
         line_print_data[0] = '\0';
         for (int i = 16; i <= 18; i++)
@@ -177,7 +177,7 @@ void play_lcd_print(int lcd_print_mode, int ahead_x, int ahead_y)
         break;
 
     case LINE_CHECK_WITH_LCD:
-        sprintf(buf, "line_deg: %d", get_LINE_deg());
+        sprintf(buf, "line_deg: %d", get_LINE_memory_deg());
         SSD1306_write(1, 0 + ahead_x, 0 + ahead_y, buf, false);
 
         line_print_data[0] = '\0';

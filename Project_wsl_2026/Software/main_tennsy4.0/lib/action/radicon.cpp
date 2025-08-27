@@ -43,9 +43,9 @@ void play_radicon(int motor_power)
         }
         else if ((get_IR_deg() <= 80) || (get_IR_deg() >= 280)) // 前付近にボールがあるならば
         {
-            if (get_IR_distance() < 300)
+            if (get_IR_distance() < 290)
             {
-                motors_move(get_IR_hirei_deg(2), motor_power);
+                motors_move(get_IR_hirei_deg(2.72), motor_power);
             }
             else
             {
@@ -54,7 +54,7 @@ void play_radicon(int motor_power)
         }
         else
         {
-            if (get_IR_distance() < 320)
+            if (get_IR_distance() < 290)
             {
                 motors_move(get_IR_sessen_deg(100, -170), motor_power);
             }

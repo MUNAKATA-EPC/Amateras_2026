@@ -34,38 +34,7 @@ void play_attacker(bool use_yellow_cam, bool use_blue_cam, int motor_power)
     /*ロボット制御*/
     if (is_LINE_exist()) // ラインがあるならば
     {
-        if (is_LINE_half_out() || !is_IR_exist()) // IRボールがないもしくはハーフアウトしたなら
-        {
-            motors_move(get_LINE_memory_deg() + 180, motor_power); // ラインから逃れる動きをする
-        }
-        else // ハーフアウト前でIRボールがあるなら
-        {
-            /*
-            if (compute_deg_diff(get_LINE_deg(), get_IR_deg()) < 60) // ラインの角度とIRの角度同じくらいの方向だった場合
-            {
-                // ゴールの接線方向もしくはラインの接線方向を計算（2通り）
-                int defence_sessen_deg1 = (get_LINE_deg() + 90 + 360) % 360;
-                int defence_sessen_deg2 = (get_LINE_deg() - 90 + 360) % 360;
-
-                int diff_of_sessen1 = compute_deg_diff(defence_sessen_deg1, get_IR_deg()); // 差を計算
-                int diff_of_sessen2 = compute_deg_diff(defence_sessen_deg2, get_IR_deg()); // 差を計算
-
-                if (diff_of_sessen1 < diff_of_sessen2) // sessen_deg1のほうがボールの方向との差が小さいなら
-                {
-                    motors_move(defence_sessen_deg1, motor_power / 1.6);
-                }
-                else // sessen_deg2のほうがボールの方向との差が小さいなら
-                {
-                    motors_move(defence_sessen_deg2, motor_power / 1.6);
-                }
-            }
-            else // ラインの角度とは反対の位置にIRボールがある場合
-            {
-                motors_move(get_IR_deg(), motor_power / 1);
-            }
-            */
-            motors_move(get_LINE_memory_deg() + 180, motor_power);
-        }
+        motors_move(get_LINE_memory_deg() + 180, motor_power); // ラインから逃れる動きをする
     }
     else
     {
@@ -79,18 +48,20 @@ void play_attacker(bool use_yellow_cam, bool use_blue_cam, int motor_power)
             }
             else if ((get_IR_deg() <= 80) || (get_IR_deg() >= 280)) // 前付近にボールがあるならば
             {
-                if (get_IR_distance() < 300)
+                if (get_IR_distance() < 290)
                 {
-                    motors_move(get_IR_hirei_deg(2), motor_power);
+                    motors_move(get_IR_hirei_deg(2.72), motor_power);
                 }
                 else
                 {
-                    motors_move(get_IR_sessen_deg(70, -170), motor_power);
+                    motors_move(get_IR_sessen_deg(100, -170), motor_power);
                 }
             }
             else
             {
-                if (get_IR_distance() < 320)
+                motors_move(get_IR_sessen_deg(80, -150), motor_power);
+                /*
+                if (get_IR_distance() < 290)
                 {
                     motors_move(get_IR_sessen_deg(100, -170), motor_power);
                 }
@@ -98,6 +69,7 @@ void play_attacker(bool use_yellow_cam, bool use_blue_cam, int motor_power)
                 {
                     motors_move(get_IR_deg(), motor_power);
                 }
+                */
             }
         }
         else
