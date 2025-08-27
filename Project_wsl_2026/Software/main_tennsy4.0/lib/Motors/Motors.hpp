@@ -4,7 +4,7 @@
 #include <Arduino.h>
 #include "serial/DSR1202.hpp"
 #include "compute/motors-boost_ver.hpp"
-#include "PD/PDpower.hpp"
+#include "PD/pdpower.hpp"
 
 #include "Gyro.hpp"
 #include "Camera.hpp"

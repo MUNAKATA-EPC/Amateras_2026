@@ -1,4 +1,4 @@
-#include "PDpower.hpp"
+#include "pdpower.hpp"
 
 /*PD制御の出力値を計算する*/
 
