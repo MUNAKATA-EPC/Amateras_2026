@@ -28,9 +28,11 @@ void Camera_init(HardwareSerial *serial, int baudrate)
 
 int16_t read_int16_from_serial()
 {
-    uint8_t low = (*camera_serial).read();
-    uint8_t high = (*camera_serial).read();
-    return (int16_t)((high << 8) | low); // 上位バイトと下位バイトをつなげる(もともとはint16_tなのでキャストで戻す)
+    uint8_t low  = (uint8_t)(*camera_serial).read();
+    uint8_t high = (uint8_t)(*camera_serial).read();
+    int16_t value = (int16_t)((high << 8) | low);
+
+    return value;
 }
 
 void Camera_update()

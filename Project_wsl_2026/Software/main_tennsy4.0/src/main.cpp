@@ -50,15 +50,15 @@ void loop()
   LINE_serial_update();  // 更新1
   LINE_compute_update(); // 更新2
   Camera_update();       // 更新
-  BNO055_update();      // 更新
-  Ps3_serial_update();  // 更新1
-  Ps3_compute_update(); // 更新2
+  BNO055_update();       // 更新
+  Ps3_serial_update();   // 更新1
+  Ps3_compute_update();  // 更新2
 
   ui_process(); // uiを実行
 
   if (is_now_selecting_ui()) // 今選んでる途中なら
   {
-    Serial.println("Now selecting UI: ");
+    //Serial.println("Now selecting UI");
 
     motors_break(); // モータは停止させる
   }
