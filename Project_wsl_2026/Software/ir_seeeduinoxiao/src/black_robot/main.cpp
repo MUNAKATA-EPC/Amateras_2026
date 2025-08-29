@@ -11,8 +11,8 @@ int IRsensor_value[16]; // IRセンサーの値を格納
 int IRsensor_min_index; // IRセンサーで最も反応の小さいセンサーの配列番号
 
 double IRball_of_x, IRball_of_y; // IRセンサーのxy方向の重み
-int IRball_deg;              // 角度
-int IRball_distance;         // 距離
+int IRball_deg;                  // 角度
+int IRball_value;                // 値
 
 Multiplexer ir_mux;
 
@@ -49,7 +49,7 @@ void loop()
   if (IRsensor_value[IRsensor_min_index] > 1000)
   {
     IRball_deg = -1;
-    IRball_distance = -1;
+    IRball_value = -1;
   }
   else
   {
@@ -65,11 +65,13 @@ void loop()
     IRball_deg_sub = (IRball_deg_sub < 0) ? IRball_deg_sub + 360 : IRball_deg_sub;
     IRball_deg = (int)IRball_deg_sub;
     // IRball_distance = (int)(map(IRsensor_value[IRsensor_min_index], 0, 1023, 0, 200));
-    double IRball_of_x_for_distance = IRball_of_x / 30.0;
-    double IRball_of_y_for_distance = IRball_of_y / 30.0;
-    double IRball_distance_sub = sqrt(IRball_of_x_for_distance * IRball_of_x_for_distance + IRball_of_y_for_distance * IRball_of_y_for_distance); // 距離を算出
-    // IRball_distance = (int)map(IRball_distance_sub, 0, 500, 500, 0) - 20;
-    IRball_distance = (int)IRball_distance_sub;
+    // IRball_distance = pow(IRball_distance, 1.35);
+    // IRball_distance = constrain(IRball_distance, 0, 1023);
+    double IRball_of_x_for_value = IRball_of_x / 10;
+    double IRball_of_y_for_value = IRball_of_y / 10;
+    double IRball_value_sub = sqrt(IRball_of_x_for_value * IRball_of_x_for_value + IRball_of_y_for_value * IRball_of_y_for_value); // 距離を算出
+    IRball_value_sub = constrain(IRball_value_sub, 0, 1023);
+    IRball_value = (int)IRball_value_sub;
   }
 
   /*送信*/
@@ -83,14 +85,13 @@ void loop()
   Serial1.print("a");
   Serial1.print(IRball_deg);
   Serial1.print("b");
-  Serial1.print(IRball_distance);
+  Serial1.print(IRball_value);
   Serial1.print("c");
   Serial1.flush(); // 送信バッファがなくなるまで、つまり全て送信するまで待つ
 
-  /*Serial.print(IRball_deg);
-  Serial.print("a");
-  Serial.print(IRball_distance);
-  Serial.println("b");*/
+  Serial.print(IRball_of_x);
+  Serial.print(",");
+  Serial.println(IRball_of_y);
 
   delay(10);
 }
