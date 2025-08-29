@@ -68,7 +68,7 @@ void loop()
     double IRball_of_x_for_distance = IRball_of_x / 10.0;
     double IRball_of_y_for_distance = IRball_of_y / 10.0;
     double IRball_distance_sub = sqrt(IRball_of_x_for_distance * IRball_of_x_for_distance + IRball_of_y_for_distance * IRball_of_y_for_distance); // 距離を算出
-    IRball_distance = (int16_t)map(IRball_distance_sub, 0, 500, 500, 0);
+    // IRball_distance = (int16_t)map(IRball_distance_sub, 0, 500, 500, 0);
   }
 
   /*送信*/
@@ -78,12 +78,12 @@ void loop()
   Serial1.write(IRball_distance);      // 2byteのデータなので下位の1byteのみ送信
   Serial1.write(IRball_distance >> 8); // 2byteのデータなので上位の1byteのみ送信
 
-  Serial1.flush(); // 送信バッファがなくなるまで、つまり全て送信するまで待つ
+  // Serial1.flush(); // 送信バッファがなくなるまで、つまり全て送信するまで待つ
 
-  Serial.print(IRball_deg);
+  /*Serial.print(IRball_deg);
   Serial.print("a");
   Serial.print(IRball_distance);
-  Serial.println("b");
+  Serial.println("b");*/
 
   delay(10);
 }
