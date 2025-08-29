@@ -5,7 +5,7 @@
 
 #define LINE_SIDE_RIGHT_PIN 8 // 右サイド
 #define LINE_SIDE_LEFT_PIN 9  // 左サイド
-#define LINE_SIDE_BACK_PIN 7  // 後サイド
+#define LINE_SIDE_BACK_PIN 10 // 後サイド
 
 #define LINE_ANGEL_JUDGE_VALUE 70 // エンジェルライン判定用の値
 #define LINE_SIDE_JUDGE_VALUE 790 // サイドライン判定用の値
@@ -42,8 +42,8 @@ void loop()
 
   /*サイドラインについて*/
   uint32_t right_val = analogRead(LINE_SIDE_RIGHT_PIN); // 右サイドのラインセンサー
-  uint32_t left_val  = analogRead(LINE_SIDE_LEFT_PIN);  // 左サイドのラインセンサー
-  uint32_t back_val  = analogRead(LINE_SIDE_BACK_PIN);  // 後サイドのラインセンサー
+  uint32_t left_val = analogRead(LINE_SIDE_LEFT_PIN);   // 左サイドのラインセンサー
+  uint32_t back_val = analogRead(LINE_SIDE_BACK_PIN);   // 後サイドのラインセンサー
 
   if (right_val > LINE_SIDE_JUDGE_VALUE && right_val < 1020) // 右サイドのラインセンサーがラインを見ているか
     lines_data_bit_mask |= (1UL << 16);
@@ -62,13 +62,13 @@ void loop()
 
   Serial1.flush(); // 送信バッファがなくなるまで、つまり全て送信するまで待つ
 
-  Serial1.println(lines_data_bit_mask, BIN); // pcに送る
+  /*Serial.print(lines_data_bit_mask, BIN); // pcに送る
   Serial.print("l");
   Serial.print(left_val);
   Serial.print("r");
   Serial.print(right_val);
   Serial.print("b");
-  Serial.println(back_val);
+  Serial.println(back_val);*/
 
   delay(10); // 10ms待機
 }
