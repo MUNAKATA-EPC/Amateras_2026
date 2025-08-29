@@ -10,35 +10,35 @@ int get_IR_mawarikomi_deg()
 
     if (ir_deg < 45) // 左にボールがある
     {
-        IR_mawarikomi_deg = ir_deg + 100;
+        IR_mawarikomi_deg = ir_deg + 65;
     }
     else if (ir_deg < 90)
     {
-        IR_mawarikomi_deg = ir_deg + 90;
+        IR_mawarikomi_deg = ir_deg + 65;
     }
     else if (ir_deg < 135)
     {
-        IR_mawarikomi_deg = ir_deg + 90;
+        IR_mawarikomi_deg = ir_deg + 65;
     }
     else if (ir_deg < 180)
     {
-        IR_mawarikomi_deg = ir_deg + 100;
+        IR_mawarikomi_deg = ir_deg + 65;
     }
     else if (ir_deg < 225) // 右にボールがある
     {
-        IR_mawarikomi_deg = ir_deg - 100;
+        IR_mawarikomi_deg = ir_deg - 65;
     }
     else if (ir_deg < 270)
     {
-        IR_mawarikomi_deg = ir_deg - 90;
+        IR_mawarikomi_deg = ir_deg - 65;
     }
     else if (ir_deg < 315)
     {
-        IR_mawarikomi_deg = ir_deg - 90;
+        IR_mawarikomi_deg = ir_deg - 65;
     }
     else
     {
-        IR_mawarikomi_deg = ir_deg - 100;
+        IR_mawarikomi_deg = ir_deg - 65;
     }
 
     IR_mawarikomi_deg = (IR_mawarikomi_deg + 360) % 360; // 一応0~360に直す

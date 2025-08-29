@@ -7,20 +7,21 @@ const uint8_t head_byte = 0xAA; // 同期ヘッダー格納用
 HardwareSerial *ir_serial; // とりあえず定義
 uint32_t ir_baudrate;      // ボートレート格納用
 
-bool ir_exist = false;    // IRボールがあるかどうか
-int16_t ir_deg = -1;      // IRボールの角度格納用
-int16_t ir_distance = -1; // IRボールの距離格納用
+bool ir_exist = false; // IRボールがあるかどうか
+int ir_deg = -1;       // IRボールの角度格納用
+int ir_distance = -1;  // IRボールの距離格納用
 
 void IR_init(HardwareSerial *serial, uint32_t baudrate)
 {
     ir_serial = serial;
     ir_baudrate = baudrate;
     (*ir_serial).begin(ir_baudrate); // ボートレート定義
-    (*ir_serial).setTimeout(50);     // 50msでタイムアウトとする
+    (*ir_serial).setTimeout(10);     // 10msでタイムアウト
 }
 
 void IR_update()
 {
+    /*
     // バッファに1フレーム分以上ある限りループ（4バイトデータ + 1同期ヘッダー）
     while ((*ir_serial).available() >= 4 + 1) // seeeduinoxiaoからの4つのデータと1つの同期ヘッダーが溜まっているなら
     {
@@ -41,7 +42,30 @@ void IR_update()
             else
             {
                 ir_exist = true;
-                ir_deg = (ir_deg - 359 + 360) % 360; // 調整
+            }
+        }
+        else // そうでないならゴミのバッファ
+        {
+            (*ir_serial).read(); // ブッファを捨てる
+        }
+    }
+    */
+    while ((*ir_serial).available() >= 2 + 2 + 2) // 角度・距離は1バイト以上だけど多めのデータがたまっていたら
+    {
+        if ((*ir_serial).peek() == 'a') // 最初のブッファが'a'
+        {
+            (*ir_serial).read(); // 同期ヘッダーを捨てる
+
+            ir_deg = (*ir_serial).readStringUntil('b').toInt(); // bまで読む
+
+            ir_distance = (*ir_serial).readStringUntil('c').toInt(); // cまで読む
+
+            if (ir_deg == -1)
+                ir_exist = false;
+            else
+            {
+                ir_exist = true;
+                ir_deg = (ir_deg - 358 + 360) % 360; // 調整
             }
         }
         else // そうでないならゴミのバッファ

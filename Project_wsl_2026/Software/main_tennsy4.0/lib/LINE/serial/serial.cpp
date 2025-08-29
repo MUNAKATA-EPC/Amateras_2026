@@ -21,6 +21,7 @@ void LINE_init(HardwareSerial *serial, uint32_t baudrate)
 
 void LINE_serial_update()
 {
+    /*
     // バッファに1フレーム分以上ある限りループ（3バイトデータ + 1同期ヘッダー）
     while ((*line_serial).available() >= 3 + 1) // seeeduinoxiaoからの3つのデータと1つの同期ヘッダーが溜まっているなら
     {
@@ -43,11 +44,17 @@ void LINE_serial_update()
             (*line_serial).read(); // ブッファを捨てる
         }
     }
+    */
 
-    /*while ((*line_serial).available() > 0)
+    while ((*line_serial).available() > 0) // 多めのデータがたまっていたら
     {
-        lines_data_bit_mask = (*line_serial).readStringUntil('\n').toInt();
-    }*/
+        lines_data_bit_mask = (uint32_t)(*line_serial).readStringUntil('a').toInt(); // aまで読む
+
+        if (lines_data_bit_mask > 0) // 一個でも1があったら0より大きくなる
+            line_exist = true;
+        else
+            line_exist = false;
+    }
 }
 
 bool get_LINE_data(uint8_t index)
