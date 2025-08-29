@@ -14,10 +14,12 @@ void IR_update();
 bool is_IR_exist();
 
 // ボールの方向を出力
-int16_t get_IR_deg();
+int get_IR_deg();
 
 // ボールまでの距離を出力
-int16_t get_IR_distance();
+int get_IR_distance();
+
+// ボールの値を出力
+int get_IR_value();
 
 #endif
-

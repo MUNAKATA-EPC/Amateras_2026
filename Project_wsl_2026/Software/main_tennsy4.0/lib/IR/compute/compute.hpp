@@ -16,4 +16,7 @@ int get_IR_follow_deg(int follow_target_offset);
 // IRボールの角度に比例する角度を出力
 int get_IR_hirei_deg(double a);
 
+//距離の逆数に比例した値を出力
+int get_IR_hirei_distance(double a, int dist_adjust_value);
+
 #endif

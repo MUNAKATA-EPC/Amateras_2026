@@ -9,7 +9,7 @@ uint32_t ir_baudrate;      // ボートレート格納用
 
 bool ir_exist = false; // IRボールがあるかどうか
 int ir_deg = -1;       // IRボールの角度格納用
-int ir_distance = -1;  // IRボールの距離格納用
+int ir_value = -1;     // IRボールの値格納用
 
 void IR_init(HardwareSerial *serial, uint32_t baudrate)
 {
@@ -58,7 +58,7 @@ void IR_update()
 
             ir_deg = (*ir_serial).readStringUntil('b').toInt(); // bまで読む
 
-            ir_distance = (*ir_serial).readStringUntil('c').toInt(); // cまで読む
+            ir_value = (*ir_serial).readStringUntil('c').toInt(); // cまで読む
 
             if (ir_deg == -1)
                 ir_exist = false;
@@ -80,12 +80,20 @@ bool is_IR_exist()
     return ir_exist; // IRボールが存在するかどうかについてを返す
 }
 
-int16_t get_IR_deg()
+int get_IR_deg()
 {
     return ir_deg; // IRボールの角度を返す
 }
 
-int16_t get_IR_distance()
+int get_IR_distance()
 {
-    return ir_distance; // IRボールの距離を返す
+    if (!is_IR_exist())
+        return -1;
+
+    return 1023 - ir_value; // IRボールの距離を返す
+}
+
+int get_IR_value()
+{
+    return ir_value; // IRボールの値を返す
 }

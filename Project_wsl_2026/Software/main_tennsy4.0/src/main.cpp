@@ -58,13 +58,13 @@ void loop()
 
   if (is_now_selecting_ui()) // 今選んでる途中なら
   {
-    //Serial.println("Now selecting UI");
+    Serial.println("Now selecting UI");
 
     motors_break(); // モータは停止させる
   }
   else // 今選んだ
   {
-    play_pc_print(PS3_CHECK_WITH_PC); // 全て確認する
+    // play_pc_print(PS3_CHECK_WITH_PC); // 全て確認する
 
     switch (get_selected_ui_action())
     {

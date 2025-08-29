@@ -55,7 +55,7 @@ int get_IR_sessen_deg(double R, double dist_adjust_value)
     {
         int edge = (get_IR_deg() + 360 - 270) % 360; // x軸正の方向を0度とする
 
-        double rad_edge = radians(edge);                                         // ラジアンの角度を計算
+        double rad_edge = radians(edge);      // ラジアンの角度を計算
         double rad_dif_edge = asin(R / dist); // ± asin(ballR ÷ IRdist)
 
         int sessen_angle1 = int(degrees(rad_edge + rad_dif_edge)); // 接点1を求める
@@ -106,4 +106,14 @@ int get_IR_hirei_deg(double a)
     IR_hirei_deg = (IR_hirei_deg + 360) % 360;             // 一応0~360に直す
 
     return IR_hirei_deg; // 比例角度を返す
+}
+
+int get_IR_hirei_distance(double a, int dist_adjust_value)
+{
+    int value = get_IR_value() + dist_adjust_value; // 近ければ大きく、遠ければ小さくする
+
+    if (value < 0 || value < 60) // ボールが明らかに遠かったら0を返す
+        return 0;
+
+    return int(a * value);
 }
