@@ -7,9 +7,10 @@ const uint8_t head_byte = 0xAA; // 同期ヘッダー格納用
 HardwareSerial *ir_serial; // とりあえず定義
 uint32_t ir_baudrate;      // ボートレート格納用
 
-bool ir_exist = false; // IRボールがあるかどうか
-int ir_deg = -1;       // IRボールの角度格納用
-int ir_value = -1;     // IRボールの値格納用
+bool ir_exist = false;    // IRボールがあるかどうか
+int16_t ir_deg = -1;      // IRボールの角度格納用
+int16_t ir_distance = -1; // IRボールの距離格納用
+int16_t ir_value = -1;    // IRボールの値格納用
 
 void IR_init(HardwareSerial *serial, uint32_t baudrate)
 {
@@ -46,9 +47,17 @@ void IR_update()
             ir_value = int16_t((uint16_t(high2) << 8) | uint16_t(low2)); // 上位バイトと下位バイトをつなげる
 
             if (ir_deg == -1)
+            {
                 ir_exist = false;
+
+                ir_distance = -1;
+            }
             else
+            {
                 ir_exist = true;
+
+                ir_distance = map(constrain(ir_value, 0, 300), 0, 300, 300, 0); // 0~300を300~0にするそれを距離とする
+            }
         }
         else // そうでないならゴミのバッファ
         {
@@ -69,10 +78,7 @@ int get_IR_deg()
 
 int get_IR_distance()
 {
-    if (!is_IR_exist())
-        return -1;
-
-    return 1023 - ir_value; // IRボールの距離を返す（送信側の値仕様に依存）
+    return ir_distance; // IRボールの距離を返す
 }
 
 int get_IR_value()
