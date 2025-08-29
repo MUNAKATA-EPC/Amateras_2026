@@ -38,30 +38,40 @@ void Ps3_init(HardwareSerial *serial, uint32_t baudrate)
 
 void Ps3_serial_update()
 {
-    // バッファに1フレーム分以上ある限りループ（6バイトデータ + 1同期ヘッダー）
-    while ((*ps3_serial).available() >= 6 + 1) // m5stamp-picoからの6つのデータと1つの同期ヘッダーが溜まっているなら
+    // バッファに1フレーム分以上ある限りループ（6バイトデータ + 1同期ヘッダー = 7バイト）
+    while ((*ps3_serial).available() >= 7)
     {
-        if ((*ps3_serial).peek() == head_byte) // 最初のブッファが同期ヘッダーなら
+        // --- 同期ズレ対策: ヘッダーが出るまで捨てる ---
+        while ((*ps3_serial).available() > 0 && (*ps3_serial).peek() != head_byte)
         {
-            (*ps3_serial).read(); // 同期ヘッダーを捨てる
-
-            ps3_stick_lx = (*ps3_serial).read();                // 左ステックのx座標を読み取る(-128~127)
-            ps3_stick_ly = (int8_t)(-(*ps3_serial).read() - 1); // 左ステックのy座標を読み取る(-128~127)
-            ps3_stick_rx = (*ps3_serial).read();                // 右ステックのx座標を読み取る(-128~127)
-            ps3_stick_ry = (int8_t)(-(*ps3_serial).read() - 1); // 右ステックのy座標を読み取る(-128~127)
-
-            uint8_t low = (*ps3_serial).read();                                // ボタンの下位バイトを読み取る
-            uint8_t high = (*ps3_serial).read();                               // ボタンの上位バイトを読み取る
-            ps3_buttons_data_bit_mask = (uint16_t(high) << 8) | uint16_t(low); // 上位バイトと下位バイトをつなげる
+            (*ps3_serial).read(); // ゴミを捨てる
         }
-        else // そうでないならゴミのバッファ
+
+        if ((*ps3_serial).available() < 7)
+            break; // まだ7バイト揃っていなければ抜ける
+
+        if ((*ps3_serial).peek() == head_byte) // ヘッダー確認
         {
-            (*ps3_serial).read(); // ブッファを捨てる
+            (*ps3_serial).read(); // ヘッダーを捨てる
+
+            // 順に読み取り
+            ps3_stick_lx = (int8_t)(*ps3_serial).read();        // 左ステックX (-128~127)
+            ps3_stick_ly = (int8_t)(-(*ps3_serial).read() - 1); // 左ステックY
+            ps3_stick_rx = (int8_t)(*ps3_serial).read();        // 右ステックX
+            ps3_stick_ry = (int8_t)(-(*ps3_serial).read() - 1); // 右ステックY
+
+            uint8_t low = (*ps3_serial).read();                      // ボタン下位バイト
+            uint8_t high = (*ps3_serial).read();                     // ボタン上位バイト
+            ps3_buttons_data_bit_mask = (uint16_t(high) << 8) | low; // 16bit にまとめる
+        }
+        else
+        {
+            (*ps3_serial).read(); // ゴミを捨てる
         }
     }
 }
 
-int8_t get_Ps3_stick_lx()
+int get_Ps3_stick_lx()
 {
     if (abs(ps3_stick_lx) > ps3_stick_lx_adjust)
         return ps3_stick_lx; // 左スティックのx方向を返す
@@ -69,7 +79,7 @@ int8_t get_Ps3_stick_lx()
     return 0; // 調整値以下なので0を返す
 }
 
-int8_t get_Ps3_stick_ly()
+int get_Ps3_stick_ly()
 {
     if (abs(ps3_stick_ly) > ps3_stick_ly_adjust)
         return ps3_stick_ly; // 左スティックのy方向を返す
@@ -77,7 +87,7 @@ int8_t get_Ps3_stick_ly()
     return 0; // 調整値以下なので0を返す
 }
 
-int8_t get_Ps3_stick_rx()
+int get_Ps3_stick_rx()
 {
     if (abs(ps3_stick_rx) > ps3_stick_rx_adjust)
         return ps3_stick_rx; // 右スティックのx方向を返す
@@ -85,7 +95,7 @@ int8_t get_Ps3_stick_rx()
     return 0; // 調整値以下なので0を返す
 }
 
-int8_t get_Ps3_stick_ry()
+int get_Ps3_stick_ry()
 {
     if (abs(ps3_stick_ry) > ps3_stick_ry_adjust)
         return ps3_stick_ry; // 右スティックのy方向を返す

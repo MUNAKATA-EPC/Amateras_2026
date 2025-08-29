@@ -30,34 +30,41 @@ int16_t read_int16_from_serial()
 {
     uint8_t low  = (uint8_t)(*camera_serial).read();
     uint8_t high = (uint8_t)(*camera_serial).read();
-    int16_t value = (int16_t)((high << 8) | low);
-
-    return value;
+    return (int16_t)((high << 8) | low);
 }
 
 void Camera_update()
 {
-    // バッファに1フレーム分以上ある限りループ（10バイトデータ + 1同期ヘッダー）
-    while ((*camera_serial).available() >= 10 + 1) // openmvからの10個のデータと1つの同期ヘッダーが溜まっているなら
+    // バッファに1フレーム分以上ある限りループ（10バイトデータ + 1同期ヘッダー = 11バイト）
+    while ((*camera_serial).available() >= 11)
     {
-        if ((*camera_serial).peek() == head_byte) // 最初のブッファが同期ヘッダーなら
+        // --- 同期ズレ対策: ヘッダーが出るまで捨てる ---
+        while ((*camera_serial).available() > 0 && (*camera_serial).peek() != head_byte)
         {
-            (*camera_serial).read(); // 同期ヘッダーを捨てる
-
-            field_deg = read_int16_from_serial();            // コートの角度
-            yellow_goal_deg = read_int16_from_serial();      // 黄色ゴールの角度
-            yellow_goal_distance = read_int16_from_serial(); // 黄色ゴールの距離
-            blue_goal_deg = read_int16_from_serial();        // 青ゴールの角度
-            blue_goal_distance = read_int16_from_serial();   // 青ゴールの距離
-
-            // それぞれあるかどうか判定
-            field_exist = (field_deg != -1);                  // コートが見えるかどうか
-            yellow_goal_exist = (yellow_goal_distance != -1); // 黄色ゴールが見えるかどうか
-            blue_goal_exist = (blue_goal_distance != -1);     // 青ゴールが見えるかどうか
+            (*camera_serial).read(); // ゴミを捨てる
         }
-        else // そうでないならゴミのバッファ
+
+        if ((*camera_serial).available() < 11) break; // まだ11バイト揃っていなければ抜ける
+
+        if ((*camera_serial).peek() == head_byte) // ヘッダー確認
         {
-            (*camera_serial).read(); // ブッファを捨てる
+            (*camera_serial).read(); // ヘッダーを捨てる
+
+            // 順に読み取り
+            field_deg          = read_int16_from_serial();  // コートの角度
+            yellow_goal_deg    = read_int16_from_serial();  // 黄色ゴールの角度
+            yellow_goal_distance = read_int16_from_serial();// 黄色ゴールの距離
+            blue_goal_deg      = read_int16_from_serial();  // 青ゴールの角度
+            blue_goal_distance = read_int16_from_serial();  // 青ゴールの距離
+
+            // 存在フラグ更新
+            field_exist        = (field_deg != -1);
+            yellow_goal_exist  = (yellow_goal_distance != -1);
+            blue_goal_exist    = (blue_goal_distance != -1);
+        }
+        else
+        {
+            (*camera_serial).read(); // 不要データ捨てる
         }
     }
 }
@@ -67,7 +74,7 @@ bool is_field_exist()
     return field_exist; // コートが見えるかどうかについてを返す
 }
 
-int16_t get_field_deg()
+int get_field_deg()
 {
     return field_deg; // コートの角度を返す
 }
@@ -77,12 +84,12 @@ bool is_yellow_goal_exist()
     return yellow_goal_exist; // 黄色ゴールが見えるかどうかについて返す
 }
 
-int16_t get_yellow_goal_deg()
+int get_yellow_goal_deg()
 {
     return yellow_goal_deg; // 黄色ゴールの角度を返す
 }
 
-int16_t get_yellow_goal_distance()
+int get_yellow_goal_distance()
 {
     return yellow_goal_distance; // 黄色ゴールの距離を返す
 }
@@ -92,12 +99,12 @@ bool is_blue_goal_exist()
     return blue_goal_exist; // 青色ゴールが見えるかどうかについて返す
 }
 
-int16_t get_blue_goal_deg()
+int get_blue_goal_deg()
 {
     return blue_goal_deg; // 青色ゴールの角度を返す
 }
 
-int16_t get_blue_goal_distance()
+int get_blue_goal_distance()
 {
     return blue_goal_distance; // 青色ゴールの距離を返す
 }

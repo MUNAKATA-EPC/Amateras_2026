@@ -14,16 +14,16 @@ void Ps3_serial_update();
 // 左スティックが触られたかどうか
 bool is_Ps3_stick_left_move();
 // 左ステックのX方向を出力
-int8_t get_Ps3_stick_lx();
+int get_Ps3_stick_lx();
 // 左ステックのY方向を出力
-int8_t get_Ps3_stick_ly();
+int get_Ps3_stick_ly();
 
 // 右スティックが触られたかどうか
 bool is_Ps3_stick_right_move();
 // 右ステックのX方向を出力
-int8_t get_Ps3_stick_rx();
+int get_Ps3_stick_rx();
 // 右ステックのY方向を出力
-int8_t get_Ps3_stick_ry();
+int get_Ps3_stick_ry();
 
 // buttonのデータを出力
 bool get_Ps3_button_data(uint8_t index);

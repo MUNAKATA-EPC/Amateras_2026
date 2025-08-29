@@ -16,57 +16,39 @@ void IR_init(HardwareSerial *serial, uint32_t baudrate)
     ir_serial = serial;
     ir_baudrate = baudrate;
     (*ir_serial).begin(ir_baudrate); // ボートレート定義
-    (*ir_serial).setTimeout(10);     // 10msでタイムアウト
+    // (*ir_serial).setTimeout(10);
 }
 
 void IR_update()
 {
-    /*
-    // バッファに1フレーム分以上ある限りループ（4バイトデータ + 1同期ヘッダー）
-    while ((*ir_serial).available() >= 4 + 1) // seeeduinoxiaoからの4つのデータと1つの同期ヘッダーが溜まっているなら
+    // バッファに1フレーム分以上ある限りループ（4バイトデータ + 1同期ヘッダー = 5バイト）
+    while ((*ir_serial).available() >= 5) // seeeduinoxiaoからの4つのデータと1つの同期ヘッダーが溜まっているなら
     {
+        // --- 同期ズレ対策: ヘッダー(0xAA)が出るまでゴミを捨てる ---
+        while ((*ir_serial).available() > 0 && (*ir_serial).peek() != head_byte)
+        {
+            (*ir_serial).read(); // ゴミを捨てる
+        }
+
+        if ((*ir_serial).available() < 5)
+            break; // まだ5バイト揃っていなければ抜ける
+
         if ((*ir_serial).peek() == head_byte) // 最初のブッファが同期ヘッダーなら
         {
             (*ir_serial).read(); // 同期ヘッダーを捨てる
 
             uint8_t low1 = (*ir_serial).read();                        // ボールの角度の下位バイトを読み取る
             uint8_t high1 = (*ir_serial).read();                       // ボールの角度の上位バイトを読み取る
-            ir_deg = int16_t((uint16_t(high1) << 8) | uint16_t(low1)); // 上位バイトと下位バイトをつなげる(もともとはint16_tなのでキャストで戻す)
+            ir_deg = int16_t((uint16_t(high1) << 8) | uint16_t(low1)); // 上位バイトと下位バイトをつなげる
 
-            uint8_t low2 = (*ir_serial).read();                             // ボールの距離の下位バイトを読み取る
-            uint8_t high2 = (*ir_serial).read();                            // ボールの距離の上位バイトを読み取る
-            ir_distance = int16_t((uint16_t(high2) << 8) | uint16_t(low2)); // 上位バイトと下位バイトをつなげる(もともとはint16_tなのでキャストで戻す)
-
-            if (ir_deg == -1)
-                ir_exist = false;
-            else
-            {
-                ir_exist = true;
-            }
-        }
-        else // そうでないならゴミのバッファ
-        {
-            (*ir_serial).read(); // ブッファを捨てる
-        }
-    }
-    */
-    while ((*ir_serial).available() >= 2 + 2 + 2) // 角度・距離は1バイト以上だけど多めのデータがたまっていたら
-    {
-        if ((*ir_serial).peek() == 'a') // 最初のブッファが'a'
-        {
-            (*ir_serial).read(); // 同期ヘッダーを捨てる
-
-            ir_deg = (*ir_serial).readStringUntil('b').toInt(); // bまで読む
-
-            ir_value = (*ir_serial).readStringUntil('c').toInt(); // cまで読む
+            uint8_t low2 = (*ir_serial).read();                          // ボールの値の下位バイトを読み取る
+            uint8_t high2 = (*ir_serial).read();                         // ボールの値の上位バイトを読み取る
+            ir_value = int16_t((uint16_t(high2) << 8) | uint16_t(low2)); // 上位バイトと下位バイトをつなげる
 
             if (ir_deg == -1)
                 ir_exist = false;
             else
-            {
                 ir_exist = true;
-                ir_deg = (ir_deg - 358 + 360) % 360; // 調整
-            }
         }
         else // そうでないならゴミのバッファ
         {
@@ -90,7 +72,7 @@ int get_IR_distance()
     if (!is_IR_exist())
         return -1;
 
-    return 1023 - ir_value; // IRボールの距離を返す
+    return 1023 - ir_value; // IRボールの距離を返す（送信側の値仕様に依存）
 }
 
 int get_IR_value()
