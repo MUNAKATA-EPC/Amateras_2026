@@ -78,7 +78,7 @@ void LINE_compute_update()
             line_y += sin(radians(180.0));
         }
 
-        line_deg = (int)degrees(atan2(line_y, line_x));
+        line_deg = (int)round(degrees(atan2(line_y, line_x)));
         if (line_deg < 0)
             line_deg += 360;
         line_distance = double(line_x * line_x + line_y * line_y);

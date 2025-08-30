@@ -18,10 +18,7 @@ void play_attacker(bool use_yellow_cam, bool use_blue_cam, int motor_power)
     /*PD制御*/
     if (use_yellow_cam)
     {
-        if (is_IR_exist_front && get_IR_value() > 185)
-            PD_use_yellow_goal(); // 黄色ゴールをPD制御に使う
-        else
-            PD_use_gyro(0);
+        PD_use_yellow_goal(); // 黄色ゴールをPD制御に使う
     }
     else if (use_blue_cam)
     {
@@ -75,7 +72,7 @@ void play_attacker(bool use_yellow_cam, bool use_blue_cam, int motor_power)
                 else
                     mawarikomi_deg = (get_IR_deg() - diff_deg + 360) % 360;
 
-                Serial.println(diff_deg);
+                // Serial.println(diff_deg);
 
                 motors_move(mawarikomi_deg, motor_power);
             }
