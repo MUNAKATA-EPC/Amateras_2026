@@ -7,6 +7,9 @@ const int head_byte = 0xAA; // 同期ヘッダー格納用
 
 const int IRsensor_pin[16] = {0, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1}; // 前から反時計回りに指定
 
+const double ir_gain = 0.9;
+const double ir_adjust = -70;
+
 int IRsensor_value[16]; // IRセンサーの値を格納
 int IRsensor_min_index; // IRセンサーで最も反応の小さいセンサーの配列番号
 
@@ -30,7 +33,7 @@ void loop()
   IRsensor_min_index = 0; // 初期化
   for (uint8_t i = 0; i < 16; i++)
   {
-    IRsensor_value[i] = ir_mux.read(IRsensor_pin[i]);
+    IRsensor_value[i] = constrain(ir_mux.read(IRsensor_pin[i]) * ir_gain + ir_adjust, 0, 1023);
 
     if (IRsensor_value[i] < IRsensor_value[IRsensor_min_index])
       IRsensor_min_index = i;
@@ -63,7 +66,7 @@ void loop()
 
     double IRball_deg_sub = degrees(atan2(IRball_of_y, IRball_of_x)); // 角度を算出
     IRball_deg_sub = (IRball_deg_sub < 0) ? IRball_deg_sub + 360 : IRball_deg_sub;
-    IRball_deg = (int)IRball_deg_sub;
+    IRball_deg = (int)round(IRball_deg_sub);
     // IRball_distance = (int)(map(IRsensor_value[IRsensor_min_index], 0, 1023, 0, 200));
     // IRball_distance = pow(IRball_distance, 1.35);
     // IRball_distance = constrain(IRball_distance, 0, 1023);
@@ -75,9 +78,9 @@ void loop()
   }
 
   /*送信*/
-  Serial1.write(head_byte);                       // teensyとの通信開始
-  Serial1.write((uint8_t)IRball_deg);             // 2byteのデータなので下位の1byteのみ送信
-  Serial1.write((uint8_t)(IRball_deg >> 8));      // 2byteのデータなので上位の1byteのみ送信
+  Serial1.write(head_byte);                    // teensyとの通信開始
+  Serial1.write((uint8_t)IRball_deg);          // 2byteのデータなので下位の1byteのみ送信
+  Serial1.write((uint8_t)(IRball_deg >> 8));   // 2byteのデータなので上位の1byteのみ送信
   Serial1.write((uint8_t)IRball_value);        // 2byteのデータなので下位の1byteのみ送信
   Serial1.write((uint8_t)(IRball_value >> 8)); // 2byteのデータなので上位の1byteのみ送信
 
