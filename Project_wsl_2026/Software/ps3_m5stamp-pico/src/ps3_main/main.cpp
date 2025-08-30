@@ -22,7 +22,7 @@ void setup()
   Ps3.attach(data_update);               // PS3のどれが反応すると呼ばれる関数
   Ps3.attachOnConnect(connect_success);  // 接続されたときに呼び出す関数
   Ps3.attachOnDisconnect(connect_false); // 切断されたときに呼び出す関数
-  Ps3.begin("4C:75:25:C4:14:F2");        // ps3_setupで取得したアドレスを記入
+  Ps3.begin("E8:6B:EA:31:0A:3A");        // ps3_setupで取得したアドレスを記入
   // 白コントローラー : E8:6B:EA:31:0A:3A
   // 黒コントローラー : 4C:75:25:C4:14:F2
 
@@ -39,8 +39,6 @@ void loop()
   Serial.write(stick_ry);                   // 右ステックのy座標を送信
   Serial.write(buttons_data_bit_mask);      // 2byteのデータなので下位の1byteのみ送信
   Serial.write(buttons_data_bit_mask >> 8); // 8bit分右にシフトして上位の1byteを送信
-
-  Serial.flush(); // 送信バッファがなくなるまで、つまり全て送信するまで待つ
 
   delay(10); // 10ms待機
 }
