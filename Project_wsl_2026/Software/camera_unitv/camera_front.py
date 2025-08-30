@@ -8,9 +8,9 @@ lcd.init()
 fm.register(35, fm.fpioa.UART1_TX, force=True)
 fm.register(34, fm.fpioa.UART1_RX, force=True)
 uart = UART(UART.UART1, 115200, 8, None, 1, timeout=1000)
-
-goal_yellow = (51, 25, -9, -49, 25, -53)
-goal_blue   = (51, 25, -9, -49, 25, -53)
+#(0, 100, -128, 127, -128, 127) <- スライダーリセットの時の値
+goal_yellow = (44, 61, -7, 17, 28, 109)
+goal_blue   = (44, 61, -7, 17, 28, 109)
 screen_center = [160, 120]  # 中央座標
 
 sensor.reset(dual_buff=True)
@@ -72,19 +72,50 @@ while True:
         blue_dir = calc_angle(cx)
 
     # ==================== Teensyへ送信 ====================
-    #send_str = "%da%db%dc%dd%de\n" % (
-    #   court_dir, yellow_dir, yellow_dis, blue_dir, blue_dis
-    #)
-    uart.write(str(court_dir))
-    uart.write("a")
-    uart.write(str(yellow_dir))
-    uart.write("b")
-    uart.write(str(yellow_dis))
-    uart.write("c")
-    uart.write(str(blue_dir))
-    uart.write("d")
-    uart.write(str(blue_dis))
-    uart.write("e")
+    # 角度を0~360度の範囲に正規化（UART送信前）
+    if court_dir != -1:
+        court_dir = (court_dir + 360) % 360
+        court_dir = 360.0 - court_dir
+    else:
+        court_dir = -1
+
+    if yellow_dir != -1:
+        yellow_dir = (yellow_dir + 360) % 360
+        yellow_dir = 360 - yellow_dir
+    else:
+        yellow_dir = -1
+
+    if blue_dir != -1:
+        blue_dir = (blue_dir + 360) % 360
+        blue_dir = 360 - blue_dir
+    else:
+        blue_dir = -1
+
+    # すべて整数に変換
+    court_dir = int(court_dir)
+    yellow_dir = int(yellow_dir)
+    yellow_dis = int(yellow_dis)
+    blue_dir = int(blue_dir)
+    blue_dis = int(blue_dis)
+
+    #2バイトのデータのなので1バイトずつ送る
+    # 送信したい値をintにしてバイナリ送信
+    def send_int16(uart, value):
+        if value == -1:
+            value = 0xFFFF
+        low = value & 0xFF
+        high = (value >> 8) & 0xFF
+        uart.write(bytearray([low, high]))  # low -> high
+
+    # 同期ヘッダー送信
+    uart.write(bytearray([0xAA]))
+
+    # バイナリで送信
+    send_int16(uart, court_dir)
+    send_int16(uart, yellow_dir)
+    send_int16(uart, yellow_dis)
+    send_int16(uart, blue_dir)
+    send_int16(uart, blue_dis)
 
     print("court:%d yellow:%d dist:%d blue:%d dist:%d" %
           (court_dir, yellow_dir, yellow_dis, blue_dir, blue_dis))
