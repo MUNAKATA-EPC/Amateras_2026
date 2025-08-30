@@ -6,7 +6,7 @@
 #define LINE_SIDE_LEFT_PIN 9  // 左サイド
 #define LINE_SIDE_BACK_PIN 10 // 後サイド
 
-#define LINE_ANGEL_JUDGE_VALUE 70 // エンジェルライン判定用の値
+#define LINE_ANGEL_JUDGE_VALUE 40 // エンジェルライン判定用の値
 #define LINE_SIDE_JUDGE_VALUE 790 // サイドライン判定用の値
 
 const uint8_t head_byte = 0xAA; // 同期ヘッダー格納用

@@ -21,7 +21,7 @@ void loop()
         Serial.print(i);
         Serial.print(":");
         Serial.print(line_mux.read(i));
-        Serial.print("\t,");
+        Serial.print(",");
     }
     Serial.print("\n");
 
