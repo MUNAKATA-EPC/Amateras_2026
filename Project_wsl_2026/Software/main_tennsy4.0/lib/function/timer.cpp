@@ -8,7 +8,7 @@ void Timer::reset() /// タイマーを初期化、0からカウントを始め�
     _is_timer_stop = false; // リセットしたら必ず動く状態にする
 }
 
-int Timer::get_time() // タイマーからの時間を取得
+unsigned long Timer::get_time() // タイマーからの時間を取得
 {
     if (!_first_call) // 今まで呼ばれたことがなかったなら
         _first_call = true;

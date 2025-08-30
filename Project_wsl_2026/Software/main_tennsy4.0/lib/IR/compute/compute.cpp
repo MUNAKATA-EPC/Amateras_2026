@@ -48,9 +48,9 @@ int get_IR_mawarikomi_deg()
 
 // 角度の算出方法について : https://www.desmos.com/calculator/c0nzjtscrs?lang=ja
 // ロボットは原点にして障害物（円）との接線をIRedge[rad] ± asin(ballR / IRdist)で求める方式
-int get_IR_sessen_deg(double R, double dist_adjust_value)
+int get_IR_sessen_deg(double R, double adjust)
 {
-    int dist = get_IR_distance() + dist_adjust_value;
+    int dist = get_IR_distance() + adjust;
     if (dist > R) // 接線が存在する場合  ->  && !LeftBack_and_RightBack
     {
         int edge = (get_IR_deg() + 360 - 270) % 360; // x軸正の方向を0度とする
@@ -108,9 +108,9 @@ int get_IR_hirei_deg(double a)
     return IR_hirei_deg; // 比例角度を返す
 }
 
-int get_IR_hirei_distance(double a, int dist_adjust_value)
+int get_IR_hirei_value(double a, double adjust)
 {
-    int value = get_IR_value() + dist_adjust_value; // 近ければ大きく、遠ければ小さくする
+    int value = get_IR_value() + adjust; // 近ければ大きく、遠ければ小さくする
 
     if (value < 0 || value < 60) // ボールが明らかに遠かったら0を返す
         return 0;

@@ -59,8 +59,8 @@ void Camera_update()
 
             // 存在フラグ更新
             field_exist        = (field_deg != -1);
-            yellow_goal_exist  = (yellow_goal_distance != -1);
-            blue_goal_exist    = (blue_goal_distance != -1);
+            yellow_goal_exist  = (yellow_goal_deg != -1);
+            blue_goal_exist    = (blue_goal_deg != -1);
         }
         else
         {

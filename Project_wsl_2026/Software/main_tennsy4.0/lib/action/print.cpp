@@ -142,7 +142,7 @@ void play_lcd_print(int lcd_print_mode, int ahead_x, int ahead_y)
         // IRについて
         sprintf(buf, "ir_deg: %d", get_IR_deg());
         SSD1306_write(1, 0 + ahead_x, 0 + ahead_y, buf, false);
-        sprintf(buf, "ir_val: %d", get_IR_value());
+        sprintf(buf, "ir_deg: %d", get_IR_distance());
         SSD1306_write(1, 0 + ahead_x, 10 + ahead_y, buf, false);
 
         // LINEについて

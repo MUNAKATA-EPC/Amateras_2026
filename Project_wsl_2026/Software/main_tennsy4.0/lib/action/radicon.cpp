@@ -6,6 +6,8 @@
 
 void play_radicon(int motor_power)
 {
+    bool is_IR_exist_front = is_IR_exist() && ((get_IR_deg() <= 11) || (get_IR_deg() >= 349)); // 前にボールがあるかどうか格納
+
     /*PD制御*/
     if (is_Ps3_stick_right_move()) // 右ステックが倒されたならば
         PD_use_gyro(get_Ps3_stick_right_deg());
@@ -15,7 +17,7 @@ void play_radicon(int motor_power)
     /*キッカー制御*/
     if (get_Ps3_button_r1() || get_Ps3_button_r2())
         kicker_kick(true); // ボタンが反応したら蹴る
-    else if (is_IR_exist() && ((get_IR_deg() < 3) || (get_IR_deg() > 357)) && get_IR_distance() < 300 && get_selected_ui_setting(KICK_AUTO_INDEX))
+    else if (is_IR_exist_front && get_IR_distance() <= 16 && get_selected_ui_setting(KICK_AUTO_INDEX))
         kicker_kick(true); // 前付近で近くのボールがありsettingで有効ならば蹴る
     else
         kicker_kick(false); // 蹴らない
@@ -39,17 +41,39 @@ void play_radicon(int motor_power)
     {
         if (is_IR_exist()) // IRボールがあるならば
         {
-            if ((get_IR_deg() <= 3) || (get_IR_deg() >= 357)) // 前にブールがあるならば
+            if (is_IR_exist_front) // 前にボールがあるならば
             {
                 motors_move(0, motor_power); // 前進する
             }
-            else if (((get_IR_deg() <= 80) || (get_IR_deg() >= 280)) && get_IR_distance() < 290) // 前付近にボールがあるならば
+            else if (((get_IR_deg() <= 40) || (get_IR_deg() >= 320)) && get_IR_distance() < 25) // 前付近にボールがあるならば
             {
-                motors_move(get_IR_hirei_deg(2.7), motor_power);
+                motors_move(get_IR_hirei_deg(2.47), motor_power);
             }
             else
             {
-                motors_move(get_IR_sessen_deg(80, -150), motor_power);
+                /*方法1*/
+                // motors_move(get_IR_sessen_deg(85, -150), motor_power);
+
+                /*方法2*/
+                /*
+                if (get_IR_distance() < 300)
+                    motors_move(get_IR_mawarikomi_deg(), motor_power);
+                else
+                    motors_move(get_IR_follow_deg(0), motor_power);
+                */
+
+                /*方法3*/
+                int mawarikomi_deg;
+                int diff_deg = get_IR_hirei_value(0.226, 0); // 差を格納
+
+                if (get_IR_deg() < 180) // 左にボールがある場合
+                    mawarikomi_deg = (get_IR_deg() + diff_deg + 360) % 360;
+                else
+                    mawarikomi_deg = (get_IR_deg() - diff_deg + 360) % 360;
+
+                // Serial.println(diff_deg);
+
+                motors_move(mawarikomi_deg, motor_power);
             }
         }
         else

@@ -17,7 +17,7 @@ public:
     void reset();
 
     // タイマーからの時間を取得
-    int get_time();
+    unsigned long get_time();
 
     // タイマーを一時停止させる
     void stop();

@@ -17,7 +17,7 @@ public:
     double get_x() const;           // xを出力
     double get_y() const;           // yを出力
     int get_deg() const;            // ベクトルの方向を出力(0~360)
-    double Vector::get_rad() const; // ラジアンで出力
+    double get_rad() const; // ラジアンで出力
     double get_length() const;      // ベクトルの大きさを出力
 
     Vector operator+(const Vector &other) const; // ベクトル同士の足し算

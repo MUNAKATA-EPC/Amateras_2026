@@ -13,7 +13,7 @@ int compute_deg_diff(int a, int b)
 
 void play_attacker(bool use_yellow_cam, bool use_blue_cam, int motor_power)
 {
-    bool is_IR_exist_front = is_IR_exist() && ((get_IR_deg() <= 9) || (get_IR_deg() >= 351)); // 前にボールがあるかどうか格納
+    bool is_IR_exist_front = is_IR_exist() && ((get_IR_deg() <= 11) || (get_IR_deg() >= 349)); // 前にボールがあるかどうか格納
 
     /*PD制御*/
     if (use_yellow_cam)
@@ -31,7 +31,7 @@ void play_attacker(bool use_yellow_cam, bool use_blue_cam, int motor_power)
     }
 
     /*キッカー制御*/
-    kicker_kick(is_IR_exist_front && get_IR_value() > 185); // キャッチセンサーが反応したら蹴る
+    // kicker_kick(is_IR_exist_front && get_IR_value() > 185); // キャッチセンサーが反応したら蹴る
 
     /*ロボット制御*/
     if (is_LINE_exist()) // ラインがあるならば
@@ -46,9 +46,9 @@ void play_attacker(bool use_yellow_cam, bool use_blue_cam, int motor_power)
             {
                 motors_move(0, motor_power); // 前進する
             }
-            else if (((get_IR_deg() <= 40) || (get_IR_deg() >= 320)) && get_IR_distance() < 300) // 前付近にボールがあるならば
+            else if (((get_IR_deg() <= 40) || (get_IR_deg() >= 320)) && get_IR_distance() < 25) // 前付近にボールがあるならば
             {
-                motors_move(get_IR_hirei_deg(2.15), motor_power);
+                motors_move(get_IR_hirei_deg(2.47), motor_power);
             }
             else
             {
@@ -65,7 +65,7 @@ void play_attacker(bool use_yellow_cam, bool use_blue_cam, int motor_power)
 
                 /*方法3*/
                 int mawarikomi_deg;
-                int diff_deg = get_IR_hirei_distance(0.32, 0); // 差を格納
+                int diff_deg = get_IR_hirei_value(0.226, 0); // 差を格納
 
                 if (get_IR_deg() < 180) // 左にボールがある場合
                     mawarikomi_deg = (get_IR_deg() + diff_deg + 360) % 360;
