@@ -1,5 +1,7 @@
-#include "IR/IR.hpp"
-#include "LINE/LINE.hpp"
+#include "action.hpp"
+#include "driver.hpp"
+#include "function.hpp"
+#include "sensor.hpp"
 
 void setup()
 {
