@@ -1,0 +1,42 @@
+#######################################
+# key mapping for motor library
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+RPmotor	KEYWORD1
+RPlib	KEYWORD1
+
+#######################################
+# Funciones (KEYWORD2)
+#######################################
+
+cw	KEYWORD2
+ccw		KEYWORD2
+free	KEYWORD2
+brake	KEYWORD2
+
+#######################################
+# Instancias (KEYWORD2)
+#######################################
+
+#######################################
+# Constantes (LITERAL1)
+MC1 LITERAL1
+MC2 LITERAL1
+MC3 LITERAL1
+MC0 LITERAL1
+D0 LITERAL1
+D1 LITERAL1
+D2 LITERAL1
+D3 LITERAL1
+A0 LITERAL1
+A1 LITERAL1
+A2 LITERAL1
+A3 LITERAL1
+
+
+#######################################
+

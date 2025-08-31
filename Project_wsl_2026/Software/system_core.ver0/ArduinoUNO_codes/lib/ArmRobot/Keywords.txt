@@ -1,0 +1,51 @@
+#######################################
+# Syntax Coloring Map ArmRobot
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+ArmRobot	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+setup	KEYWORD2
+setPosition	KEYWORD2
+setServoSpeed	KEYWORD2
+gripperCatch	KEYWORD2
+gripperRelease	KEYWORD2
+penUp	KEYWORD2
+penDown	KEYWORD2
+setXYZ	KEYWORD2
+traceLine	KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+ARM_A                   LITERAL1
+ARM_B                   LITERAL1
+ARM_2AB                 LITERAL1
+ARM_A2                  LITERAL1
+ARM_B2                  LITERAL1
+ARM_A2B2                LITERAL1
+ARM_STRETCH_MIN         LITERAL1
+ARM_STRETCH_MAX         LITERAL1
+ARM_HEIGHT_MIN          LITERAL1
+ARM_HEIGHT_MAX          LITERAL1
+ARM_ROTATION_MIN        LITERAL1
+ARM_ROTATION_MAX        LITERAL1
+GRIP_ROTATION_MIN       LITERAL1
+GRIP_ROTATION_MAX       LITERAL1
+GRIP_OPEN         LITERAL1
+GRIP_CLOSE        LITERAL1
+FIXED_OFFSET_L          LITERAL1
+FIXED_OFFSET_R          LITERAL1
+INIT_POS_L              LITERAL1
+INIT_POS_R              LITERAL1
+SERVO_GRIP              LITERAL1
+SERVO_ROT               LITERAL1
+SERVO_R                 LITERAL1
+SERVO_L                 LITERAL1
