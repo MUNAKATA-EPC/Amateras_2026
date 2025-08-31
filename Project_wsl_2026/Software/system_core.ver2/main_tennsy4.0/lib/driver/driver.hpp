@@ -1,4 +1,4 @@
-/*モーターやOLEDなどの制御*/
+/*モーターやディスプレイの制御*/
 #pragma once
 
 #include "kicker/kicker.hpp"
