@@ -5,16 +5,19 @@
 class IR
 {
 private:
-    HardwareSerial &_serial;
+    HardwareSerial *_serial;
     uint32_t _baudrate;
     uint8_t _frameHeader;
 
 public:
+    // コントラクタ
     IR();
-    IR(HardwareSerial &serial, uint32_t baudrate, uint8_t frameHeader);
 
-    void update(); // 更新・計算
+    // 関数
+    void init(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHeader); // 定義
+    void update();                                                             // 更新・計算
 
+    // 変数
     bool detected;
     int deg;
     int val;

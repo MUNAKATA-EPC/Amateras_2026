@@ -3,14 +3,23 @@
 #include "function.hpp"
 #include "sensor.hpp"
 
+// sensors
+DigitalSensor catchsensor;
+IR irball;
+LINE line;
+
 void setup()
 {
-    IR ir(Serial1, 115200, 0xAA);
-    LINE line(Serial2, 115200, 0xAA);
+    Serial.begin(9600);
+
+    catchsensor.init(6);
+    irball.init(&Serial1, 115200, 0xAA);
+    line.init(&Serial2, 115200, 0xAA);
 }
 
 void loop()
 {
-    ir.update();
-    line.update();
+    Serial.println(catchsensor.get());
+
+    delay(100);
 }
