@@ -5,6 +5,6 @@
 #include "LINE/LINE.hpp"
 #include "cam/openmv.hpp"
 #include "gyro/bno055.hpp"
-#include "DigitalSensor/DigitalSensor.hpp"
+#include "bitSensor/bitSensor.hpp"
 #include "button/button.hpp"
 #include "toggle/toggle.hpp"

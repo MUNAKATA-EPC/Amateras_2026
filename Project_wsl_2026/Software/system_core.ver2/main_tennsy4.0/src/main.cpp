@@ -4,7 +4,7 @@
 #include "sensor.hpp"
 
 // sensors
-DigitalSensor catchsensor;
+bitSensor catchsensor;
 IR irball;
 LINE line;
 

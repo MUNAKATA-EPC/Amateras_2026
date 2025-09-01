@@ -2,18 +2,18 @@
 
 #include <Arduino.h>
 
-class DigitalSensor
+class bitSensor
 {
 private:
     uint8_t _pin;
 
 public:
     // コントラクタ
-    DigitalSensor();
+    bitSensor();
 
     // 関数
     void init(uint8_t pin); // 定義
     bool get();             // 取得
 };
 
-extern DigitalSensor catchsensor;
+extern bitSensor catchsensor;
