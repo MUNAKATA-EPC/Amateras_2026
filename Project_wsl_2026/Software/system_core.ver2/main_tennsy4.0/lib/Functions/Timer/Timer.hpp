@@ -18,7 +18,7 @@ public:
     void start();
 
     // データの取得
-    unsigned long msTime();
+    unsigned long millis();
 
     bool isStopped() const { return _isStopped; }
     bool everCalled() const { return everCalled; }

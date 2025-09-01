@@ -24,7 +24,7 @@ void Timer::start()
     }
 }
 
-unsigned long Timer::msTime()
+unsigned long Timer::millis()
 {
     if (!_everCalled)
         _everCalled = true;
