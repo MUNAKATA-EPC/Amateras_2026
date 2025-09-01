@@ -9,19 +9,21 @@ private:
     uint32_t _baudrate;
     uint8_t _frameHeader;
 
-public:
-    // コントラクタ
-    IRSensor();
+    bool _detected;
+    int _deg;
+    int _val;
+    double _dis;
 
+public:
     // 関数
     void init(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHeader); // 定義
     void update();                                                             // 更新・計算
 
-    // 変数
-    bool detected;
-    int deg;
-    int val;
-    double dis;
+    // データの取得
+    bool detected() const { return _detected; }
+    int deg() const { return _deg; }
+    int val() const { return _val; }
+    double dis() const { return _dis; }
 };
 
 extern IRSensor ir;

@@ -8,9 +8,6 @@ private:
     uint8_t _pin;
 
 public:
-    // コントラクタ
-    DigitalSensor();
-
     // モード
     enum Mode
     {

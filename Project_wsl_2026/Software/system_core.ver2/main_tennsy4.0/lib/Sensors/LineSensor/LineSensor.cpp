@@ -1,7 +1,5 @@
 #include "LineSensor.hpp"
 
-LineSensor::LineSensor() {}
-
 void LineSensor::init(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHeader)
 {
     _serial = serial;
@@ -11,48 +9,48 @@ void LineSensor::init(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHe
     _serial->begin(_baudrate);
 
     // 初期化
-    detected = false;
-    deg = degMemory = -1;
-    dis = -1;
-    sideRight = sideLeft = sideBack = false;
+    _detected = false;
+    _deg = _degMemory = -1;
+    _dis = -1;
+    _sideRight = _sideLeft = _sideBack = false;
 
     for (int i = 0; i < 19; i++)
-        sensor[i] = sensorMemory[i] = false;
+        _sensor[i] = _sensorMemory[i] = false;
 }
 
 int LineSensor::degCompute(bool *data)
 {
-    if (!detected)
+    if (!_detected)
         return -1;
 
-    x = 0;
-    y = 0;
+    _x = 0;
+    _y = 0;
     for (int i = 0; i < 16; i++)
     {
         if (data[i])
         {
-            x += cos(radians(22.5 * i));
-            y += sin(radians(22.5 * i));
+            _x += cos(radians(22.5 * i));
+            _y += sin(radians(22.5 * i));
         }
     }
 
-    if (sideRight)
+    if (_sideRight)
     {
-        x += cos(radians(90));
-        y += sin(radians(90));
+        _x += cos(radians(90));
+        _y += sin(radians(90));
     }
-    if (sideLeft)
+    if (_sideLeft)
     {
-        x += cos(radians(270));
-        y += sin(radians(270));
+        _x += cos(radians(270));
+        _y += sin(radians(270));
     }
-    if (sideBack)
+    if (_sideBack)
     {
-        x += cos(radians(180));
-        y += sin(radians(180));
+        _x += cos(radians(180));
+        _y += sin(radians(180));
     }
 
-    return (int)round(degrees(atan2(y, x)));
+    return (int)round(degrees(atan2(_y, _x)));
 }
 
 void LineSensor::update()
@@ -75,14 +73,14 @@ void LineSensor::update()
             uint8_t high = _serial->read();
 
             uint32_t bit_mask = ((uint32_t)high << 16) | ((uint32_t)middle << 8) | (uint32_t)low;
-            detected = (bit_mask > 0);
+            _detected = (bit_mask > 0);
 
             for (int i = 0; i < 19; i++)
-                sensor[i] = (bit_mask & (1UL << i)) != 0;
+                _sensor[i] = (bit_mask & (1UL << i)) != 0;
 
-            sideRight = sensor[16];
-            sideLeft = sensor[17];
-            sideBack = sensor[18];
+            _sideRight = _sensor[16];
+            _sideLeft = _sensor[17];
+            _sideBack = _sensor[18];
         }
         else
         {
@@ -91,31 +89,31 @@ void LineSensor::update()
     }
 
     // データの加工
-    if (detected)
+    if (_detected)
     {
         // 瞬間角度・距離
-        deg = degCompute(sensor);
-        if (deg < 0)
-            deg += 360;
-        dis = sqrt(x * x + y * y);
+        _deg = degCompute(_sensor);
+        if (_deg < 0)
+            _deg += 360;
+        _dis = sqrt(_x * _x + _y * _y);
 
         // 記憶角度
         for (int i = 0; i < 19; i++)
         {
-            if (sensor[i])
-                sensorMemory[i] = true;
+            if (_sensor[i])
+                _sensorMemory[i] = true;
         }
 
-        degMemory = degCompute(sensorMemory);
-        if (degMemory < 0)
-            degMemory += 360;
+        _degMemory = degCompute(_sensorMemory);
+        if (_degMemory < 0)
+            _degMemory += 360;
     }
     else
     {
         // 初期化
-        deg = degMemory = -1;
-        dis = -1;
+        _deg = _degMemory = -1;
+        _dis = -1;
         for (int i = 0; i < 19; i++)
-            sensorMemory[i] = false;
+            _sensorMemory[i] = false;
     }
 }

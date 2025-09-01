@@ -1,7 +1,5 @@
 #include "IRSensor.hpp"
 
-IRSensor::IRSensor() {}
-
 void IRSensor::init(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHeader)
 {
     _serial = serial;
@@ -28,22 +26,22 @@ void IRSensor::update()
 
             uint8_t low1 = _serial->read();                      // ボールの角度の下位バイトを読み取る
             uint8_t high1 = _serial->read();                     // ボールの角度の上位バイトを読み取る
-            deg = int((uint16_t(high1) << 8) | uint16_t(low1)); // 上位バイトと下位バイトをつなげる
+            _deg = int((uint16_t(high1) << 8) | uint16_t(low1)); // 上位バイトと下位バイトをつなげる
 
             uint8_t low2 = _serial->read();                      // ボールの値の下位バイトを読み取る
             uint8_t high2 = _serial->read();                     // ボールの値の上位バイトを読み取る
-            val = int((uint16_t(high2) << 8) | uint16_t(low2)); // 上位バイトと下位バイトをつなげる
+            _val = int((uint16_t(high2) << 8) | uint16_t(low2)); // 上位バイトと下位バイトをつなげる
 
-            if (deg == -1)
+            if (_deg == -1)
             {
-                detected = false;
-                val = -1;
-                dis = -1;
+                _detected = false;
+                _val = -1;
+                _dis = -1;
             }
             else
             {
-                detected = true;
-                dis = map(constrain(val, 0, 300), 0, 300, 300, 0);
+                _detected = true;
+                _dis = map(constrain(_val, 0, 300), 0, 300, 300, 0);
             }
         }
         else
