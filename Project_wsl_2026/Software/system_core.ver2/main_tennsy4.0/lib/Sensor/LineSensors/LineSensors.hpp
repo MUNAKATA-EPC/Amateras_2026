@@ -2,7 +2,7 @@
 
 #include <Arduino.h>
 
-class Line
+class LineSensors
 {
 private:
     HardwareSerial *_serial;
@@ -14,7 +14,7 @@ private:
 
 public:
     // コンストラクタ
-    Line();
+    LineSensors();
 
     // 関数
     void init(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHeader);
@@ -35,4 +35,4 @@ public:
     bool sensorMemory[19];
 };
 
-extern Line line;
+extern LineSensors line;

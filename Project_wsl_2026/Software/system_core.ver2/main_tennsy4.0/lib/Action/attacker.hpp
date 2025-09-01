@@ -1,4 +1,4 @@
-#ifndef ATTACKER_HPP
+ifndef ATTACKER_HPP
 #define ATTACKER_HPP
 
 // IRについて

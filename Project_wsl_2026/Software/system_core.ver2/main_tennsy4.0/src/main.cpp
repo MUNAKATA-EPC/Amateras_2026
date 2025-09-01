@@ -1,14 +1,14 @@
-#include "Action.hpp"
-#include "Driver.hpp"
-#include "Function.hpp"
-#include "Sensor.hpp"
+#include "Actions.hpp"
+#include "Drivers.hpp"
+#include "Functions.hpp"
+#include "Sensors.hpp"
 
 // sensors
 DigitalSensor catchSensor;
 DigitalSensor camToggle;
 DigitalSensor motorToggle;
-IR ir;
-Line line;
+IRSensor ir;
+LineSensors line;
 
 void setup()
 {

@@ -2,7 +2,7 @@
 
 #include <Arduino.h>
 
-class IR
+class IRSensor
 {
 private:
     HardwareSerial *_serial;
@@ -11,7 +11,7 @@ private:
 
 public:
     // コントラクタ
-    IR();
+    IRSensor();
 
     // 関数
     void init(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHeader); // 定義
@@ -24,4 +24,4 @@ public:
     double dis;
 };
 
-extern IR ir;
+extern IRSensor ir;

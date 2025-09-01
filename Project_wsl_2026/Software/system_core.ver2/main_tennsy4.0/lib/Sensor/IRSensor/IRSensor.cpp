@@ -1,8 +1,8 @@
-#include "IR.hpp"
+#include "IRSensor.hpp"
 
-IR::IR() {}
+IRSensor::IRSensor() {}
 
-void IR::init(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHeader)
+void IRSensor::init(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHeader)
 {
     _serial = serial;
     _baudrate = baudrate;
@@ -11,7 +11,7 @@ void IR::init(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHeader)
     _serial->begin(_baudrate);
 }
 
-void IR::update()
+void IRSensor::update()
 {
     // データの受け取り
     while (_serial->available() >= 5)

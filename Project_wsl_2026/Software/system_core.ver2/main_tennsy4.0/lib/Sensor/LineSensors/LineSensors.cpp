@@ -1,8 +1,8 @@
-#include "LINE.hpp"
+#include "LineSensors.hpp"
 
-Line::Line() {}
+LineSensors::LineSensors() {}
 
-void Line::init(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHeader)
+void LineSensors::init(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHeader)
 {
     _serial = serial;
     _baudrate = baudrate;
@@ -20,7 +20,7 @@ void Line::init(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHeader)
         sensor[i] = sensorMemory[i] = false;
 }
 
-int Line::degCompute(bool *data)
+int LineSensors::degCompute(bool *data)
 {
     if (!detected)
         return -1;
@@ -55,7 +55,7 @@ int Line::degCompute(bool *data)
     return (int)round(degrees(atan2(y, x)));
 }
 
-void Line::update()
+void LineSensors::update()
 {
     // データの読み取り
     while (_serial->available() >= 4)
