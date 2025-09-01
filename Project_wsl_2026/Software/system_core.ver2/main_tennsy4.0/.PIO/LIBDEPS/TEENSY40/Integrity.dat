@@ -1,0 +1,6 @@
+adafruit/Adafruit Unified Sensor
+adafruit/Adafruit GFX Library@^1.12.0
+br3ttb/PID@^1.2.1
+adafruit/Adafruit BNO055
+adafruit/Adafruit SSD1306@^2.5.13
+adafruit/Adafruit NeoPixel@^1.14.0
