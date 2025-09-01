@@ -3,31 +3,31 @@
 void Timer::reset()
 {
     _resetTime = millis();
-    isStopped = false;
+    _isStopped = false;
 }
 
 void Timer::stop()
 {
-    if (!isStopped)
+    if (!_isStopped)
     {
-        isStopped = true;
+        _isStopped = true;
         _stopTime = millis();
     }
 }
 
 void Timer::start()
 {
-    if (isStopped)
+    if (_isStopped)
     {
-        isStopped = false;
+        _isStopped = false;
         _resetTime = millis() - _stopTime + _resetTime;
     }
 }
 
-unsigned long Timer::getTime()
+unsigned long Timer::msTime()
 {
-    if (!everCalled)
-        everCalled = true;
+    if (!_everCalled)
+        _everCalled = true;
 
     if (!isStopped)
     {

@@ -8,15 +8,18 @@ private:
     unsigned long _stopTime = 0;  // 停止時の時間
     unsigned long _nowTime = 0;   // 計測時間
 
+    bool _isStopped = false;  // タイマーは停止しているか
+    bool _everCalled = false; // タイマーは今まで呼ばれたか
+
 public:
     // 関数
     void reset();
     void stop();
     void start();
 
-    unsigned long getTime();
+    // データの取得
+    unsigned long msTime();
 
-    // 変数
-    bool isStopped = false;  // タイマーは停止しているか
-    bool everCalled = false; // タイマーは今まで呼ばれたか
+    bool isStopped() const { return _isStopped; }
+    bool everCalled() const { return everCalled; }
 };
