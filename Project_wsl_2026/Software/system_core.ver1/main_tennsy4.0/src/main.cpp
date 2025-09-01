@@ -54,9 +54,8 @@ void loop()
   Ps3_serial_update();   // 更新1
   Ps3_compute_update();  // 更新2
 
-  play_radicon(95);
+  // play_radicon(95);
 
-  /*
   ui_process(); // uiを実行
 
   if (is_now_selecting_ui()) // 今選んでる途中なら
@@ -144,5 +143,4 @@ void loop()
       break;
     }
   }
-  */
 }
