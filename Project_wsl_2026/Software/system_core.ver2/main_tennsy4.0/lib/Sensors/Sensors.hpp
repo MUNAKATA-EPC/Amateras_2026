@@ -2,7 +2,7 @@
 #pragma once
 
 #include "IRSensor/IRSensor.hpp"
-#include "LineSensors/LineSensors.hpp"
+#include "LineSensor/LineSensor.hpp"
 #include "Cam/Openmv.hpp"
 #include "Gyro/BNO055.hpp"
 #include "DigitalSensor/DigitalSensor.hpp"

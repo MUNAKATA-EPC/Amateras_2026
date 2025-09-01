@@ -3,12 +3,12 @@
 #include "Functions.hpp"
 #include "Sensors.hpp"
 
-// sensors
+// 使用するセンサー類
 DigitalSensor catchSensor;
 DigitalSensor camToggle;
 DigitalSensor motorToggle;
 IRSensor ir;
-LineSensors line;
+LineSensor line;
 
 void setup()
 {
