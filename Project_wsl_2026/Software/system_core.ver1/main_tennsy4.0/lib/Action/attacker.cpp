@@ -31,8 +31,7 @@ void play_attacker(bool use_yellow_cam, bool use_blue_cam, int motor_power)
     }
 
     /*キッカー制御*/
-    // kicker_kick(is_IR_exist_front && get_IR_value() > 185); // キャッチセンサーが反応したら蹴る
-    Serial.println(get_catchsensor());
+    kicker_kick(get_catchsensor()); // キャッチセンサーが反応したら蹴る
 
     /*ロボット制御*/
     if (is_LINE_exist()) // ラインがあるならば

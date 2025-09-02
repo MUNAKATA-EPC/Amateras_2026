@@ -55,7 +55,7 @@ void catchsensor_init(int pin)
     pinMode(catchsensor_pin, INPUT);
 }
 
-unsigned int get_catchsensor()
+uint8_t get_catchsensor()
 {
     return digitalRead(catchsensor_pin);
 }

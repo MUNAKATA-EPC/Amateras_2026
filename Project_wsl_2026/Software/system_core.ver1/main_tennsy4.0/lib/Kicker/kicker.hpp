@@ -21,6 +21,6 @@ void kicker_kick(bool kick_signal);
 void catchsensor_init(int pin);
 
 // キャッチセンサーの値を取得
-unsigned int get_catchsensor();
+uint8_t get_catchsensor();
 
 #endif
