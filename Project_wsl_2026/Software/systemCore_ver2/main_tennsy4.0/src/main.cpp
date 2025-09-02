@@ -13,9 +13,9 @@ Button enterButton; // Uiの決定ボタン
 Button rightButton; // Uiの右ボタン
 Button leftButton;  // Uiの左ボタン
 
-Openmv cam;
 BallSensor ir;
 LineSensor line;
+Openmv cam;
 
 void setup()
 {
@@ -32,6 +32,7 @@ void setup()
 
     ir.init(&Serial1, 115200, 0xAA);
     line.init(&Serial2, 115200, 0xAA);
+    cam.init(&Serial3, 115200, 0xAA);
 }
 
 void loop()

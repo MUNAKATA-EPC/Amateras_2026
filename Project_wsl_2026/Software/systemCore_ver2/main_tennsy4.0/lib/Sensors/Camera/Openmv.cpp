@@ -32,15 +32,20 @@ void Openmv::update()
         {
             _serial->read();
 
-            int fieldDeg = readAndDocking();
-            int yellowDeg = readAndDocking();
-            int yellowDis = readAndDocking();
-            int blueDeg = readAndDocking();
-            int blueDis = readAndDocking();
+            // コートの角度
+            int16_t deg, dis;
+            deg = readAndDocking();
+            field.set(deg, 0);
 
-            field.set(fieldDeg, 0);
-            yellowGoal.set(yellowDeg, yellowDis);
-            blueGoal.set(blueDeg, blueDis);
+            // 黄色ゴールの角度・距離
+            deg = readAndDocking();
+            dis = readAndDocking();
+            yellowGoal.set(deg, dis);
+
+            // 青色ゴールの角度・距離
+            deg = readAndDocking();
+            dis = readAndDocking();
+            blueGoal.set(deg, dis);
         }
         else
         {

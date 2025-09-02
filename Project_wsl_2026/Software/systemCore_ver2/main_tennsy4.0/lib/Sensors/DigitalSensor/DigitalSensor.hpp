@@ -12,16 +12,16 @@ public:
     enum Mode
     {
         // catchSensor
-        NONE = false,
-        CATCH = true,
+        NONE = LOW,
+        CATCH = HIGH,
 
         // camToggle
-        YELLOW_GOAL = true,
-        BLUE_GOAL = false,
+        YELLOW_GOAL = HIGH,
+        BLUE_GOAL = LOW,
 
         // motorToggle
-        STOP = true,
-        START = false
+        STOP = HIGH,
+        START = LOW
     };
 
     // 関数
