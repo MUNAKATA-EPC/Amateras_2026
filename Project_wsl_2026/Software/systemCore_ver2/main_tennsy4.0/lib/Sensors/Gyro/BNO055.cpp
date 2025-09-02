@@ -2,7 +2,7 @@
 
 Button resetButton; // ジャイロのリセット用ボタン
 
-void BNO055::init(TwoWire *wire, uint8_t address, uint8_t pin, uint8_t pinmode)
+void BNO055::init(TwoWire *wire, uint8_t address, Button *resetButton)
 {
     if (_bno != nullptr)
     {
@@ -19,7 +19,7 @@ void BNO055::init(TwoWire *wire, uint8_t address, uint8_t pin, uint8_t pinmode)
 
     _bno->setExtCrystalUse(true); // 外部水晶振動子使用
 
-    resetButton.init(pin, pinmode);
+    _resetButton = resetButton;
 }
 
 void BNO055::update()
@@ -27,7 +27,7 @@ void BNO055::update()
     imu::Vector<3> euler = _bno->getVector(Adafruit_BNO055::VECTOR_EULER);
     _degNormal = euler.x(); // X軸の角度
 
-    if (resetButton.isReleased()) // リセットボタンが押されたら
+    if (_resetButton->isReleased()) // リセットボタンが押されたら
         _degReset = _degNormal;
 
     // 補正後の角度 (-180〜180)
