@@ -1,0 +1,12 @@
+{
+	"folders": [
+		{
+			"path": "../Project_wsl_2026/Software/system_core.ver1/ps3_m5stamp-pico"
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"cmath": "cpp"
+		}
+	}
+}
