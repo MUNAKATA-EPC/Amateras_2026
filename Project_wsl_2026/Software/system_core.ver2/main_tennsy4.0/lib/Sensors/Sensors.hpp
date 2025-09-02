@@ -1,7 +1,7 @@
 /*センサーからの情報を読み取り*/
 #pragma once
 
-#include "IRSensor/IRSensor.hpp"
+#include "BallSensor/BallSensor.hpp"
 #include "LineSensor/LineSensor.hpp"
 #include "Cam/Openmv.hpp"
 #include "Gyro/BNO055.hpp"

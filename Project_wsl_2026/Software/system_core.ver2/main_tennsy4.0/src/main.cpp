@@ -7,7 +7,7 @@
 DigitalSensor catchSensor;
 DigitalSensor camToggle;
 DigitalSensor motorToggle;
-IRSensor ir;
+BallSensor ir;
 LineSensor line;
 
 void setup()

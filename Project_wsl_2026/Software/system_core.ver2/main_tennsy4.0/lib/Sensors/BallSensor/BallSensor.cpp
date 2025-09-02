@@ -1,6 +1,6 @@
-#include "IRSensor.hpp"
+#include "BallSensor.hpp"
 
-void IRSensor::init(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHeader)
+void BallSensor::init(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHeader)
 {
     _serial = serial;
     _baudrate = baudrate;
@@ -9,7 +9,7 @@ void IRSensor::init(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHead
     _serial->begin(_baudrate);
 }
 
-void IRSensor::update()
+void BallSensor::update()
 {
     // データの受け取り
     while (_serial->available() >= 5)

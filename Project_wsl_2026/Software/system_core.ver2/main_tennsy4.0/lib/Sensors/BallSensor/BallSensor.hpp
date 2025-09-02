@@ -2,7 +2,7 @@
 
 #include <Arduino.h>
 
-class IRSensor
+class BallSensor
 {
 private:
     HardwareSerial *_serial;
@@ -26,4 +26,4 @@ public:
     double dis() const { return _dis; }
 };
 
-extern IRSensor ir;
+extern BallSensor ir;
