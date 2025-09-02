@@ -7,13 +7,14 @@
 BallSensor ir;             // IRセンサー
 LineSensor line;           // ラインセンサー
 Openmv cam;                // カメラ
-Button enterButton;        // ディスプレイの決定ボタン
-Button rightButton;        // ディスプレイの右ボタン
-Button leftButton;         // ディスプレイの左ボタン
 Button resetButton;        // ジャイロセンサーのリセットボタン
 BNO055 bno;                // ジャイロセンサー
 DigitalSensor catchSensor; // キッカーのキャッチセンサー
 DigitalSensor motorToggle; // モータのトグルスイッチ
+// 使用するドライバー類
+Button enterButton;        // ディスプレイの決定ボタン
+Button rightButton;        // ディスプレイの右ボタン
+Button leftButton;         // ディスプレイの左ボタン
 
 void setup()
 {
@@ -25,16 +26,17 @@ void setup()
     line.init(&Serial2, 115200, 0xAA);
     // カメラの定義
     cam.init(&Serial3, 115200, 0xAA);
-    // ディスプレイの定義
-    enterButton.init(11, INPUT_PULLDOWN);
-    rightButton.init(12, INPUT_PULLDOWN);
-    leftButton.init(10, INPUT_PULLDOWN);
     // ジャイロの定義
     resetButton.init(9, INPUT_PULLDOWN);
     bno.init(&Wire1, 0x28, &resetButton);
     // その他のセンサー
     catchSensor.init(6);
     motorToggle.init(5);
+
+    // ディスプレイの定義
+    enterButton.init(11, INPUT_PULLDOWN);
+    rightButton.init(12, INPUT_PULLDOWN);
+    leftButton.init(10, INPUT_PULLDOWN);
 }
 
 void loop()
@@ -45,13 +47,14 @@ void loop()
     line.update();
     // カメラの更新
     cam.update();
+    // ジャイロの更新
+    resetButton.update();
+    bno.update();
+
     //  ディスプレイの更新
     enterButton.update();
     rightButton.update();
     leftButton.update();
-    // ジャイロの更新
-    resetButton.update();
-    bno.update();
 
     delay(100);
 }
