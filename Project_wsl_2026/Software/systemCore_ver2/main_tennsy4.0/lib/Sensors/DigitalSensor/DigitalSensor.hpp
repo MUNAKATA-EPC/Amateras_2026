@@ -15,10 +15,6 @@ public:
         NONE = LOW,
         CATCH = HIGH,
 
-        // camToggle
-        YELLOW_GOAL = HIGH,
-        BLUE_GOAL = LOW,
-
         // motorToggle
         STOP = HIGH,
         START = LOW
@@ -30,5 +26,4 @@ public:
 };
 
 extern DigitalSensor catchSensor;
-extern DigitalSensor camToggle;
 extern DigitalSensor motorToggle;

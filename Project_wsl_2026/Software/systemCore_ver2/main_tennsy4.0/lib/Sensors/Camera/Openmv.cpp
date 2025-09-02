@@ -9,7 +9,7 @@ void Openmv::init(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHeader
     _serial->begin(_baudrate);
 }
 
-int16_t Openmv::readAndDocking()
+int16_t Openmv::readSerial()
 {
     uint8_t low = (uint8_t)_serial->read();
     uint8_t high = (uint8_t)_serial->read();
@@ -32,19 +32,20 @@ void Openmv::update()
         {
             _serial->read();
 
-            // コートの角度
             int16_t deg, dis;
-            deg = readAndDocking();
+
+            // コートの角度
+            deg = readSerial();
             field.set(deg, 0);
 
             // 黄色ゴールの角度・距離
-            deg = readAndDocking();
-            dis = readAndDocking();
+            deg = readSerial();
+            dis = readSerial();
             yellowGoal.set(deg, dis);
 
             // 青色ゴールの角度・距離
-            deg = readAndDocking();
-            dis = readAndDocking();
+            deg = readSerial();
+            dis = readSerial();
             blueGoal.set(deg, dis);
         }
         else

@@ -28,9 +28,9 @@ public:
 };
 
 /*ボタンの実態を定義*/
-extern Button resetButton; // BNO055のリセットボタン用
 extern Button enterButton; // 決定ボタン
 extern Button rightButton; // 右ボタン
 extern Button leftButton;  // 左ボタン
+extern Button resetButton; // ジャイロのリセットボタン
 
 #endif
