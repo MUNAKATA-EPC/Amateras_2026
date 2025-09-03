@@ -24,12 +24,12 @@ void Timer::start()
     }
 }
 
-unsigned long Timer::millis()
+unsigned long Timer::msTime()
 {
     if (!_everCalled)
         _everCalled = true;
 
-    if (!isStopped)
+    if (!_isStopped)
     {
         _nowTime = millis() - _resetTime;
     }

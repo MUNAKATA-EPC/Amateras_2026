@@ -1,5 +1,4 @@
-#ifndef BUTTON_HPP
-#define BUTTON_HPP
+#pragma once
 
 #include <Arduino.h>
 #include "Timer/Timer.hpp"
@@ -16,8 +15,9 @@ private:
     unsigned long _pushingTime = 0;
 
 public:
-    // 関数
-    void init(uint8_t pin, uint8_t pinmode);
+    // 関数・コントラクタ
+    Button(uint8_t pin, uint8_t pinmode);
+    void begin();
     void update();
 
     bool isPushing();
@@ -26,11 +26,3 @@ public:
     unsigned long pushingTime();
     void pushingTimeReset();
 };
-
-/*ボタンの実態を定義*/
-extern Button enterButton; // 決定ボタン
-extern Button rightButton; // 右ボタン
-extern Button leftButton;  // 左ボタン
-extern Button resetButton; // ジャイロのリセットボタン
-
-#endif

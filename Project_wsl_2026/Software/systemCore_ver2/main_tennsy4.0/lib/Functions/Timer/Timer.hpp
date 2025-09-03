@@ -18,8 +18,8 @@ public:
     void start();
 
     // データの取得
-    unsigned long millis();
+    unsigned long msTime();
 
     bool isStopped() const { return _isStopped; }
-    bool everCalled() const { return everCalled; }
+    bool everCalled() const { return _everCalled; }
 };

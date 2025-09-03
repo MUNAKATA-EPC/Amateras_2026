@@ -20,10 +20,8 @@ public:
         START = LOW
     };
 
-    // 関数
-    void init(uint8_t pin); // 定義
-    bool read();            // 取得
+    // 関数・コントラクタ
+    DigitalSensor(uint8_t pin); // 定義
+    void begin();               // 開始
+    bool read();                // 取得
 };
-
-extern DigitalSensor catchSensor;
-extern DigitalSensor motorToggle;

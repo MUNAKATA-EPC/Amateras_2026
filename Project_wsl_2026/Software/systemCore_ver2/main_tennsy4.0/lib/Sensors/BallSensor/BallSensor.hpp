@@ -15,9 +15,10 @@ private:
     double _dis;
 
 public:
-    // 関数
-    void init(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHeader); // 定義
-    void update();                                                             // 更新・計算
+    // 関数・コントラクタ
+    BallSensor(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHeader); // 定義
+    void begin();                                                               // 開始
+    void update();                                                              // 更新・計算
 
     // データの取得
     bool detected() const { return _detected; }
@@ -25,5 +26,3 @@ public:
     int val() const { return _val; }
     double dis() const { return _dis; }
 };
-
-extern BallSensor ir;

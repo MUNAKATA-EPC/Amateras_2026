@@ -1,12 +1,10 @@
 #include "LineSensor.hpp"
 
-void LineSensor::init(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHeader)
+LineSensor::LineSensor(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHeader)
 {
     _serial = serial;
     _baudrate = baudrate;
     _frameHeader = frameHeader;
-
-    _serial->begin(_baudrate);
 
     // 初期化
     _detected = false;
@@ -16,6 +14,11 @@ void LineSensor::init(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHe
 
     for (int i = 0; i < 19; i++)
         _sensor[i] = _sensorMemory[i] = false;
+}
+
+void LineSensor::begin()
+{
+    _serial->begin(_baudrate);
 }
 
 int LineSensor::degCompute(bool *data)

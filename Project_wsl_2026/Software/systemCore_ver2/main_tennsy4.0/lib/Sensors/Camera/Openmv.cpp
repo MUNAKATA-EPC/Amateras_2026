@@ -1,11 +1,14 @@
 #include "Openmv.hpp"
 
-void Openmv::init(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHeader)
+Openmv::Openmv(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHeader)
 {
     _serial = serial;
     _baudrate = baudrate;
     _frameHeader = frameHeader;
+}
 
+void Openmv::begin()
+{
     _serial->begin(_baudrate);
 }
 

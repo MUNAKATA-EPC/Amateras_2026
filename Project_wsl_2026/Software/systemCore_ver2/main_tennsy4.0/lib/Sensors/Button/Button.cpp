@@ -1,12 +1,13 @@
 #include "button.hpp"
 
-/*ボタンを定義*/
-
-void Button::init(uint8_t pin, uint8_t pinmode)
+Button::Button(uint8_t pin, uint8_t pinmode)
 {
     _pin = pin;
     _pinmode = pinmode;
+}
 
+void Button::begin()
+{
     pinMode(_pin, _pinmode);
     _count = 0;
 }
@@ -30,7 +31,7 @@ void Button::update()
             _pushingTimer.reset(); // 最初に押されたときにタイマーをリセット
 
         _count++;                              // カウントアップ
-        _pushingTime = _pushingTimer.millis(); // タイマーからの時間を格納
+        _pushingTime = _pushingTimer.msTime(); // タイマーからの時間を格納
     }
     else // ボタンが押されていない場合
     {
@@ -41,7 +42,7 @@ void Button::update()
         else //_button_countが正なら
         {
             _count = -1;                           // カウントアップされているので-1にする
-            _pushingTime = _pushingTimer.millis(); // 最後の時間を記録
+            _pushingTime = _pushingTimer.msTime(); // 最後の時間を記録
             _pushingTimer.reset();                 // 押されていないのでリセット
         }
     }

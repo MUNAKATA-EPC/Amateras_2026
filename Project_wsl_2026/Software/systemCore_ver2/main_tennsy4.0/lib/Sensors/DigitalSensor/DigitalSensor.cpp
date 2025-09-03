@@ -1,9 +1,11 @@
 #include "DigitalSensor.hpp"
 
-void DigitalSensor::init(uint8_t pin)
-{
+DigitalSensor::DigitalSensor(uint8_t pin){
     _pin = pin;
+}
 
+void DigitalSensor::begin()
+{
     pinMode(_pin, INPUT);
 }
 

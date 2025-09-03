@@ -1,8 +1,6 @@
 #include "BNO055.hpp"
 
-Button resetButton; // ジャイロのリセット用ボタン
-
-void BNO055::init(TwoWire *wire, uint8_t address, Button *resetButton)
+BNO055::BNO055(TwoWire *wire, uint8_t address, Button *resetbtn)
 {
     if (_bno != nullptr)
     {
@@ -10,16 +8,26 @@ void BNO055::init(TwoWire *wire, uint8_t address, Button *resetButton)
     }
     _bno = new Adafruit_BNO055(BNO055_ID, address, wire);
 
+    _resetbtn = resetbtn;
+}
+
+void BNO055::begin()
+{
     Timer bnoTimer;
     bnoTimer.reset();
-    while (!_bno->begin(OPERATION_MODE_IMUPLUS) && bnoTimer.millis() < 5000)
+    while (!_bno->begin(OPERATION_MODE_IMUPLUS) && bnoTimer.msTime() < 5000)
     {
         delay(10); // BNO055の通信開始待ち
     }
 
+    if (!_bno->begin(OPERATION_MODE_IMUPLUS))
+    {
+        Serial.println("bno timeout");
+    }
+
     _bno->setExtCrystalUse(true); // 外部水晶振動子使用
 
-    _resetButton = resetButton;
+    _resetbtn->begin();
 }
 
 void BNO055::update()
@@ -27,9 +35,11 @@ void BNO055::update()
     imu::Vector<3> euler = _bno->getVector(Adafruit_BNO055::VECTOR_EULER);
     _degNormal = euler.x(); // X軸の角度
 
-    if (_resetButton->isReleased()) // リセットボタンが押されたら
+    _resetbtn->update();
+
+    if (_resetbtn->isReleased()) // リセットボタンが押されたら
         _degReset = _degNormal;
 
-    // 補正後の角度 (-180〜180)
+    // 補正後の角度
     _deg = (int)((_degNormal - _degReset + 360) % 360);
 }

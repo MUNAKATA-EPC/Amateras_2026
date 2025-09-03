@@ -27,9 +27,10 @@ private:
 
 public:
     // 関数
-    void init(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHeader);
-    int degCompute(bool *data); // -180~180
-    void update();              // 更新・計算
+    LineSensor(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHeader); // 定義
+    void begin();                                                         // 開始
+    int degCompute(bool *data);                                           // -180~180
+    void update();                                                        // 更新・計算
 
     // データの取得
     bool detected() const { return _detected; }
@@ -45,5 +46,3 @@ public:
     bool sensorMemory(uint8_t index) const { return _sensorMemory[index]; }
     int degMemory() const { return _degMemory; }
 };
-
-extern LineSensor line;
