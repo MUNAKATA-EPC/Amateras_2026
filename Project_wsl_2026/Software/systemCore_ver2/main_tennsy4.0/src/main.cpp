@@ -19,8 +19,9 @@ void loop()
     Serial.print("bno:");
     Serial.print(bno.deg());
     Serial.print(" ir:");
-    Serial.print((int)ir.deg());
+    Serial.print(ir.deg());
     Serial.print(" line:");
     Serial.println(line.deg());
+
     delay(100);
 }
