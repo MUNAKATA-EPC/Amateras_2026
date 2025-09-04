@@ -9,6 +9,8 @@ void setup()
     Serial.begin(9600);
     // センサー類の開始
     sensors.begin();
+    // uiの初期設定・開始
+    ui.begin(&enterButton, &rightButton, &leftButton);
 }
 
 void loop()
@@ -16,12 +18,18 @@ void loop()
     // センサー類の更新
     sensors.update();
 
-    Serial.print("bno:");
-    Serial.print(bno.deg());
-    Serial.print(" ir:");
-    Serial.print(ir.deg());
-    Serial.print(" line:");
-    Serial.println(line.deg());
-
-    delay(100);
+    // uiを実行
+    ui.process();
+    Serial.print(" action: ");
+    Serial.print(ui.actionDecided());
+    Serial.print(" ");
+    Serial.print(ui.actionNumber());
+    Serial.print(" mode: ");
+    Serial.print(ui.modeDecided());
+    Serial.print(" ");
+    Serial.print(ui.modeNumber());
+    Serial.print(" config: ");
+    Serial.print(ui.configNumber());
+    Serial.print(" ");
+    Serial.println(ui.configActive(ui.configNumber()));
 }
