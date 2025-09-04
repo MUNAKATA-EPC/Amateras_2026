@@ -2,7 +2,7 @@
 
 #include <Arduino.h>
 
-class CamData
+class OpenmvData
 {
 private:
     bool _detected;
@@ -15,7 +15,7 @@ public:
     int deg() const { return _deg; }
     double dis() const { return _dis; }
 
-    //_degと_disをセットする
+    //_degと_disと_detectedをセットする
     void set(int deg, double dis)
     {
         _deg = deg;
@@ -40,7 +40,7 @@ public:
     void begin();                                                           // 開始
     void update();                                                          // 更新・計算
 
-    CamData yellowGoal;
-    CamData blueGoal;
-    CamData field;
+    OpenmvData yellowGoal;
+    OpenmvData blueGoal;
+    OpenmvData field;
 };

@@ -3,6 +3,8 @@
 #include "Functions.hpp"
 #include "Sensors.hpp"
 
+Timer timer; // ui更新用のタイマー
+
 void setup()
 {
     // PCとのシリアル通信の開始
@@ -19,7 +21,12 @@ void loop()
     sensors.update();
 
     // uiを実行
-    ui.process();
+    if (!timer.everCalled() || timer.msTime() > 100) // まだ呼ばれていない場合もタイマーをリセットさせる
+    {
+        timer.reset();
+        ui.process(); // 100msに一回更新
+    }
+
     Serial.print(" action: ");
     Serial.print(ui.actionDecided());
     Serial.print(" ");
