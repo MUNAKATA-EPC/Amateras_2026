@@ -31,7 +31,7 @@ public:
           cam(&Serial3, 115200, 0xAA),
           // ジャイロ
           resetButton(9, INPUT_PULLDOWN),
-          bno(&Wire, 0x28, &resetButton),
+          bno(&Wire, 0x28),
           // キャッチセンサー
           catchSensor(6),
           // モータ用のトグルスイッチ
@@ -51,7 +51,7 @@ public:
         line.begin();
         cam.begin();
         // I2C
-        bno.begin();
+        bno.begin(&resetButton);
         // ボタン
         resetButton.begin();
         enterButton.begin();

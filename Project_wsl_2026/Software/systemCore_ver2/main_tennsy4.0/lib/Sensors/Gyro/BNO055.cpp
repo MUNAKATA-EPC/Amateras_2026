@@ -1,17 +1,15 @@
 #include "BNO055.hpp"
 
-BNO055::BNO055(TwoWire *wire, uint8_t address, Button *resetbtn)
+BNO055::BNO055(TwoWire *wire, uint8_t address)
 {
     if (_bno != nullptr)
     {
         delete _bno;
     }
     _bno = new Adafruit_BNO055(BNO055_ID, address, wire);
-
-    _resetbtn = resetbtn;
 }
 
-void BNO055::begin()
+void BNO055::begin(Button *resetbtn)
 {
     Timer bnoTimer;
     bnoTimer.reset();
@@ -19,14 +17,13 @@ void BNO055::begin()
     {
         delay(10); // BNO055の通信開始待ち
     }
-
     if (!_bno->begin(OPERATION_MODE_IMUPLUS))
     {
         Serial.println("bno timeout");
     }
-
     _bno->setExtCrystalUse(true); // 外部水晶振動子使用
 
+    _resetbtn = resetbtn;
     _resetbtn->begin();
 }
 
