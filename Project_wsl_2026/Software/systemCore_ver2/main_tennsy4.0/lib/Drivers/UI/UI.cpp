@@ -292,7 +292,6 @@ void UI::process()
     else
         _ssd->print("---");
     _ssd->println(modeName);
-
     // config 表示
     for (int i = 0; i < configCount; i++)
     {
