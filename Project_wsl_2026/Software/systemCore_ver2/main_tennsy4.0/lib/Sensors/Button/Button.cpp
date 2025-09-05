@@ -9,53 +9,46 @@ Button::Button(uint8_t pin, uint8_t pinmode)
 void Button::begin()
 {
     pinMode(_pin, _pinmode);
-    _count = 0;
 }
 
 void Button::update()
 {
-    bool pressed = false;
-
     if (_pinmode == INPUT_PULLDOWN)
     {
-        pressed = (digitalRead(_pin) == HIGH); // ボタンが押されたか
+        _pressed = (digitalRead(_pin) == HIGH);
     }
     else if (_pinmode == INPUT_PULLUP)
     {
-        pressed = (digitalRead(_pin) == LOW); // ボタンが押されたか
+        _pressed = (digitalRead(_pin) == LOW);
     }
 
-    if (pressed) // ボタンが押されている場合
+    if (_pressed)
     {
-        if (_count <= 0)
-            _pushingTimer.reset(); // 最初に押されたときにタイマーをリセット
+        if (!_oldpressed)
+            _pushingTimer.reset();
 
-        _count++;                              // カウントアップ
-        _pushingTime = _pushingTimer.msTime(); // タイマーからの時間を格納
+        _pushingTime = _pushingTimer.msTime();
     }
-    else // ボタンが押されていない場合
+    else
     {
-        if (_count <= 0) // 0もしくは負（-1）ならば
-        {
-            _count = 0; // 0にする
-        }
-        else //_button_countが正なら
-        {
-            _count = -1;                           // カウントアップされているので-1にする
-            _pushingTime = _pushingTimer.msTime(); // 最後の時間を記録
-            _pushingTimer.reset();                 // 押されていないのでリセット
-        }
+        _pushingTime = 0;
     }
+
+    // 変化を検出
+    _released = (!_pressed && _oldpressed);
+
+    // 過去の状態を保存
+    _oldpressed = _pressed;
 }
 
 bool Button::isPushing()
 {
-    return _count > 0; // _button_countが正なら押されている
+    return _pressed;
 }
 
 bool Button::isReleased()
 {
-    return _count == -1; // _button_countが-1なら離された直後
+    return _released;
 }
 
 unsigned long Button::pushingTime()

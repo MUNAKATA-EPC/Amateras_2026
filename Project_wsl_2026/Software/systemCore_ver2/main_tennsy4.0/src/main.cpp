@@ -26,17 +26,4 @@ void loop()
         timer.reset();
         ui.process(); // 100msに一回更新
     }
-
-    Serial.print(" action: ");
-    Serial.print(ui.actionDecided());
-    Serial.print(" ");
-    Serial.print(ui.actionNumber());
-    Serial.print(" mode: ");
-    Serial.print(ui.modeDecided());
-    Serial.print(" ");
-    Serial.print(ui.modeNumber());
-    Serial.print(" config: ");
-    Serial.print(ui.configNumber());
-    Serial.print(" ");
-    Serial.println(ui.configActive(ui.configNumber()));
 }

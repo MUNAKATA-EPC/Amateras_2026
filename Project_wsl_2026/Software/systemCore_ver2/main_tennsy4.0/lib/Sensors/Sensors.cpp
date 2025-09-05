@@ -22,10 +22,6 @@ void Sensors::begin()
     line.begin();
     cam.begin();
     bno.begin(&resetButton);
-    resetButton.begin();
-    enterButton.begin();
-    rightButton.begin();
-    leftButton.begin();
 }
 
 // 更新
@@ -35,10 +31,6 @@ void Sensors::update()
     line.update();
     cam.update();
     bno.update();
-    resetButton.update();
-    enterButton.update();
-    rightButton.update();
-    leftButton.update();
 }
 
 // ショートカットキー

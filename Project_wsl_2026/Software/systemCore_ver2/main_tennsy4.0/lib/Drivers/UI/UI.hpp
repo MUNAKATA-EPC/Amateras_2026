@@ -22,7 +22,7 @@ private:
     int _actionNumber = 0;
     int _modeNumber = 0;
     int _configNumber = 0;
-    bool _configActive[Action::Type::COUNT][10][10] = {false}; // [Actionの番号][Modeの番号][Configの番号]
+    bool _configActive[10] = {false}; // [Configの番号]
 
 public:
     // 関数・コントラクタ
@@ -36,5 +36,5 @@ public:
     int actionNumber() const { return _actionNumber; }
     int modeNumber() const { return _modeNumber; }
     int configNumber() const { return _configNumber; }
-    bool configActive(uint8_t index) const { return _configActive[_actionNumber][_modeNumber][index]; }
+    bool configActive(uint8_t index) const { return _configActive[index]; }
 };

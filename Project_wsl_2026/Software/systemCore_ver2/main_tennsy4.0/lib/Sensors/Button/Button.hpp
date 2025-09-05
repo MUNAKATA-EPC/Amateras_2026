@@ -9,7 +9,9 @@ private:
     uint8_t _pin = 0;                // ボタンのピン番号
     uint8_t _pinmode = INPUT_PULLUP; // ボタンのピンモード
 
-    int8_t _count = 0; // ボタンが押されている回数格納用
+    bool _pressed = false;
+    bool _oldpressed = false;
+    bool _released = false;
 
     Timer _pushingTimer; // 押されている時間計測用
     unsigned long _pushingTime = 0;

@@ -13,11 +13,12 @@ void BNO055::begin(Button *resetbtn)
 {
     Timer bnoTimer;
     bnoTimer.reset();
-    while (!_bno->begin(OPERATION_MODE_IMUPLUS) && bnoTimer.msTime() < 5000)
+    bool bnosuccess = _bno->begin(OPERATION_MODE_IMUPLUS);
+    while (!bnosuccess && bnoTimer.msTime() < 5000)
     {
         delay(10); // BNO055の通信開始待ち
     }
-    if (!_bno->begin(OPERATION_MODE_IMUPLUS))
+    if (!bnosuccess)
     {
         Serial.println("bno timeout");
     }
