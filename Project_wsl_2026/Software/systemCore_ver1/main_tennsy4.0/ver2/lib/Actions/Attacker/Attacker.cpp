@@ -22,7 +22,7 @@ void playAttacker(int mode, int power)
     {
         pd_deg = bno.deg();
     }
-    motors.PDprocess(pd, pd_deg, 0); // pd成分計算
+    motors.PDprocess(pd, pd_deg, 0); // PD成分計算
 
     // キッカー
     kicker.kick(catchSensor.read() == CATCH);
