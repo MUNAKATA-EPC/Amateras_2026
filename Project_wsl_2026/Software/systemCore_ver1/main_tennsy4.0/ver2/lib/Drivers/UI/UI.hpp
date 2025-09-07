@@ -33,6 +33,7 @@ public:
     // データの取得
     bool actionDecided() const { return _actionDecided; }
     bool modeDecided() const { return _modeDecided; }
+    bool running() const { return _modeDecided && _actionDecided && _configActive[0]; }
     int actionNumber() const { return _actionNumber; }
     int modeNumber() const { return _modeNumber; }
     int configNumber() const { return _configNumber; }

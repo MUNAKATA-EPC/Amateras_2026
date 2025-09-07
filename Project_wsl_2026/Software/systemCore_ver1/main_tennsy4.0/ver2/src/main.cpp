@@ -26,4 +26,26 @@ void loop()
         timer.reset();
         ui.process(); // 100msに一回更新
     }
+
+    // 動作を実行
+    if (!ui.running())
+    {
+        Serial.println("now sellecting...");
+        kicker.kick(false); // キッカーを動かさない
+        motors.stop();      // 動作選択中はモータを止める
+    }
+    else
+    {
+        switch (ui.actionNumber())
+        {
+        case Action::ATTACKER:
+            break;
+        case Action::DEFENDER:
+            break;
+        case Action::TEST:
+            break;
+        case Action::RADICON:
+            break;
+        }
+    }
 }
