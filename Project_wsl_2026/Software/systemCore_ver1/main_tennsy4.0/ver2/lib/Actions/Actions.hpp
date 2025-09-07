@@ -1,5 +1,10 @@
 /*実際の動きの部分*/
 #pragma once
 
+#include <Arduino.h>
+#include "Sensors.hpp"
+#include "Functions.hpp"
+#include "Drivers.hpp"
+
 #include "Attacker/Attacker.hpp"
 #include "Defender/Defender.hpp"
