@@ -8,24 +8,13 @@
 #include "DigitalSensor/DigitalSensor.hpp"
 #include "Button/Button.hpp"
 
-class Sensors
-{
-public:
-    BallSensor ir;
-    LineSensor line;
-    Openmv cam;
-    BNO055 bno;
-    DigitalSensor catchSensor;
+extern BallSensor ir;
+extern LineSensor line;
+extern Openmv cam;
+extern BNO055 bno;
+extern DigitalSensor catchSensor;
 
-    Sensors();
-    void begin();
-    void update();
-};
-
-// グローバル参照（宣言のみ）
-extern Sensors sensors;
-extern DigitalSensor &catchSensor;
-extern BallSensor &ir;
-extern LineSensor &line;
-extern Openmv &cam;
-extern BNO055 &bno;
+// すべてのセンサーを開始させる関数
+void SensorsBegin();
+// すべてのセンサーを更新させる関数
+void SensorsUpdate();

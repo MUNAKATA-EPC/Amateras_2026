@@ -3,8 +3,9 @@
 PD pdGyro(0.78, 0.025); // ジャイロ用のPD
 PD pdCam(0.6, 0.02);    // カメラ用のPD
 
-void playAttacker(bool mode, int power)
+void playAttacker(int mode, int power)
 {
+    // PD制御
     switch (mode)
     {
     case Attacker::Mode::GYRO:
@@ -32,5 +33,9 @@ void playAttacker(bool mode, int power)
         break;
     }
 
+    //キッカー
+    kicker.kick(catchSensor.read() == CATCH);
+
+    //移動
     motors.move(0, 50);
 }

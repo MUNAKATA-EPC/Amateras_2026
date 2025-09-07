@@ -10,15 +10,15 @@ void setup()
     // PCとのシリアル通信の開始
     Serial.begin(9600);
     // センサー類の開始
-    sensors.begin();
+    SensorsBegin();
     // ドライバー類の開始
-    drivers.begin();
+    DriversBegin();
 }
 
 void loop()
 {
     // センサー類の更新
-    sensors.update();
+    SensorsUpdate();
 
     // uiを実行
     if (!timer.everCalled() || timer.msTime() > 100) // まだ呼ばれていない場合もタイマーをリセットさせる

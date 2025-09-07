@@ -6,19 +6,9 @@
 #include "Motors/Motors.hpp"
 #include "UI/UI.hpp"
 
-class Drivers
-{
-public:
-    Kicker kicker;
-    UI ui;
-    Motors motors;
+extern Kicker kicker;
+extern UI ui;
+extern Motors motors;
 
-    Drivers();
-    void begin();
-};
-
-// グローバル参照（宣言のみ）
-extern Drivers drivers;
-extern Kicker &kicker;
-extern UI &ui;
-extern Motors &motors;
+// すべてのドライバーを開始させる関数
+void DriversBegin();
