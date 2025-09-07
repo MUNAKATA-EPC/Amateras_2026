@@ -287,10 +287,10 @@ void UI::process()
     _ssd->setTextColor(SSD1306_WHITE, SSD1306_BLACK);
     _ssd->setCursor(0, 0);
     _ssd->println(actionName);
-    if (_modeDecided)
-        _ssd->print("-->");
+    if (_actionDecided)
+        _ssd->print(">");
     else
-        _ssd->print("---");
+        _ssd->print("");
     _ssd->println(modeName);
     // config 表示
     for (int i = 0; i < configCount; i++)
