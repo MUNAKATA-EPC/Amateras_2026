@@ -14,13 +14,8 @@ public:
     BallSensor ir;
     LineSensor line;
     Openmv cam;
-    Button resetButton;
     BNO055 bno;
     DigitalSensor catchSensor;
-    DigitalSensor motorToggle;
-    Button enterButton;
-    Button rightButton;
-    Button leftButton;
 
     Sensors();
     void begin();
@@ -29,12 +24,7 @@ public:
 
 // グローバル参照（宣言のみ）
 extern Sensors sensors;
-extern Button &enterButton;
-extern Button &rightButton;
-extern Button &leftButton;
-extern Button &resetButton;
 extern DigitalSensor &catchSensor;
-extern DigitalSensor &motorToggle;
 extern BallSensor &ir;
 extern LineSensor &line;
 extern Openmv &cam;

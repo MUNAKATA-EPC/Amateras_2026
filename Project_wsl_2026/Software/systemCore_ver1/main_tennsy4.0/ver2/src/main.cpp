@@ -11,8 +11,8 @@ void setup()
     Serial.begin(9600);
     // センサー類の開始
     sensors.begin();
-    // uiの初期設定・開始
-    ui.begin(&enterButton, &rightButton, &leftButton);
+    // ドライバー類の開始
+    drivers.begin();
 }
 
 void loop()
