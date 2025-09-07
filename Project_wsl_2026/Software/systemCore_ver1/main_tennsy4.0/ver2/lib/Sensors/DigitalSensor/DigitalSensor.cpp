@@ -1,6 +1,7 @@
 #include "DigitalSensor.hpp"
 
-DigitalSensor::DigitalSensor(uint8_t pin){
+DigitalSensor::DigitalSensor(uint8_t pin)
+{
     _pin = pin;
 }
 
@@ -9,6 +10,12 @@ void DigitalSensor::begin()
     pinMode(_pin, INPUT);
 }
 
-bool DigitalSensor::read(){
-    return digitalRead(_pin);
+DigitalSensor::ToggleSwitch DigitalSensor::readToggle()
+{
+    return ToggleSwitch(digitalRead(_pin));
+}
+
+DigitalSensor::CatchSensor DigitalSensor::readCatch()
+{
+    return CatchSensor(digitalRead(_pin));
 }

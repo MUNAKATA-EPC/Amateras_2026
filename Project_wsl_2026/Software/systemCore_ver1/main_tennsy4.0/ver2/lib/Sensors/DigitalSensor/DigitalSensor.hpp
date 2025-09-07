@@ -2,13 +2,6 @@
 
 #include <Arduino.h>
 
-// キャッチセンサーで使える
-#define CATCH HIGH
-#define NONE LOW
-// トグルスイッチで使える
-#define ON HIGH
-#define OFF LOW
-
 class DigitalSensor
 {
 private:
@@ -18,5 +11,18 @@ public:
     //  関数・コントラクタ
     DigitalSensor(uint8_t pin); // 定義
     void begin();               // 開始
-    bool read();                // 取得
+
+    enum ToggleSwitch
+    {
+        ON = HIGH,
+        OFF = LOW
+    };
+
+    enum CatchSensor
+    {
+        Catch = HIGH,
+        NONE = LOW
+    };
+    ToggleSwitch readToggle(); // 取得(トグルスイッチ版)
+    CatchSensor readCatch();   // 取得(キャッチセンサー版)
 };
