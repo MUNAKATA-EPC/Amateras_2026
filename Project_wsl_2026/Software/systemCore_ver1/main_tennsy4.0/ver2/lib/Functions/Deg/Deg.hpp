@@ -7,42 +7,42 @@ int areaIndexFromDeg(int n, int deg);   // n分割したときのdegに最も近
 int degFromAreaIndex(int n, int index); // n分割したときのindex番目のエリアの角度を返す
 
 // 4・8・16分割の時は特別定義
-enum Area4
+enum class Area4
 {
     FRONT,
     RIGHT,
     BACK,
     LEFT
 };
-enum Area8
+enum class Area8
 {
-    FRONT8,
+    FRONT,
     FRONT_RIGHT,
-    RIGHT8,
+    RIGHT,
     BACK_RIGHT,
-    BACK8,
+    BACK,
     BACK_LEFT,
-    LEFT8,
-    FRONT_LEFT8
+    LEFT,
+    FRONT_LEFT
 };
-enum Area16
+enum class Area16
 {
-    FRONT16,
+    FRONT,
     FRONT_FRONT_RIGHT,
-    FRONT_RIGHT16,
+    FRONT_RIGHT,
     RIGHT_FRONT_RIGHT,
-    RIGHT16,
+    RIGHT,
     RIGHT_BACK_RIGHT,
-    BACK_RIGHT16,
+    BACK_RIGHT,
     BACK_BACK_RIGHT,
-    BACK16,
+    BACK,
     BACK_BACK_LEFT,
-    BACK_LEFT16,
+    BACK_LEFT,
     LEFT_BACK_LEFT,
-    LEFT16,
+    LEFT,
     LEFT_FRONT_LEFT,
-    FRONT_LEFT16,
-    FRONT_FRONT_LEFT16
+    FRONT_LEFT,
+    FRONT_FRONT_LEFT
 };
 Area4 area4(int deg);
 Area8 area8(int deg);
