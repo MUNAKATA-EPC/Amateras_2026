@@ -31,4 +31,6 @@ void playAttacker(bool mode, int power)
         }
         break;
     }
+
+    motors.move(0, 50);
 }
