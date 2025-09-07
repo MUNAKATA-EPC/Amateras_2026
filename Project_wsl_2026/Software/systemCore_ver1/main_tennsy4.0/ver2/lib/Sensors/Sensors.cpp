@@ -20,7 +20,7 @@ void SensorsBegin()
     bno.begin(&resetButton);
 }
 
-void SensorsUpate()
+void SensorsUpdate()
 {
     ir.update();
     line.update();

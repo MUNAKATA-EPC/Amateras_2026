@@ -6,36 +6,27 @@ PD pdCam(0.6, 0.02);    // カメラ用のPD
 void playAttacker(int mode, int power)
 {
     // PD制御
-    switch (mode)
+    int pd_deg = 0;
+    PD *pd = &pdGyro; // デフォルトはジャイロ
+    if (mode == Attacker::Mode::YELLOWGOAL && cam.yellowGoal.detected())
     {
-    case Attacker::Mode::GYRO:
-        motors.PDprocess(&pdGyro, bno.deg(), 0);
-        break;
-    case Attacker::Mode::YELLOWGOAL:
-        if (cam.yellowGoal.detected())
-        {
-            motors.PDprocess(&pdCam, cam.yellowGoal.deg(), 0);
-        }
-        else
-        {
-            motors.PDprocess(&pdGyro, bno.deg(), 0);
-        }
-        break;
-    case Attacker::Mode::BLUEGOAL:
-        if (cam.blueGoal.detected())
-        {
-            motors.PDprocess(&pdCam, cam.blueGoal.deg(), 0);
-        }
-        else
-        {
-            motors.PDprocess(&pdGyro, bno.deg(), 0);
-        }
-        break;
+        pd = &pdCam;
+        pd_deg = cam.yellowGoal.deg();
     }
+    else if (mode == Attacker::Mode::BLUEGOAL && cam.blueGoal.detected())
+    {
+        pd = &pdCam;
+        pd_deg = cam.blueGoal.deg();
+    }
+    else
+    {
+        pd_deg = bno.deg();
+    }
+    motors.PDprocess(pd, pd_deg, 0); // pd成分計算
 
-    //キッカー
+    // キッカー
     kicker.kick(catchSensor.read() == CATCH);
 
-    //移動
+    // 移動
     motors.move(0, 50);
 }
