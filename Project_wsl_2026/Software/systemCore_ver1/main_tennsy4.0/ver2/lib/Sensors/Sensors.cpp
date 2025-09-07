@@ -28,7 +28,7 @@ void Sensors::update()
     bno.update();
 }
 
-// ショートカットキー
+// ショートカット
 Sensors sensors;
 DigitalSensor &catchSensor = sensors.catchSensor;
 BallSensor &ir = sensors.ir;

@@ -14,7 +14,7 @@ void Drivers::begin()
     ui.begin(&Button(11, INPUT_PULLDOWN), &Button(12, INPUT_PULLDOWN), &Button(10, INPUT_PULLDOWN));
 }
 
-// ショートカットキー
+// ショートカット
 Drivers drivers;
 Kicker &kicker = drivers.kicker;
 UI &ui = drivers.ui;
