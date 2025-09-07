@@ -11,6 +11,7 @@ class Drivers
 public:
     Kicker kicker;
     UI ui;
+    Motors motors;
 
     Drivers();
     void begin();
@@ -20,3 +21,4 @@ public:
 extern Drivers drivers;
 extern Kicker &kicker;
 extern UI &ui;
+extern Motors &motors;
