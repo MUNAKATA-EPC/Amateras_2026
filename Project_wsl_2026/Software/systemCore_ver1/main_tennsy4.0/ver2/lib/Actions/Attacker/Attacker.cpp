@@ -25,7 +25,7 @@ void playAttacker(int mode, int power)
     motors.PDprocess(pd, pd_deg, 0); // PD成分計算
 
     // キッカー
-    kicker.kick(catchSensor.readCatch() == DigitalSensor::CatchSensor::Catch);
+    kicker.kick(catchSensor.read() == HIGH);
 
     if(area4(line.deg()) == Area4::BACK)
 

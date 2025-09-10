@@ -21,7 +21,7 @@ void DSR1202::stop()
 
 void DSR1202::move(int value_1ch, int value_2ch, int value_3ch, int value_4ch)
 {
-    if (_toggle->readToggle() == DigitalSensor::ToggleSwitch::OFF)
+    if (_toggle->read() == LOW)
     {
         stop(); 
         return;

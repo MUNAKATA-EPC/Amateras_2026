@@ -10,12 +10,7 @@ void DigitalSensor::begin()
     pinMode(_pin, INPUT);
 }
 
-DigitalSensor::ToggleSwitch DigitalSensor::readToggle()
+bool DigitalSensor::read()
 {
-    return ToggleSwitch(digitalRead(_pin));
-}
-
-DigitalSensor::CatchSensor DigitalSensor::readCatch()
-{
-    return CatchSensor(digitalRead(_pin));
+    return bool(digitalRead(_pin));
 }

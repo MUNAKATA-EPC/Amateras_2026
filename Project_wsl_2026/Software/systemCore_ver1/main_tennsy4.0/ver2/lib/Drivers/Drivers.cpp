@@ -6,7 +6,7 @@ Kicker kicker(7, 8);
 Motors motors(&Serial2, 115200);
 DigitalSensor motorsToggle(5); //<-ここでしか使えない
 // UI
-UI ui(&Wire, 0x3C, 128, 64);
+UI ui(&Wire1, 0x3C, 128, 64);
 Button enterButton(11, INPUT_PULLDOWN); //<-ここでしか使えない
 Button rightButton(12, INPUT_PULLDOWN); //<-ここでしか使えない
 Button leftButton(10, INPUT_PULLDOWN);  //<-ここでしか使えない

@@ -25,6 +25,11 @@ void UI::begin(Button *enterbtn, Button *rightbtn, Button *leftbtn)
         Serial.println("ssd timeout");
     }
     _ssd->clearDisplay(); // 画面初期化
+    _ssd->setTextSize(1);
+    _ssd->setTextColor(SSD1306_WHITE, SSD1306_BLACK);
+    _ssd->setCursor(0, 0);
+    _ssd->print("Hello ssd!");
+    _ssd->display(); // 試験的描画
 
     _enterbtn = enterbtn;
     _rightbtn = rightbtn;
@@ -37,9 +42,6 @@ void UI::begin(Button *enterbtn, Button *rightbtn, Button *leftbtn)
 
 void UI::process()
 {
-    // 初期化
-    _ssd->clearDisplay();
-
     // ボタン
     _enterbtn->update();
     _rightbtn->update();
@@ -283,26 +285,28 @@ void UI::process()
         break;
     }
     // 画面描画
+    _ssd->clearDisplay(); // 初期化
+
     _ssd->setTextSize(1);
     _ssd->setTextColor(SSD1306_WHITE, SSD1306_BLACK);
     _ssd->setCursor(0, 0);
     // action表示
-    _ssd->print(">");
+    _ssd->print("> ");
     _ssd->print(actionName);
     if (!_actionDecided)
     {
-        _ssd->println("<");
+        _ssd->println(" <");
     }
     else
     {
         _ssd->println("");
 
         // mode表示
-        _ssd->print(" >");
+        _ssd->print(" > ");
         _ssd->print(modeName);
         if (!_modeDecided)
         {
-            _ssd->println("<");
+            _ssd->println(" <");
         }
         else
         {
@@ -310,9 +314,11 @@ void UI::process()
 
             // config 表示
             int configNameMaxLength = 0;
-            for(int i = 0;i < configCount;i++){
+            for (int i = 0; i < configCount; i++)
+            {
                 int len = strlen(configName[i]);
-                if(len > configNameMaxLength) configNameMaxLength = len;
+                if (len > configNameMaxLength)
+                    configNameMaxLength = len;
             }
             for (int i = 0; i < configCount; i++)
             {
@@ -355,5 +361,5 @@ void UI::process()
         }
     }
 
-    _ssd->display();
+    _ssd->display(); // 表示
 }
