@@ -37,3 +37,36 @@ Area16 area16(int deg)
 {
     return Area16(areaIndexFromDeg(16, deg));
 }
+
+int mapDeg(int deg, int deg_in, int deg_out, MapMode mode)
+{
+    // 0~360 -> -180~180にする
+    if (deg > 180)
+        deg -= 360;
+
+    // 計算
+    int output;
+    double scale;
+    switch (mode)
+    {
+    case MapMode::HIREI:
+        scale = (double)deg_out / deg_in;
+        output = deg * scale;
+        break;
+
+    case MapMode::NIJI:
+        scale = (double)deg_out / (deg_in * deg_in);
+        output = deg * deg * scale;
+        break;
+
+    default:
+        output = deg;
+        break;
+    }
+
+    //-180~180 -> 0~360にする
+    if (output < 0)
+        output += 360;
+
+    return output;
+}

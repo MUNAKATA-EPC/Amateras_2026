@@ -27,6 +27,7 @@ public:
     void setPdSign(int sign_1ch, int sign_2ch, int sign_3ch, int sign_4ch);   // PD制御のための符号をセット
     // 制御系
     void stop();
-    void PDprocess(PD *pd, int deg, int target);
-    void move(int deg, int power);
+    void PDprocess(PD *pd, int deg, int target); // PD出力範囲は-100~100
+    void move(int deg, int power);               // PD出力範囲は-100~100
+    void PDmove();                               // PD出力範囲は-100~100
 };

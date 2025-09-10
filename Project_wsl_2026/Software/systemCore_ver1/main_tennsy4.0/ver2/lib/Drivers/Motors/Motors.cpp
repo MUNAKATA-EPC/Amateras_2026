@@ -47,8 +47,8 @@ void Motors::PDprocess(PD *pd, int deg, int target)
 
 void Motors::move(int deg, int power)
 {
-    deg = (deg + 90) % 360; // 前を0度にする
-
+    deg = (deg + 180) % 360; // 前を0度にする
+    /*
     // いったん計算
     double max_move_output = 0.0;
     for (int i = 0; i < 4; i++)
@@ -65,12 +65,36 @@ void Motors::move(int deg, int power)
         _move_output[i] *= scale;
     }
     // PD成分を付け加えて最終出力を決定
-    double pd_output = _pd->output();
+    double pd_output = -_pd->output();
     for (int i = 0; i < 4; i++)
     {
         _output[i] = (int)round(constrain(_move_output[i] + pd_output * _pd_sign[i], -power, power));
     }
+    */
+    // いったん計算
+    double pd_output = -map(_pd->output(), -100, 100, -power, power);
+    double max_output = 0.0;
+    for (int i = 0; i < 4; i++)
+    {
+        Vector vec(deg + _deg_position[i], power);        // "i"chから見た移動方向のベクトル
+        _output[i] = vec.x() * _move_sign[i] + pd_output; // "i"chの出力(X成分だけが移動に使える)
+
+        max_output = (fabs(_output[i]) > max_output) ? fabs(_output[i]) : max_output; // 前よりも大きいなら更新
+    }
+    // 最大にする
+    double scale = (max_output != 0) ? power / max_output : 0; // 出力がpowerになるようにするためのスケール
+    for (int i = 0; i < 4; i++)
+    {
+        _move_output[i] *= scale;
+    }
 
     // 制御
     _dsr->move(_output[0], _output[1], _output[2], _output[3]); // 制御
+}
+
+void Motors::PDmove()
+{
+    // 制御
+    double pd_output = -_pd->output();
+    _dsr->move((int)pd_output, (int)pd_output, (int)pd_output, (int)pd_output); // 制御
 }

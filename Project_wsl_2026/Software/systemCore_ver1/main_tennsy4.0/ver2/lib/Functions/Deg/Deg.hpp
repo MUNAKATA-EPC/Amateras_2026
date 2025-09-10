@@ -6,6 +6,13 @@ int diffDeg(int deg1, int deg2); // 二つの角度の差を返す
 int areaIndexFromDeg(int n, int deg);   // n分割したときのdegに最も近いエリアを返す
 int degFromAreaIndex(int n, int index); // n分割したときのindex番目のエリアの角度を返す
 
+enum class MapMode
+{
+    HIREI,
+    NIJI
+};
+int mapDeg(int deg, int deg_in, int deg_out, MapMode mode); // 角度をin->outになるように変形させその角度を返す
+
 // 4・8・16分割の時は特別定義
 enum class Area4
 {

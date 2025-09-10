@@ -12,6 +12,7 @@ extern BallSensor ir;
 extern LineSensor line;
 extern Openmv cam;
 extern BNO055 bno;
+extern Button resetButton;
 extern DigitalSensor catchSensor;
 
 // すべてのセンサーを開始させる関数

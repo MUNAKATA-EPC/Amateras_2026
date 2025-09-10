@@ -2,4 +2,4 @@
 
 #include "Actions.hpp"
 
-void playAttacker(int mode, int power);
+void playAttacker(Attacker::Mode mode, int power);

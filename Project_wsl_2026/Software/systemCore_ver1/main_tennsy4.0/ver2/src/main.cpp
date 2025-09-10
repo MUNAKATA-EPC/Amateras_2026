@@ -39,7 +39,7 @@ void loop()
         switch (ui.actionNumber())
         {
         case Action::ATTACKER:
-            playAttacker(ui.modeNumber(), 95);
+            playAttacker((Attacker::Mode)ui.modeNumber(), 95);
             break;
         case Action::DEFENDER:
             break;
@@ -49,4 +49,6 @@ void loop()
             break;
         }
     }
+
+    kicker.kick(resetButton.isReleased());
 }

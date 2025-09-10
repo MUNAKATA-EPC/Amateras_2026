@@ -1,15 +1,15 @@
 #include "Drivers.hpp"
 
 // キッカー
-Kicker kicker(7, 8);
+Kicker kicker(2, 3);
 // モーター
-Motors motors(&Serial2, 115200);
+Motors motors(&Serial1, 115200);
 DigitalSensor motorsToggle(5); //<-ここでしか使えない
 // UI
 UI ui(&Wire1, 0x3C, 128, 64);
-Button enterButton(11, INPUT_PULLDOWN); //<-ここでしか使えない
-Button rightButton(12, INPUT_PULLDOWN); //<-ここでしか使えない
-Button leftButton(10, INPUT_PULLDOWN);  //<-ここでしか使えない
+Button enterButton(11, INPUT_PULLDOWN);
+Button rightButton(12, INPUT_PULLDOWN);
+Button leftButton(10, INPUT_PULLDOWN);
 
 void DriversBegin()
 {

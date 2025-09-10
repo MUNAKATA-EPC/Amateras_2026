@@ -8,6 +8,10 @@
 
 extern Kicker kicker;
 extern UI ui;
+extern Button enterButton;
+extern Button rightButton;
+extern Button leftButton;
+
 extern Motors motors;
 
 // すべてのドライバーを開始させる関数
