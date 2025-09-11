@@ -25,8 +25,6 @@ void loop()
     {
         timer.reset();
         ui.process(true); // 10msに一回更新
-
-        Serial.println("show");
     }
     else
     {
@@ -36,7 +34,7 @@ void loop()
     // 動作を実行
     if (!ui.running())
     {
-        // Serial.println("now sellecting...");
+        Serial.println("now sellecting...");
         kicker.kick(false); // キッカーを動かさない
         motors.stop();      // 動作選択中はモータを止める
     }
