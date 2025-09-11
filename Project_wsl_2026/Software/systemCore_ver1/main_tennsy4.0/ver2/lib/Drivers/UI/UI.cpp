@@ -40,7 +40,7 @@ void UI::begin(Button *enterbtn, Button *rightbtn, Button *leftbtn)
     _leftbtn->begin();
 }
 
-void UI::process()
+void UI::process(bool show)
 {
     // ボタン
     _enterbtn->update();
@@ -285,26 +285,17 @@ void UI::process()
         break;
     }
     // 画面描画
-    _ssd->clearDisplay(); // 初期化
-
-    _ssd->setTextSize(1);
-    _ssd->setTextColor(SSD1306_WHITE, SSD1306_BLACK);
-    _ssd->setCursor(0, 0);
-    // action表示
-    _ssd->print("> ");
-    _ssd->print(actionName);
-    if (!_actionDecided)
+    if (show)
     {
-        _ssd->println(" <");
-    }
-    else
-    {
-        _ssd->println("");
+        _ssd->clearDisplay(); // 初期化
 
-        // mode表示
-        _ssd->print(" > ");
-        _ssd->print(modeName);
-        if (!_modeDecided)
+        _ssd->setTextSize(1);
+        _ssd->setTextColor(SSD1306_WHITE, SSD1306_BLACK);
+        _ssd->setCursor(0, 0);
+        // action表示
+        _ssd->print("> ");
+        _ssd->print(actionName);
+        if (!_actionDecided)
         {
             _ssd->println(" <");
         }
@@ -312,54 +303,66 @@ void UI::process()
         {
             _ssd->println("");
 
-            // config 表示
-            int configNameMaxLength = 0;
-            for (int i = 0; i < configCount; i++)
+            // mode表示
+            _ssd->print(" > ");
+            _ssd->print(modeName);
+            if (!_modeDecided)
             {
-                int len = strlen(configName[i]);
-                if (len > configNameMaxLength)
-                    configNameMaxLength = len;
+                _ssd->println(" <");
             }
-            for (int i = 0; i < configCount; i++)
+            else
             {
-                if (i == 0) // Runは大きく
-                    _ssd->setTextSize(2);
-                else
-                    _ssd->setTextSize(1);
-
-                if (i == _configNumber) // 選択中の文字は変更する
-                {
-                    //_ssd->setTextColor(SSD1306_BLACK, SSD1306_WHITE);
-                    if (i == 0)
-                        _ssd->print("|");
-                    else
-                        _ssd->print(" |");
-                }
-                else
-                {
-                    //_ssd->setTextColor(SSD1306_WHITE, SSD1306_BLACK);
-                    if (i == 0)
-                        _ssd->print(" ");
-                    else
-                        _ssd->print("  ");
-                }
-
-                _ssd->print(configName[i]);
-                if (i != 0) // Runじゃないなら
-                {
-                    int tabspace = (configNameMaxLength + 1) - strlen(configName[i]);
-                    for (int i = 0; i < tabspace; i++)
-                    {
-                        _ssd->print(" ");
-                    }
-                }
-                _ssd->print(":");
-                _ssd->print(_configActive[i] ? "on" : "off");
-
                 _ssd->println("");
+
+                // config 表示
+                int configNameMaxLength = 0;
+                for (int i = 0; i < configCount; i++)
+                {
+                    int len = strlen(configName[i]);
+                    if (len > configNameMaxLength)
+                        configNameMaxLength = len;
+                }
+                for (int i = 0; i < configCount; i++)
+                {
+                    if (i == 0) // Runは大きく
+                        _ssd->setTextSize(2);
+                    else
+                        _ssd->setTextSize(1);
+
+                    if (i == _configNumber) // 選択中の文字は変更する
+                    {
+                        //_ssd->setTextColor(SSD1306_BLACK, SSD1306_WHITE);
+                        if (i == 0)
+                            _ssd->print("|");
+                        else
+                            _ssd->print(" |");
+                    }
+                    else
+                    {
+                        //_ssd->setTextColor(SSD1306_WHITE, SSD1306_BLACK);
+                        if (i == 0)
+                            _ssd->print(" ");
+                        else
+                            _ssd->print("  ");
+                    }
+
+                    _ssd->print(configName[i]);
+                    if (i != 0) // Runじゃないなら
+                    {
+                        int tabspace = (configNameMaxLength + 1) - strlen(configName[i]);
+                        for (int i = 0; i < tabspace; i++)
+                        {
+                            _ssd->print(" ");
+                        }
+                    }
+                    _ssd->print(":");
+                    _ssd->print(_configActive[i] ? "on" : "off");
+
+                    _ssd->println("");
+                }
             }
         }
-    }
 
-    _ssd->display(); // 表示
+        _ssd->display(); // 表示
+    }
 }

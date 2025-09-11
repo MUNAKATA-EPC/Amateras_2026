@@ -21,16 +21,22 @@ void loop()
     SensorsUpdate();
 
     // uiを実行
-    if (!timer.everCalled() || timer.msTime() > 100) // まだ呼ばれていない場合もタイマーをリセットさせる
+    if ((!timer.everCalled() || timer.msTime() > 10) && !ui.running()) // まだ呼ばれていない場合もタイマーをリセットさせる
     {
         timer.reset();
-        ui.process(); // 100msに一回更新
+        ui.process(true); // 10msに一回更新
+
+        Serial.println("show");
+    }
+    else
+    {
+        ui.process(false);
     }
 
     // 動作を実行
     if (!ui.running())
     {
-        Serial.println("now sellecting...");
+        // Serial.println("now sellecting...");
         kicker.kick(false); // キッカーを動かさない
         motors.stop();      // 動作選択中はモータを止める
     }

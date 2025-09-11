@@ -28,7 +28,7 @@ public:
     // 関数・コントラクタ
     UI(TwoWire *wire, uint8_t address, uint8_t width, uint8_t height);
     void begin(Button *enterbtn, Button *rightbtn, Button *leftbtn);
-    void process();
+    void process(bool show);
 
     // データの取得
     bool actionDecided() const { return _actionDecided; }
