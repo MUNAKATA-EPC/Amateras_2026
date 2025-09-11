@@ -3,6 +3,16 @@
 #include "Functions.hpp"
 #include "Sensors.hpp"
 
+enum PrintMode
+{
+    ALL,
+    IR,
+    LINE,
+    GYRO,
+    CAM
+};
+void playPrint(PrintMode mode); // シリアルプリントする関数
+
 Timer timer; // ui更新用のタイマー
 
 void setup()
@@ -40,6 +50,7 @@ void loop()
     }
     else
     {
+        playPrint(PrintMode::ALL);
         switch (ui.actionNumber())
         {
         case Action::ATTACKER:
@@ -55,4 +66,54 @@ void loop()
     }
 
     kicker.kick(resetButton.isReleased());
+}
+
+void playPrint(PrintMode mode)
+{
+    switch (mode)
+    {
+    case PrintMode::ALL:
+    case PrintMode::IR:
+        Serial.print("ir.deg:");
+        Serial.print(ir.deg());
+        if (mode == PrintMode::IR)
+        {
+            Serial.print(" ir.val:");
+            Serial.print(ir.val());
+            break;
+        }
+    case PrintMode::LINE:
+        Serial.print(" line.deg:");
+        Serial.print(line.deg());
+        if (mode == PrintMode::LINE)
+        {
+            Serial.print(" line.dis:");
+            Serial.print(line.dis());
+            break;
+        }
+    case PrintMode::GYRO:
+        Serial.print(" bno.deg:");
+        Serial.print(bno.deg());
+        if (mode == PrintMode::GYRO)
+        {
+            break;
+        }
+    case PrintMode::CAM:
+        Serial.print(" yellow.deg:");
+        Serial.print(cam.yellowGoal.deg());
+        if (mode == PrintMode::CAM)
+        {
+            Serial.print(" yellow.dis:");
+            Serial.print(cam.yellowGoal.dis());
+        }
+        Serial.print(" blue.deg:");
+        Serial.print(cam.blueGoal.deg());
+        if (mode == PrintMode::CAM)
+        {
+            Serial.print(" blue.dis:");
+            Serial.print(cam.blueGoal.dis());
+            break;
+        }
+    }
+    Serial.println();
 }

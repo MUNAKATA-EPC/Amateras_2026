@@ -23,7 +23,7 @@ void Kicker::kick(bool signal)
         digitalWrite(_chargepin, LOW);
         _kickTimer.reset();
     }
-    else if (_kickTimer.msTime() <= 50)
+    else if (_kickTimer.msTime() <= 200)
     {
         digitalWrite(_kickpin, HIGH);
         digitalWrite(_chargepin, LOW);
