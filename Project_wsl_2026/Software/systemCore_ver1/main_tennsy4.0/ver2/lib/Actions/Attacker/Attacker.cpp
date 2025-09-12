@@ -40,7 +40,7 @@ void playAttacker(Attacker::Mode mode, int power)
         }
         else if (ir.deg() < 30 || ir.deg() > 330)
          {
-             motors.move(mapDeg(ir.deg(), 30, 42, MapMode::HIREI), power);
+             motors.move(mapDeg(ir.deg(), 30, 52, MapMode::NIJI), power);
          }
         else if (ir.val() > 60)
         {
