@@ -39,17 +39,17 @@ void Openmv::update()
 
             // コートの角度
             deg = readSerial();
-            field.set(deg, 0);
+            field.set(deg, 0, deg != -1);
 
             // 黄色ゴールの角度・距離
             deg = readSerial();
             dis = readSerial();
-            yellowGoal.set(deg, dis);
+            yellowGoal.set(deg, dis, deg != -1);
 
             // 青色ゴールの角度・距離
             deg = readSerial();
             dis = readSerial();
-            blueGoal.set(deg, dis);
+            blueGoal.set(deg, dis, deg != -1);
         }
         else
         {

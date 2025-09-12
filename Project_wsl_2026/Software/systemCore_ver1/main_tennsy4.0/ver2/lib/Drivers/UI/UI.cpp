@@ -11,7 +11,7 @@ UI::UI(TwoWire *wire, uint8_t address, uint8_t width, uint8_t height)
     _address = address;
 }
 
-void UI::begin(Button *enterbtn, Button *rightbtn, Button *leftbtn)
+void UI::begin()
 {
     Timer my_display_timer;
     my_display_timer.reset();
@@ -30,25 +30,12 @@ void UI::begin(Button *enterbtn, Button *rightbtn, Button *leftbtn)
     _ssd->setCursor(0, 0);
     _ssd->print("Hello ssd!");
     _ssd->display(); // 試験的描画
-
-    _enterbtn = enterbtn;
-    _rightbtn = rightbtn;
-    _leftbtn = leftbtn;
-
-    _enterbtn->begin();
-    _rightbtn->begin();
-    _leftbtn->begin();
 }
 
-void UI::process(bool show)
+void UI::process(bool show,bool enterbtn,bool rightbtn,bool leftbtn)
 {
-    // ボタン
-    _enterbtn->update();
-    _rightbtn->update();
-    _leftbtn->update();
-
     // 操作
-    if (_leftbtn->isReleased())
+    if (leftbtn)
     {
         if (_modeDecided)
         {
@@ -66,18 +53,18 @@ void UI::process(bool show)
 
     if (!_actionDecided)
     {
-        if (_rightbtn->isReleased())
+        if (rightbtn)
         {
             _actionNumber++;
             if (_actionNumber > Action::Type::COUNT - 1)
                 _actionNumber = 0;
         }
-        if (_enterbtn->isReleased())
+        if (enterbtn)
             _actionDecided = true;
     }
     else if (!_modeDecided)
     {
-        if (_rightbtn->isReleased())
+        if (rightbtn)
         {
             _modeNumber++;
             switch (_actionNumber)
@@ -100,12 +87,12 @@ void UI::process(bool show)
                 break;
             }
         }
-        if (_enterbtn->isReleased())
+        if (enterbtn)
             _modeDecided = true;
     }
     else
     {
-        if (_rightbtn->isReleased())
+        if (rightbtn)
         {
             _configNumber++;
             uint8_t configCount = 0;
@@ -128,7 +115,7 @@ void UI::process(bool show)
                 _configNumber = 0;
         }
 
-        if (_enterbtn->isReleased())
+        if (enterbtn)
         {
             _configActive[_configNumber] = !_configActive[_configNumber];
         }

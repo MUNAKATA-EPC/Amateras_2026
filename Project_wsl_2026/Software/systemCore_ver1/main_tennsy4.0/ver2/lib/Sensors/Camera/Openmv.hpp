@@ -2,7 +2,7 @@
 
 #include <Arduino.h>
 
-class OpenmvData
+class OpenmvAngleData
 {
 private:
     bool _detected;
@@ -16,11 +16,11 @@ public:
     double dis() const { return _dis; }
 
     //_degと_disと_detectedをセットする
-    void set(int deg, double dis)
+    void set(int deg, double dis, bool detected)
     {
         _deg = deg;
         _dis = dis;
-        _detected = (deg != -1);
+        _detected = detected;
     }
 };
 
@@ -40,7 +40,8 @@ public:
     void begin();                                                           // 開始
     void update();                                                          // 更新・計算
 
-    OpenmvData yellowGoal;
-    OpenmvData blueGoal;
-    OpenmvData field;
+    // データの所得
+    OpenmvAngleData yellowGoal;
+    OpenmvAngleData blueGoal;
+    OpenmvAngleData field;
 };

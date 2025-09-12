@@ -8,11 +8,14 @@
 #include "DigitalSensor/DigitalSensor.hpp"
 #include "Button/Button.hpp"
 
+extern Button resetButton;
+extern Button enterButton;
+extern Button rightButton;
+extern Button leftButton;
 extern BallSensor ir;
 extern LineSensor line;
 extern Openmv cam;
 extern BNO055 bno;
-extern Button resetButton;
 extern DigitalSensor catchSensor;
 
 // すべてのセンサーを開始させる関数

@@ -2,6 +2,14 @@
 #include "Drivers.hpp"
 #include "Functions.hpp"
 #include "Sensors.hpp"
+#include <Servo.h>
+
+/*
+#define ESC_PIN 9
+#define MIN 1000
+#define MAX 2000
+Servo esc;
+*/
 
 enum PrintMode
 {
@@ -23,6 +31,14 @@ void setup()
     SensorsBegin();
     // ドライバー類の開始
     DriversBegin();
+    // サーボモータの開始
+    /*
+    esc.attach(ESC_PIN);
+    esc.writeMicroseconds(MAX);
+    delay(500);
+    esc.writeMicroseconds(MIN);
+    delay(500);
+    */
 }
 
 void loop()
@@ -34,12 +50,15 @@ void loop()
     if ((!timer.everCalled() || timer.msTime() > 10) && !ui.running()) // まだ呼ばれていない場合もタイマーをリセットさせる
     {
         timer.reset();
-        ui.process(true); // 10msに一回更新
+        ui.process(true, enterButton.isReleased(), rightButton.isReleased(), leftButton.isReleased()); // 10msに一回更新
     }
     else
     {
-        ui.process(false);
+        ui.process(false, enterButton.isReleased(), rightButton.isReleased(), leftButton.isReleased());
     }
+
+    // ドリブラーを動かす
+    // esc.writeMicroseconds((MIN + MAX) / 2);
 
     // 動作を実行
     if (!ui.running())

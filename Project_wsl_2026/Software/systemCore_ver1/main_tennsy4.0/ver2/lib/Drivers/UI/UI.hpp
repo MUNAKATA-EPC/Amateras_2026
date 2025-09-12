@@ -11,10 +11,7 @@ class UI
 {
 private:
     Adafruit_SSD1306 *_ssd = nullptr;
-
-    Button *_enterbtn;
-    Button *_rightbtn;
-    Button *_leftbtn;
+    
     uint8_t _address;
 
     bool _actionDecided = false;
@@ -27,8 +24,8 @@ private:
 public:
     // 関数・コントラクタ
     UI(TwoWire *wire, uint8_t address, uint8_t width, uint8_t height);
-    void begin(Button *enterbtn, Button *rightbtn, Button *leftbtn);
-    void process(bool show);
+    void begin();
+    void process(bool show,bool enterbtn,bool rightbtn,bool leftbtn);
 
     // データの取得
     bool actionDecided() const { return _actionDecided; }
