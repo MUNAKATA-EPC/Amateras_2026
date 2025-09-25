@@ -7,6 +7,7 @@
 #include "Gyro/BNO055.hpp"
 #include "DigitalSensor/DigitalSensor.hpp"
 #include "Button/Button.hpp"
+#include "Converse/M5stamp.hpp"
 
 extern Button resetButton;
 extern Button enterButton;
@@ -17,6 +18,7 @@ extern LineSensor line;
 extern Openmv cam;
 extern BNO055 bno;
 extern DigitalSensor catchSensor;
+extern M5stamp ps3;
 
 // すべてのセンサーを開始させる関数
 void SensorsBegin();

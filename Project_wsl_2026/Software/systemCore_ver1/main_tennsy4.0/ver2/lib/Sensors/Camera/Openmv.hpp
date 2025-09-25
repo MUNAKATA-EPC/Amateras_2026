@@ -45,6 +45,7 @@ public:
         case BLUEGOAL:
             return _bluegoal_detected;
         }
+        return 0;
     }
     bool deg(CamData data)
     {
@@ -57,15 +58,19 @@ public:
         case BLUEGOAL:
             return _bluegoal_deg;
         }
+        return 0;
     }
     bool dis(CamData data)
     {
         switch (data)
         {
+        case FIELD:
+            return 0;
         case YELLOWGOAL:
             return _yellowgoal_dis;
         case BLUEGOAL:
             return _bluegoal_dis;
         }
+        return 0;
     }
 };

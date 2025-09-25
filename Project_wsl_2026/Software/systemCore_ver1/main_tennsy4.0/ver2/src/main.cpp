@@ -9,7 +9,8 @@ enum PrintMode
     IR,
     LINE,
     GYRO,
-    CAM
+    CAM,
+    PS3
 };
 void playPrint(PrintMode mode); // シリアルプリントする関数
 
@@ -56,7 +57,7 @@ void loop()
     }
     else
     {
-        playPrint(PrintMode::ALL);
+        //playPrint(PrintMode::PS3);
         switch (ui.actionNumber())
         {
         case Action::ATTACKER:
@@ -116,6 +117,24 @@ void playPrint(PrintMode mode)
         {
             Serial.print(" blue.dis:");
             Serial.print(cam.dis(Openmv::BLUEGOAL));
+            break;
+        }
+    case PrintMode::PS3:
+        if (mode == PrintMode::PS3)
+        {
+            Serial.print("right.deg:");
+            Serial.print(ps3.deg(M5stamp::StickData::RIGHTSTICK));
+            Serial.print(" right.dis:");
+            Serial.print(ps3.dis(M5stamp::StickData::RIGHTSTICK));
+            Serial.print(" left.deg:");
+            Serial.print(ps3.deg(M5stamp::StickData::LEFTSTICK));
+            Serial.print(" left.dis:");
+            Serial.print(ps3.dis(M5stamp::StickData::LEFTSTICK));
+            Serial.print(" button:");
+            for (int i = 0; i < 14; i++)
+            {
+                Serial.print(ps3.button((M5stamp::ButtonType)i));
+            }
             break;
         }
     }

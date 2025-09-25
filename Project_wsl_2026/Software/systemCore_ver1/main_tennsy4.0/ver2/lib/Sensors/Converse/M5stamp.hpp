@@ -50,6 +50,7 @@ public:
         case RIGHTSTICK:
             return _rightstick_detected;
         }
+        return 0;
     }
     bool deg(StickData data)
     {
@@ -60,6 +61,7 @@ public:
         case RIGHTSTICK:
             return _rightstick_deg;
         }
+        return 0;
     }
     bool dis(StickData data)
     {
@@ -70,6 +72,7 @@ public:
         case RIGHTSTICK:
             return _rightstick_dis;
         }
+        return 0;
     }
     // ボタン
     enum ButtonType

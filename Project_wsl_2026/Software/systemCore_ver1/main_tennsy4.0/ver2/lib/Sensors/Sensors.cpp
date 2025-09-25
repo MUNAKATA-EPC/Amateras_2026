@@ -1,6 +1,6 @@
 #include "Sensors.hpp"
 
-//ボタン
+// ボタン
 Button resetButton(9, INPUT_PULLDOWN);
 Button enterButton(11, INPUT_PULLDOWN);
 Button rightButton(12, INPUT_PULLDOWN);
@@ -15,6 +15,8 @@ Openmv cam(&Serial3, 115200, 0xAA);
 BNO055 bno(&Wire, 0x28);
 // キャッチセンサー
 DigitalSensor catchSensor(6);
+// PS3コントローラー
+M5stamp ps3(&Serial2, 115200, 0xAA);
 
 void SensorsBegin()
 {
@@ -27,6 +29,7 @@ void SensorsBegin()
     line.begin();
     cam.begin();
     bno.begin();
+    ps3.begin(0, 0);
 }
 
 void SensorsUpdate()
@@ -40,4 +43,5 @@ void SensorsUpdate()
     line.update();
     cam.update();
     bno.update(resetButton.isReleased());
+    ps3.update();
 }

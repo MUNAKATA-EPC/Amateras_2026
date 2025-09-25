@@ -32,18 +32,20 @@ void M5stamp::update()
             _serial->read(); // ヘッダーを捨てる
 
             // ステックのx,y
-            _stick_lx = (int)_serial->read(); // 左ステックX (-128~127)
+            _stick_lx = (int8_t)_serial->read(); // 左ステックX (-128~127)
             if (abs(_stick_lx) < abs(_left_adjust))
                 _stick_lx = 0;
-            _stick_ly = (int)(-_serial->read() - 1); // 左ステックY
+            _stick_ly = -(int8_t)(_serial->read()); // 左ステックY
             if (abs(_stick_ly) < abs(_left_adjust))
                 _stick_ly = 0;
-            _stick_rx = (int)_serial->read(); // 右ステックX
+            _stick_rx = (int8_t)_serial->read(); // 右ステックX
             if (abs(_stick_rx) < abs(_right_adjust))
                 _stick_rx = 0;
-            _stick_ry = (int)(-_serial->read() - 1); // 右ステックY
+            _stick_ry = -(int8_t)(_serial->read()); // 右ステックY
             if (abs(_stick_ry) < abs(_right_adjust))
                 _stick_ry = 0;
+
+            Serial.println(_stick_ry);
 
             // ステックの角度・距離
             if (_stick_lx == 0 && _stick_ly == 0)
