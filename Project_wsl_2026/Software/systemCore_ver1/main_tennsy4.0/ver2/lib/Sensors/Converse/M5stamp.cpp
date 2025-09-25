@@ -45,8 +45,6 @@ void M5stamp::update()
             if (abs(_stick_ry) < abs(_right_adjust))
                 _stick_ry = 0;
 
-            Serial.println(_stick_ry);
-
             // ステックの角度・距離
             if (_stick_lx == 0 && _stick_ly == 0)
             {

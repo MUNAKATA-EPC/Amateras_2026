@@ -29,7 +29,7 @@ void SensorsBegin()
     line.begin();
     cam.begin();
     bno.begin();
-    ps3.begin(0, 0);
+    ps3.begin(10, 10);
 }
 
 void SensorsUpdate()

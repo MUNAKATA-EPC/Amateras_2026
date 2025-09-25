@@ -52,7 +52,7 @@ public:
         }
         return 0;
     }
-    bool deg(StickData data)
+    int deg(StickData data)
     {
         switch (data)
         {
@@ -63,7 +63,7 @@ public:
         }
         return 0;
     }
-    bool dis(StickData data)
+    int dis(StickData data)
     {
         switch (data)
         {

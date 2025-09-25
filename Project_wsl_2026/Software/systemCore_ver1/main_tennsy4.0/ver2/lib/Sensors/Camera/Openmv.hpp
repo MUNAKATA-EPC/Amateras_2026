@@ -47,7 +47,7 @@ public:
         }
         return 0;
     }
-    bool deg(CamData data)
+    int deg(CamData data)
     {
         switch (data)
         {
@@ -60,7 +60,7 @@ public:
         }
         return 0;
     }
-    bool dis(CamData data)
+    int dis(CamData data)
     {
         switch (data)
         {

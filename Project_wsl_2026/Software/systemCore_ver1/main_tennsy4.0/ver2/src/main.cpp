@@ -51,13 +51,13 @@ void loop()
     // 動作を実行
     if (!ui.running())
     {
-        //Serial.println("now sellecting...");
+        Serial.println("now sellecting...");
         kicker.kick(false); // キッカーを動かさない
         motors.stop();      // 動作選択中はモータを止める
     }
     else
     {
-        //playPrint(PrintMode::PS3);
+        playPrint(PrintMode::PS3);
         switch (ui.actionNumber())
         {
         case Action::ATTACKER:
