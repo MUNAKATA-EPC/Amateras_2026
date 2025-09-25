@@ -12,7 +12,7 @@ private:
     Timer _kickTimer;
 
 public:
-    // 関数・コントラクタ
+    // 関数・コンストラクタ
     Kicker(uint8_t kickpin, uint8_t chargepin); // 定義
     void begin(unsigned long cooldownTime);     // 開始
     void kick(bool signal);                     // キックする

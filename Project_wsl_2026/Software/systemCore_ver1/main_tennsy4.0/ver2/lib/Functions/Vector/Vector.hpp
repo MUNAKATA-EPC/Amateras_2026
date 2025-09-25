@@ -10,7 +10,7 @@ private:
     double _vector_y; // ベクトルのy方向
 
 public:
-    // コントラクタ
+    // コンストラクタ
     Vector();
     Vector(double x, double y);     // ベクトル生成 方法1
     Vector(int deg, double length); // ベクトル生成 方法2

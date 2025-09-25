@@ -26,7 +26,7 @@ private:
     int _degMemory;
 
 public:
-    // 関数
+    // 関数・コンストラクタ
     LineSensor(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHeader); // 定義
     void begin();                                                         // 開始
     int degCompute(bool *data);                                           // -180~180

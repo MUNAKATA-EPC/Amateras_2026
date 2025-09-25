@@ -18,7 +18,7 @@ private:
     double _d_power = 0.0; // D制御の出力
     double _output = 0;    // 出力
 public:
-    // 関数・コントラクタ
+    // 関数・コンストラクタ
     PD(double kp,double kd);
     void process(int deg, int target);
 

@@ -18,7 +18,7 @@ private:
     int _deg;       // 計算し算出した角度
 
 public:
-    // 関数・コントラクタ
+    // 関数・コンストラクタ
     BNO055(TwoWire *wire, uint8_t address); // 定義
     void begin();                           // 開始
     void update(bool resetbtn);                // 更新・計算

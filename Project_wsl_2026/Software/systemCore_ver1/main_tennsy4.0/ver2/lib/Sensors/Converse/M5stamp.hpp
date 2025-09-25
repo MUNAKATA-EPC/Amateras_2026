@@ -29,7 +29,7 @@ private:
     uint16_t button_bitmask = 0;
 
 public:
-    // 関数・コントラクタ
+    // 関数・コンストラクタ
     M5stamp(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHeader); // 定義
     void begin(int left_adjust, int right_adjust);                           // 開始
     void update();                                                           // 更新・計算

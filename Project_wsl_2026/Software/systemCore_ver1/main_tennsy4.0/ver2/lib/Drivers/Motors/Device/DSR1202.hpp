@@ -12,7 +12,7 @@ private:
     DigitalSensor   *_toggle;
 
 public:
-    // 関数・コントラクタ
+    // 関数・コンストラクタ
     DSR1202(HardwareSerial *serial, uint32_t baudrate);
     void begin(DigitalSensor *toggle);
     void stop();

@@ -19,7 +19,7 @@ private:
     PD *_pd;
 
 public:
-    // 関数・コントラクタ
+    // 関数・コンストラクタ
     Motors(HardwareSerial *serial, uint32_t baudrate);
     void begin(DigitalSensor *toggle);
     void setDegPosition(int deg_1ch, int deg_2ch, int deg_3ch, int deg_4ch);  // モータの位置をセット

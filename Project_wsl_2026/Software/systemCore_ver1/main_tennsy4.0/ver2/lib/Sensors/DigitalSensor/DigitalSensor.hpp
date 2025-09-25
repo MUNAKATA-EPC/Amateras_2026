@@ -8,7 +8,7 @@ private:
     uint8_t _pin;
 
 public:
-    //  関数・コントラクタ
+    //  関数・コンストラクタ
     DigitalSensor(uint8_t pin); // 定義
     void begin();               // 開始
 

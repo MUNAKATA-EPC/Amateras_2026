@@ -22,7 +22,7 @@ private:
     bool _configActive[10] = {false}; // [Configの番号]
 
 public:
-    // 関数・コントラクタ
+    // 関数・コンストラクタ
     UI(TwoWire *wire, uint8_t address, uint8_t width, uint8_t height);
     void begin();
     void process(bool show,bool enterbtn,bool rightbtn,bool leftbtn);

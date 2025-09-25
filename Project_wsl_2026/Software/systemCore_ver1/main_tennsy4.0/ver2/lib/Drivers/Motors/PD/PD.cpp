@@ -11,7 +11,7 @@ PD::PD(double kp, double kd)
 void PD::process(int deg, int target)
 {
     deg = (deg + 360 + target) % 360;
-    _value = (deg < 180.0) ? deg : deg - 360.0;
+    _value = (deg < 180) ? deg : deg - 360;
 
     _gap_of_value = _value - _oldvalue;
     if (_gap_of_value > 180.0)

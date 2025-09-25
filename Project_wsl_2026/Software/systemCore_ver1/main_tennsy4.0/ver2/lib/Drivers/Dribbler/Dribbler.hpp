@@ -16,7 +16,7 @@ private:
     int _setup_count = 0;
 
 public:
-    // 関数・コントラクタ
+    // 関数・コンストラクタ
     Dribbler(uint8_t pin, int min, int max);
     void begin();
 

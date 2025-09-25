@@ -17,7 +17,7 @@ private:
     unsigned long _pushingTime = 0;
 
 public:
-    // 関数・コントラクタ
+    // 関数・コンストラクタ
     Button(uint8_t pin, uint8_t pinmode);
     void begin();
     void update();

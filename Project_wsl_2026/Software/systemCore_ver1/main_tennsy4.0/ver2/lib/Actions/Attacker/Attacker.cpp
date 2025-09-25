@@ -39,14 +39,14 @@ void playAttacker(Attacker::Mode mode, int power)
             motors.move(0, power);
         }
         else if (ir.deg() < 25 || ir.deg() > 335)
-         {
-             motors.move(mapDeg(ir.deg(), 30, 48, MapMode::HIREI), power);
-         }
+        {
+            motors.move(mapDeg(ir.deg(), 30, 48, MapMode::HIREI), power);
+        }
         else if (ir.val() > 60)
         {
             double hirei_val = ir.val() * 0.226;
             int mawarikomi_deg;
-            
+
             if (ir.deg() < 180)
                 mawarikomi_deg = (int)round(ir.deg() + hirei_val + 360) % 360;
             else
