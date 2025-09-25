@@ -28,9 +28,9 @@ private:
 public:
     // 関数・コンストラクタ
     LineSensor(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHeader); // 定義
-    void begin();                                                         // 開始
-    int degCompute(bool *data);                                           // -180~180
-    void update();                                                        // 更新・計算
+    void begin();                                                               // 開始
+    int degCompute(bool *data);                                                 // -180~180
+    void update();                                                              // 更新・計算
 
     // データの取得
     bool detected() const { return _detected; }
