@@ -1,5 +1,7 @@
 #include "PD.hpp"
 
+// #define D_USE_TIMER //D制御でタイマーを使うか
+
 PD::PD(double kp, double kd)
 {
     _kp = kp;
@@ -23,6 +25,8 @@ void PD::process(int deg, int target)
     _p_power = _value * _kp;
 
     // D制御
+    _d_power = _kd * _gap_of_value;
+#ifdef D_USE_TIMER
     double sec = 0.0;
     if (!_timer.everCalled())
     {
@@ -38,6 +42,7 @@ void PD::process(int deg, int target)
             _d_power = 0.0;
         _timer.reset();
     }
+#endif
 
     _output = constrain(_p_power + _d_power, -100.0, 100.0);
 }

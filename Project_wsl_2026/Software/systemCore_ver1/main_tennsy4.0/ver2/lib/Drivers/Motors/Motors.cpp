@@ -2,6 +2,10 @@
 
 Motors::Motors(HardwareSerial *serial, uint32_t baudrate)
 {
+    if (_dsr != nullptr)
+    {
+        delete _dsr;
+    }
     _dsr = new DSR1202(serial, baudrate);
 }
 
