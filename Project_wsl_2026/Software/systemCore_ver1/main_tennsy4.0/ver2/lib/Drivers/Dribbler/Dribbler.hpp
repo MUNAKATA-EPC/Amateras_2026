@@ -13,14 +13,15 @@ private:
 
     Timer _setupTimer;
     bool _setup_flag = false;
+    int _setup_count = 0;
 
 public:
     // 関数・コントラクタ
-    Dribbler::Dribbler(uint8_t pin, int min, int max);
+    Dribbler(uint8_t pin, int min, int max);
     void begin();
 
     // 制御系
-    void process();
+    void setup();
     void move(int power);
 
     // データの取得

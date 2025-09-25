@@ -12,7 +12,7 @@ void Dribbler::begin()
     _esc.attach(_pin);
 }
 
-void Dribbler::process()
+void Dribbler::setup()
 {
     if (!_setupTimer.everCalled())
         _setupTimer.start();
@@ -20,18 +20,23 @@ void Dribbler::process()
     if (_setupTimer.msTime() < 4000)
     {
         _esc.writeMicroseconds(_min);
-
-        _setup_flag = false;
-    }
-    else if (_setupTimer.msTime() < 8000)
-    {
-        _esc.writeMicroseconds(_max);
-
+        _setup_count = _max;
         _setup_flag = false;
     }
     else
     {
-        _setup_flag = true;
+        if (!_setup_flag)
+        {
+            _esc.writeMicroseconds(_setup_count);
+            _setup_count -= (_setupTimer.msTime() - 4000) / 80;
+        }
+        else
+        {
+            _esc.writeMicroseconds(_min);
+        }
+
+        if (_setup_count <= _min)
+            _setup_flag = true;
     }
 }
 

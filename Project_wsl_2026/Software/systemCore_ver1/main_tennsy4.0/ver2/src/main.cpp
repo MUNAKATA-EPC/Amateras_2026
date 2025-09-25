@@ -31,11 +31,10 @@ void loop()
     SensorsUpdate();
 
     // ドリブラーを動かす
-    esc.process();
-    if (esc.available())
-    {
-        esc.move(1100);
-    }
+    if (!esc.available())
+        esc.setup();
+    else
+        esc.move(1000);
 
     // uiを実行
     if ((!uiTimer.everCalled() || uiTimer.msTime() > 10) && !ui.running()) // まだ呼ばれていない場合もタイマーをリセットさせる
@@ -51,7 +50,7 @@ void loop()
     // 動作を実行
     if (!ui.running())
     {
-        Serial.println("now sellecting...");
+        //Serial.println("now sellecting...");
         kicker.kick(false); // キッカーを動かさない
         motors.stop();      // 動作選択中はモータを止める
     }
