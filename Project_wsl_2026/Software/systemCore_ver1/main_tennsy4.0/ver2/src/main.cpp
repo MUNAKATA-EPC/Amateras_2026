@@ -104,18 +104,18 @@ void playPrint(PrintMode mode)
         }
     case PrintMode::CAM:
         Serial.print(" yellow.deg:");
-        Serial.print(cam.yellowGoal.deg());
+        Serial.print(cam.deg(Openmv::YELLOWGOAL));
         if (mode == PrintMode::CAM)
         {
             Serial.print(" yellow.dis:");
-            Serial.print(cam.yellowGoal.dis());
+            Serial.print(cam.dis(Openmv::YELLOWGOAL));
         }
         Serial.print(" blue.deg:");
-        Serial.print(cam.blueGoal.deg());
+        Serial.print(cam.deg(Openmv::BLUEGOAL));
         if (mode == PrintMode::CAM)
         {
             Serial.print(" blue.dis:");
-            Serial.print(cam.blueGoal.dis());
+            Serial.print(cam.dis(Openmv::BLUEGOAL));
             break;
         }
     }

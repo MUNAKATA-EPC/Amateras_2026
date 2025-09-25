@@ -2,38 +2,6 @@
 
 #include <Arduino.h>
 
-class M5stampData
-{
-private:
-    int _x;
-    int _y;
-    bool _detected;
-    int _deg;
-    double _dis;
-
-public:
-    // データの所得
-    int x() const { return _x; }
-    int y() const { return _y; }
-    bool detected() const { return _detected; }
-    int deg() const { return _deg; }
-    double dis() const { return _dis; }
-
-    //_x,_yをセットする
-    void setXY(int x, int y)
-    {
-        _x = x;
-        _y = y;
-    }
-    //_degと_disと_detectedセットする
-    void setAngle(int deg, double dis, bool detected)
-    {
-        _deg = deg;
-        _dis = dis;
-        _detected = detected;
-    }
-};
-
 class M5stamp
 {
 private:
@@ -41,18 +9,69 @@ private:
     uint32_t _baudrate;
     uint8_t _frameHeader;
 
-    // 下位バイトと上位バイトを読み取りつなげる
-    int16_t readSerial();
+    // 調整
+    int _left_adjust;
+    int _right_adjust;
+
+    // 左ステック
+    int _stick_lx;
+    int _stick_ly;
+    bool _leftstick_detected;
+    int _leftstick_deg;
+    double _leftstick_dis;
+    // 右ステック
+    int _stick_rx;
+    int _stick_ry;
+    bool _rightstick_detected;
+    int _rightstick_deg;
+    double _rightstick_dis;
+    // ボタン（14個）
+    uint16_t button_bitmask = 0;
 
 public:
     // 関数・コントラクタ
     M5stamp(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHeader); // 定義
-    void begin();                                                            // 開始
+    void begin(int left_adjust, int right_adjust);                           // 開始
     void update();                                                           // 更新・計算
 
     // データの取得
-    M5stampData LeftStick;
-    M5stampData RightStick;
+    // ステック
+    enum StickData
+    {
+        LEFTSTICK,
+        RIGHTSTICK
+    };
+    bool detected(StickData data)
+    {
+        switch (data)
+        {
+        case LEFTSTICK:
+            return _leftstick_detected;
+        case RIGHTSTICK:
+            return _rightstick_detected;
+        }
+    }
+    bool deg(StickData data)
+    {
+        switch (data)
+        {
+        case LEFTSTICK:
+            return _leftstick_deg;
+        case RIGHTSTICK:
+            return _rightstick_deg;
+        }
+    }
+    bool dis(StickData data)
+    {
+        switch (data)
+        {
+        case LEFTSTICK:
+            return _leftstick_dis;
+        case RIGHTSTICK:
+            return _rightstick_dis;
+        }
+    }
+    // ボタン
     enum ButtonType
     {
         UP,
@@ -70,8 +89,8 @@ public:
         R2,
         R3
     };
-    bool button(ButtonType name)
+    bool button(ButtonType type)
     {
-        return false;
+        return ((1 << (int)type) & button_bitmask) > 0; // (int)type分だけシフトした1との論理積が0よりも大きかったらそのbitは1
     }
 };

@@ -2,28 +2,6 @@
 
 #include <Arduino.h>
 
-class OpenmvAngleData
-{
-private:
-    bool _detected;
-    int _deg;
-    double _dis;
-
-public:
-    // データの取得
-    bool detected() const { return _detected; }
-    int deg() const { return _deg; }
-    double dis() const { return _dis; }
-
-    //_degと_disと_detectedをセットする
-    void set(int deg, double dis, bool detected)
-    {
-        _deg = deg;
-        _dis = dis;
-        _detected = detected;
-    }
-};
-
 class Openmv
 {
 private:
@@ -31,8 +9,17 @@ private:
     uint32_t _baudrate;
     uint8_t _frameHeader;
 
-    // 下位バイトと上位バイトを読み取りつなげる
-    int16_t readSerial();
+    // コート
+    bool _field_detected;
+    int _field_deg;
+    // 青ゴール
+    bool _bluegoal_detected;
+    int _bluegoal_deg;
+    double _bluegoal_dis;
+    // 黄ゴール
+    bool _yellowgoal_detected;
+    int _yellowgoal_deg;
+    double _yellowgoal_dis;
 
 public:
     // 関数・コントラクタ
@@ -41,7 +28,44 @@ public:
     void update();                                                          // 更新・計算
 
     // データの所得
-    OpenmvAngleData yellowGoal;
-    OpenmvAngleData blueGoal;
-    OpenmvAngleData field;
+    enum CamData
+    {
+        FIELD,
+        YELLOWGOAL,
+        BLUEGOAL
+    };
+    bool detected(CamData data)
+    {
+        switch (data)
+        {
+        case FIELD:
+            return _field_detected;
+        case YELLOWGOAL:
+            return _yellowgoal_detected;
+        case BLUEGOAL:
+            return _bluegoal_detected;
+        }
+    }
+    bool deg(CamData data)
+    {
+        switch (data)
+        {
+        case FIELD:
+            return _field_deg;
+        case YELLOWGOAL:
+            return _yellowgoal_deg;
+        case BLUEGOAL:
+            return _bluegoal_deg;
+        }
+    }
+    bool dis(CamData data)
+    {
+        switch (data)
+        {
+        case YELLOWGOAL:
+            return _yellowgoal_dis;
+        case BLUEGOAL:
+            return _bluegoal_dis;
+        }
+    }
 };

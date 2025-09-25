@@ -8,15 +8,15 @@ void playAttacker(Attacker::Mode mode, int power)
     // PD制御
     int pd_deg = 0;
     PD *pd = &pdGyro; // デフォルトはジャイロ
-    if (mode == Attacker::Mode::YELLOWGOAL && cam.yellowGoal.detected())
+    if (mode == Attacker::Mode::YELLOWGOAL && cam.detected(Openmv::YELLOWGOAL))
     {
         pd = &pdCam;
-        pd_deg = cam.yellowGoal.deg();
+        pd_deg = cam.deg(Openmv::YELLOWGOAL);
     }
-    else if (mode == Attacker::Mode::BLUEGOAL && cam.blueGoal.detected())
+    else if (mode == Attacker::Mode::BLUEGOAL && cam.detected(Openmv::BLUEGOAL))
     {
         pd = &pdCam;
-        pd_deg = cam.blueGoal.deg();
+        pd_deg = cam.deg(Openmv::BLUEGOAL);
     }
     else
     {
@@ -46,6 +46,7 @@ void playAttacker(Attacker::Mode mode, int power)
         {
             double hirei_val = ir.val() * 0.226;
             int mawarikomi_deg;
+            
             if (ir.deg() < 180)
                 mawarikomi_deg = (int)round(ir.deg() + hirei_val + 360) % 360;
             else
