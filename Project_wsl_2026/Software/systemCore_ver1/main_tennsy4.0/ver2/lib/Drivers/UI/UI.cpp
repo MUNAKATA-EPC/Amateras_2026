@@ -32,7 +32,7 @@ void UI::begin()
     _ssd->display(); // 試験的描画
 }
 
-void UI::process(bool show,bool enterbtn,bool rightbtn,bool leftbtn)
+void UI::process(bool show, bool enterbtn, bool rightbtn, bool leftbtn)
 {
     // 操作
     if (leftbtn)
@@ -113,6 +113,9 @@ void UI::process(bool show,bool enterbtn,bool rightbtn,bool leftbtn)
             }
             if (_configNumber >= configCount)
                 _configNumber = 0;
+
+            // runは右が押されたらfalseになる
+            _configActive[0] = false;
         }
 
         if (enterbtn)
