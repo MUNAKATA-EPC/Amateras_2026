@@ -61,13 +61,14 @@ void loop()
         switch (ui.actionNumber())
         {
         case Action::ATTACKER:
-            playAttacker((Attacker::Mode)ui.modeNumber(), 95);
+            playAttacker(95);
             break;
         case Action::DEFENDER:
             break;
         case Action::TEST:
             break;
         case Action::RADICON:
+            playRadicon(95);
             break;
         }
     }

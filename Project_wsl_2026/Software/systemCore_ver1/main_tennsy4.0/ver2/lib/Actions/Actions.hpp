@@ -8,3 +8,4 @@
 
 #include "Attacker/Attacker.hpp"
 #include "Defender/Defender.hpp"
+#include "Radicon/Radicon.hpp"
