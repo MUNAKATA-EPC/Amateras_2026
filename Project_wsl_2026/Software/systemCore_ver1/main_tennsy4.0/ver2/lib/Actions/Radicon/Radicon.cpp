@@ -1,7 +1,5 @@
 #include "Radicon/Radicon.hpp"
 
-PD pdGyro(0.6, 0.02); // ジャイロ用のPD
-
 void playRadicon(int power)
 {
     Radicon::Mode mode = (Radicon::Mode)ui.modeNumber();
@@ -26,6 +24,8 @@ void playRadicon(int power)
     case Radicon::SPEED_100CC:
         power = 65;
     case Radicon::SPEED_200CC:
+        power = 95;
+    default:
         power = 95;
     }
 

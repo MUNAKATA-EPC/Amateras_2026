@@ -9,3 +9,6 @@
 #include "Attacker/Attacker.hpp"
 #include "Defender/Defender.hpp"
 #include "Radicon/Radicon.hpp"
+
+extern PD pdGyro; // ジャイロ用のPD
+extern PD pdCam;  // カメラ用のPD
