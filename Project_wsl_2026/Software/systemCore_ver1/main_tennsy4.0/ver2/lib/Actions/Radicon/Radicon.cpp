@@ -32,8 +32,8 @@ void playRadicon(int power)
     // 制御
     if (ps3.detected(M5stamp::LEFTSTICK))
     {
-        int move_deg = (ps3.deg(M5stamp::LEFTSTICK) + bno.deg() + 360) % 360;  // 移動方向
-        double scale = map(ps3.dis(M5stamp::LEFTSTICK), 0.0, 128.0, 0.0, 1.0); // 速度のスケール計算
+        int move_deg = (ps3.deg(M5stamp::LEFTSTICK) + bno.deg() + 360) % 360; // 移動方向
+        double scale = ps3.dis(M5stamp::LEFTSTICK) / 128.0;                   // 速度のスケール計算
 
         motors.move(move_deg, (int)power * scale);
     }
