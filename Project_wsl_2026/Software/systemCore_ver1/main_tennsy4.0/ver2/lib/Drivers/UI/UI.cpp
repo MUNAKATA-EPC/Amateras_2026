@@ -32,6 +32,32 @@ void UI::begin()
     _ssd->display(); // 試験的描画
 }
 
+// ssd1306ライブラリーの拡張
+// メータ表示用
+void UI::circleMeter(bool show, int x0, int y0, int r, const char *s, int deg)
+{
+    _ssd->drawCircle(x0, y0, r, SSD1306_WHITE);
+
+    int x1 = x0, y1 = y0;
+    if (show)
+    {
+        x1 = x0 - sin(radians(deg)) * r;
+        y1 = y0 - cos(radians(deg)) * r;
+    }
+    _ssd->drawLine(x0, y0, x1, y1, SSD1306_WHITE);
+
+    String buf = s;
+    buf += ":";
+    buf += String(deg);
+
+    int text_x = x0 - r, text_y = y0 + r + 1;
+    _ssd->setTextSize(1);
+    _ssd->setTextColor(SSD1306_WHITE, SSD1306_BLACK);
+    _ssd->setCursor(text_x, text_y);
+
+    _ssd->print(buf);
+}
+
 void UI::process(bool show, bool enterbtn, bool rightbtn, bool leftbtn)
 {
     // 操作
@@ -43,11 +69,19 @@ void UI::process(bool show, bool enterbtn, bool rightbtn, bool leftbtn)
             for (int i = 0; i < 10; i++)
                 _configActive[i] = false;
             _configNumber = 0;
+
+            _meterNumber = 0; // リセット
         }
         else if (_actionDecided)
         {
             _actionDecided = false;
             _modeNumber = 0;
+
+            _meterNumber = 0; // リセット
+        }
+        else
+        {
+            _meterNumber = (_meterNumber + 1 + 6) % 6; // 0~4を周期するようにする
         }
     }
 
@@ -288,6 +322,48 @@ void UI::process(bool show, bool enterbtn, bool rightbtn, bool leftbtn)
         if (!_actionDecided)
         {
             _ssd->println(" <");
+
+            _ssd->setCursor(0, 10); // 改行だと多いのでセットし直す
+
+            switch (_meterNumber)
+            {
+            case 0:
+                _ssd->println("[gyro]");
+                _ssd->print(" bno055");
+                circleMeter(true, 87, 32, 20, "deg", bno.deg());
+                break;
+            case 1:
+                _ssd->println("[ir]");
+                _ssd->print(" dis:");
+                _ssd->print(String(ir.dis()));
+                circleMeter(true, 87, 32, 20, "deg", ir.deg());
+                break;
+            case 2:
+                _ssd->println("[line]");
+                _ssd->println("/normal");
+                _ssd->println("/memory");
+                circleMeter(true, 67, 32, 20, "n", line.deg());
+                circleMeter(true, 107, 32, 20, "m", line.degMemory());
+                break;
+            case 3:
+                _ssd->println("[blueGoal]");
+                _ssd->print(" dis:");
+                _ssd->print(String(cam.dis(Openmv::BLUEGOAL)));
+                circleMeter(true, 87, 32, 20, "deg", cam.deg(Openmv::BLUEGOAL));
+                break;
+            case 4:
+                _ssd->println("[yellowGoal]");
+                _ssd->print(" dis:");
+                _ssd->print(String(cam.dis(Openmv::YELLOWGOAL)));
+                circleMeter(true, 97, 32, 20, "deg", cam.deg(Openmv::YELLOWGOAL));
+                break;
+            case 5:
+                _ssd->println("[field]");
+                _ssd->print(" dis:");
+                _ssd->print(String(cam.dis(Openmv::FIELD)));
+                circleMeter(true, 87, 32, 20, "deg", cam.deg(Openmv::FIELD));
+                break;
+            }
         }
         else
         {

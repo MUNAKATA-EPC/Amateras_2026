@@ -43,6 +43,10 @@ public:
     int deg() const { return _deg; }
     double dis() const { return _dis; }
 
-    bool sensorMemory(uint8_t index) const { return _sensorMemory[index]; }
+    bool sensorMemory(uint8_t index) const
+    {
+        index = (index + 16) % 16;
+        return _sensorMemory[index];
+    }
     int degMemory() const { return _degMemory; }
 };

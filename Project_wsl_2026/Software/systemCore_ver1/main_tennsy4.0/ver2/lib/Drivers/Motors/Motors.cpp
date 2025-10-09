@@ -52,7 +52,6 @@ void Motors::PDprocess(PD *pd, int deg, int target)
 void Motors::move(int deg, int power)
 {
     deg = (deg + 180) % 360; // 前を0度にする
-    /*
     // いったん計算
     double max_move_output = 0.0;
     for (int i = 0; i < 4; i++)
@@ -74,7 +73,8 @@ void Motors::move(int deg, int power)
     {
         _output[i] = (int)round(constrain(_move_output[i] + pd_output * _pd_sign[i], -power, power));
     }
-    */
+    
+    /*
     // いったん計算
     double pd_output = -map(_pd->output(), -100, 100, -power, power);
     double max_output = 0.0;
@@ -91,6 +91,7 @@ void Motors::move(int deg, int power)
     {
         _move_output[i] *= scale;
     }
+    */
 
     // 制御
     _dsr->move(_output[0], _output[1], _output[2], _output[3]); // 制御

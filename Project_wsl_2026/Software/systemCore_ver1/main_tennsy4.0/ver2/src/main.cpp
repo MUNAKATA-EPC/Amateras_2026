@@ -57,7 +57,7 @@ void loop()
     }
     else
     {
-        playPrint(PrintMode::PS3);
+        playPrint(PrintMode::ALL);
         switch (ui.actionNumber())
         {
         case Action::ATTACKER:

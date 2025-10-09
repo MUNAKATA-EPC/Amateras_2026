@@ -11,8 +11,10 @@ class UI
 {
 private:
     Adafruit_SSD1306 *_ssd = nullptr;
-    
+
     uint8_t _address;
+
+    int _meterNumber = 0;
 
     bool _actionDecided = false;
     bool _modeDecided = false;
@@ -25,7 +27,10 @@ public:
     // 関数・コンストラクタ
     UI(TwoWire *wire, uint8_t address, uint8_t width, uint8_t height);
     void begin();
-    void process(bool show,bool enterbtn,bool rightbtn,bool leftbtn);
+    void process(bool show, bool enterbtn, bool rightbtn, bool leftbtn);
+
+    // ssd1306の拡張
+    void circleMeter(bool show, int x0, int y0, int r, const char *s, int deg);
 
     // データの取得
     bool actionDecided() const { return _actionDecided; }

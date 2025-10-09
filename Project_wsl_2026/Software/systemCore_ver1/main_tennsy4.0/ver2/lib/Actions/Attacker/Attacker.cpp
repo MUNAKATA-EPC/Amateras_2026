@@ -1,9 +1,11 @@
 #include "Attacker/Attacker.hpp"
 
+int attack_deg = 0;
+
 void playAttacker(int power)
 {
     Attacker::Mode mode = (Attacker::Mode)ui.modeNumber();
-    
+
     // PD制御
     int pd_deg = 0;
     PD *pd = &pdGyro; // デフォルトはジャイロ
@@ -33,30 +35,32 @@ void playAttacker(int power)
     }
     else if (ir.detected())
     {
-        if (ir.deg() < 10 || ir.deg() > 350)
+        if (ir.deg() <= 10 || ir.deg() >= 350)
         {
-            motors.move(0, power);
+            attack_deg = 0;
         }
-        else if (ir.deg() < 25 || ir.deg() > 335)
+        else if (ir.deg() <= 30 || ir.deg() >= 330)
         {
-            motors.move(mapDeg(ir.deg(), 30, 48, MapMode::HIREI), power);
+            attack_deg = mapDeg(ir.deg(), 60, 84, MapMode::HIREI);
         }
-        else if (ir.val() > 60)
+        else if (ir.val() > 50)
         {
-            double hirei_val = ir.val() * 0.226;
-            int mawarikomi_deg;
-
+            double hirei_val = ir.val() * 0.23;
             if (ir.deg() < 180)
-                mawarikomi_deg = (int)round(ir.deg() + hirei_val + 360) % 360;
+            {
+                attack_deg = (int)round(ir.deg() + hirei_val + 360) % 360;
+            }
             else
-                mawarikomi_deg = (int)round(ir.deg() - hirei_val + 360) % 360;
-
-            motors.move(mawarikomi_deg, power);
+            {
+                attack_deg = (int)round(ir.deg() - hirei_val + 360) % 360;
+            }
         }
         else
         {
-            motors.move(ir.deg(), power);
+            attack_deg = ir.deg();
         }
+
+        motors.move(attack_deg, power);
     }
     else
     {
