@@ -43,4 +43,7 @@ public:
     }
 };
 
+// ベクター自動生成用
+Vector getVec(int deg, double length);
+
 #endif

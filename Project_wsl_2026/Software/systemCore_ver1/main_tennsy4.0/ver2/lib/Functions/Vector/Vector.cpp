@@ -35,3 +35,9 @@ Vector Vector::operator/(const double &scale) const
 {
     return Vector(_vector_x / scale, _vector_y / scale);
 }
+
+Vector getVec(int deg, double length)
+{
+    Vector vec(deg, length);
+    return vec;
+}
