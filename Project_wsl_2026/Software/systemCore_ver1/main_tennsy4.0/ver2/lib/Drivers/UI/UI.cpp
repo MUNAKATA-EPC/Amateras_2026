@@ -341,9 +341,9 @@ void UI::process(bool show, bool enterbtn, bool rightbtn, bool leftbtn)
             case 2:
                 _ssd->println("[line]");
                 _ssd->println("/normal");
-                _ssd->println("/memory");
+                _ssd->println("/side");
                 circleMeter(true, 67, 32, 20, "n", line.deg(LineSensor::RING));
-                circleMeter(true, 107, 32, 20, "m", 0);
+                circleMeter(true, 107, 32, 20, "s", line.deg(LineSensor::SIDE));
                 break;
             case 3:
                 _ssd->println("[blueGoal]");

@@ -54,8 +54,8 @@ void LineSensor::update()
             }
 
             // 　サイドの検出
-            _sideLeft = _sensor[16];
-            _sideRight = _sensor[17];
+            _sideRight = _sensor[16];
+            _sideLeft = _sensor[17];
             _sideBack = _sensor[18];
 
             _sideDetected = _sideLeft || _sideRight || _sideBack;
@@ -67,5 +67,52 @@ void LineSensor::update()
     }
 
     // 計算
-    
+    // エンジェル
+    _x = _y = 0.0; // 初期化
+
+    if (_ringDetected)
+    {
+        int ringDetectedCount = 0;
+        for (int i = 0; i < 16; i++)
+        {
+            if (_sensor[i] == true)
+            {
+                ringDetectedCount++;
+                _x += cos(radians(22.5 * i));
+                _y += sin(radians(22.5 * i));
+            }
+        }
+        _x = _x * 100 / ringDetectedCount;
+        _y = _y * 100 / ringDetectedCount;
+        _dis = sqrt(_x * _x + _y * _y);
+
+        _ringDeg = (int)round(degrees(atan2(_y, _x)));
+        _ringDeg = (_ringDeg + 360) % 360;
+    }
+    else
+    {
+        _dis = -1.0;
+        _ringDeg = -1;
+    }
+
+    // サイドライン
+    double side_x = 0.0, side_y = 0.0;
+
+    if (_sideDetected)
+    {
+        side_x += (_sideRight == true) ? cos(radians(270.0)) : 0; // 前が0度としているのでx,yが反転する
+        side_x += (_sideLeft == true) ? cos(radians(90.0)) : 0;   // 前が0度としているのでx,yが反転する
+        side_x += (_sideBack == true) ? cos(radians(180.0)) : 0;  // 前が0度としているのでx,yが反転する
+
+        side_y += (_sideRight == true) ? sin(radians(270.0)) : 0; // 前が0度としているのでx,yが反転する
+        side_y += (_sideLeft == true) ? sin(radians(90.0)) : 0;   // 前が0度としているのでx,yが反転する
+        side_y += (_sideBack == true) ? sin(radians(180.0)) : 0;  // 前が0度としているのでx,yが反転する
+
+        _sideDeg = (int)round(degrees(atan2(side_y, side_x)));
+        _sideDeg = (_sideDeg + 360) % 360;
+    }
+    else
+    {
+        _sideDeg = -1;
+    }
 }
