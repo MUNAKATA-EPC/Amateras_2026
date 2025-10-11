@@ -5,7 +5,7 @@ Vector::Vector()
     _vector_x = 0;
     _vector_y = 0;
 }
-Vector::Vector(double x, double y)
+Vector::Vector(double x, double y, bool useXY)
 {
     _vector_x = x;
     _vector_y = y;

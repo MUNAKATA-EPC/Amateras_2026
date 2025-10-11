@@ -12,18 +12,18 @@ private:
     double _x;
     double _y;
 
-    bool _detected;
+    bool _ringDetected;
+    bool _sideDetected;
     bool _sensor[19];
 
     bool _sideRight;
     bool _sideLeft;
     bool _sideBack;
 
-    int _deg;
-    double _dis;
+    int _ringDeg;
+    int _sideDeg;
 
-    bool _sensorMemory[19];
-    int _degMemory;
+    double _dis;
 
 public:
     // 関数・コンストラクタ
@@ -33,20 +33,33 @@ public:
     void update();                                                              // 更新・計算
 
     // データの取得
-    bool detected() const { return _detected; }
+    enum LineData
+    {
+        RING,
+        SIDE
+    };
+
+    bool detected(LineData data) const
+    {
+        if (data == RING)
+            return _ringDetected;
+
+        return _sideDetected;
+    }
     bool sensor(uint8_t index) const { return _sensor[index]; }
 
     bool sideRight() const { return _sideRight; }
     bool sideLeft() const { return _sideLeft; }
     bool sideBack() const { return _sideBack; }
 
-    int deg() const { return _deg; }
+    int deg(LineData data) const { 
+        if (data == RING)
+            return _ringDeg;
+
+        return _sideDeg;
+     }
     double dis() const { return _dis; }
 
-    bool sensorMemory(uint8_t index) const
-    {
-        index = (index + 16) % 16;
-        return _sensorMemory[index];
-    }
-    int degMemory() const { return _degMemory; }
+    double x() const { return _x; }
+    double y() const { return _y; }
 };

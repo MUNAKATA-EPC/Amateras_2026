@@ -57,13 +57,14 @@ void loop()
     }
     else
     {
-        playPrint(PrintMode::ALL);
+        // playPrint(PrintMode::LINE);
         switch (ui.actionNumber())
         {
         case Action::ATTACKER:
             playAttacker(95);
             break;
         case Action::DEFENDER:
+            playDefender(66);
             break;
         case Action::TEST:
             break;
@@ -90,7 +91,7 @@ void playPrint(PrintMode mode)
         }
     case PrintMode::LINE:
         Serial.print(" line.deg:");
-        Serial.print(line.deg());
+        Serial.print(line.deg(LineSensor::RING));
         if (mode == PrintMode::LINE)
         {
             Serial.print(" line.dis:");

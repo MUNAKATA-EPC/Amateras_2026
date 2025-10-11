@@ -12,7 +12,7 @@ private:
 public:
     // コンストラクタ
     Vector();
-    Vector(double x, double y);     // ベクトル生成 方法1
+    Vector(double x, double y, bool useXY);     // ベクトル生成 方法1
     Vector(int deg, double length); // ベクトル生成 方法2
 
     // 演算
