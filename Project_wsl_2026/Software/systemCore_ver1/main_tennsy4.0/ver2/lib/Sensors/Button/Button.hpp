@@ -19,7 +19,7 @@ private:
 public:
     // 関数・コンストラクタ
     Button(uint8_t pin, uint8_t pinmode);
-    void begin();
+    bool begin();
     void update();
 
     bool isPushing();

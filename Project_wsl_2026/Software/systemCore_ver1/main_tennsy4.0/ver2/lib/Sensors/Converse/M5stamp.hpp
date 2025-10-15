@@ -31,7 +31,7 @@ private:
 public:
     // 関数・コンストラクタ
     M5stamp(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHeader); // 定義
-    void begin(int left_adjust, int right_adjust);                           // 開始
+    bool begin(int left_adjust, int right_adjust);                           // 開始
     void update();                                                           // 更新・計算
 
     // データの取得

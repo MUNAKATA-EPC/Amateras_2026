@@ -7,9 +7,11 @@ Openmv::Openmv(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHeader)
     _frameHeader = frameHeader;
 }
 
-void Openmv::begin()
+bool Openmv::begin()
 {
     _serial->begin(_baudrate);
+
+    return _serial->available() > 0;
 }
 
 void Openmv::update()

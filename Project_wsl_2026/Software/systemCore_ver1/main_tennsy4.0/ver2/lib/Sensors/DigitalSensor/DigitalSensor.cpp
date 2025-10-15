@@ -5,9 +5,11 @@ DigitalSensor::DigitalSensor(uint8_t pin)
     _pin = pin;
 }
 
-void DigitalSensor::begin()
+bool DigitalSensor::begin()
 {
     pinMode(_pin, INPUT);
+
+    return true;
 }
 
 bool DigitalSensor::read()

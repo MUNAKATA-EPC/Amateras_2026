@@ -9,9 +9,12 @@ Motors::Motors(HardwareSerial *serial, uint32_t baudrate)
     _dsr = new DSR1202(serial, baudrate);
 }
 
-void Motors::begin(DigitalSensor *toggle)
+bool Motors::begin(DigitalSensor *toggle)
 {
     _dsr->begin(toggle);
+
+    return true;
+
 }
 
 void Motors::setDegPosition(int deg_1ch, int deg_2ch, int deg_3ch, int deg_4ch)

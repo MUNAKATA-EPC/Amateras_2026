@@ -20,7 +20,7 @@ private:
 public:
     // 関数・コンストラクタ
     BNO055(TwoWire *wire, uint8_t address); // 定義
-    void begin();                           // 開始
+    bool begin();                           // 開始
     void update(bool resetbtn);                // 更新・計算
 
     // データの取得

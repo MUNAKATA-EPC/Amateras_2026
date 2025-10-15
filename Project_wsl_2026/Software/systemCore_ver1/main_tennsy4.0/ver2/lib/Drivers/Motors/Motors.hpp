@@ -21,7 +21,7 @@ private:
 public:
     // 関数・コンストラクタ
     Motors(HardwareSerial *serial, uint32_t baudrate);
-    void begin(DigitalSensor *toggle);
+    bool begin(DigitalSensor *toggle);
     void setDegPosition(int deg_1ch, int deg_2ch, int deg_3ch, int deg_4ch);  // モータの位置をセット
     void setMoveSign(int sign_1ch, int sign_2ch, int sign_3ch, int sign_4ch); // 移動のための符号をセット
     void setPdSign(int sign_1ch, int sign_2ch, int sign_3ch, int sign_4ch);   // PD制御のための符号をセット

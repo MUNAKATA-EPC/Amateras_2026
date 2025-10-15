@@ -17,7 +17,7 @@ private:
 public:
     // 関数・コンストラクタ
     BallSensor(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHeader); // 定義
-    void begin();                                                               // 開始
+    bool begin();                                                               // 開始
     void update();                                                              // 更新・計算
 
     // データの取得

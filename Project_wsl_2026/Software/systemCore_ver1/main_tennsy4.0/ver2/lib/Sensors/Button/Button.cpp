@@ -6,9 +6,11 @@ Button::Button(uint8_t pin, uint8_t pinmode)
     _pinmode = pinmode;
 }
 
-void Button::begin()
+bool Button::begin()
 {
     pinMode(_pin, _pinmode);
+
+    return true;
 }
 
 void Button::update()

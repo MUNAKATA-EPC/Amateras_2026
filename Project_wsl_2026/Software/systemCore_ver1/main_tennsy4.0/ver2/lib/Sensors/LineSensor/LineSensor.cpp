@@ -17,9 +17,11 @@ LineSensor::LineSensor(HardwareSerial *serial, uint32_t baudrate, uint8_t frameH
         _sensor[i] = false;
 }
 
-void LineSensor::begin()
+bool LineSensor::begin()
 {
     _serial->begin(_baudrate);
+
+    return _serial->available() > 0;
 }
 
 void LineSensor::update()

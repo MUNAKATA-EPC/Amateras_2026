@@ -7,9 +7,11 @@ Dribbler::Dribbler(uint8_t pin, int min, int max)
     _max = max;
 }
 
-void Dribbler::begin()
+bool Dribbler::begin()
 {
-    _esc.attach(_pin);
+    bool success = _esc.attach(_pin);
+
+    return success;
 }
 
 void Dribbler::setup()

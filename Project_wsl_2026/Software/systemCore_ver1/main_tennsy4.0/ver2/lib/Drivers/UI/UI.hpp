@@ -26,11 +26,12 @@ private:
 public:
     // 関数・コンストラクタ
     UI(TwoWire *wire, uint8_t address, uint8_t width, uint8_t height);
-    void begin();
+    bool begin();
     void process(bool show, bool enterbtn, bool rightbtn, bool leftbtn);
 
     // ssd1306の拡張
     void circleMeter(bool show, int x0, int y0, int r, const char *s, int deg);
+    void debug(const char *msg);
 
     // データの取得
     bool actionDecided() const { return _actionDecided; }

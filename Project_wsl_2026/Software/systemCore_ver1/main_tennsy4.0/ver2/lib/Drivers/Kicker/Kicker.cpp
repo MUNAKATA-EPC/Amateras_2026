@@ -6,13 +6,15 @@ Kicker::Kicker(uint8_t kickpin, uint8_t chargepin)
     _chargepin = chargepin;
 }
 
-void Kicker::begin(unsigned long cooldownTime)
+bool Kicker::begin(unsigned long cooldownTime)
 {
     _cooldownTime = cooldownTime;
     pinMode(_kickpin, OUTPUT);
     pinMode(_chargepin, OUTPUT);
     digitalWrite(_kickpin, LOW);
     digitalWrite(_chargepin, HIGH);
+
+    return true;
 }
 
 void Kicker::kick(bool signal)

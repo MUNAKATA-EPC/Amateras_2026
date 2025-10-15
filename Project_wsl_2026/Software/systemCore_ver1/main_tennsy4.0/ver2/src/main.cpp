@@ -20,10 +20,10 @@ void setup()
 {
     // PCとのシリアル通信の開始
     Serial.begin(9600);
-    // センサー類の開始
-    SensorsBegin();
     // ドライバー類の開始
     DriversBegin();
+    // センサー類の開始
+    SensorsBegin();
 }
 
 void loop()

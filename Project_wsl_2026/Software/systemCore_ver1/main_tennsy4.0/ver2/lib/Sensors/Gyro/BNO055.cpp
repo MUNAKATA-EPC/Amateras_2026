@@ -9,20 +9,18 @@ BNO055::BNO055(TwoWire *wire, uint8_t address)
     _bno = new Adafruit_BNO055(BNO055_ID, address, wire);
 }
 
-void BNO055::begin()
+bool BNO055::begin()
 {
     Timer bnoTimer;
     bnoTimer.reset();
-    bool bnosuccess = _bno->begin(OPERATION_MODE_IMUPLUS);
-    while (!bnosuccess && bnoTimer.msTime() < 5000)
+    bool success = _bno->begin(OPERATION_MODE_IMUPLUS);
+    while (!success && bnoTimer.msTime() < 5000)
     {
         delay(10); // BNO055の通信開始待ち
     }
-    if (!bnosuccess)
-    {
-        Serial.println("bno timeout");
-    }
     _bno->setExtCrystalUse(true); // 外部水晶振動子使用
+
+    return success;
 }
 
 void BNO055::update(bool resetbtn)

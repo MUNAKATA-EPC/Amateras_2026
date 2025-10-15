@@ -11,24 +11,26 @@ UI::UI(TwoWire *wire, uint8_t address, uint8_t width, uint8_t height)
     _address = address;
 }
 
-void UI::begin()
+bool UI::begin()
 {
     Timer my_display_timer;
     my_display_timer.reset();
-    bool ssdsuccess = _ssd->begin(SSD1306_SWITCHCAPVCC, _address);
-    while (!ssdsuccess && my_display_timer.msTime() < 5000)
+    bool success = _ssd->begin(SSD1306_SWITCHCAPVCC, _address);
+    while (!success && my_display_timer.msTime() < 5000)
     {
         delay(10); // SSD1306との通信開始待ち
     }
-    if (!ssdsuccess)
-    {
-        Serial.println("ssd timeout");
-    }
+    return success;
+}
+
+// デバッグ用
+void UI::debug(const char *msg)
+{
     _ssd->clearDisplay(); // 画面初期化
     _ssd->setTextSize(1);
     _ssd->setTextColor(SSD1306_WHITE, SSD1306_BLACK);
     _ssd->setCursor(0, 0);
-    _ssd->print("Hello ssd!");
+    _ssd->println(msg);
     _ssd->display(); // 試験的描画
 }
 

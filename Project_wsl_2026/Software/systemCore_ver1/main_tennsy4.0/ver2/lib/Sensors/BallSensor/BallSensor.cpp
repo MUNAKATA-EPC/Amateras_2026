@@ -7,9 +7,11 @@ BallSensor::BallSensor(HardwareSerial *serial, uint32_t baudrate, uint8_t frameH
     _frameHeader = frameHeader;
 }
 
-void BallSensor::begin()
+bool BallSensor::begin()
 {
     _serial->begin(_baudrate);
+    
+    return _serial->available() > 0;
 }
 
 void BallSensor::update()

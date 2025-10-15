@@ -18,7 +18,7 @@ private:
 public:
     // 関数・コンストラクタ
     Dribbler(uint8_t pin, int min, int max);
-    void begin();
+    bool begin();
 
     // 制御系
     void setup();

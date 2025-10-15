@@ -7,12 +7,14 @@ M5stamp::M5stamp(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHeader)
     _frameHeader = frameHeader;
 }
 
-void M5stamp::begin(int left_adjust, int right_adjust)
+bool M5stamp::begin(int left_adjust, int right_adjust)
 {
     _serial->begin(_baudrate);
 
     _left_adjust = left_adjust;
     _right_adjust = right_adjust;
+
+    return _serial->available() > 0;
 }
 
 void M5stamp::update()

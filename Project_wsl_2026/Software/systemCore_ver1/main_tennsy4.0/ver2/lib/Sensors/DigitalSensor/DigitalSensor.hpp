@@ -10,7 +10,7 @@ private:
 public:
     //  関数・コンストラクタ
     DigitalSensor(uint8_t pin); // 定義
-    void begin();               // 開始
+    bool begin();               // 開始
 
     bool read(); // 取得
 };
