@@ -49,7 +49,7 @@ void LineSensor::update()
             for (int i = 0; i < 19; i++)
             {
                 _sensor[i] = (bit_mask & (1UL << i)) != 0;
-                if (_sensor[i] == true)
+                if (_sensor[i] == true && i < 16)
                     _ringDetected = true;
             }
 
@@ -68,7 +68,8 @@ void LineSensor::update()
 
     // 計算
     // エンジェル
-    _x = _y = 0.0; // 初期化
+    _x = 0.0; // 初期化
+    _y = 0.0; // 初期化
 
     if (_ringDetected)
     {
@@ -82,12 +83,21 @@ void LineSensor::update()
                 _y += sin(radians(22.5 * i));
             }
         }
-        _x = _x * 100 / ringDetectedCount;
-        _y = _y * 100 / ringDetectedCount;
-        _dis = sqrt(_x * _x + _y * _y);
 
-        _ringDeg = (int)round(degrees(atan2(_y, _x)));
-        _ringDeg = (_ringDeg + 360) % 360;
+        if (ringDetectedCount > 0)
+        {
+            _x = _x * 100 / ringDetectedCount;
+            _y = _y * 100 / ringDetectedCount;
+            _dis = sqrt(_x * _x + _y * _y);
+
+            _ringDeg = (int)round(degrees(atan2(_y, _x)));
+            _ringDeg = (_ringDeg + 360) % 360;
+        }
+        else // ringDetectedCount == 0 の場合 (リングセンサーの反応がない)
+        {
+            _dis = -1.0;
+            _ringDeg = -1;
+        }
     }
     else
     {

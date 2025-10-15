@@ -29,4 +29,5 @@ void playAttacker(int power)
     kicker.kick(catchSensor.read() == HIGH);
 
     // 制御
+    motors.PDmove();
 }
