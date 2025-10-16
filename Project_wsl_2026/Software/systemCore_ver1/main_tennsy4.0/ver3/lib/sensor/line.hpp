@@ -1,3 +1,4 @@
+/*SeeeduinoXiaoとSerial通信*/
 #pragma once
 
 #include <Arduino.h>
