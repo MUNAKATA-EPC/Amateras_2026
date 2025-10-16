@@ -81,9 +81,7 @@ void m5stampUpdate()
             {
                 _stickLeftDetected = true;
 
-                double degSub = degrees(atan2(_stickLy, _stickLx)); // 角度を算出
-                degSub = (degSub < 0) ? degSub + 360 : degSub;
-                _stickLeftDeg = (int)round(degSub);
+                _stickLeftDeg = (int)round(degrees(atan2(_stickLy, _stickLx)));
                 _stickLeftDeg = (_stickLeftDeg - 90 + 360) % 360; // 調整
 
                 _stickLeftDis = sqrt(_stickLx * _stickLx + _stickLy * _stickLy); // 距離を算出
@@ -100,9 +98,7 @@ void m5stampUpdate()
             {
                 _stickRightDetected = true;
 
-                double degSub = degrees(atan2(_stickRy, _stickRx)); // 角度を算出
-                degSub = (degSub < 0) ? degSub + 360 : degSub;
-                _stickRightDeg = (int)round(degSub);
+                _stickRightDeg = (int)round(degrees(atan2(_stickRy, _stickRx)));
                 _stickRightDeg = (_stickRightDeg - 90 + 360) % 360; // 調整
 
                 _stickRightDis = sqrt(_stickRx * _stickRx + _stickRy * _stickRy); // 距離を算出

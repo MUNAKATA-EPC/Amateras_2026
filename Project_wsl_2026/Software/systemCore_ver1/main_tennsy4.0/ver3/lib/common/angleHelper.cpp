@@ -1,7 +1,10 @@
-#include "angleComputer.hpp"
+#include "angleHelper.hpp"
 
 int diffDeg(int deg1, int deg2)
 {
+    deg1 = (deg1 + 360) % 360; // 0〜360度に変換
+    deg2 = (deg2 + 360) % 360; // 0〜360度に変換
+
     int diff = (deg1 - deg2 + 360) % 360;
     if (diff > 180)
         diff -= 360;

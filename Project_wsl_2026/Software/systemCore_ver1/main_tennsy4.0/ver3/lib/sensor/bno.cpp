@@ -35,6 +35,8 @@ void bnoUpdate(bool resetbtn)
 
     // 補正後の角度
     _deg = (int)((_degNormal - _degReset + 360) % 360);
+    if (_deg > 180)
+        _deg -= 360; // -180~180に変換
 }
 
 int bnoDeg() { return _deg; }
