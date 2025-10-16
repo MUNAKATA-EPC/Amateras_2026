@@ -15,7 +15,7 @@
 #include "digitalSensor.hpp"
 #include "ir.hpp"
 #include "line.hpp"
-#include "m5stamp.hpp"
+#include "ps3.hpp"
 #include "openmv.hpp"
 
 void playAttacker();

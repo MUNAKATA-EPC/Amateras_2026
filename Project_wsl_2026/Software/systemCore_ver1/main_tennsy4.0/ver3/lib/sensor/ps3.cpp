@@ -1,4 +1,4 @@
-#include "m5stamp.hpp"
+#include "ps3.hpp"
 
 inline HardwareSerial *_serial = nullptr;
 inline uint32_t _baudrate = 9600;
@@ -23,7 +23,7 @@ inline double _stickRightDis = -1.0;
 // ボタン（14個）
 inline uint16_t buttonBitMask = 0;
 
-bool m5stampInit(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHeader)
+bool ps3Init(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHeader)
 {
     _serial = serial;
     _baudrate = baudrate;
@@ -34,13 +34,13 @@ bool m5stampInit(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHeader)
     return _serial->available() > 0;
 }
 
-void m5stampStickAdjust(int leftAdjust, int rightAdjust)
+void ps3StickAdjust(int leftAdjust, int rightAdjust)
 {
     _stickLeftAdjust = leftAdjust;
     _stickRightAdjust = rightAdjust;
 }
 
-void m5stampUpdate()
+void ps3Update()
 {
     while (_serial->available() >= 11)
     {
@@ -117,7 +117,7 @@ void m5stampUpdate()
     }
 }
 
-bool m5stampDetected(StickDataType data)
+bool ps3Detected(StickDataType data)
 {
     switch (data)
     {
@@ -128,7 +128,7 @@ bool m5stampDetected(StickDataType data)
     }
     return 0;
 }
-int m5stampDeg(StickDataType data)
+int ps3Deg(StickDataType data)
 {
     switch (data)
     {
@@ -139,7 +139,7 @@ int m5stampDeg(StickDataType data)
     }
     return 0;
 }
-int m5stampDis(StickDataType data)
+int ps3Dis(StickDataType data)
 {
     switch (data)
     {
@@ -150,7 +150,7 @@ int m5stampDis(StickDataType data)
     }
     return 0;
 }
-bool m5stampButtonIsPushing(ButtonDataType type)
+bool ps3ButtonIsPushing(ButtonDataType type)
 {
     return ((1 << (int)type) & buttonBitMask) > 0; // (int)type分だけシフトした1との論理積が0よりも大きかったらそのbitは1
 }

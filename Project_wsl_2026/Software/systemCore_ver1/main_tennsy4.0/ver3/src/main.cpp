@@ -20,7 +20,7 @@
 #include "digitalSensor.hpp"
 #include "ir.hpp"
 #include "line.hpp"
-#include "m5stamp.hpp"
+#include "ps3.hpp"
 #include "openmv.hpp"
 
 void setup()
@@ -37,6 +37,7 @@ void setup()
     debugMessage += irInit(&Serial1, 115200, 0xAA) ? "ir found\n" : "ir not found\n";
     debugMessage += lineInit(&Serial5, 115200, 0xAA) ? "line found\n" : "line not found\n";
     debugMessage += openmvInit(&Serial3, 115200, 0xAA) ? "openmv found\n" : "openmv not found\n";
+    debugMessage += ps3Init(&Serial2, 115200, 0xAA) ? "ps3 found\n" : "ps3 not found\n";
 
     debugMessage += motorsInit(&Serial1, 115200) ? "motors found\n" : "motors not found\n";
     motorsSetMoveSign(1, -1, -1, 1);         // 移動のための符号をセット
@@ -75,6 +76,7 @@ void loop()
     irUpdate();
     lineUpdate();
     openmvUpdate();
+    ps3Update();
     bnoUpdate(resetButton.isReleased()); // bno更新
 
     // ドリブラーを動かす
