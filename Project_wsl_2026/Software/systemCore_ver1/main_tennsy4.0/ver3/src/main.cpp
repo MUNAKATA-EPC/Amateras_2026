@@ -6,7 +6,7 @@
 #include "radicon.hpp"
 
 // common類
-#include "angleComputer.hpp"
+#include "angleHelper.hpp"
 #include "timer.hpp"
 #include "vector.hpp"
 // driver類
@@ -25,19 +25,27 @@
 
 void setup()
 {
+    String debugMessage = "setup\n";
+
     // I2C
     uiInit(&Wire1, 0x3C, 128, 64);
-    bnoInit(&Wire, 0x28);
+    debugMessage += bnoInit(&Wire, 0x28) ? "bno found\n" : "bno not found\n";
 
     // シリアル
-    irInit(&Serial1, 115200, 0xAA);
-    lineInit(&Serial5, 115200, 0xAA);
-    openmvInit(&Serial3, 115200, 0xAA);
+    Serial.begin(9600); // デバッグ用
 
-    motorsInit(&Serial1, 115200);
+    debugMessage += irInit(&Serial1, 115200, 0xAA) ? "ir found\n" : "ir not found\n";
+    debugMessage += lineInit(&Serial5, 115200, 0xAA) ? "line found\n" : "line not found\n";
+    debugMessage += openmvInit(&Serial3, 115200, 0xAA) ? "openmv found\n" : "openmv not found\n";
+
+    debugMessage += motorsInit(&Serial1, 115200) ? "motors found\n" : "motors not found\n";
     motorsSetMoveSign(1, -1, -1, 1);         // 移動のための符号をセット
     motorsSetPdSign(1, 1, 1, 1);             // PD制御のための符号をセット
     motorsSetDegPosition(315, 45, 225, 135); // モータの位置をセット
+
+    // デバッグメッセージの出力
+    Serial.println(debugMessage);
+    uiPrintDebug(debugMessage.c_str()); // uiにも表示
 
     // デジタル
     dribbler1.init(13, 1000, 2000);
@@ -63,13 +71,11 @@ void loop()
     leftButton.update();
     resetButton.update();
 
-    // シリアル更新
+    // センサー類更新
     irUpdate();
     lineUpdate();
     openmvUpdate();
-
-    // bno更新
-    bnoUpdate(resetButton.isReleased());
+    bnoUpdate(resetButton.isReleased()); // bno更新
 
     // ドリブラーを動かす
     dribbler1.move(1500);
@@ -91,7 +97,6 @@ void loop()
     }
     else
     {
-        // playPrint(PrintMode::LINE);
         switch (uiActionNumber())
         {
         case Action::ATTACKER:

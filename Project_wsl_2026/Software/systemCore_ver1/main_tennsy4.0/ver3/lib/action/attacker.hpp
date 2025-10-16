@@ -1,7 +1,7 @@
 #pragma once
 
 // common類
-#include "angleComputer.hpp"
+#include "angleHelper.hpp"
 #include "timer.hpp"
 #include "vector.hpp"
 // driver類
