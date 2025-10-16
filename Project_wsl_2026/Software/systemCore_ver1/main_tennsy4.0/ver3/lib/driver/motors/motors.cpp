@@ -84,7 +84,7 @@ void motorsStop()
 // deg 現在の角度（BNOなど）
 // target 目標角度
 void motorsPdProcess(PD *pd, int deg, int target)
-// NOTE: ここでPDポインタを更新し、計算を実行
+// ここでPDポインタを更新し、計算を実行
 {
     _pd = pd;
     _pd->process(deg, target);
@@ -158,3 +158,6 @@ void motorsPdMove()
     // 制御
     _dsr->move(output1, output2, output3, output4);
 }
+
+PD *pdGyro = new PD(0.6, 0.1); // ジャイロ用のPD調節値
+PD *pdCam = new PD(0.6, 0.1);  // カメラ用のPD調節値

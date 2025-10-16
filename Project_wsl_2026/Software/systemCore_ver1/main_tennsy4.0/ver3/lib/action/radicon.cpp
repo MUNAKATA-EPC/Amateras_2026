@@ -1,8 +1,5 @@
 #include "radicon.hpp"
 
-inline PD *pdGyro = new PD(0.6, 0.1); // ジャイロ用のPD調節値
-inline PD *pdCam = new PD(0.6, 0.1);  // カメラ用のPD調節値
-
 void playRadicon()
 {
     Radicon::Mode mode = (Radicon::Mode)uiModeNumber();
@@ -28,6 +25,9 @@ void playRadicon()
         power = 65;
     case Radicon::SPEED_200CC:
         power = 95;
+    default:
+        power = 95;
+        break;
     }
 
     // 制御
