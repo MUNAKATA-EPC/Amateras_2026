@@ -57,6 +57,20 @@ Timer timer; // ui用
 
 void loop()
 {
+    // ボタン更新
+    enterButton.update();
+    rightButton.update();
+    leftButton.update();
+    resetButton.update();
+
+    // シリアル更新
+    irUpdate();
+    lineUpdate();
+    openmvUpdate();
+
+    // bno更新
+    bnoUpdate(resetButton.isReleased());
+
     // ドリブラーを動かす
     dribbler1.move(1500);
 
