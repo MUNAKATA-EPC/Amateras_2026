@@ -3,14 +3,15 @@
 inline PD *pdGyro = new PD(0.6, 0.1); // ジャイロ用のPD調節値
 inline PD *pdCam = new PD(0.6, 0.1);  // カメラ用のPD調節値
 
-void playRadicon() {
+void playRadicon()
+{
     Radicon::Mode mode = (Radicon::Mode)uiModeNumber();
 
     // PD制御
     int pdDeg = bnoDeg();
-    if (m5stampDetected(StickDataType::RIGHTSTICK))
+    if (ps3Detected(StickDataType::RIGHTSTICK))
     {
-        motorsPdProcess(pdGyro, pdDeg, m5stampDeg(StickDataType::RIGHTSTICK)); // PD成分計算(右ステック補正付き)
+        motorsPdProcess(pdGyro, pdDeg, ps3Deg(StickDataType::RIGHTSTICK)); // PD成分計算(右ステック補正付き)
     }
     else
     {
@@ -30,10 +31,10 @@ void playRadicon() {
     }
 
     // 制御
-    if (m5stampDetected(StickDataType::LEFTSTICK))
+    if (ps3Detected(StickDataType::LEFTSTICK))
     {
-        int moveDeg = (m5stampDeg(StickDataType::LEFTSTICK) + bnoDeg() + 360) % 360; // 移動方向
-        double scale = m5stampDis(StickDataType::LEFTSTICK) / 128.0;                   // 速度のスケール計算
+        int moveDeg = (ps3Deg(StickDataType::LEFTSTICK) + bnoDeg() + 360) % 360; // 移動方向
+        double scale = ps3Dis(StickDataType::LEFTSTICK) / 128.0;                 // 速度のスケール計算
 
         motorsMove(moveDeg, (int)power * scale);
     }
@@ -43,6 +44,6 @@ void playRadicon() {
     }
 
     // キッカー
-    bool on = (catchSensor.read() == HIGH) || m5stampButtonIsPushing(ButtonDataType::L1) || m5stampButtonIsPushing(ButtonDataType::R1);
+    bool on = (catchSensor.read() == HIGH) || ps3ButtonIsPushing(ButtonDataType::L1) || ps3ButtonIsPushing(ButtonDataType::R1);
     kicker1.kick(on);
 }
