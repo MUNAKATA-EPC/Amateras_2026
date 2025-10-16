@@ -1,4 +1,3 @@
-#include "Drivers.hpp"
 #include "Sensors.hpp"
 
 // ボタン
@@ -21,65 +20,16 @@ M5stamp ps3(&Serial2, 115200, 0xAA);
 
 void SensorsBegin()
 {
-    if (resetButton.begin() && enterButton.begin() && rightButton.begin() && leftButton.begin())
-    {
-        ui.debug("buttons found");
-    }
-    else
-    {
-        ui.debug("buttons not found");
-        delay(2500);
-    }
+    resetButton.begin();
+    enterButton.begin();
+    rightButton.begin();
+    leftButton.begin();
 
-    if (ir.begin() == true)
-    {
-        ui.debug("ir found");
-    }
-    else
-    {
-        ui.debug("ir not found");
-        delay(2500);
-    }
-
-    if (line.begin() == true)
-    {
-        ui.debug("line found");
-    }
-    else
-    {
-        ui.debug("line not found");
-        delay(2500);
-    }
-
-    if (cam.begin() == true)
-    {
-        ui.debug("cam found");
-    }
-    else
-    {
-        ui.debug("cam not found");
-        delay(2500);
-    }
-
-    if (bno.begin() == true)
-    {
-        ui.debug("bno found");
-    }
-    else
-    {
-        ui.debug("bno not found");
-        delay(2500);
-    }
-
-    if (ps3.begin(10, 10) == true)
-    {
-        ui.debug("ps3 found");
-    }
-    else
-    {
-        ui.debug("ps3 not found");
-        delay(2500);
-    }
+    ir.begin();
+    line.begin();
+    cam.begin();
+    bno.begin();
+    ps3.begin(10, 10);
 }
 
 void SensorsUpdate()

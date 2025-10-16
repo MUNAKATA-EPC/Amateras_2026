@@ -38,7 +38,7 @@ void loop()
         esc.move(1000);
 
     // uiを実行
-    if ((!uiTimer.everCalled() || uiTimer.msTime() > 10)) // まだ呼ばれていない場合もタイマーをリセットさせる
+    if (!uiTimer.everCalled() || uiTimer.msTime() > 10) // まだ呼ばれていない場合もタイマーをリセットさせる
     {
         uiTimer.reset();
         bool show = !ui.running(); // runningなら表示しない

@@ -63,13 +63,13 @@ void loop()
   Serial1.print("a");
   Serial1.flush(); // 送信バッファがなくなるまで、つまり全て送信するまで待つ*/
 
-  /*Serial.print(lines_data_bit_mask, BIN); // pcに送る
+  Serial.print(lines_data_bit_mask, BIN); // pcに送る
   Serial.print("l");
   Serial.print(left_val);
   Serial.print("r");
   Serial.print(right_val);
   Serial.print("b");
-  Serial.println(back_val);*/
+  Serial.println(back_val);
 
   delay(10); // 10ms待機
 }

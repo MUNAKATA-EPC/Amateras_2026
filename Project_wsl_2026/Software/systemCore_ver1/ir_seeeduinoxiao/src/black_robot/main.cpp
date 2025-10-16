@@ -63,7 +63,6 @@ void loop()
       IRball_of_x += cos(radians(IRsensor_min_around_index[i] * 22.5)) * (1023.0 - IRsensor_value[IRsensor_min_around_index[i]]); // 重みを加算
       IRball_of_y += sin(radians(IRsensor_min_around_index[i] * 22.5)) * (1023.0 - IRsensor_value[IRsensor_min_around_index[i]]); // 重みを加算
     }
-
     double IRball_deg_sub = degrees(atan2(IRball_of_y, IRball_of_x)); // 角度を算出
     IRball_deg_sub = (IRball_deg_sub < 0) ? IRball_deg_sub + 360 : IRball_deg_sub;
     IRball_deg = (int)round(IRball_deg_sub);
