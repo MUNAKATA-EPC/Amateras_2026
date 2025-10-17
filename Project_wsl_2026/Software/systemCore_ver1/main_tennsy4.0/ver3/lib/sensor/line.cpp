@@ -38,7 +38,16 @@ bool lineInit(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHeader)
 
     _serial->begin(_baudrate);
 
-    return _serial->available() > 0;
+    Timer timer;
+    timer.reset();
+    bool success = false;
+    while (!success && timer.msTime() < 100)
+    {
+        success = _serial->available() >= 2; // 2個くらいデータが来たら成功しているとみなす
+        delay(10);                           // lineの通信開始待ち
+    }
+
+    return success;
 }
 
 void lineUpdate()

@@ -31,7 +31,16 @@ bool ps3Init(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHeader)
 
     _serial->begin(_baudrate);
 
-    return _serial->available() > 0;
+    Timer timer;
+    timer.reset();
+    bool success = false;
+    while (!success && timer.msTime() < 100)
+    {
+        success = _serial->available() >= 2; // 2個くらいデータが来たら成功しているとみなす
+        delay(10);                           // ps3(m5stamp-pico)の通信開始待ち
+    }
+
+    return success;
 }
 
 void ps3StickAdjust(int leftAdjust, int rightAdjust)
@@ -106,8 +115,8 @@ void ps3Update()
             }
 
             // ボタン
-            uint8_t low = _serial->read();                // ボタン下位バイト
-            uint8_t high = _serial->read();               // ボタン上位バイト
+            uint8_t low = _serial->read();               // ボタン下位バイト
+            uint8_t high = _serial->read();              // ボタン上位バイト
             buttonBitMask = (uint16_t(high) << 8) | low; // 16bit にまとめる
         }
         else

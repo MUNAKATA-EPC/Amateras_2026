@@ -1,8 +1,8 @@
 #pragma once
 
 #include <Arduino.h>
-#include "device/dsr1202.hpp"
-#include "pd/pd.hpp"
+#include "motorsDsr1202.hpp"
+#include "motorsPd.hpp"
 #include "vector.hpp"
 
 bool motorsInit(HardwareSerial *serial, uint32_t baudrate);

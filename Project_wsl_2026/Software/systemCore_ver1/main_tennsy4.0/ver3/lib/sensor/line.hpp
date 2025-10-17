@@ -2,6 +2,7 @@
 #pragma once
 
 #include <Arduino.h>
+#include "timer.hpp"
 
 bool lineInit(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHeader);
 void lineUpdate();

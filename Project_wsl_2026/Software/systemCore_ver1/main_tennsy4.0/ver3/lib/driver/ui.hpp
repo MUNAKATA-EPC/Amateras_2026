@@ -3,7 +3,7 @@
 #include <Arduino.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
-#include "nameTag.hpp"
+#include "uiNameTag.hpp"
 #include "timer.hpp"
 
 bool uiInit(TwoWire *wire, uint8_t address, uint8_t width, uint8_t height);

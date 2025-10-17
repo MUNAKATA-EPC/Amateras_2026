@@ -16,7 +16,7 @@ bool bnoInit(TwoWire *wire, uint8_t address)
     Timer timer;
     timer.reset();
     bool success = _bno->begin(OPERATION_MODE_IMUPLUS);
-    while (!success && timer.msTime() < 5000)
+    while (!success && timer.msTime() < 100)
     {
         delay(10); // BNO055の通信開始待ち
     }

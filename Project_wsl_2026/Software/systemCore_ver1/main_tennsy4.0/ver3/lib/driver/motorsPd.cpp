@@ -1,5 +1,5 @@
 // pd.hppファイルで宣言されていることを前提とする
-#include "pd.hpp"
+#include "motorsPd.hpp"
 #include "Arduino.h" // constrain, roundなどのArduino関数を使用するため
 
 // D_USE_TIMERが定義されていない場合は、timerに関するコードがコンパイルされない

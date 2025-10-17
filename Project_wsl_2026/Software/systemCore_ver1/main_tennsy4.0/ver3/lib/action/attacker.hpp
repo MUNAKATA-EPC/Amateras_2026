@@ -5,10 +5,10 @@
 #include "timer.hpp"
 #include "vector.hpp"
 // driver類
-#include "dribbler/dribbler.hpp"
-#include "kicker/kicker.hpp"
-#include "motors/motors.hpp"
-#include "ui/ui.hpp"
+#include "dribbler.hpp"
+#include "kicker.hpp"
+#include "motors.hpp"
+#include "ui.hpp"
 // sensor類
 #include "bno.hpp"
 #include "button.hpp"

@@ -2,6 +2,7 @@
 #pragma once
 
 #include <Arduino.h>
+#include "timer.hpp"
 
 bool openmvInit(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHeader);
 void openmvUpdate();

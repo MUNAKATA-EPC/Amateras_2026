@@ -3,6 +3,7 @@
 #pragma once
 
 #include <Arduino.h>
+#include "timer.hpp"
 
 bool ps3Init(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHeader);
 void ps3StickAdjust(int left_adjust, int right_adjust);

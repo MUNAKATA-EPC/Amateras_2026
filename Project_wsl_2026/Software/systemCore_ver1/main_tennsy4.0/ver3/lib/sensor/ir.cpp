@@ -17,7 +17,16 @@ bool irInit(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHeader)
 
     _serial->begin(_baudrate);
 
-    return _serial->available() > 0;
+    Timer timer;
+    timer.reset();
+    bool success = false;
+    while (!success && timer.msTime() < 100)
+    {
+        success = _serial->available() >= 2; // 2個くらいデータが来たら成功しているとみなす
+        delay(10);                           // irの通信開始待ち
+    }
+
+    return success;
 }
 
 void irUpdate()
@@ -35,12 +44,12 @@ void irUpdate()
         {
             _serial->read(); // 同期ヘッダーを捨てる
 
-            uint8_t low1 = _serial->read();                                 // ボールの角度の下位バイトを読み取る
-            uint8_t high1 = _serial->read();                                // ボールの角度の上位バイトを読み取る
+            uint8_t low1 = _serial->read();                          // ボールの角度の下位バイトを読み取る
+            uint8_t high1 = _serial->read();                         // ボールの角度の上位バイトを読み取る
             _deg = int16_t((uint16_t(high1) << 8) | uint16_t(low1)); // 上位バイトと下位バイトをつなげる
 
-            uint8_t low2 = _serial->read();                                 // ボールの値の下位バイトを読み取る
-            uint8_t high2 = _serial->read();                                // ボールの値の上位バイトを読み取る
+            uint8_t low2 = _serial->read();                          // ボールの値の下位バイトを読み取る
+            uint8_t high2 = _serial->read();                         // ボールの値の上位バイトを読み取る
             _val = int16_t((uint16_t(high2) << 8) | uint16_t(low2)); // 上位バイトと下位バイトをつなげる
 
             if (_deg == -1)

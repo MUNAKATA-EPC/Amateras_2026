@@ -10,10 +10,10 @@
 #include "timer.hpp"
 #include "vector.hpp"
 // driver類
-#include "ui/ui.hpp"
-#include "dribbler/dribbler.hpp"
-#include "kicker/kicker.hpp"
-#include "motors/motors.hpp"
+#include "ui.hpp"
+#include "dribbler.hpp"
+#include "kicker.hpp"
+#include "motors.hpp"
 // sensor類
 #include "bno.hpp"
 #include "button.hpp"
@@ -25,34 +25,26 @@
 
 void setup()
 {
-    String debugMessage = "setup\n";
+    String debugMessage = "<setup>\n";
 
     // I2C
-    uiInit(&Wire1, 0x3C, 128, 64);
-    debugMessage += bnoInit(&Wire, 0x28) ? "bno found\n" : "bno not found\n";
+    debugMessage += uiInit(&Wire1, 0x3C, 128, 64) ? "ui     : found\n" : "ui     : not found\n";
+    debugMessage += bnoInit(&Wire, 0x28) ? "bno    : found\n" : "bno    : not found\n";
 
     // シリアル
     Serial.begin(9600); // デバッグ用
 
-    debugMessage += irInit(&Serial1, 115200, 0xAA) ? "ir found\n" : "ir not found\n";
-    debugMessage += lineInit(&Serial5, 115200, 0xAA) ? "line found\n" : "line not found\n";
-    debugMessage += openmvInit(&Serial3, 115200, 0xAA) ? "openmv found\n" : "openmv not found\n";
-    debugMessage += ps3Init(&Serial2, 115200, 0xAA) ? "ps3 found\n" : "ps3 not found\n";
+    debugMessage += irInit(&Serial1, 115200, 0xAA) ? "ir     : found\n" : "ir     : not found\n";
+    debugMessage += lineInit(&Serial5, 115200, 0xAA) ? "line   : found\n" : "line   : not found\n";
+    debugMessage += openmvInit(&Serial3, 115200, 0xAA) ? "openmv : found\n" : "openmv : not found\n";
+    debugMessage += ps3Init(&Serial2, 115200, 0xAA) ? "ps3    : found\n" : "ps3    : not found\n";
 
-    debugMessage += motorsInit(&Serial1, 115200) ? "motors found\n" : "motors not found\n";
+    debugMessage += motorsInit(&Serial1, 115200) ? "motors : found\n" : "motors : not found\n";
     motorsSetMoveSign(1, -1, -1, 1);         // 移動のための符号をセット
     motorsSetPdSign(1, 1, 1, 1);             // PD制御のための符号をセット
     motorsSetDegPosition(315, 45, 225, 135); // モータの位置をセット
 
-    // デバッグメッセージの出力
-    Serial.println(debugMessage);
-    uiPrintDebug(debugMessage.c_str()); // uiにも表示
-
     // デジタル
-    dribbler1.init(13, 1000, 2000);
-    while (!dribbler1.available()) // ドリブラーの初期化が完了していなかったら初期化
-        dribbler1.setup();
-
     kicker1.init(2, 3, 700);
     catchSensor.init(6); // キッカー用
 
@@ -60,6 +52,27 @@ void setup()
     rightButton.init(12, INPUT_PULLDOWN); // ui用
     leftButton.init(10, INPUT_PULLDOWN);  // ui用
     resetButton.init(9, INPUT_PULLDOWN);  // bno用
+
+    // デバッグメッセージの出力
+    Serial.println(debugMessage);
+    uiPrintDebug(debugMessage.c_str()); // uiにも表示
+
+    // どれかのボタンを押すまで待機
+    bool wait = true;
+    while (wait)
+    {
+        enterButton.update();
+        rightButton.update();
+        leftButton.update();
+        resetButton.update();
+
+        wait = !(enterButton.isReleased() || rightButton.isReleased() || leftButton.isReleased() || resetButton.isReleased());
+    }
+
+    // ドリブラー
+    dribbler1.init(13, 1000, 2000);
+    while (!dribbler1.available()) // ドリブラーの初期化が完了していなかったら初期化
+        dribbler1.setup();
 }
 
 Timer timer; // ui用

@@ -1,17 +1,17 @@
 #include "ui.hpp"
 
-Adafruit_SSD1306 *_ssd = nullptr;
+inline Adafruit_SSD1306 *_ssd = nullptr;
 
-uint8_t _address;
+inline uint8_t _address;
 
-int _meterNumber = 0;
+inline int _meterNumber = 0;
 
-bool _actionDecided = false;
-bool _modeDecided = false;
-int _actionNumber = 0;
-int _modeNumber = 0;
-int _configNumber = 0;
-bool _configActive[10] = {false}; // [Configの番号]
+inline bool _actionDecided = false;
+inline bool _modeDecided = false;
+inline int _actionNumber = 0;
+inline int _modeNumber = 0;
+inline int _configNumber = 0;
+inline bool _configActive[10] = {false}; // [Configの番号]
 
 bool uiInit(TwoWire *wire, uint8_t address, uint8_t width, uint8_t height)
 {
@@ -26,10 +26,14 @@ bool uiInit(TwoWire *wire, uint8_t address, uint8_t width, uint8_t height)
     Timer my_display_timer;
     my_display_timer.reset();
     bool success = _ssd->begin(SSD1306_SWITCHCAPVCC, _address);
-    while (!success && my_display_timer.msTime() < 5000)
+    while (!success && my_display_timer.msTime() < 100)
     {
         delay(10); // SSD1306との通信開始待ち
     }
+
+    _ssd->clearDisplay(); // 画面初期化
+    _ssd->display();      // 試験的描画
+
     return success;
 }
 
