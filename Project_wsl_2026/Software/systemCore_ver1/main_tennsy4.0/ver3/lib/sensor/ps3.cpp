@@ -1,27 +1,27 @@
 #include "ps3.hpp"
 
-inline HardwareSerial *_serial = nullptr;
-inline uint32_t _baudrate = 9600;
-inline uint8_t _frameHeader = 0xAA;
+static HardwareSerial *_serial = nullptr;
+static uint32_t _baudrate = 9600;
+static uint8_t _frameHeader = 0xAA;
 
 // 調整
-inline int _stickLeftAdjust = 0;
-inline int _stickRightAdjust = 0;
+static int _stickLeftAdjust = 0;
+static int _stickRightAdjust = 0;
 
 // 左ステック
-inline int _stickLx = 0;
-inline int _stickLy = 0;
-inline bool _stickLeftDetected = false;
-inline int _stickLeftDeg = -1;
-inline double _stickLeftDis = -1.0;
+static int _stickLx = 0;
+static int _stickLy = 0;
+static bool _stickLeftDetected = false;
+static int _stickLeftDeg = -1;
+static double _stickLeftDis = -1.0;
 // 右ステック
-inline int _stickRx = 0;
-inline int _stickRy = 0;
-inline bool _stickRightDetected = false;
-inline int _stickRightDeg = -1;
-inline double _stickRightDis = -1.0;
+static int _stickRx = 0;
+static int _stickRy = 0;
+static bool _stickRightDetected = false;
+static int _stickRightDeg = -1;
+static double _stickRightDis = -1.0;
 // ボタン（14個）
-inline uint16_t buttonBitMask = 0;
+static uint16_t buttonBitMask = 0;
 
 bool ps3Init(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHeader)
 {

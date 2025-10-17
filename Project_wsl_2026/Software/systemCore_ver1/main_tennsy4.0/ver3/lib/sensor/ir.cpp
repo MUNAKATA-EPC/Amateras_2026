@@ -1,13 +1,13 @@
 #include "ir.hpp"
 
-inline HardwareSerial *_serial = nullptr;
-inline uint32_t _baudrate = 9600;
-inline uint8_t _frameHeader = 0xAA;
+static HardwareSerial *_serial = nullptr;
+static uint32_t _baudrate = 9600;
+static uint8_t _frameHeader = 0xAA;
 
-inline bool _detected = false;
-inline int _deg = -1;
-inline int _val = -1;
-inline double _dis = -1.0;
+static bool _detected = false;
+static int _deg = -1;
+static int _val = -1;
+static double _dis = -1.0;
 
 bool irInit(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHeader)
 {

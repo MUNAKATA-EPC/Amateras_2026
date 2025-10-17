@@ -77,8 +77,6 @@ def send_int16(uart, value):
 def convert_angle_for_teensy(angle):
     if angle == -1:
         return -1
-    if angle < 0:
-        angle = 360 + angle
 
     angle = (angle - 270 + 360)%360
     angle = 360 - angle

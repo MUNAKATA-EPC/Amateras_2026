@@ -3,17 +3,17 @@
 #include "motors.hpp"
 
 // DSR1202モータードライバクラスのポインタ
-inline DSR1202 *_dsr = nullptr;
+static DSR1202 *_dsr = nullptr;
 
-// メンバ変数（inlineで定義することでヘッダーを省略）
-inline int _deg_position[4] = {0};     // モータの物理的な配置角度（例: 315, 45, 225, 135など）
-inline int _move_sign[4] = {1};        // 移動ベクトル計算後のパワーに対する符号
-inline int _pd_sign[4] = {1};          // PD制御の回転トルクに対する符号
-inline double _move_output[4] = {0.0}; // 移動成分の出力（スケーリング済み）
-inline int _output[4] = {0};           // 最終的なモーター出力（移動 + PD）
+// メンバ変数（staticで定義することでヘッダーを省略）
+static int _deg_position[4] = {0};     // モータの物理的な配置角度（例: 315, 45, 225, 135など）
+static int _move_sign[4] = {1};        // 移動ベクトル計算後のパワーに対する符号
+static int _pd_sign[4] = {1};          // PD制御の回転トルクに対する符号
+static double _move_output[4] = {0.0}; // 移動成分の出力（スケーリング済み）
+static int _output[4] = {0};           // 最終的なモーター出力（移動 + PD）
 
 // PD制御クラスのポインタ
-inline PD *_pd = nullptr;
+static PD *_pd = nullptr;
 
 // モーター制御の初期化
 // serial 使用するシリアルポート
@@ -158,6 +158,3 @@ void motorsPdMove()
     // 制御
     _dsr->move(output1, output2, output3, output4);
 }
-
-PD *pdGyro = new PD(0.6, 0.1); // ジャイロ用のPD調節値
-PD *pdCam = new PD(0.6, 0.1);  // カメラ用のPD調節値

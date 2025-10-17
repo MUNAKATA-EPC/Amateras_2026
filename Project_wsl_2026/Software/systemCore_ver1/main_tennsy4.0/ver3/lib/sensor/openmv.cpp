@@ -1,20 +1,20 @@
 #include "openmv.hpp"
 
-inline HardwareSerial *_serial = nullptr;
-inline uint32_t _baudrate = 9600;
-inline uint8_t _frameHeader = 0xAA;
+static HardwareSerial *_serial = nullptr;
+static uint32_t _baudrate = 9600;
+static uint8_t _frameHeader = 0xAA;
 
 // コート
-inline bool _fieldDetected = false;
-inline int _fieldDeg = -1;
+static bool _fieldDetected = false;
+static int _fieldDeg = -1;
 // 青ゴール
-inline bool _blueGoalDetected = false;
-inline int _blueGoalDeg = -1;
-inline double _blueGoalDis = -1;
+static bool _blueGoalDetected = false;
+static int _blueGoalDeg = -1;
+static double _blueGoalDis = -1;
 // 黄ゴール
-inline bool _yellowGoalDetected = false;
-inline int _yellowGoalDeg = -1;
-inline double _yellowGoalDis = -1;
+static bool _yellowGoalDetected = false;
+static int _yellowGoalDeg = -1;
+static double _yellowGoalDis = -1;
 
 bool openmvInit(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHeader)
 {

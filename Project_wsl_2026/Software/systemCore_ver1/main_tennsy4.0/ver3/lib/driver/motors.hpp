@@ -14,6 +14,3 @@ void motorsStop();
 void motorsPdProcess(PD *pd, int deg, int target); // PD出力範囲は-100~100
 void motorsMove(int deg, int power);               // PD出力範囲は-100~100
 void motorsPdMove();                               // PD出力範囲は-100~100
-
-extern PD *pdGyro; // ジャイロ用のPD調節値
-extern PD *pdCam;  // カメラ用のPD調節値

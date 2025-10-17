@@ -1,9 +1,9 @@
 #include "bno.hpp"
-inline Adafruit_BNO055 *_bno = nullptr;
+static Adafruit_BNO055 *_bno = nullptr;
 
-inline int _degNormal = 0; // BNO055からの生角度
-inline int _degReset = 0;  // リセット時の角度
-inline int _deg = 0;       // 補正後の角度格納用
+static int _degNormal = 0; // BNO055からの生角度
+static int _degReset = 0;  // リセット時の角度
+static int _deg = 0;       // 補正後の角度格納用
 
 bool bnoInit(TwoWire *wire, uint8_t address)
 {
@@ -35,8 +35,6 @@ void bnoUpdate(bool resetbtn)
 
     // 補正後の角度
     _deg = (int)((_degNormal - _degReset + 360) % 360);
-    if (_deg > 180)
-        _deg -= 360; // -180~180に変換
 }
 
 int bnoDeg() { return _deg; }

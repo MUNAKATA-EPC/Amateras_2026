@@ -1,24 +1,24 @@
 #include "line.hpp"
 
-inline HardwareSerial *_serial = nullptr;
-inline uint32_t _baudrate = 9600;
-inline uint8_t _frameHeader = 0xAA;
+static HardwareSerial *_serial = nullptr;
+static uint32_t _baudrate = 9600;
+static uint8_t _frameHeader = 0xAA;
 
-inline double _x = 0.0;
+static double _x = 0.0;
 double _y = 0.0;
 
-inline bool _ringDetected = false;
-inline bool _sideDetected = false;
-inline bool _sensor[19] = {false};
+static bool _ringDetected = false;
+static bool _sideDetected = false;
+static bool _sensor[19] = {false};
 
-inline bool _sideRight = false;
-inline bool _sideLeft = false;
-inline bool _sideBack = false;
+static bool _sideRight = false;
+static bool _sideLeft = false;
+static bool _sideBack = false;
 
-inline int _ringDeg = -1;
-inline int _sideDeg = -1;
+static int _ringDeg = -1;
+static int _sideDeg = -1;
 
-inline double _dis = -1.0;
+static double _dis = -1.0;
 
 bool lineInit(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHeader)
 {

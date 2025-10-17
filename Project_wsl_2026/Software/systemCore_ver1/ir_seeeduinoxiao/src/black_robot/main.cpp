@@ -32,14 +32,14 @@ void setup()
   ir_mux.init(10);
 }
 
- // 16個のセンサーそれぞれの移動平均を計算する
- // index センサーの配列番号 (0～15)
- // new_value 新しい測定値 (0～1023)
- // int 移動平均値。有効なデータがない場合は-1を返す。
+// 16個のセンサーそれぞれの移動平均を計算する
+// index センサーの配列番号 (0～15)
+// new_value 新しい測定値 (0～1023)
+// int 移動平均値。有効なデータがない場合は-1を返す。
 int GetMovementAverage(int index, int new_value)
 {
   // history_size: 過去の値を保存する数 (移動平均の期間)
-  const int history_size = 4;
+  const int history_size = 3;
 
   // static変数はプログラム実行中に一度だけ初期化され、値を保持し続ける
   // 全要素を-1（無効値）で初期化
@@ -105,16 +105,18 @@ void loop()
 
   // 3. ボールの方向と値の算出
   if (IRsensor_value[IRsensor_min_index] > 1000)
-
   {
     // センサー値がほぼ最大（ボールが見えない）の場合
     IRball_deg = -1;
     IRball_value = -1;
+
+    IRball_of_x = -1.0; // 重み付けベクトルのX成分を初期化
+    IRball_of_y = -1.0; // 重み付けベクトルのY成分を初期化
   }
   else
   {
-    IRball_of_x = 0; // 重み付けベクトルのX成分を初期化
-    IRball_of_y = 0; // 重み付けベクトルのY成分を初期化
+    IRball_of_x = 0.0; // 重み付けベクトルのX成分を初期化
+    IRball_of_y = 0.0; // 重み付けベクトルのY成分を初期化
 
     // 周囲7センサーの値を信号強度（1023.0 - 値）に変換し、ベクトル加算
     for (uint8_t i = 0; i < 7; i++)
@@ -133,6 +135,7 @@ void loop()
     // 角度を計算し、度数に変換して丸める
     // atan2の結果は-πから+π（-180度から+180度）
     IRball_deg = (int)round(degrees(atan2(IRball_of_y, IRball_of_x)));
+    IRball_deg = (IRball_deg + 360) % 360; // 0～359度に変換
 
     // IRball_value（距離/強度）を計算
     // 浮動小数点数での除算を確実にするため、10.0を使用
@@ -147,24 +150,37 @@ void loop()
     IRball_value = (int)IRball_value_sub;
   }
 
+  // IRball_deg と IRball_value を int16_t 型に変換
+  int16_t deg_to_send = (int16_t)IRball_deg;
+  int16_t val_to_send = (int16_t)IRball_value;
+
+  // 1. 未検出（-1）の場合、2バイトデータとして 0xFFFF（= -1）として送信する
+  if (deg_to_send == -1)
+  {
+    deg_to_send = 0xFFFF;
+  }
+  if (val_to_send == -1)
+  {
+    val_to_send = 0xFFFF;
+  }
+
   /* 4. 送信処理 (Serial1: Teensyなどとの通信) */
-  Serial1.write(head_byte);
-  // 同期ヘッダー (0xAA)
+  Serial1.write(head_byte); // 同期ヘッダー (0xAA)
 
-  // IRball_deg (2バイト送信, 下位バイト→上位バイトの順)
-  Serial1.write((uint8_t)IRball_deg);
+  // IRball_deg (2バイト送信: 下位バイト -> 上位バイトの順)
+  Serial1.write((uint8_t)(deg_to_send & 0xFF));        // 下位バイト (low1)
+  Serial1.write((uint8_t)((deg_to_send >> 8) & 0xFF)); // 上位バイト (high1)
 
-  Serial1.write((uint8_t)(IRball_deg >> 8));
+  // IRball_value (2バイト送信: 下位バイト -> 上位バイトの順)
+  Serial1.write((uint8_t)(val_to_send & 0xFF));        // 下位バイト (low2)
+  Serial1.write((uint8_t)((val_to_send >> 8) & 0xFF)); // 上位バイト (high2)
 
-  // IRball_value (2バイト送信, 下位バイト→上位バイトの順)
-  Serial1.write((uint8_t)IRball_value);
-
-  Serial1.write((uint8_t)(IRball_value >> 8));
-
-  /* デバッグ用シリアル出力 (Serial: PCとの通信) */
+  /* デバッグ用シリアル出力 */
   Serial.print(IRball_of_x);
   Serial.print(",");
-  Serial.println(IRball_of_y);
+  Serial.print(IRball_of_y);
+  Serial.print("->");
+  Serial.println(IRball_deg);
 
   delay(10);
 }

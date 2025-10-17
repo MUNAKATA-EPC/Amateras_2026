@@ -1,17 +1,17 @@
 #include "ui.hpp"
 
-inline Adafruit_SSD1306 *_ssd = nullptr;
+static Adafruit_SSD1306 *_ssd = nullptr;
 
-inline uint8_t _address;
+static uint8_t _address;
 
-inline int _meterNumber = 0;
+static int _meterNumber = 0;
 
-inline bool _actionDecided = false;
-inline bool _modeDecided = false;
-inline int _actionNumber = 0;
-inline int _modeNumber = 0;
-inline int _configNumber = 0;
-inline bool _configActive[10] = {false}; // [Configの番号]
+static bool _actionDecided = false;
+static bool _modeDecided = false;
+static int _actionNumber = 0;
+static int _modeNumber = 0;
+static int _configNumber = 0;
+static bool _configActive[10] = {false}; // [Configの番号]
 
 bool uiInit(TwoWire *wire, uint8_t address, uint8_t width, uint8_t height)
 {
@@ -45,13 +45,15 @@ void uiPrintDebug(const char *msg)
     _ssd->setTextColor(SSD1306_WHITE, SSD1306_BLACK);
     _ssd->setCursor(0, 0);
     _ssd->println(msg);
-    _ssd->display(); // 試験的描画
+    _ssd->display();    // 画面に表示
 }
 
 // ssd1306ライブラリーの拡張
 // メータ表示用
 void uiDrawCircleMeter(bool show, int x0, int y0, int r, const char *s, int deg)
 {
+    _ssd->clearDisplay(); // 画面初期化
+
     _ssd->drawCircle(x0, y0, r, SSD1306_WHITE);
 
     int x1 = x0, y1 = y0;
@@ -72,6 +74,8 @@ void uiDrawCircleMeter(bool show, int x0, int y0, int r, const char *s, int deg)
     _ssd->setCursor(text_x, text_y);
 
     _ssd->print(buf);
+
+    _ssd->display();    // 画面に表示
 }
 
 void uiProcess(bool show, bool enterbtn, bool rightbtn, bool leftbtn)

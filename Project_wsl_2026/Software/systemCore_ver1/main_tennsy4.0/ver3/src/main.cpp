@@ -95,6 +95,10 @@ void loop()
     // ドリブラーを動かす
     dribbler1.move(1500);
 
+    uiDrawCircleMeter(true, 64, 32, 15, "ir", irDeg());
+    Serial.println(irDeg());
+
+    /*
     // uiを実行
     if (!timer.everCalled() || timer.msTime() > 10) // まだ呼ばれていない場合もタイマーをリセットさせる
     {
@@ -127,4 +131,5 @@ void loop()
             break;
         }
     }
+    */
 }
