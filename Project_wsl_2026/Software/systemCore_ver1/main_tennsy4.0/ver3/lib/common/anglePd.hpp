@@ -23,7 +23,7 @@ public:
     void process(int deg, int target);
 
     // [-100~100]の値を返す
-    int output()
+    int const output()
     {
         return (int)round(_output);
     }

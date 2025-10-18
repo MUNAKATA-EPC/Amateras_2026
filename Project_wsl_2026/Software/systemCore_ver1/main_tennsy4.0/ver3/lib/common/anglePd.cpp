@@ -1,8 +1,4 @@
-// pd.hppファイルで宣言されていることを前提とする
-#include "motorsPd.hpp"
-#include "Arduino.h" // constrain, roundなどのArduino関数を使用するため
-
-// D_USE_TIMERが定義されていない場合は、timerに関するコードがコンパイルされない
+#include "anglePd.hpp"
 
 PD::PD(double kp, double kd)
 {

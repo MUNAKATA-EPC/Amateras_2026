@@ -40,7 +40,7 @@ void setup()
     debugMessage += ps3Init(&Serial2, 115200, 0xAA) ? "ps3    : found\n" : "ps3    : not found\n";
 
     debugMessage += motorsInit(&Serial1, 115200) ? "motors : found\n" : "motors : not found\n";
-    motorsSetMoveSign(1, -1, -1, 1);         // 移動のための符号をセット
+    motorsSetMoveSign(1, 1, 1, 1);           // 移動のための符号をセット
     motorsSetPdSign(1, 1, 1, 1);             // PD制御のための符号をセット
     motorsSetDegPosition(315, 45, 225, 135); // モータの位置をセット
 
@@ -95,10 +95,6 @@ void loop()
     // ドリブラーを動かす
     dribbler1.move(1500);
 
-    uiDrawCircleMeter(true, 64, 32, 15, "ir", irDeg());
-    Serial.println(irDeg());
-
-    /*
     // uiを実行
     if (!timer.everCalled() || timer.msTime() > 10) // まだ呼ばれていない場合もタイマーをリセットさせる
     {
@@ -125,11 +121,11 @@ void loop()
             playDefender();
             break;
         case Action::TEST:
+            motorsMove(0, 50);
             break;
         case Action::RADICON:
             playRadicon();
             break;
         }
     }
-    */
 }

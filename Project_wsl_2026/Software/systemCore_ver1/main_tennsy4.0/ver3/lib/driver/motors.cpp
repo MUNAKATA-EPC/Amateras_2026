@@ -42,10 +42,10 @@ bool motorsInit(HardwareSerial *serial, uint32_t baudrate)
 // 各モーターの物理的な配置角度を設定（度数法）
 void motorsSetDegPosition(int deg_1ch, int deg_2ch, int deg_3ch, int deg_4ch)
 {
-    _deg_position[0] = deg_1ch;
-    _deg_position[1] = deg_2ch;
-    _deg_position[2] = deg_3ch;
-    _deg_position[3] = deg_4ch;
+    _deg_position[0] = deg_1ch > 180 ? deg_1ch - 360 : deg_1ch;
+    _deg_position[1] = deg_2ch > 180 ? deg_2ch - 360 : deg_2ch;
+    _deg_position[2] = deg_3ch > 180 ? deg_3ch - 360 : deg_3ch;
+    _deg_position[3] = deg_4ch > 180 ? deg_4ch - 360 : deg_4ch;
 }
 
 // 各モーターの移動方向の符号を設定（1または-1）
@@ -95,24 +95,23 @@ void motorsPdProcess(PD *pd, int deg, int target)
 // power 移動の強さ（最大値）
 void motorsMove(int deg, int power)
 {
-    // 1. degの基準調整 (元のコードはコメントアウト維持)
-    // deg = (deg + 180) % 360;
+    deg = deg > 180 ? deg - 360 : deg; // degを-180~180に変換
 
-    // 2. 移動成分の計算と最大出力の探索
+    // 1. 移動成分の計算と最大出力の探索
     double max_move_output = 0.0;
     for (int i = 0; i < 4; i++)
     {
-        // **修正点**: モーターiから見た移動方向は (移動方向 deg) - (モーター位置 _deg_position[i]) で計算します。
-        Vector vec(deg - _deg_position[i], power); // 正しい相対角度の計算
+        // モーターiから見た移動方向は (モーター位置 _deg_position[i]) - (移動方向 deg) で計算する
+        Vector vec(_deg_position[i] - deg, power);
 
-        // "i"chの出力(X成分だけが移動に使える)
-        _move_output[i] = vec.x() * _move_sign[i];
+        // "i"chの出力(y成分だけが移動に使える)
+        _move_output[i] = vec.y() * _move_sign[i];
 
         // 最大移動出力（絶対値）を更新
         max_move_output = (fabs(_move_output[i]) > max_move_output) ? fabs(_move_output[i]) : max_move_output;
     }
 
-    // 3. 移動成分の出力スケーリング
+    // 2. 移動成分の出力スケーリング
     // 出力が power になるようにするためのスケールを計算
     double scale = (max_move_output != 0) ? (double)power / max_move_output : 0;
     for (int i = 0; i < 4; i++)
@@ -123,8 +122,7 @@ void motorsMove(int deg, int power)
 
     // 4. PD成分を付け加えて最終出力を決定
     // PD制御の出力は -100~100 (int)
-    // NOTE: _pd->output() は int を返すため、doubleにキャストし、元のコードの符号を維持。
-    double pd_output = (double)-_pd->output();
+    double pd_output = (double)_pd->output();
 
     for (int i = 0; i < 4; i++)
     {
@@ -140,13 +138,17 @@ void motorsMove(int deg, int power)
     _dsr->move(_output[0], _output[1], _output[2], _output[3]);
 }
 
+void motorsVectorMove(Vector *vec)
+{
+    motorsMove(vec->deg(), (int)round(vec->length()));
+}
+
 // PD制御のみで機体を回転させる
 void motorsPdMove()
 {
     // 制御
     // PD制御の出力は -100~100 (int)
-    // 元のコードの `-` 符号を維持。
-    int pd_output = -_pd->output();
+    int pd_output = _pd->output();
 
     // 全てのモーターに同じPDトルクを適用（その場の回転）
     // モーターに適用するPD出力を、PD符号に基づいて決定

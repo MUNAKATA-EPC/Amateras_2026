@@ -43,8 +43,8 @@ bool lineInit(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHeader)
     bool success = false;
     while (!success && timer.msTime() < 100)
     {
-        success = _serial->available() >= 2; // 2個くらいデータが来たら成功しているとみなす
-        delay(10);                           // lineの通信開始待ち
+        success = _serial->available() > 0;  // 1個以上データが来たら成功しているとみなす
+        delay(10);                           // irの通信開始待ち
     }
 
     return success;
