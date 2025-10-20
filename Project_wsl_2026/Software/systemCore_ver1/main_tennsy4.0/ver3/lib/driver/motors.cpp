@@ -13,7 +13,7 @@ static double _move_output[4] = {0.0}; // 移動成分の出力（スケーリ�
 static int _output[4] = {0};           // 最終的なモーター出力（移動 + PD）
 
 // PD制御クラスのポインタ
-static PD *_pd = nullptr;
+static AnglePD *_anglePd = nullptr;
 
 // モーター制御の初期化
 // serial 使用するシリアルポート
@@ -31,9 +31,9 @@ bool motorsInit(HardwareSerial *serial, uint32_t baudrate)
     _dsr->begin();
 
     // PDクラスのインスタンスを確保（未設定時にNULLポインタ参照を防ぐため）
-    if (_pd == nullptr)
+    if (_anglePd == nullptr)
     {
-        _pd = new PD(0.0, 0.0);
+        _anglePd = new AnglePD(0.0, 0.0);
     }
 
     return true;
@@ -83,11 +83,11 @@ void motorsStop()
 // pd 使用するPDオブジェクトのポインタ
 // deg 現在の角度（BNOなど）
 // target 目標角度
-void motorsPdProcess(PD *pd, int deg, int target)
+void motorsPdProcess(AnglePD *pd, int deg, int target)
 // ここでPDポインタを更新し、計算を実行
 {
-    _pd = pd;
-    _pd->process(deg, target);
+    _anglePd = pd;
+    _anglePd->process(deg, target);
 }
 
 // 移動制御とPD制御を合成してモーターを駆動
@@ -123,7 +123,7 @@ void motorsMove(int deg, int power)
 
     // 4. PD成分を付け加えて最終出力を決定
     // PD制御の出力は -100~100 (int)
-    double pd_output = (double)_pd->output();
+    double pd_output = (double)_anglePd->output();
 
     for (int i = 0; i < 4; i++)
     {
@@ -149,7 +149,7 @@ void motorsPdMove()
 {
     // 制御
     // PD制御の出力は -100~100 (int)
-    int pd_output = _pd->output();
+    int pd_output = _anglePd->output();
 
     // 全てのモーターに同じPDトルクを適用（その場の回転）
     // モーターに適用するPD出力を、PD符号に基づいて決定

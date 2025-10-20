@@ -3,7 +3,7 @@
 #include <Arduino.h>
 #include "timer.hpp"
 
-class PD
+class AnglePD
 {
 private:
     double _kp = 0.0; // 比例ゲイン
@@ -19,7 +19,7 @@ private:
     double _output = 0;    // 出力
 public:
     // 関数・コンストラクタ
-    PD(double kp,double kd);
+    AnglePD(double kp,double kd);
     void process(int deg, int target);
 
     // [-100~100]の値を返す

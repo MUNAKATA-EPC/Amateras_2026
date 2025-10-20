@@ -1,6 +1,6 @@
-#include "anglePd.hpp"
+#include "pd.hpp"
 
-AnglePD::AnglePD(double kp, double kd)
+PD::PD(double kp, double kd)
 {
     // PゲインとDゲインを初期化
     _kp = kp;
@@ -15,32 +15,20 @@ AnglePD::AnglePD(double kp, double kd)
 #endif
 }
 
-void AnglePD::process(int deg, int target)
+void PD::process(double val, double target)
 {
-    // 現在の角度を設定
-    _value = (deg < 180) ? (double)deg : double(deg - 360); // -180~180に変換する
-
+    // 現在値を設定
+    _value = val;
     // --- P制御（比例項）の計算 ---
     // 誤差を計算 (目標 - 現在値)
     double error = (double)target - _value;
 
-    // 角度誤差を最短経路にラップする (-180.0 から 180.0)
-    // 例えば、目標 170°、現在 -170° のとき、誤差 340° ではなく 20° になる
-    if (error > 180.0)
-        error -= 360.0;
-    else if (error < -180.0)
-        error += 360.0;
-
+    // --- P制御の計算 ---
     _p_power = error * _kp;
 
     // --- D制御（微分項）の計算 ---
     // 角度の変化量 (_gap_of_value) を計算
-    // -180° から 180° の境界をまたぐ変化も正しく処理される
     _gap_of_value = _value - _oldvalue;
-    if (_gap_of_value > 180.0)
-        _gap_of_value -= 360.0;
-    else if (_gap_of_value < -180.0)
-        _gap_of_value += 360.0;
 
     // 過去の値を更新
     _oldvalue = _value;

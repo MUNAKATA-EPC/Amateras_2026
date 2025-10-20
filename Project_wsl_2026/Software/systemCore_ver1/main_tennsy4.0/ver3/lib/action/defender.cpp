@@ -1,56 +1,56 @@
 #include "defender.hpp"
 
-static PD pdGyro(0.8, 0.1); // ジャイロ用のPD調節値
-static PD pdCam(0.6, 0.1);  // カメラ用のPD調節値
+static AnglePD pdGyro(0.8, 0.1); // ジャイロ用のPD調節値
+static AnglePD pdCam(0.6, 0.1);  // カメラ用のPD調節値
 
-static PD pdLineX(1.0, 0.45); // ライントレース用のPD調節値
+static PD pdLineTrace(1.0, 0.45); // ライントレース用のPD調節値
+static PD pdIrY(0.4, 0.45);       // IRボール捕獲用横方向のPD調節値
 
 void playDefender()
 {
     motorsPdProcess(&pdGyro, bnoDeg(), 0);
 
-    pdLineX.process(lineRingX(), 0); // ライントレース用PD計算
+    pdLineTrace.process(lineRingDis(), 0.0); // ライントレース用PD計算
+
+    Vector irVec(irDeg(), irDis()); // IRボール捕獲用横方向のPD計算
+    pdIrY.process(irVec.y(), 0.0);
 
     if (lineRingDetected())
     {
-        const double lineTraceMaxLen = 95.0; // ライントレースの最大長さ
+        /* --詳しい算出方法は物xを見るべし-- */
 
-        /*
-        // 円形ラインでPD制御する
-        Serial.print(lineRingDeg());
-        Serial.print(" , ");
-        Serial.println(lineRingX());
-        */
+        const double defenceMaxLen = 95.0; // ディフェンス時の最大長さ
 
-        // ライトレースのx成分は、角度=(リングのx角度)と長さ=(リングのx成分)で決定
-        int xDeg = lineRingDeg() > 135 && lineRingDeg() < 255 ? 180 : 0;
-        double xLen = constrain(fabs((double)pdLineX.output()), 0.0, lineTraceMaxLen);
-        Vector xVec(xDeg, xLen);
+        // ライトレースは、角度=(リングの角度)と長さ=(リングの距離)で決定
+        double traceLen = constrain(fabs((double)pdLineTrace.output()), 0.0, defenceMaxLen);
+        Vector lineTraceVec(lineRingDeg(), traceLen);
 
-        // ライトレースのy成分は、角度=(IRのy角度)と長さ=(100-リングの長さ)で決定
-        int yDeg = irDeg() > 180 ? 270 : 90;
+        // IRボールのy成分は、角度はIRのy角度(90度か270度)と長さはライントレースのベクトルと足して長さが100以下になるように決定
         // 合力が0になってほしいので三平方の定理で算出
-        double yLen = sqrt(lineTraceMaxLen * lineTraceMaxLen - xVec.length() * xVec.length());
+        int yDeg = (irDeg() < 180) ? 90 : 270;
+        double yLen = fabs((double)pdIrY.output());
+
+        // y軸水平方向での円の接点からx軸までの距離
+        double yMaxLen = sqrt(defenceMaxLen * defenceMaxLen - lineTraceVec.x() * lineTraceVec.x());
+
+        if (irDeg() < 180)
+        {
+            yLen = constrain(yLen, 0.0, yMaxLen + lineTraceVec.y());
+        }
+        else
+        {
+            yLen = constrain(yLen, 0.0, yMaxLen - lineTraceVec.y());
+        }
         Vector yVec = Vector(yDeg, yLen);
 
         // 移動ベクトルの合成
-        Area16 irPosi = area16(irDeg()); // IRボールが前にあるかどうか
-        if (irPosi == Area16::FRONT)
-        {
-            yVec = yVec * 0.0; // IRボールがないのならy成分は削除
-        }
-        else if (irPosi == Area16::FRONT_FRONT_LEFT || irPosi == Area16::FRONT_FRONT_RIGHT)
-        {
-            yVec = yVec * 0.5; // IRボールが微妙に前にあるならy成分を弱める
-        }
-        Vector moveVec = xVec + yVec;
+        Vector moveVec = lineTraceVec + yVec;
 
-        // motorsMove(xVec.deg(), xVec.length());
         motorsVectorMove(&moveVec);
 
-        Serial.print(xVec.deg());
+        Serial.print(lineTraceVec.deg());
         Serial.print(" , ");
-        Serial.print(xVec.length());
+        Serial.print(lineTraceVec.length());
         Serial.print(" + ");
         Serial.print(yVec.deg());
         Serial.print(" , ");
