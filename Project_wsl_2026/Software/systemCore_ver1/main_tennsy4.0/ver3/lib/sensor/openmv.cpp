@@ -83,42 +83,13 @@ void openmvUpdate()
     }
 }
 
-bool m5stampDetected(CamDataType data)
-{
-    switch (data)
-    {
-    case FIELD:
-        return _fieldDetected;
-    case YELLOWGOAL:
-        return _yellowGoalDetected;
-    case BLUEGOAL:
-        return _blueGoalDetected;
-    }
-    return 0;
-}
-int m5stampDeg(CamDataType data)
-{
-    switch (data)
-    {
-    case FIELD:
-        return _fieldDeg;
-    case YELLOWGOAL:
-        return _yellowGoalDeg;
-    case BLUEGOAL:
-        return _blueGoalDeg;
-    }
-    return 0;
-}
-int m5stampDis(CamDataType data)
-{
-    switch (data)
-    {
-    case FIELD:
-        return 0;
-    case YELLOWGOAL:
-        return _yellowGoalDis;
-    case BLUEGOAL:
-        return _blueGoalDis;
-    }
-    return 0;
-}
+bool openmvFieldDetected() { return _fieldDetected; }
+int openmvFieldDeg() { return _fieldDeg; }
+
+bool openmvBlueGoalDetected() { return _blueGoalDetected; }
+int openmvBlueGoalDeg() { return _blueGoalDeg; }
+double openmvBlueGoalDis() { return _blueGoalDis; }
+
+bool openmvYellowGoalDetected() { return _yellowGoalDetected; }
+int openmvYellowGoalDeg() { return _yellowGoalDeg; }
+double openmvYellowGoalDis() { return _yellowGoalDis; }

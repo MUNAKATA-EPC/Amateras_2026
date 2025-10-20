@@ -1,12 +1,12 @@
 #include "attacker.hpp"
 
-static PD *pdGyro = new PD(0.6, 0.1); // ジャイロ用のPD調節値
-static PD *pdCam = new PD(0.6, 0.1);  // カメラ用のPD調節値
+static PD pdGyro(0.8, 0.1); // ジャイロ用のPD調節値
+static PD pdCam(0.6, 0.1);  // カメラ用のPD調節値
 
 void playAttacker()
 {
     // PD制御
-    motorsPdProcess(pdGyro, bnoDeg(), 0);
+    motorsPdProcess(&pdGyro, bnoDeg(), 0);
 
     // キッカー
     kicker1.kick(catchSensor.read() == HIGH);

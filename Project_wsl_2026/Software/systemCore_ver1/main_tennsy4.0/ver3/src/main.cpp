@@ -68,6 +68,13 @@ void setup()
 
         wait = !(enterButton.isReleased() || rightButton.isReleased() || leftButton.isReleased() || resetButton.isReleased());
     }
+    while(enterButton.isPushing() || rightButton.isPushing() || leftButton.isPushing() || resetButton.isPushing())
+    {
+        enterButton.update();
+        rightButton.update();
+        leftButton.update();
+        resetButton.update();
+    } // 押しっぱなし防止
 
     // ドリブラー
     dribbler1.init(13, 1000, 2000);

@@ -126,39 +126,15 @@ void ps3Update()
     }
 }
 
-bool ps3Detected(StickDataType data)
-{
-    switch (data)
-    {
-    case LEFTSTICK:
-        return _stickLeftDetected;
-    case RIGHTSTICK:
-        return _stickRightDetected;
-    }
-    return 0;
-}
-int ps3Deg(StickDataType data)
-{
-    switch (data)
-    {
-    case LEFTSTICK:
-        return _stickLeftDeg;
-    case RIGHTSTICK:
-        return _stickRightDeg;
-    }
-    return 0;
-}
-int ps3Dis(StickDataType data)
-{
-    switch (data)
-    {
-    case LEFTSTICK:
-        return _stickLeftDis;
-    case RIGHTSTICK:
-        return _stickRightDis;
-    }
-    return 0;
-}
+bool ps3LeftStickDetected() { return _stickLeftDetected; }
+bool ps3RightStickDetected() { return _stickRightDetected; }
+
+int ps3LeftStickDeg() { return _stickLeftDeg; }
+int ps3RightStickDeg() { return _stickRightDeg; }
+
+double ps3LeftStickDis() { return _stickLeftDis; }
+double ps3RightStickDis() { return _stickRightDis; }
+
 bool ps3ButtonIsPushing(ButtonDataType type)
 {
     return ((1 << (int)type) & buttonBitMask) > 0; // (int)type分だけシフトした1との論理積が0よりも大きかったらそのbitは1

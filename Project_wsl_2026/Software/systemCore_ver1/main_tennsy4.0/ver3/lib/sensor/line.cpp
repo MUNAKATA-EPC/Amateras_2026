@@ -5,7 +5,7 @@ static uint32_t _baudrate = 9600;
 static uint8_t _frameHeader = 0xAA;
 
 static double _x = 0.0;
-double _y = 0.0;
+static double _y = 0.0;
 
 static bool _ringDetected = false;
 static bool _sideDetected = false;
@@ -155,27 +155,19 @@ void lineUpdate()
     }
 }
 
-bool lineDetected(LineDataType data)
-{
-    if (data == RING)
-        return _ringDetected;
+bool lineRingDetected() { return _ringDetected; }
+bool lineSideDetected() { return _sideDetected; }
 
-    return _sideDetected;
-}
 bool lineSensorDetected(uint8_t index) { return _sensor[index]; }
 
 bool lineSideRightDetected() { return _sideRight; }
 bool lineSideLeftDetected() { return _sideLeft; }
 bool lineSideBackDetected() { return _sideBack; }
 
-int lineDeg(LineDataType data)
-{
-    if (data == RING)
-        return _ringDeg;
+int lineRingDeg() { return _ringDeg; }
+int lineSideDeg() { return _sideDeg; }
 
-    return _sideDeg;
-}
-double lineDis() { return _dis; }
+double lineRingDis() { return _dis; }
 
 double lineRingX() { return _x; }
 double lineRingY() { return _y; }

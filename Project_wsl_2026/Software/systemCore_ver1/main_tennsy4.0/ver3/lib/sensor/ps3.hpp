@@ -10,14 +10,14 @@ void ps3StickAdjust(int left_adjust, int right_adjust);
 void ps3Update();
 
 // ステック
-enum StickDataType
-{
-    LEFTSTICK,
-    RIGHTSTICK
-};
-bool ps3Detected(StickDataType data);
-int ps3Deg(StickDataType data);
-int ps3Dis(StickDataType data);
+bool ps3LeftStickDetected();
+bool ps3RightStickDetected();
+
+int ps3LeftStickDeg();
+int ps3RightStickDeg();
+
+double ps3LeftStickDis();
+double ps3RightStickDis();
 // ボタン
 enum ButtonDataType
 {

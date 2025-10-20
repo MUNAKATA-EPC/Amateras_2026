@@ -21,19 +21,19 @@ Vector::Vector(int deg, double length)
 
 Vector Vector::operator+(const Vector &other) const
 {
-    return Vector(_vector_x + other.x(), _vector_y + other.y());
+    return Vector(_vector_x + other.x(), _vector_y + other.y(), true);
 }
 Vector Vector::operator-(const Vector &other) const
 {
-    return Vector(_vector_x - other.x(), _vector_y - other.y());
+    return Vector(_vector_x - other.x(), _vector_y - other.y(), true);
 }
 Vector Vector::operator*(const double &scale) const
 {
-    return Vector(_vector_x * scale, _vector_y * scale);
+    return Vector(_vector_x * scale, _vector_y * scale, true);
 }
 Vector Vector::operator/(const double &scale) const
 {
-    return Vector(_vector_x / scale, _vector_y / scale);
+    return Vector(_vector_x / scale, _vector_y / scale, true);
 }
 
 Vector getVec(int deg, double length)

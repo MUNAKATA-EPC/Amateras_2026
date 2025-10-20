@@ -95,6 +95,7 @@ void motorsPdProcess(PD *pd, int deg, int target)
 // power 移動の強さ（最大値）
 void motorsMove(int deg, int power)
 {
+    power = constrain(power, 0, 100);  // powerを0~100に制限
     deg = deg > 180 ? deg - 360 : deg; // degを-180~180に変換
 
     // 1. 移動成分の計算と最大出力の探索

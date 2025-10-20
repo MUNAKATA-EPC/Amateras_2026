@@ -13,15 +13,18 @@ enum LineDataType
     SIDE
 };
 
-bool lineDetected(LineDataType data);
+bool lineRingDetected();
+bool lineSideDetected();
+
 bool lineSensorDetected(uint8_t index);
 
 bool lineSideRightDetected();
 bool lineSideLeftDetected();
 bool lineSideBackDetected();
 
-int lineDeg(LineDataType data);
-double lineDis();
+int lineRingDeg();
+int lineSideDeg();
 
+double lineRingDis();
 double lineRingX();
 double lineRingY();
