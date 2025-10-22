@@ -83,13 +83,13 @@ void openmvUpdate()
     }
 }
 
-bool openmvFieldDetected() { return _fieldDetected; }
-int openmvFieldDeg() { return _fieldDeg; }
+bool fieldDetected() { return _fieldDetected; }
+int fieldDeg() { return _fieldDeg; }
 
-bool openmvBlueGoalDetected() { return _blueGoalDetected; }
-int openmvBlueGoalDeg() { return _blueGoalDeg; }
-double openmvBlueGoalDis() { return _blueGoalDis; }
+bool blueGoalDetected() { return _blueGoalDetected; }
+int blueGoalDeg() { return _blueGoalDeg; }
+double blueGoalDis() { return _blueGoalDis; }
 
-bool openmvYellowGoalDetected() { return _yellowGoalDetected; }
-int openmvYellowGoalDeg() { return _yellowGoalDeg; }
-double openmvYellowGoalDis() { return _yellowGoalDis; }
+bool yellowGoalDetected() { return _yellowGoalDetected; }
+int yellowGoalDeg() { return _yellowGoalDeg; }
+double yellowGoalDis() { return _yellowGoalDis; }

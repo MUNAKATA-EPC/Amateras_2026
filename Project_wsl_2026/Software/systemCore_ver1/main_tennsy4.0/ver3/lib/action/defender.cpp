@@ -3,58 +3,50 @@
 static AnglePD pdGyro(0.8, 0.1); // ジャイロ用のPD調節値
 static AnglePD pdCam(0.6, 0.1);  // カメラ用のPD調節値
 
-static PD pdLineTrace(1.0, 0.45); // ライントレース用のPD調節値
-static PD pdIrY(0.4, 0.45);       // IRボール捕獲用横方向のPD調節値
+static PD pdLineTrace(0.78, 0.0); // ライントレース用のPD調節値
 
 void playDefender()
 {
     motorsPdProcess(&pdGyro, bnoDeg(), 0);
 
-    pdLineTrace.process(lineRingDis(), 0.0); // ライントレース用PD計算
+    pdLineTrace.process(lineRingDetected() ? lineRingDis() : 0.0, 0.0); // ライントレース用PD計算
 
-    Vector irVec(irDeg(), irDis()); // IRボール捕獲用横方向のPD計算
-    pdIrY.process(irVec.y(), 0.0);
+    int resetDeg = yellowGoalDetected() ? (yellowGoalDeg() + 180) % 360 : 0; // ゴールの対角方向の角度
+    int taikakuIrDeg = (irDeg() - resetDeg + 360) % 360;                     // ゴールの対角方向の角度を基準とした時のIR角度
 
     if (lineRingDetected())
     {
         /* --詳しい算出方法は物xを見るべし-- */
+        const double defenceMaxLen = 90.0; // ディフェンス時の最大長さ
 
-        const double defenceMaxLen = 95.0; // ディフェンス時の最大長さ
+        // ライトレース用ベクトル
+        double lineLen = constrain(fabs((double)pdLineTrace.output()), 0.0, defenceMaxLen);
+        Vector lineTraceVec(lineRingDeg(), lineLen);
 
-        // ライトレースは、角度=(リングの角度)と長さ=(リングの距離)で決定
-        double traceLen = constrain(fabs((double)pdLineTrace.output()), 0.0, defenceMaxLen);
-        Vector lineTraceVec(lineRingDeg(), traceLen);
+        // IRボール用ベクトル（ラインの角度の接線方向）（ライトレースの残りのベクトルで生成）
+        double irMaxLen = sqrt(defenceMaxLen * defenceMaxLen - lineTraceVec.length() * lineTraceVec.length());
 
-        // IRボールのy成分は、角度はIRのy角度(90度か270度)と長さはライントレースのベクトルと足して長さが100以下になるように決定
-        // 合力が0になってほしいので三平方の定理で算出
-        int yDeg = (irDeg() < 180) ? 90 : 270;
-        double yLen = fabs((double)pdIrY.output());
+        int lineRingRoundDeg = areaIndexFromDeg(8, lineRingDeg()) * 360 / 8;
+        int sessen1 = (lineRingRoundDeg + 90) % 360, sessen2 = (lineRingRoundDeg + 270) % 360;
 
-        // y軸水平方向での円の接点からx軸までの距離
-        double yMaxLen = sqrt(defenceMaxLen * defenceMaxLen - lineTraceVec.x() * lineTraceVec.x());
+        bool isSessen1Near = abs(diffDeg(sessen1, taikakuIrDeg)) < abs(diffDeg(sessen2, taikakuIrDeg));
 
-        if (irDeg() < 180)
-        {
-            yLen = constrain(yLen, 0.0, yMaxLen + lineTraceVec.y());
-        }
-        else
-        {
-            yLen = constrain(yLen, 0.0, yMaxLen - lineTraceVec.y());
-        }
-        Vector yVec = Vector(yDeg, yLen);
+        int irSessen = isSessen1Near ? sessen1 : sessen2; // どっちの接線がIRボールの角度に近いか
+        Vector irSessenVec(irSessen, irMaxLen);
 
         // 移動ベクトルの合成
-        Vector moveVec = lineTraceVec + yVec;
+        bool isTaikakuIrFront = taikakuIrDeg < 10 || taikakuIrDeg > 350;
+        Vector moveVec = irDetected() ? !isTaikakuIrFront ? lineTraceVec + irSessenVec : lineTraceVec : lineTraceVec;
+        if (moveVec.length() > defenceMaxLen)
+        {
+            moveVec = moveVec * (defenceMaxLen / moveVec.length());
+        }
 
         motorsVectorMove(&moveVec);
 
         Serial.print(lineTraceVec.deg());
         Serial.print(" , ");
         Serial.print(lineTraceVec.length());
-        Serial.print(" + ");
-        Serial.print(yVec.deg());
-        Serial.print(" , ");
-        Serial.print(yVec.length());
         Serial.print(" = ");
         Serial.print(moveVec.deg());
         Serial.print(" , ");
@@ -63,8 +55,16 @@ void playDefender()
     else
     {
         // 円形ラインで反応なし
-        Serial.println("none");
+        Serial.print("none -> ");
+        Serial.println(yellowGoalDeg());
 
-        motorsPdMove();
+        if (yellowGoalDetected())
+        {
+            motorsMove(yellowGoalDeg(), 50);
+        }
+        else
+        {
+            motorsPdMove();
+        }
     }
 }

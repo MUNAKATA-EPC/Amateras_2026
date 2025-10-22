@@ -7,13 +7,13 @@
 bool openmvInit(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHeader);
 void openmvUpdate();
 
-bool openmvFieldDetected();
-int openmvFieldDeg();
+bool fieldDetected();
+int fieldDeg();
 
-bool openmvBlueGoalDetected();
-int openmvBlueGoalDeg();
-double openmvBlueGoalDis();
+bool blueGoalDetected();
+int blueGoalDeg();
+double blueGoalDis();
 
-bool openmvYellowGoalDetected();
-int openmvYellowGoalDeg();
-double openmvYellowGoalDis();
+bool yellowGoalDetected();
+int yellowGoalDeg();
+double yellowGoalDis();
