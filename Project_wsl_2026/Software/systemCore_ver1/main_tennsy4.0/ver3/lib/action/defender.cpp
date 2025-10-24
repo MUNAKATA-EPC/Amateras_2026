@@ -2,7 +2,7 @@
 
 // defenceで使う行動パターン
 static void Defence(int power, bool useTaikaku);
-static void GoalToKyoriTamotiModoru(int power, int keepDis);
+static void TeiitiModoru(int power, int keepDis);
 
 static AnglePD pdGyro(0.8, 0.1); // ジャイロ用のPD調節値
 static AnglePD pdCam(0.6, 0.1);  // カメラ用のPD調節値
@@ -56,13 +56,13 @@ void playDefender()
                 }
                 else // ラインが反応していていないならゴールから一定の距離を保ちながら定位置へ移動
                 {
-                    GoalToKyoriTamotiModoru(90, 80);
+                    TeiitiModoru(90, 80);
                 }
             }
         }
         else
         {
-            GoalToKyoriTamotiModoru(60, 80);
+            TeiitiModoru(60, 80);
         }
     }
     else if (lineRingDetected())
@@ -102,7 +102,7 @@ static void Defence(int power, bool useTaikaku)
 
     /* --詳しい算出方法は物xを見るべし-- */
     double maxLen = (double)power; // ディフェンス時の最大長さ
-    const int frontDeg = 50;       // 前の長さ（子の角度を区切りにロボットは停止する制御に移る）
+    const int frontDeg = 50;       // 前の長さ（この角度を区切りにロボットは停止する制御に移る）
 
     pdLineTrace.process(lineRingDis(), 0.0); // ライントレース用PD計算
 
@@ -141,7 +141,7 @@ static void Defence(int power, bool useTaikaku)
 // ゴールと距離保ちながら戻る
 static PD pdKeepDisFromGoal(0.6, 0); // ゴールと一定の距離を保ちながら定位置へ移動用のPD調整値
 
-static void GoalToKyoriTamotiModoru(int power, int keepDis)
+static void TeiitiModoru(int power, int keepDis)
 {
     double maxLen = (double)power; // ディフェンス時の最大長さ
 
