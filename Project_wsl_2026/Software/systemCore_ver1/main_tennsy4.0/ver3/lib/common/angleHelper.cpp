@@ -11,6 +11,15 @@ int diffDeg(int deg1, int deg2)
     return diff;
 }
 
+int nearSeesenDeg(int targetDeg, int enterDeg)
+{
+    int sessen1Deg = (targetDeg + 90) % 360, sessen2Deg = (targetDeg + 270) % 360;
+
+    bool isSessen1DegNear = abs(diffDeg(sessen1Deg, enterDeg)) < abs(diffDeg(sessen2Deg, enterDeg));
+
+    return isSessen1DegNear ? sessen1Deg : sessen2Deg; // どっちの接線が入力された角度に近いか
+}
+
 int areaIndexFromDeg(int n, int deg)
 {
     deg = (deg + 360) % 360;

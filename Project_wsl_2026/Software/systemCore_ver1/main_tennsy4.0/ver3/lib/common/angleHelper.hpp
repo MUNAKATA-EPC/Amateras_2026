@@ -1,7 +1,11 @@
 #pragma once
 
+#include <Arduino.h>
+
 // 関数
 int diffDeg(int deg1, int deg2); // 二つの角度の差を返す
+
+int nearSeesenDeg(int targetDeg, int enterDeg); // targetDegの接線の角度を出しその2つ角度の内enterDegに近いほうを返す
 
 int areaIndexFromDeg(int n, int deg);   // n分割したときのdegに最も近いエリアを返す
 int degFromAreaIndex(int n, int index); // n分割したときのindex番目のエリアの角度を返す
