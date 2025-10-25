@@ -25,7 +25,7 @@
 
 void setup()
 {
-    String debugMessage = "<setup>\n";
+    String debugMessage = "> setup <\n";
 
     // I2C
     debugMessage += uiInit(&Wire1, 0x3C, 128, 64) ? "ui     : found\n" : "ui     : not found\n";

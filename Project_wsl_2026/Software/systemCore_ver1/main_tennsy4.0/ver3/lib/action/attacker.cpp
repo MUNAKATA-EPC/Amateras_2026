@@ -3,65 +3,67 @@
 static AnglePD pdGyro(0.8, 0.1); // ジャイロ用のPD調節値
 static AnglePD pdCam(0.6, 0.1);  // カメラ用のPD調節値
 
+static Timer camTimer;
+
 void playAttacker()
 {
+    // キャッチしたらゴール方向を一定時間向く
+    if (catchSensor.read() == HIGH)
+        camTimer.reset();
+
     // PD制御
-    motorsPdProcess(&pdGyro, bnoDeg(), 0);
+    if ((Attacker::Mode)uiModeNumber() == Attacker::Mode::GYRO)
+    {
+        motorsPdProcess(&pdGyro, bnoDeg(), 0);
+    }
+    else
+    {
+        if (yellowGoalDetected() && camTimer.msTime() < 1600 && camTimer.everCalled())
+        {
+            motorsPdProcess(&pdCam, yellowGoalDeg(), 0);
+        }
+        else
+        {
+            motorsPdProcess(&pdGyro, bnoDeg(), 0);
+        }
+    }
 
     // キッカー
     kicker1.kick(catchSensor.read() == HIGH);
 
     // 制御
-    if (irDetected())
+    if (lineRingDetected())
     {
-        Area16 area = area16(irDeg());
+        int toEscapeDeg = lineRingDeg() + 180;
 
-        switch (area)
+        if (abs(diffDeg(toEscapeDeg, fieldDeg())) > 90)
         {
-        case Area16::FRONT:
-        case Area16::FRONT_FRONT_LEFT:
-            motorsMove(0, 85);
-            break;
+            toEscapeDeg = toEscapeDeg + 180;
+        }
 
-        case Area16::FRONT_LEFT:
-        case Area16::LEFT_FRONT_LEFT:
-        case Area16::LEFT:
-            motorsMove(250, 85);
-            break;
+        toEscapeDeg = (toEscapeDeg + 360) % 360;
 
-        case Area16::LEFT_BACK_LEFT:
-        case Area16::BACK_LEFT:
-            motorsMove(210, 85);
-            break;
+        motorsMove(toEscapeDeg, 95);
+    }
+    else if (irDetected())
+    {
+        if (irDeg() < 8 || irDeg() > 352)
+        {
+            motorsMove(0, 90);
+        }
+        else if (irDeg() < 15 || irDeg() > 345)
+        {
+            int toHoldDeg = mapDeg(irDeg(), 20, 60, MapMode::HIREI);
 
-        case Area16::BACK_BACK_LEFT:
-            motorsMove(180, 85);
-            break;
+            motorsMove(toHoldDeg, 60);
+        }
+        else
+        {
+            double diffMawarikomiDeg = irVal() / 5.2;
+            int mawarikomiDeg = (irDeg() < 180) ? irDeg() + (int)diffMawarikomiDeg : irDeg() - (int)diffMawarikomiDeg;
+            mawarikomiDeg = (mawarikomiDeg + 360) % 360;
 
-        case Area16::BACK:
-            motorsMove(120, 85);
-            break;
-
-        case Area16::BACK_BACK_RIGHT:
-        case Area16::BACK_RIGHT:
-        case Area16::RIGHT_BACK_RIGHT:
-            motorsMove(180, 85);
-            break;
-
-        case Area16::RIGHT:
-        case Area16::RIGHT_FRONT_RIGHT:
-        case Area16::FRONT_RIGHT:
-            motorsMove(110, 85);
-            break;
-
-        case Area16::FRONT_FRONT_RIGHT:
-            motorsMove(15, 85);
-            break;
-
-        default:
-            // もし他のエリアがあれば安全策として停止や処理を書く
-            motorsMove(0, 0);
-            break;
+            motorsMove(mawarikomiDeg, 90);
         }
     }
     else

@@ -45,15 +45,13 @@ void uiPrintDebug(const char *msg)
     _ssd->setTextColor(SSD1306_WHITE, SSD1306_BLACK);
     _ssd->setCursor(0, 0);
     _ssd->println(msg);
-    _ssd->display();    // 画面に表示
+    _ssd->display(); // 画面に表示
 }
 
-// ssd1306ライブラリーの拡張
+// ssd1306ライブラリーの拡張(描画と初期化はしない)
 // メータ表示用
-void uiDrawCircleMeter(bool show, int x0, int y0, int r, const char *s, int deg)
+static void uiDrawCircleMeter(bool show, int x0, int y0, int r, const char *s, int deg)
 {
-    _ssd->clearDisplay(); // 画面初期化
-
     _ssd->drawCircle(x0, y0, r, SSD1306_WHITE);
 
     int x1 = x0, y1 = y0;
@@ -74,8 +72,6 @@ void uiDrawCircleMeter(bool show, int x0, int y0, int r, const char *s, int deg)
     _ssd->setCursor(text_x, text_y);
 
     _ssd->print(buf);
-
-    _ssd->display();    // 画面に表示
 }
 
 void uiProcess(bool show, bool enterbtn, bool rightbtn, bool leftbtn)
@@ -101,7 +97,7 @@ void uiProcess(bool show, bool enterbtn, bool rightbtn, bool leftbtn)
         }
         else
         {
-            _meterNumber = (_meterNumber + 1 + 6) % 6; // 0~4を周期するようにする
+            _meterNumber = (_meterNumber + 1 + 6) % 6; // 0~5を周期するようにする
         }
     }
 
@@ -341,8 +337,8 @@ void uiProcess(bool show, bool enterbtn, bool rightbtn, bool leftbtn)
         _ssd->print(actionName);
         if (!_actionDecided)
         {
-            _ssd->println(" <");
             /*
+            _ssd->println(" <");
             _ssd->setCursor(0, 10); // 改行だと多いのでセットし直す
 
             switch (_meterNumber)
@@ -350,38 +346,38 @@ void uiProcess(bool show, bool enterbtn, bool rightbtn, bool leftbtn)
             case 0:
                 _ssd->println("[gyro]");
                 _ssd->print(" bno055");
-                uiDrawCircleMeter(true, 87, 32, 20, "deg", bno.deg());
+                uiDrawCircleMeter(true, 87, 32, 20, "deg", bnoDeg());
                 break;
             case 1:
                 _ssd->println("[ir]");
                 _ssd->print(" dis:");
-                _ssd->print(String(ir.dis()));
-                uiDrawCircleMeter(true, 87, 32, 20, "deg", ir.deg());
+                _ssd->println(String(irDis()));
+                _ssd->print(" val:");
+                _ssd->print(String(irVal()));
+                uiDrawCircleMeter(true, 87, 32, 20, "deg", irDeg());
                 break;
             case 2:
                 _ssd->println("[line]");
                 _ssd->println("/normal");
                 _ssd->println("/side");
-                uiDrawCircleMeter(true, 67, 32, 20, "n", line.deg(LineSensor::RING));
-                uiDrawCircleMeter(true, 107, 32, 20, "s", line.deg(LineSensor::SIDE));
+                uiDrawCircleMeter(true, 67, 32, 20, "n", lineRingDeg());
+                uiDrawCircleMeter(true, 107, 32, 20, "s", lineSideDeg());
                 break;
             case 3:
                 _ssd->println("[blueGoal]");
                 _ssd->print(" dis:");
-                _ssd->print(String(cam.dis(Openmv::BLUEGOAL)));
-                uiDrawCircleMeter(true, 87, 32, 20, "deg", cam.deg(Openmv::BLUEGOAL));
+                _ssd->print(String(blueGoalDis()));
+                uiDrawCircleMeter(true, 87, 32, 20, "deg", blueGoalDeg());
                 break;
             case 4:
                 _ssd->println("[yellowGoal]");
                 _ssd->print(" dis:");
-                _ssd->print(String(cam.dis(Openmv::YELLOWGOAL)));
-                uiDrawCircleMeter(true, 97, 32, 20, "deg", cam.deg(Openmv::YELLOWGOAL));
+                _ssd->print(String(yellowGoalDis()));
+                uiDrawCircleMeter(true, 97, 32, 20, "deg", yellowGoalDeg());
                 break;
             case 5:
                 _ssd->println("[field]");
-                _ssd->print(" dis:");
-                _ssd->print(String(cam.dis(Openmv::FIELD)));
-                uiDrawCircleMeter(true, 87, 32, 20, "deg", cam.deg(Openmv::FIELD));
+                uiDrawCircleMeter(true, 87, 32, 20, "deg", fieldDeg());
                 break;
             }
             */
