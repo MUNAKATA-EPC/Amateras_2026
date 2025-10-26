@@ -1,0 +1,113 @@
+#######################################
+# Syntax Coloring Map For MWings
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+ParsedAppTwelitePacket			KEYWORD1
+ParsedAppIoPacket			KEYWORD1
+ParsedAppAriaPacket			KEYWORD1
+ParsedAppCuePacket			KEYWORD1
+ParsedAppPalOpenClosePacket		KEYWORD1
+ParsedAppPalAmbPacket			KEYWORD1
+ParsedAppPalMotPacket			KEYWORD1
+ParsedAppUartAsciiPacket		KEYWORD1
+ParsedAppUartAsciiExtendedPacket	KEYWORD1
+
+BarePacket				KEYWORD1
+
+AppTweliteCommand			KEYWORD1
+AppPalNoticeCommand			KEYWORD1
+AppPalNoticeDetailedCommand		KEYWORD1
+AppPalNoticeEventCommand		KEYWORD1
+AppPalNoticeColor			KEYWORD1
+AppPalNoticeBlinkSpeed			KEYWORD1
+AppPalNoticeRGBWColor			KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+begin					KEYWORD2
+end					KEYWORD2
+update					KEYWORD2
+on					KEYWORD2
+send					KEYWORD2
+
+isValid					KEYWORD2
+
+#######################################
+# Instances (KEYWORD2)
+#######################################
+
+Twelite					KEYWORD2
+
+#######################################
+# Struct Members (KEYWORD2)
+#######################################
+
+u32SourceSerialId			KEYWORD2
+u8SourceLogicalId			KEYWORD2
+u16SequenceNumber			KEYWORD2
+u8Lqi					KEYWORD2
+u16SupplyVoltage			KEYWORD2
+i16Temp100x				KEYWORD2
+u16Humid100x				KEYWORD2
+u8MagnetState				KEYWORD2
+bMagnetStateChanged			KEYWORD2
+i16SamplesX				KEYWORD2
+i16SamplesY				KEYWORD2
+i16SamplesZ				KEYWORD2
+u8SampleCount				KEYWORD2
+u8RelayCount				KEYWORD2
+bDiState				KEYWORD2
+bDiValid				KEYWORD2
+bDiInterrupt				KEYWORD2
+u16Ai1Voltage				KEYWORD2
+u32Illuminance				KEYWORD2
+u16SamplingFrequency			KEYWORD2
+bPeriodic				KEYWORD2
+bDiChanged				KEYWORD2
+u16AiVoltage				KEYWORD2
+u32DestinationSerialId			KEYWORD2
+u8CommandId				KEYWORD2
+u8Data					KEYWORD2
+u16DataSize				KEYWORD2
+
+u8Payload				KEYWORD2
+u16PayloadSize				KEYWORD2
+u8Checksum				KEYWORD2
+
+u8DestinationLogicalId			KEYWORD2
+bDiToChange				KEYWORD2
+bPwmToChange				KEYWORD2
+u16PwmDuty				KEYWORD2
+eColor					KEYWORD2
+eBlinkSpeed				KEYWORD2
+u8Brightness				KEYWORD2
+u16DurationInSec			KEYWORD2
+sRGBWColor				KEYWORD2
+u8BlinkDutyPercentage			KEYWORD2
+fBlinkPeriodInSec			KEYWORD2
+u16DurationInSec			KEYWORD2
+u8EventId				KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
+RED					LITERAL1
+GREEN					LITERAL1
+BLUE					LITERAL1
+YELLOW					LITERAL1
+PURPLE					LITERAL1
+LIGHT_BLUE				LITERAL1
+WHITE					LITERAL1
+WARM_WHITE				LITERAL1
+
+ALWAYS_ON				LITERAL1
+SLOW					LITERAL1
+MEDIUM					LITERAL1
+FAST					LITERAL1

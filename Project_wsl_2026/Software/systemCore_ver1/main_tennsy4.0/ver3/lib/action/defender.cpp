@@ -1,47 +1,60 @@
 #include "defender.hpp"
 
 // defenceで使う行動パターン
-static void Defence(int power, bool useTaikaku, bool backToLineMiddle);
-static void TeiitiModoru(int power, int keepDis);
-static void LineEscape(int power);
+static Vector Defence(int power, bool useTaikaku, bool backToLineMiddle);
+static Vector TeiitiModoru(int power, int keepDis);
+static Vector LineEscape(int power);
 
 static AnglePD pdGyro(0.8, 0.1); // ジャイロ用のPD調節値
 static AnglePD pdCam(0.6, 0.1);  // カメラ用のPD調節値
 
-void playDefender()
+void playDefender(Defender::Mode mode)
 {
+    Vector defenderVec;              // 最終的な移動方向・力格納
+    bool lineEscapeMovement = false; // これがtrueならIRの位置関係なくラインから逃れる
+
     motorsPdProcess(&pdGyro, bnoDeg(), 0);
+
+    Serial.println(yellowGoalDeg());
 
     if (yellowGoalDetected()) // 黄色ゴール見えてて
     {
-        const int backDeg = 45;
+        // 後ろを0度として範囲指定
+        const int backDeg = 40;         // 守備範囲
+        const int defenceLimitDeg = 35; // ボールを追おうとするが守れる範囲のギリギリだったらそこで停止する
+        const int TaikakuBackDeg = 22;  // 対角線で”守備しない”角度
 
-        if (yellowGoalDeg() > 180 - backDeg && yellowGoalDeg() < 180 + backDeg) // 後ろにゴールあって
+        if (abs(yellowGoalDeg() - 180) < backDeg) // 後ろにゴールあって
         {
             if (lineRingDetected())
             {
-                const int TaikakuBackDeg = 15; // 対角線で守備する角度
+                lineEscapeMovement = true;
 
-                bool backToMiddleLine = (irDis() > 160) ? true : false; // 一定距離以上だったらラインの中心に戻る
+                bool irDefence = (irDetected() && irDis() < 160) ? true : false; // irボールがありかつ近くなら
 
-                if (yellowGoalDeg() > 180 - TaikakuBackDeg && yellowGoalDeg() < 180 + TaikakuBackDeg) // 後ろにゴールあって
+                if (abs(yellowGoalDeg() - 180) < TaikakuBackDeg) // かなり後ろにゴールがあって
                 {
-                    Defence(90, false, backToMiddleLine);
+                    defenderVec = Defence(90, false, irDefence);
                 }
                 else
                 {
-                    Defence(90, true, backToMiddleLine);
+                    defenderVec = Defence(90, true, irDefence);
+                }
+
+                if (abs(yellowGoalDeg() - 180) > defenceLimitDeg) // リミットを超えたら停止
+                {
+                    defenderVec = getVec(0, 0.0);
                 }
             }
             else
             {
                 if (yellowGoalDis() < 82)
                 {
-                    motorsMove(yellowGoalDeg() + 180, 60);
+                    defenderVec = getVec(yellowGoalDeg() + 180, 60);
                 }
                 else
                 {
-                    motorsMove(yellowGoalDeg(), 60);
+                    defenderVec = getVec(yellowGoalDeg(), 60);
                 }
             }
         }
@@ -49,52 +62,58 @@ void playDefender()
         {
             if (lineRingDetected())
             {
-                motorsMove(fieldDeg(), 90);
+                lineEscapeMovement = true;
+
+                defenderVec = getVec(fieldDeg(), 90);
             }
             else
             {
-                TeiitiModoru(60, 90);
+                defenderVec = TeiitiModoru(60, 90);
             }
         }
     }
     else if (lineRingDetected()) // ラインが反応していてるならラインから逃れる動き
     {
-        // LineEscape(90);
-        motorsMove(fieldDeg(), 60);
+        lineEscapeMovement = true;
 
-        Serial.println("f");
+        // LineEscape(90);
+        defenderVec = getVec(fieldDeg(), 60);
     }
-    else
+    else // 円形ラインで反応なしならば
     {
-        // 円形ラインで反応なし
         if (fieldDeg() > 90 && fieldDeg() < 270)
         {
-            motorsMove(fieldDeg(), 75);
-
-            Serial.println("g");
+            defenderVec = getVec(fieldDeg(), 75);
         }
         else
         {
             if (fieldDeg() > 180) // 右のコートの中心があるなら
             {
-                motorsMove(225, 75);
-
-                Serial.println("h");
+                defenderVec = getVec(225, 75);
             }
             else
             {
-                motorsMove(135, 75);
-
-                Serial.println("i");
+                defenderVec = getVec(135, 75);
             }
         }
+    }
+
+    bool isDangerBallPosi = abs(diffDeg(defenderVec.deg(), irDeg())) < 80 && irDis() < 100.0; // 移動方向と同じ方向にボールがあると危険
+
+    if (!lineEscapeMovement && isDangerBallPosi) // ラインが反応していないなら
+    {
+        playAttacker(Attacker::Mode::GYRO); // 攻撃の動き（よける）
+    }
+    else
+    {
+        motorsVectorMove(&defenderVec); // ディフェンダーの動き
     }
 }
 
 // ディフェンス
-static PD pdLineTrace(0.36, 0.0); // ライントレース用のPD調節値
+static PD pdLineTrace(0.30, 0.0); // ライントレース用のPD調節値
 
-static void Defence(int power, bool useTaikaku, bool backToLineMiddle)
+static Vector Defence(int power, bool useTaikaku, bool irDefence)
 {
 
     int resetDeg = (yellowGoalDetected() && useTaikaku) ? (yellowGoalDeg() + 180) % 360 : 0; // ゴールの対角方向の角度
@@ -104,8 +123,8 @@ static void Defence(int power, bool useTaikaku, bool backToLineMiddle)
 
     /* --詳しい算出方法は物xを見るべし-- */
     double maxLen = (double)power; // ディフェンス時の最大長さ
-    const int irFrontDeg = 20;     // 対角線を基準としたIRの角度の前の範囲（この角度を区切りにロボットは停止する制御に移る）
-    const int yellowFrontDeg = 10; // 黄色ゴールの角度の前の範囲（この角度を区切りにロボットは停止する制御に移る）
+    const int irFrontDeg = 25;     // 対角線を基準としたIRの角度の前の範囲（この角度を区切りにロボットは停止する制御に移る）
+    const int yellowFrontDeg = 20; // 黄色ゴールの角度の前の範囲（この角度を区切りにロボットは停止する制御に移る）
 
     pdLineTrace.process(lineRingDis(), 0.0); // ライントレース用PD計算
 
@@ -138,26 +157,28 @@ static void Defence(int power, bool useTaikaku, bool backToLineMiddle)
     // ベクトル生成
     Vector yellowSessenVec(yellowSessenDeg, yellowLen);
 
-    // 移動ベクトルの合成(backToLineMiddleが有効もしくはIRボールがない時はラインの中心に戻るベクトルの成分を足す)
-    Vector moveVec = (backToLineMiddle || !irDetected()) ? lineTraceVec + yellowSessenVec : lineTraceVec + irSessenVec;
+    // 移動ベクトルの合成(irDefenceがfalseの時はラインの中心に戻るベクトルの成分を足す)
+    Vector moveVec = !irDefence ? lineTraceVec + yellowSessenVec : lineTraceVec + irSessenVec;
     if (moveVec.length() > maxLen)
     {
         moveVec = moveVec * (maxLen / moveVec.length());
     }
 
-    motorsVectorMove(&moveVec);
+    return moveVec;
 
+    /*
     Serial.print("lineTraceVec(" + String(lineTraceVec.deg()) + "," + String(lineTraceVec.length()) + ")");
     Serial.print(" + ");
     Serial.print("irSessenVec(" + String(irSessenVec.deg()) + "," + String(irSessenVec.length()) + ")");
     Serial.print(" = ");
     Serial.println("moveVec(" + String(moveVec.deg()) + "," + String(moveVec.length()) + ")");
+    */
 }
 
 // ゴールと距離保ちながら戻る
 static PD pdKeepDisFromGoal(4.8, 0); // ゴールと一定の距離を保ちながら定位置へ移動用のPD調整値
 
-static void TeiitiModoru(int power, int keepDis)
+static Vector TeiitiModoru(int power, int keepDis)
 {
     double maxLen = (double)power; // ディフェンス時の最大長さ
 
@@ -179,10 +200,10 @@ static void TeiitiModoru(int power, int keepDis)
         moveVec = moveVec * (maxLen / moveVec.length());
     }
 
-    motorsVectorMove(&moveVec);
+    return moveVec;
 }
 
-static void LineEscape(int power)
+static Vector LineEscape(int power)
 {
     int moveDeg = lineRingDeg() + 180;
 
@@ -191,5 +212,7 @@ static void LineEscape(int power)
         moveDeg = lineRingDeg();
     }
 
-    motorsMove(moveDeg, power);
+    Vector moveVec(moveDeg, power);
+
+    return moveVec;
 }

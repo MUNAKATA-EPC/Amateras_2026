@@ -59,10 +59,6 @@ void loop()
   Serial1.write((uint8_t)((lines_data_bit_mask >> 8) & 0xFF));  // 3byteのデータなので中位の1byteのみ送信
   Serial1.write((uint8_t)((lines_data_bit_mask >> 16) & 0xFF)); // 3byteのデータなので上位の1byteを送信
 
-  /*Serial1.print((int)lines_data_bit_mask); // 文字列として送信
-  Serial1.print("a");
-  Serial1.flush(); // 送信バッファがなくなるまで、つまり全て送信するまで待つ*/
-
   Serial.print(lines_data_bit_mask, BIN); // pcに送る
   Serial.print("l");
   Serial.print(left_val);

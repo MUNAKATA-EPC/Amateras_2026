@@ -1,0 +1,59 @@
+void setup() {
+  // シリアル通信の開始
+  Serial.begin(19200);
+  change_i2c_address('1');
+  change_serial_speed('2');
+}
+
+void loop() {
+  brake_moter('1');    // 1chを停止
+  delay(1000);
+  control_motor('1',-100);    // 1chは-100%で動かす
+  delay(1000);
+}
+
+
+//関数一覧
+
+
+// I2Cアドレス変更コマンド
+void change_i2c_address(char n) {
+  Serial.print("A:");
+  Serial.print(n);
+  Serial.print("\r\n");
+}
+
+// シリアル通信速度コマンド
+void change_serial_speed(char n) {
+  Serial.print("S:");
+  Serial.print(n);
+  Serial.print("\r\n");
+}
+
+// モータ制御コマンド
+void control_motor(char ch, int speed) {
+  char direction;
+  if(speed < 0){
+    direction = 'R';
+    speed = -speed;
+  }else{
+    direction = 'F';
+  }
+  Serial.print(ch);
+  Serial.print(direction);
+  if (speed < 10) {
+    Serial.print("00");
+  } else if (speed < 100) {
+    Serial.print("0");
+  }
+  Serial.print(speed);
+  Serial.print("\r\n");
+}
+
+//ブレーキ
+void brake_moter(char ch){
+  Serial.print(ch);
+  Serial.print('R');
+  Serial.print("000");
+  Serial.print("\r\n");
+}

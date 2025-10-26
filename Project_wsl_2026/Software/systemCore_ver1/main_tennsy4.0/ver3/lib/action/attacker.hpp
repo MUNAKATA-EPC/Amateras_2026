@@ -19,4 +19,4 @@
 #include "ps3.hpp"
 #include "openmv.hpp"
 
-void playAttacker();
+void playAttacker(Attacker::Mode mode);

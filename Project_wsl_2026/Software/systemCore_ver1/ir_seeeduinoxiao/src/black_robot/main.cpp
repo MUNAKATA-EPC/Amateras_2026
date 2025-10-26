@@ -110,8 +110,8 @@ void loop()
     IRball_deg = -1;
     IRball_value = -1;
 
-    IRball_of_x = -1.0; // 重み付けベクトルのX成分を初期化
-    IRball_of_y = -1.0; // 重み付けベクトルのY成分を初期化
+    IRball_of_x = 0.0; // 重み付けベクトルのX成分を初期化
+    IRball_of_y = 0.0; // 重み付けベクトルのY成分を初期化
   }
   else
   {
@@ -120,12 +120,11 @@ void loop()
 
     // 周囲7センサーの値を信号強度（1023.0 - 値）に変換し、ベクトル加算
     for (uint8_t i = 0; i < 7; i++)
-
     {
       // センサー角度を計算 (360度 / 16センサー = 22.5度/センサー)
       double angle_rad = radians(IRsensor_min_around_index[i] * 22.5);
 
-      // (1023.0 - IRsensor_value)で信号強度（重み）を算出
+      // (1023.0 - IRsensor_value)で重みを算出
       double weight = (1023.0 - IRsensor_value[IRsensor_min_around_index[i]]);
 
       IRball_of_x += cos(angle_rad) * weight; // 重みを加算

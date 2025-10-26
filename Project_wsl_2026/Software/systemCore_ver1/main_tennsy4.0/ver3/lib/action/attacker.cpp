@@ -5,14 +5,14 @@ static AnglePD pdCam(0.6, 0.1);  // カメラ用のPD調節値
 
 static Timer camTimer;
 
-void playAttacker()
+void playAttacker(Attacker::Mode mode)
 {
     // キャッチしたらゴール方向を一定時間向く
     if (catchSensor.read() == HIGH)
         camTimer.reset();
 
     // PD制御
-    if ((Attacker::Mode)uiModeNumber() == Attacker::Mode::GYRO)
+    if (mode == Attacker::Mode::GYRO)
     {
         motorsPdProcess(&pdGyro, bnoDeg(), 0);
     }

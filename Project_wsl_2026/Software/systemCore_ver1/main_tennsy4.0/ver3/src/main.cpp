@@ -68,7 +68,7 @@ void setup()
 
         wait = !(enterButton.isReleased() || rightButton.isReleased() || leftButton.isReleased() || resetButton.isReleased());
     }
-    while(enterButton.isPushing() || rightButton.isPushing() || leftButton.isPushing() || resetButton.isPushing())
+    while (enterButton.isPushing() || rightButton.isPushing() || leftButton.isPushing() || resetButton.isPushing())
     {
         enterButton.update();
         rightButton.update();
@@ -122,10 +122,10 @@ void loop()
         switch (uiActionNumber())
         {
         case Action::ATTACKER:
-            playAttacker();
+            playAttacker(Attacker::Mode(uiModeNumber()));
             break;
         case Action::DEFENDER:
-            playDefender();
+            playDefender(Defender::Mode(uiModeNumber()));
             break;
         case Action::TEST:
             motorsMove(0, 50);

@@ -1,5 +1,8 @@
 #pragma once
 
+// action類
+#include "attacker.hpp"
+
 // common類
 #include "angleHelper.hpp"
 #include "anglePd.hpp"
@@ -20,4 +23,4 @@
 #include "ps3.hpp"
 #include "openmv.hpp"
 
-void playDefender();
+void playDefender(Defender::Mode mode);
