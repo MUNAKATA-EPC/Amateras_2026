@@ -55,7 +55,9 @@ void setup()
 
     // デバッグメッセージの出力
     Serial.println(debugMessage);
+    uiClear();
     uiPrintDebug(debugMessage.c_str()); // uiにも表示
+    uiShow();
 
     // どれかのボタンを押すまで待機
     bool wait = true;
@@ -106,8 +108,49 @@ void loop()
     if (!timer.everCalled() || timer.msTime() > 10) // まだ呼ばれていない場合もタイマーをリセットさせる
     {
         timer.reset();
-        bool show = !uiRunning();                                                                     // runningなら表示しない
-        uiProcess(show, enterButton.isReleased(), rightButton.isReleased(), leftButton.isReleased()); // 10msに一回更新
+
+        uiClear();
+        uiDrawMain(enterButton.isReleased(), rightButton.isReleased(), leftButton.isReleased()); // 10msに一回更新
+
+        if (!uiActionDecided())
+        {
+            switch (uiMeterNumber())
+            {
+            case 0:
+                uiPrint(0, 8, "[ir]\n deg:" + String(irDeg()) + "\n dis:" + String(irDis()));
+                uiDrawCircleMeter(92, 32, 20, "deg", irDeg());
+                break;
+            case 1:
+                uiPrint(0, 8, "[ringLine]\n deg:" + String(lineRingDeg()) + "\n dis:" + String(lineRingDis()));
+                uiDrawCircleMeter(92, 32, 20, "deg", lineRingDeg());
+                break;
+            case 2:
+                uiPrint(0, 8, "[sideLine]\n deg:" + String(lineSideDeg()));
+                uiDrawCircleMeter(92, 32, 20, "deg", lineSideDeg());
+                break;
+            case 3:
+                uiPrint(0, 8, "[bno055]\n deg:" + String(bnoDeg()));
+                uiDrawCircleMeter(92, 32, 20, "deg", bnoDeg());
+                break;
+            case 4:
+                uiPrint(0, 8, "[yellowGoal]\n deg:" + String(yellowGoalDeg()) + "\n dis:" + String(yellowGoalDis()));
+                uiDrawCircleMeter(92, 32, 20, "deg", yellowGoalDeg());
+                break;
+            case 5:
+                uiPrint(0, 8, "[blueGoal]\n deg:" + String(blueGoalDeg()) + "\n dis:" + String(blueGoalDis()));
+                uiDrawCircleMeter(92, 32, 20, "deg", blueGoalDeg());
+                break;
+            case 6:
+                uiPrint(0, 8, "[field]\n deg:" + String(fieldDeg()));
+                uiDrawCircleMeter(92, 32, 20, "deg", fieldDeg());
+                break;
+            case 7:
+                uiPrint(0, 8, "[none]");
+                break;
+            }
+        }
+
+        uiShow();
     }
 
     // 動作を実行

@@ -1,7 +1,7 @@
 #include "attacker.hpp"
 
-static AnglePD pdGyro(0.8, 0.1); // ジャイロ用のPD調節値
-static AnglePD pdCam(0.6, 0.1);  // カメラ用のPD調節値
+static AnglePD pdGyro(0.56, 0.26); // ジャイロ用のPD調節値
+static AnglePD pdCam(0.38, 0.0);   // カメラ用のPD調節値
 
 static Timer camTimer;
 
@@ -18,7 +18,7 @@ void playAttacker(Attacker::Mode mode)
     }
     else
     {
-        if (yellowGoalDetected() && camTimer.msTime() < 1600 && camTimer.everCalled())
+        if (yellowGoalDetected() && ((camTimer.msTime() < 1600 && camTimer.everCalled()) || yellowGoalDis() < 110))
         {
             motorsPdProcess(&pdCam, yellowGoalDeg(), 0);
         }

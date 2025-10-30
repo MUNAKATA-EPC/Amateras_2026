@@ -9,6 +9,9 @@ private:
     double _kp = 0.0; // 比例ゲイン
     double _kd = 0.0; // 微分ゲイン
 
+    bool _useP = true;
+    bool _useD = true;
+
     Timer _timer;               // D制御用のタイマー
     double _value = 0.0;        // 現在の値
     double _oldvalue = 0.0;     // 昔の値
@@ -20,6 +23,16 @@ private:
 public:
     // 関数・コンストラクタ
     PD(double kp, double kd);
+
+    void useP(bool use)
+    {
+        _useP = use;
+    }
+    void useD(bool use)
+    {
+        _useD = use;
+    }
+
     void process(double val, double target);
 
     // [-100.0~100.0]の値を返す

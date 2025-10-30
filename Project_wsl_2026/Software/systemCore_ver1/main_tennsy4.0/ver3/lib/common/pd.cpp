@@ -19,14 +19,14 @@ void PD::process(double val, double target)
 {
     // 現在値を設定
     _value = val;
-    // --- P制御（比例項）の計算 ---
+    // P制御（比例項）の計算
     // 誤差を計算 (目標 - 現在値)
     double error = (double)target - _value;
 
-    // --- P制御の計算 ---
+    // P制御の計算
     _p_power = error * _kp;
 
-    // --- D制御（微分項）の計算 ---
+    // D制御（微分項）の計算
     // 角度の変化量 (_gap_of_value) を計算
     _gap_of_value = _value - _oldvalue;
 
@@ -59,5 +59,8 @@ void PD::process(double val, double target)
 #endif
 
     // P項とD項を合計し、出力を -100.0 から 100.0 の範囲に制限
-    _output = constrain(_p_power + _d_power, -100.0, 100.0);
+    double power = 0.0;
+    power += (_useP) ? _p_power : 0.0;
+    power += (_useD) ? _d_power : 0.0;
+    _output = constrain(power, -100.0, 100.0);
 }

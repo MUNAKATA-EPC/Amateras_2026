@@ -13,6 +13,7 @@ static int _modeNumber = 0;
 static int _configNumber = 0;
 static bool _configActive[10] = {false}; // [Configの番号]
 
+// 初期化
 bool uiInit(TwoWire *wire, uint8_t address, uint8_t width, uint8_t height)
 {
     /*if (_ssd != nullptr)
@@ -37,29 +38,45 @@ bool uiInit(TwoWire *wire, uint8_t address, uint8_t width, uint8_t height)
     return success;
 }
 
-// デバッグ用
+// 画面表示・初期化
+void uiShow()
+{
+    _ssd->display(); // 描画実行
+}
+void uiClear()
+{
+    _ssd->clearDisplay(); // 描画初期化
+}
+
+// デバッグ描画用
 void uiPrintDebug(const char *msg)
 {
-    _ssd->clearDisplay(); // 画面初期化
     _ssd->setTextSize(1);
     _ssd->setTextColor(SSD1306_WHITE, SSD1306_BLACK);
     _ssd->setCursor(0, 0);
     _ssd->println(msg);
-    _ssd->display(); // 画面に表示
 }
 
-// ssd1306ライブラリーの拡張(描画と初期化はしない)
-// メータ表示用
-static void uiDrawCircleMeter(bool show, int x0, int y0, int r, const char *s, int deg)
+// プリント用
+void uiPrint(int x0, int y0, String msg)
+{
+    char msg_char[50]; // 十分に確保
+    msg.toCharArray(msg_char, 50);
+
+    _ssd->setTextSize(1);
+    _ssd->setTextColor(SSD1306_WHITE, SSD1306_BLACK);
+    _ssd->setCursor(x0, y0);
+
+    _ssd->print(msg_char);
+}
+// メータ描画用
+void uiDrawCircleMeter(int x0, int y0, int r, const char *s, int deg)
 {
     _ssd->drawCircle(x0, y0, r, SSD1306_WHITE);
 
     int x1 = x0, y1 = y0;
-    if (show)
-    {
-        x1 = x0 - sin(radians(deg)) * r;
-        y1 = y0 - cos(radians(deg)) * r;
-    }
+    x1 = x0 - sin(radians(deg)) * r;
+    y1 = y0 - cos(radians(deg)) * r;
     _ssd->drawLine(x0, y0, x1, y1, SSD1306_WHITE);
 
     String buf = s;
@@ -74,7 +91,8 @@ static void uiDrawCircleMeter(bool show, int x0, int y0, int r, const char *s, i
     _ssd->print(buf);
 }
 
-void uiProcess(bool show, bool enterbtn, bool rightbtn, bool leftbtn)
+// メインのuiの描画用
+void uiDrawMain(bool enterbtn, bool rightbtn, bool leftbtn)
 {
     // 操作
     if (leftbtn)
@@ -97,7 +115,7 @@ void uiProcess(bool show, bool enterbtn, bool rightbtn, bool leftbtn)
         }
         else
         {
-            _meterNumber = (_meterNumber + 1 + 6) % 6; // 0~5を周期するようにする
+            _meterNumber = (_meterNumber + 1 + 8) % 8; // 0~7を周期するようにする
         }
     }
 
@@ -325,132 +343,82 @@ void uiProcess(bool show, bool enterbtn, bool rightbtn, bool leftbtn)
         break;
     }
     // 画面描画
-    if (show)
+    _ssd->setTextSize(1);
+    _ssd->setTextColor(SSD1306_WHITE, SSD1306_BLACK);
+    _ssd->setCursor(0, 0);
+    // action表示
+    _ssd->print("> ");
+    _ssd->print(actionName);
+    if (!_actionDecided)
     {
-        _ssd->clearDisplay(); // 初期化
+    }
+    else
+    {
+        _ssd->println("");
 
-        _ssd->setTextSize(1);
-        _ssd->setTextColor(SSD1306_WHITE, SSD1306_BLACK);
-        _ssd->setCursor(0, 0);
-        // action表示
-        _ssd->print("> ");
-        _ssd->print(actionName);
-        if (!_actionDecided)
+        // mode表示
+        _ssd->print(" > ");
+        _ssd->print(modeName);
+        if (!_modeDecided)
         {
-            /*
             _ssd->println(" <");
-            _ssd->setCursor(0, 10); // 改行だと多いのでセットし直す
-
-            switch (_meterNumber)
-            {
-            case 0:
-                _ssd->println("[gyro]");
-                _ssd->print(" bno055");
-                uiDrawCircleMeter(true, 87, 32, 20, "deg", bnoDeg());
-                break;
-            case 1:
-                _ssd->println("[ir]");
-                _ssd->print(" dis:");
-                _ssd->println(String(irDis()));
-                _ssd->print(" val:");
-                _ssd->print(String(irVal()));
-                uiDrawCircleMeter(true, 87, 32, 20, "deg", irDeg());
-                break;
-            case 2:
-                _ssd->println("[line]");
-                _ssd->println("/normal");
-                _ssd->println("/side");
-                uiDrawCircleMeter(true, 67, 32, 20, "n", lineRingDeg());
-                uiDrawCircleMeter(true, 107, 32, 20, "s", lineSideDeg());
-                break;
-            case 3:
-                _ssd->println("[blueGoal]");
-                _ssd->print(" dis:");
-                _ssd->print(String(blueGoalDis()));
-                uiDrawCircleMeter(true, 87, 32, 20, "deg", blueGoalDeg());
-                break;
-            case 4:
-                _ssd->println("[yellowGoal]");
-                _ssd->print(" dis:");
-                _ssd->print(String(yellowGoalDis()));
-                uiDrawCircleMeter(true, 97, 32, 20, "deg", yellowGoalDeg());
-                break;
-            case 5:
-                _ssd->println("[field]");
-                uiDrawCircleMeter(true, 87, 32, 20, "deg", fieldDeg());
-                break;
-            }
-            */
         }
         else
         {
             _ssd->println("");
 
-            // mode表示
-            _ssd->print(" > ");
-            _ssd->print(modeName);
-            if (!_modeDecided)
+            // config 表示
+            int configNameMaxLength = 0;
+            for (int i = 0; i < configCount; i++)
             {
-                _ssd->println(" <");
+                int len = strlen(configName[i]);
+                if (len > configNameMaxLength)
+                    configNameMaxLength = len;
             }
-            else
+            for (int i = 0; i < configCount; i++)
             {
+                if (i == 0) // Runは大きく
+                    _ssd->setTextSize(2);
+                else
+                    _ssd->setTextSize(1);
+
+                if (i == _configNumber) // 選択中の文字は変更する
+                {
+                    //_ssd->setTextColor(SSD1306_BLACK, SSD1306_WHITE);
+                    if (i == 0)
+                        _ssd->print("|");
+                    else
+                        _ssd->print(" |");
+                }
+                else
+                {
+                    //_ssd->setTextColor(SSD1306_WHITE, SSD1306_BLACK);
+                    if (i == 0)
+                        _ssd->print(" ");
+                    else
+                        _ssd->print("  ");
+                }
+
+                _ssd->print(configName[i]);
+                if (i != 0) // Runじゃないなら
+                {
+                    int tabspace = (configNameMaxLength + 1) - strlen(configName[i]);
+                    for (int i = 0; i < tabspace; i++)
+                    {
+                        _ssd->print(" ");
+                    }
+                }
+                _ssd->print(":");
+                _ssd->print(_configActive[i] ? "on" : "off");
+
                 _ssd->println("");
-
-                // config 表示
-                int configNameMaxLength = 0;
-                for (int i = 0; i < configCount; i++)
-                {
-                    int len = strlen(configName[i]);
-                    if (len > configNameMaxLength)
-                        configNameMaxLength = len;
-                }
-                for (int i = 0; i < configCount; i++)
-                {
-                    if (i == 0) // Runは大きく
-                        _ssd->setTextSize(2);
-                    else
-                        _ssd->setTextSize(1);
-
-                    if (i == _configNumber) // 選択中の文字は変更する
-                    {
-                        //_ssd->setTextColor(SSD1306_BLACK, SSD1306_WHITE);
-                        if (i == 0)
-                            _ssd->print("|");
-                        else
-                            _ssd->print(" |");
-                    }
-                    else
-                    {
-                        //_ssd->setTextColor(SSD1306_WHITE, SSD1306_BLACK);
-                        if (i == 0)
-                            _ssd->print(" ");
-                        else
-                            _ssd->print("  ");
-                    }
-
-                    _ssd->print(configName[i]);
-                    if (i != 0) // Runじゃないなら
-                    {
-                        int tabspace = (configNameMaxLength + 1) - strlen(configName[i]);
-                        for (int i = 0; i < tabspace; i++)
-                        {
-                            _ssd->print(" ");
-                        }
-                    }
-                    _ssd->print(":");
-                    _ssd->print(_configActive[i] ? "on" : "off");
-
-                    _ssd->println("");
-                }
             }
         }
-
-        _ssd->display(); // 表示
     }
 }
 
 // 　データ取得
+int uiMeterNumber() { return _meterNumber; }
 bool uiActionDecided() { return _actionDecided; }
 bool uiModeDecided() { return _modeDecided; }
 bool uiRunning() { return _modeDecided && _actionDecided && _configActive[0]; }

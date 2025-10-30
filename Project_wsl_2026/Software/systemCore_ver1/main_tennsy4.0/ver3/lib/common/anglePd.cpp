@@ -71,5 +71,8 @@ void AnglePD::process(int deg, int target)
 #endif
 
     // P項とD項を合計し、出力を -100.0 から 100.0 の範囲に制限
-    _output = constrain(_p_power + _d_power, -100.0, 100.0);
+    double power = 0.0;
+    power += (_useP) ? _p_power : 0.0;
+    power += (_useD) ? _d_power : 0.0;
+    _output = constrain(power, -100.0, 100.0);
 }
