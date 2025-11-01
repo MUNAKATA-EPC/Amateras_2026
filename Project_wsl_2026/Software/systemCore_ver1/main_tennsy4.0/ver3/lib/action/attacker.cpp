@@ -1,9 +1,17 @@
 #include "attacker.hpp"
 
-static AnglePD pdGyro(0.56, 0.26); // ジャイロ用のPD調節値
-static AnglePD pdCam(0.38, 0.0);   // カメラ用のPD調節値
+// #define LINE_MEMORY
+#define LINE_FIELD
+
+static PD pdGyro(0.90, 2.6); // ジャイロ用のPD調節値
+static PD pdCam(0.90, 1.1);  // カメラ用のPD調節値
 
 static Timer camTimer;
+static Timer lineTimer;
+
+#ifdef LINE_MEMORY
+static bool lineSensor_memory[16] = {false};
+#endif
 
 void playAttacker(Attacker::Mode mode)
 {
@@ -12,58 +20,135 @@ void playAttacker(Attacker::Mode mode)
         camTimer.reset();
 
     // PD制御
+    PD *angle_pd = nullptr;
+    int angle_pd_deg = 0;
+
     if (mode == Attacker::Mode::GYRO)
     {
-        motorsPdProcess(&pdGyro, bnoDeg(), 0);
+        angle_pd = &pdGyro;
+        angle_pd_deg = bnoDeg();
     }
     else
     {
-        if (yellowGoalDetected() && ((camTimer.msTime() < 1600 && camTimer.everCalled()) || yellowGoalDis() < 110))
+        if (yellowGoalDetected() && (camTimer.msTime() < 1200 && camTimer.everCalled()))
         {
-            motorsPdProcess(&pdCam, yellowGoalDeg(), 0);
+            angle_pd = &pdCam;
+            angle_pd_deg = yellowGoalDeg();
+        }
+        else if (yellowGoalDetected() && yellowGoalDis() < 99)
+        {
+            angle_pd = &pdCam;
+            angle_pd_deg = yellowGoalDeg();
+
+            camTimer.reset();
         }
         else
         {
-            motorsPdProcess(&pdGyro, bnoDeg(), 0);
+            angle_pd = &pdGyro;
+            angle_pd_deg = bnoDeg();
         }
     }
+
+    motorsPdProcess(angle_pd, angle_pd_deg, 0);
 
     // キッカー
     kicker1.kick(catchSensor.read() == HIGH);
 
-    // 制御
+    // ライン計算と出力の計算
+    const int max_power = 90; // パワーの最大値
+    int power = max_power;    // デフォルトは最大値
+
+    bool line_escape = false; // ラインから離れる動きをするかどうか
+    int line_deg = 0xFF;      // 計算したライン角度
+
+#ifdef LINE_MEMORY                   // 記憶方式
+    int lineSensor_memory_count = 0; // 初期化
+
     if (lineRingDetected())
     {
-        int toEscapeDeg = lineRingDeg() + 180;
+        double x = 0.0, y = 0.0;
 
-        if (abs(diffDeg(toEscapeDeg, fieldDeg())) > 90)
+        for (uint8_t i = 0; i < 16; i++)
         {
-            toEscapeDeg = toEscapeDeg + 180;
+            if (lineSensorDetected(i) == true || lineSensor_memory[i] == true)
+            {
+                x += cos(radians(22.5 * i));
+                y += sin(radians(22.5 * i));
+                lineSensor_memory[i] = true;
+
+                lineSensor_memory_count++;
+            }
         }
 
-        toEscapeDeg = (toEscapeDeg + 360) % 360;
+        line_deg = (int)round(degrees(atan2(y, x)));
 
-        motorsMove(toEscapeDeg, 95);
+        line_escape = true;
     }
-    else if (irDetected())
+    else
     {
-        if (irDeg() < 8 || irDeg() > 352)
-        {
-            motorsMove(0, 90);
-        }
-        else if (irDeg() < 15 || irDeg() > 345)
-        {
-            int toHoldDeg = mapDeg(irDeg(), 20, 60, MapMode::HIREI);
+        for (uint8_t i = 0; i < 16; i++)
+            lineSensor_memory[i] = false;
+    }
+#endif
 
-            motorsMove(toHoldDeg, 60);
+#ifdef LINE_FIELD // コート方式
+    if (lineRingDetected())
+    {
+        Serial.print(String(fieldDeg()) + " " + String(lineRingDeg()) + " " + String(diffDeg(fieldDeg(), lineRingDeg())));
+
+        if (abs(diffDeg(fieldDeg(), lineRingDeg())) < 90) // ラインが半分以上出てしまったら
+        {
+            line_deg = lineRingDeg() + 180; // 今のライン角度と反対側に行く
+
+            line_escape = true; // ラインから離れる
         }
         else
         {
-            double diffMawarikomiDeg = irVal() / 5.2;
-            int mawarikomiDeg = (irDeg() < 180) ? irDeg() + (int)diffMawarikomiDeg : irDeg() - (int)diffMawarikomiDeg;
-            mawarikomiDeg = (mawarikomiDeg + 360) % 360;
+            // power = (int)round(map(lineRingDis(), 0.0, 100.0, (double)max_power * 0.4, (double)max_power) * 0.6); // 出力を下げる
 
-            motorsMove(mawarikomiDeg, 90);
+            line_deg = lineRingDeg(); // 今のライン角度
+            line_escape = true;       // ラインから離れる
+        }
+    }
+
+    // ゴールが見えたらline_degはゴール方向
+    if (yellowGoalDetected() && yellowGoalDis() < 70)
+    {
+        line_deg = yellowGoalDeg();
+        line_escape = true; // ゴールから離れる
+    }
+
+    if (blueGoalDetected() && blueGoalDis() < 70)
+    {
+        line_deg = blueGoalDeg();
+        line_escape = true; // ゴールから離れる
+    }
+#endif
+
+    // 制御
+    if (line_escape)
+    {
+        motorsMove(line_deg + 180, power);
+    }
+    else if (irDetected())
+    {
+        if (abs(irDeg()) < 9)
+        {
+            motorsMove(0, power);
+        }
+        else if (abs(irDeg()) < 40 && irDis() < 60)
+        {
+            int toHoldDeg = mapDeg(irDeg(), 20, 80, MapMode::HIREI);
+
+            motorsMove(toHoldDeg, power * 0.75);
+        }
+        else
+        {
+            double diffMawarikomiDeg = (irDis() > 200) ? 0 : (irDis() > 50) ? irVal() / 3.6
+                                                                            : 60;
+            int mawarikomiDeg = (irDeg() > 0) ? irDeg() + (int)diffMawarikomiDeg : irDeg() - (int)diffMawarikomiDeg;
+
+            motorsMove(mawarikomiDeg, power);
         }
     }
     else

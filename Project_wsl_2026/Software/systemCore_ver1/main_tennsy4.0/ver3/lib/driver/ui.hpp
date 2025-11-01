@@ -26,6 +26,11 @@ void uiDrawMain(bool enterbtn, bool rightbtn, bool leftbtn);
 void uiPrint(int x0, int y0, String msg);
 void uiPrintDebug(const char *msg);
 
+// configの内容をプリントする関数
+// config_num:書きたい行(1~CONFIG_NUM_LIMIT(4) - 1), msg:書きたいメッセージ, default_num:defaultの数字, min_num・max_num:範囲
+// 出力は計算した値
+int uiConfigPrintAndGet(int config_num, String msg, int default_num, int min_num, int max_num);
+
 // 　データ取得
 int uiMeterNumber(); // 0~7を周期する
 bool uiActionDecided();
@@ -34,4 +39,4 @@ bool uiRunning();
 int uiActionNumber();
 int uiModeNumber();
 int uiConfigNumber();
-bool uiConfigActive(uint8_t index);
+bool uiConfigData(uint8_t index);

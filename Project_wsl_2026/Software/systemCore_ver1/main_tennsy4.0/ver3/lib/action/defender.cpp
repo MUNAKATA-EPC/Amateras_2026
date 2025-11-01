@@ -5,8 +5,8 @@ static Vector Defence(int power, bool onlyLineTrace, bool useTaikaku, bool backT
 static Vector TeiitiModoru(int power, int keepDis);
 static Vector LineEscape(int power);
 
-static AnglePD pdGyro(0.8, 0.1);  // ジャイロ用のPD調節値
-static AnglePD pdCam(0.488, 0.0); // カメラ用のPD調節値
+static PD pdGyro(0.90, 2.6); // ジャイロ用のPD調節値
+static PD pdCam(0.90, 0.26);  // カメラ用のPD調節値
 
 void playDefender(Defender::Mode mode)
 {
@@ -15,20 +15,22 @@ void playDefender(Defender::Mode mode)
 
     motorsPdProcess(&pdGyro, bnoDeg(), 0);
 
-    // Serial.println(yellowGoalDeg());
-
     if (yellowGoalDetected()) // 黄色ゴール見えてて
     {
         // 後ろを0度として範囲指定
         const int backDeg = 60;         // 守備範囲
-        const int defenceLimitDeg = 40; // ボールを追おうとするが守れる範囲のギリギリだったらそこで停止する
+        const int defenceLimitDeg = 35; // ボールを追おうとするが守れる範囲のギリギリだったらそこで停止する
         const int TaikakuBackDeg = 20;  // 対角線で”守備しない”角度
 
-        Serial.println(String(irVal()) + " " + String(irDis()));
+        Serial.print(String(irVal()) + " " + String(irDis()));
 
         if (abs(yellowGoalDeg() - 180) < backDeg) // 後ろにゴールあって
         {
-            if (lineRingDetected())
+            if (yellowGoalDis() < 61) // 距離が近かったら危険だから逃げる
+            {
+                defenderVec = getVec(yellowGoalDeg() + 180, 60);
+            }
+            else if (lineRingDetected())
             {
                 bool irDefence = (irDetected() && irDis() < 120) ? true : false; // irボールがありかつ近くなら
 
@@ -56,16 +58,9 @@ void playDefender(Defender::Mode mode)
             }
             else
             {
-                if (yellowGoalDis() < 80) // 距離が近かったら危険だから逃げる
-                {
-                    defenderVec = getVec(yellowGoalDeg() + 180, 60);
-                }
-                else
-                {
-                    irCarefulFlag = true; // この動作ではIRの位置に気を付ける
+                irCarefulFlag = true; // この動作ではIRの位置に気を付ける
 
-                    defenderVec = getVec(yellowGoalDeg(), 60);
-                }
+                defenderVec = getVec(yellowGoalDeg(), 60);
             }
         }
         else
@@ -99,7 +94,7 @@ void playDefender(Defender::Mode mode)
         {
             irCarefulFlag = true; // この動作ではIRの位置に気を付ける
 
-            if (fieldDeg() > 180) // 右のコートの中心があるなら
+            if (fieldDeg() < 0) // 右のコートの中心があるなら
             {
                 defenderVec = getVec(225, 75);
             }

@@ -12,7 +12,6 @@ Vector::Vector(double x, double y, bool useXY)
 }
 Vector::Vector(int deg, double length)
 {
-    deg = (deg + 360) % 360; // 0~360にする
     double rad = radians(deg);
 
     _vector_x = length * cos(rad);

@@ -29,8 +29,6 @@ public:
     int deg() const // 度数法[0~180]
     {
         int deg = (int)round(degrees(atan2(_vector_y, _vector_x)));
-        if (deg < 0)
-            deg += 360;
         return deg;
     }
 

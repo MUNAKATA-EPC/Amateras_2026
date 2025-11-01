@@ -1,5 +1,4 @@
-#ifndef MULTIPLEXCER_HPP
-#define MULTIPLEXCER_HPP
+#pragma once
 
 #include <Arduino.h>
 
@@ -26,5 +25,3 @@ public:
     // マルチプレクサから情報を読み取る
     int read(int index);
 };
-
-#endif

@@ -104,7 +104,7 @@ void loop()
     // ドリブラーを動かす
     dribbler1.move(1500);
 
-    // uiを実行
+    // uiを実行・描画
     if (!timer.everCalled() || timer.msTime() > 10) // まだ呼ばれていない場合もタイマーをリセットさせる
     {
         timer.reset();
@@ -149,6 +149,12 @@ void loop()
                 break;
             }
         }
+        else if (uiModeDecided())
+        {
+            uiConfigPrintAndGet(1, "goal Range", 5, -10, 10);
+            uiConfigPrintAndGet(2, "goal Range", 5, -20, 10);
+            uiConfigPrintAndGet(3, "goal Range", 10, -10, 20);
+        }
 
         uiShow();
     }
@@ -156,7 +162,7 @@ void loop()
     // 動作を実行
     if (!uiRunning())
     {
-        Serial.println("now sellecting...");
+        Serial.print("now sellecting...");
         kicker1.kick(false); // キッカーを動かさない
         motorsStop();        // 動作選択中はモータを止める
     }
@@ -178,4 +184,6 @@ void loop()
             break;
         }
     }
+
+    Serial.print("\n");
 }

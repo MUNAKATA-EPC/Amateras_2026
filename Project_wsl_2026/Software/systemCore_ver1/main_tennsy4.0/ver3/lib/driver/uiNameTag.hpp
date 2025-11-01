@@ -19,14 +19,6 @@ namespace Attacker {
 
         MODE_COUNT
     };
-    enum Config {
-        RUN,
-        SPEED_LOW,
-        SPEED_MIDDLE,
-        SPEED_HIGH,
-
-        CONFIG_COUNT
-    };
 }
 
 namespace Defender {
@@ -36,14 +28,6 @@ namespace Defender {
         BLUEGOAL,
 
         MODE_COUNT
-    };
-    enum Config {
-        RUN,
-        SPEED_LOW,
-        SPEED_MIDDLE,
-        SPEED_HIGH,
-
-        CONFIG_COUNT
     };
 }
 
@@ -55,11 +39,6 @@ namespace Test {
 
         MODE_COUNT
     };
-    enum Config {
-        RUN,
-
-        CONFIG_COUNT
-    };
 }
 
 namespace Radicon {
@@ -69,14 +48,6 @@ namespace Radicon {
         SPEED_200CC,
 
         MODE_COUNT
-    };
-    enum Config {
-        RUN,
-        LINE_AUTO,
-        ATTACKER_AUTO,
-        KICKER_AUTO,
-
-        CONFIG_COUNT
     };
 }
 

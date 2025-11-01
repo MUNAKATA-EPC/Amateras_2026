@@ -2,9 +2,6 @@
 
 int diffDeg(int deg1, int deg2)
 {
-    deg1 = (deg1 + 360) % 360; // 0〜360度に変換
-    deg2 = (deg2 + 360) % 360; // 0〜360度に変換
-
     int diff = (deg1 - deg2 + 360) % 360;
     if (diff > 180)
         diff -= 360;
@@ -22,7 +19,6 @@ int nearSeesenDeg(int targetDeg, int enterDeg)
 
 int areaIndexFromDeg(int n, int deg)
 {
-    deg = (deg + 360) % 360;
     double area_size = 360.0 / n;
     int index = int((deg + area_size / 2.0) / area_size) % n;
     return index;
@@ -52,10 +48,6 @@ Area16 area16(int deg)
 
 int mapDeg(int deg, int deg_in, int deg_out, MapMode mode)
 {
-    // 0~360 -> -180~180にする
-    if (deg > 180)
-        deg -= 360;
-
     // 計算
     int output;
     double scale;
@@ -75,10 +67,6 @@ int mapDeg(int deg, int deg_in, int deg_out, MapMode mode)
         output = deg;
         break;
     }
-
-    //-180~180 -> 0~360にする
-    if (output < 0)
-        output += 360;
 
     return output;
 }

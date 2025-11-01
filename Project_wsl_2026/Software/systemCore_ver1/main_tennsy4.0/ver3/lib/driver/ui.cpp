@@ -4,14 +4,16 @@ static Adafruit_SSD1306 *_ssd = nullptr;
 
 static uint8_t _address;
 
-static int _meterNumber = 0;
-
 static bool _actionDecided = false;
 static bool _modeDecided = false;
+
+static int _meterNumber = 0;
 static int _actionNumber = 0;
 static int _modeNumber = 0;
+
+#define CONFIG_DATA_LIMIT 4
 static int _configNumber = 0;
-static bool _configActive[10] = {false}; // [Configの番号]
+static unsigned int _configData[CONFIG_DATA_LIMIT] = {0}; // 0~3個のconfigがある（Runも含む）
 
 // 初期化
 bool uiInit(TwoWire *wire, uint8_t address, uint8_t width, uint8_t height)
@@ -90,6 +92,29 @@ void uiDrawCircleMeter(int x0, int y0, int r, const char *s, int deg)
 
     _ssd->print(buf);
 }
+// 設定のプリント・出力
+int uiConfigPrintAndGet(int config_num, String msg, int default_num, int min_num, int max_num)
+{
+    config_num = constrain(config_num, 0 + 1, CONFIG_DATA_LIMIT);
+    default_num = constrain(default_num, min_num, max_num);
+
+    _ssd->setTextSize(1);
+
+    int start_y = 8 * 4 + (config_num - 1) * 8;
+    uiPrint(5 * 2, start_y, msg);
+    _ssd->setCursor(63, start_y);
+    _ssd->print(":");
+
+    int range = max_num - min_num; // 周期の長さ
+    int roundConfigData = (_configData[config_num]) % range;
+    String data_str = String(roundConfigData);
+    char data_char[20];
+    data_str.toCharArray(data_char, 20);
+
+    _ssd->print(data_char);
+
+    return roundConfigData;
+}
 
 // メインのuiの描画用
 void uiDrawMain(bool enterbtn, bool rightbtn, bool leftbtn)
@@ -100,8 +125,8 @@ void uiDrawMain(bool enterbtn, bool rightbtn, bool leftbtn)
         if (_modeDecided)
         {
             _modeDecided = false;
-            for (int i = 0; i < 10; i++)
-                _configActive[i] = false;
+            for (int i = 0; i < CONFIG_DATA_LIMIT; i++)
+                _configData[i] = 0;
             _configNumber = 0;
 
             _meterNumber = 0; // リセット
@@ -162,41 +187,28 @@ void uiDrawMain(bool enterbtn, bool rightbtn, bool leftbtn)
     {
         if (rightbtn)
         {
-            _configNumber++;
-            uint8_t configCount = 0;
-            switch (_actionNumber)
-            {
-            case Action::ATTACKER:
-                configCount = Attacker::Config::CONFIG_COUNT;
-                break;
-            case Action::DEFENDER:
-                configCount = Defender::Config::CONFIG_COUNT;
-                break;
-            case Action::TEST:
-                configCount = Test::Config::CONFIG_COUNT;
-                break;
-            case Action::RADICON:
-                configCount = Radicon::Config::CONFIG_COUNT;
-                break;
-            }
-            if (_configNumber >= configCount)
-                _configNumber = 0;
+            _configNumber = (_configNumber + 1) % CONFIG_DATA_LIMIT; // 0~CONFIG_DATA_LIMIT-1個のconfigがある
 
             // runは右が押されたらfalseになる
-            _configActive[0] = false;
+            _configData[0] = false;
         }
 
         if (enterbtn)
         {
-            _configActive[_configNumber] = !_configActive[_configNumber];
+            if (_configNumber == 0)
+            {
+                _configData[_configNumber] = !_configData[_configNumber]; // これはRunだからスイッチする
+            }
+            else
+            {
+                _configData[_configNumber]++; // 加算する
+            }
         }
     }
 
     // 表示
     const char *actionName;
     const char *modeName;
-    const char *configName[10]; // 最大10個まで対応
-    uint8_t configCount = 0;
 
     switch (_actionNumber)
     {
@@ -224,15 +236,6 @@ void uiDrawMain(bool enterbtn, bool rightbtn, bool leftbtn)
         {
             modeName = "";
         }
-
-        if (_modeDecided)
-        {
-            configCount = Attacker::Config::CONFIG_COUNT;
-            configName[0] = "Run";
-            configName[1] = "Low";
-            configName[2] = "Middle";
-            configName[3] = "High";
-        }
         break;
 
     case Action::Type::DEFENDER:
@@ -258,15 +261,6 @@ void uiDrawMain(bool enterbtn, bool rightbtn, bool leftbtn)
         else
         {
             modeName = "";
-        }
-
-        if (_modeDecided)
-        {
-            configCount = Defender::Config::CONFIG_COUNT;
-            configName[0] = "Run";
-            configName[1] = "Low";
-            configName[2] = "Middle";
-            configName[3] = "High";
         }
         break;
 
@@ -294,12 +288,6 @@ void uiDrawMain(bool enterbtn, bool rightbtn, bool leftbtn)
         {
             modeName = "";
         }
-
-        if (_modeDecided)
-        {
-            configCount = Test::Config::CONFIG_COUNT;
-            configName[0] = "Run";
-        }
         break;
 
     case Action::Type::RADICON:
@@ -326,15 +314,6 @@ void uiDrawMain(bool enterbtn, bool rightbtn, bool leftbtn)
         {
             modeName = "";
         }
-
-        if (_modeDecided)
-        {
-            configCount = Radicon::Config::CONFIG_COUNT;
-            configName[0] = "Run";
-            configName[1] = "LineAuto";
-            configName[2] = "AttackerAuto";
-            configName[3] = "KickerAuto";
-        }
         break;
 
     default:
@@ -351,6 +330,7 @@ void uiDrawMain(bool enterbtn, bool rightbtn, bool leftbtn)
     _ssd->print(actionName);
     if (!_actionDecided)
     {
+        _ssd->print(" <");
     }
     else
     {
@@ -366,52 +346,28 @@ void uiDrawMain(bool enterbtn, bool rightbtn, bool leftbtn)
         else
         {
             _ssd->println("");
-
-            // config 表示
-            int configNameMaxLength = 0;
-            for (int i = 0; i < configCount; i++)
+            _ssd->setTextSize(2);
+            if (_configNumber == 0)
             {
-                int len = strlen(configName[i]);
-                if (len > configNameMaxLength)
-                    configNameMaxLength = len;
+                _ssd->print("|Run:");
+
+                String buf_str = (_configData[0]) ? "on" : "off";
+                char buf_char[5];
+                buf_str.toCharArray(buf_char, 5);
+
+                _ssd->print(buf_char);
             }
-            for (int i = 0; i < configCount; i++)
+            else
             {
-                if (i == 0) // Runは大きく
-                    _ssd->setTextSize(2);
-                else
-                    _ssd->setTextSize(1);
+                _ssd->print(" Run:off");
 
-                if (i == _configNumber) // 選択中の文字は変更する
-                {
-                    //_ssd->setTextColor(SSD1306_BLACK, SSD1306_WHITE);
-                    if (i == 0)
-                        _ssd->print("|");
-                    else
-                        _ssd->print(" |");
-                }
-                else
-                {
-                    //_ssd->setTextColor(SSD1306_WHITE, SSD1306_BLACK);
-                    if (i == 0)
-                        _ssd->print(" ");
-                    else
-                        _ssd->print("  ");
-                }
-
-                _ssd->print(configName[i]);
-                if (i != 0) // Runじゃないなら
-                {
-                    int tabspace = (configNameMaxLength + 1) - strlen(configName[i]);
-                    for (int i = 0; i < tabspace; i++)
-                    {
-                        _ssd->print(" ");
-                    }
-                }
-                _ssd->print(":");
-                _ssd->print(_configActive[i] ? "on" : "off");
-
+                _ssd->setTextSize(1);
                 _ssd->println("");
+                for (int i = 0; i < _configNumber; i++)
+                {
+                    _ssd->println("");
+                }
+                _ssd->print(" |");
             }
         }
     }
@@ -421,8 +377,8 @@ void uiDrawMain(bool enterbtn, bool rightbtn, bool leftbtn)
 int uiMeterNumber() { return _meterNumber; }
 bool uiActionDecided() { return _actionDecided; }
 bool uiModeDecided() { return _modeDecided; }
-bool uiRunning() { return _modeDecided && _actionDecided && _configActive[0]; }
+bool uiRunning() { return _modeDecided && _actionDecided && _configData[0]; }
 int uiActionNumber() { return _actionNumber; }
 int uiModeNumber() { return _modeNumber; }
 int uiConfigNumber() { return _configNumber; }
-bool uiConfigActive(uint8_t index) { return _configActive[index]; }
+bool uiConfigData(uint8_t index) { return _configData[index]; }

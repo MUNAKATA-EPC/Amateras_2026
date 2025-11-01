@@ -5,9 +5,9 @@ static uint32_t _baudrate = 9600;
 static uint8_t _frameHeader = 0xAA;
 
 static bool _detected = false;
-static int _deg = -1;
-static int _val = -1;
-static double _dis = -1.0;
+static int _deg = 0xFF;
+static int _val = 0xFF;
+static double _dis = 0xFF;
 
 bool irInit(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHeader)
 {
@@ -52,11 +52,11 @@ void irUpdate()
             uint8_t high2 = _serial->read();                         // ボールの値の上位バイトを読み取る
             _val = int16_t((uint16_t(high2) << 8) | uint16_t(low2)); // 上位バイトと下位バイトをつなげる
 
-            if (_deg == -1)
+            if (_deg == 0xFF)
             {
                 _detected = false;
-                _val = -1;
-                _dis = -1;
+                _val = 0xFF;
+                _dis = 0xFF;
             }
             else
             {

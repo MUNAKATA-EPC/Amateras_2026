@@ -15,10 +15,10 @@ static bool _sideRight = false;
 static bool _sideLeft = false;
 static bool _sideBack = false;
 
-static int _ringDeg = -1;
-static int _sideDeg = -1;
+static int _ringDeg = 0xFF;
+static int _sideDeg = 0xFF;
 
-static double _dis = -1.0;
+static double _dis = 0xFF;
 
 bool lineInit(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHeader)
 {
@@ -28,8 +28,8 @@ bool lineInit(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHeader)
 
     // 初期化
     _ringDetected = _sideDetected = false;
-    _ringDeg = _sideDeg = -1;
-    _dis = -1;
+    _ringDeg = _sideDeg = 0xFF;
+    _dis = 0xFF;
     _sideRight = _sideLeft = _sideBack = false;
     _x = _y = 0.0;
 
@@ -43,8 +43,8 @@ bool lineInit(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHeader)
     bool success = false;
     while (!success && timer.msTime() < 100)
     {
-        success = _serial->available() > 0;  // 1個以上データが来たら成功しているとみなす
-        delay(10);                           // irの通信開始待ち
+        success = _serial->available() > 0; // 1個以上データが来たら成功しているとみなす
+        delay(10);                          // irの通信開始待ち
     }
 
     return success;
@@ -119,18 +119,17 @@ void lineUpdate()
             _dis = sqrt(_x * _x + _y * _y);
 
             _ringDeg = (int)round(degrees(atan2(_y, _x)));
-            _ringDeg = (_ringDeg + 360) % 360;
         }
         else // ringDetectedCount == 0 の場合 (リングセンサーの反応がない)
         {
-            _dis = -1.0;
-            _ringDeg = -1;
+            _dis = 0xFF;
+            _ringDeg = 0xFF;
         }
     }
     else
     {
-        _dis = -1.0;
-        _ringDeg = -1;
+        _dis = 0xFF;
+        _ringDeg = 0xFF;
     }
 
     // サイドライン
@@ -147,11 +146,10 @@ void lineUpdate()
         side_y += (_sideBack == true) ? sin(radians(180.0)) : 0;  // 前が0度としているのでx,yが反転する
 
         _sideDeg = (int)round(degrees(atan2(side_y, side_x)));
-        _sideDeg = (_sideDeg + 360) % 360;
     }
     else
     {
-        _sideDeg = -1;
+        _sideDeg = 0xFF;
     }
 }
 

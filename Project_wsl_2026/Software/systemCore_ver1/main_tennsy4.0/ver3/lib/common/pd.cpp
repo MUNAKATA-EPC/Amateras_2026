@@ -1,5 +1,7 @@
 #include "pd.hpp"
 
+// #define D_USE_TIMER // ループが短すぎてうまくいかないです
+
 PD::PD(double kp, double kd)
 {
     // PゲインとDゲインを初期化
@@ -30,15 +32,8 @@ void PD::process(double val, double target)
     // 角度の変化量 (_gap_of_value) を計算
     _gap_of_value = _value - _oldvalue;
 
-    // 過去の値を更新
-    _oldvalue = _value;
-
-    // D項の計算（通常は変化量にKdをかける）
-    _d_power = _kd * _gap_of_value;
-
 #ifdef D_USE_TIMER
-    // D制御にタイマーを使用する場合（真の微分項、単位時間あたりの変化量）
-    double sec = 0.0;
+    double delta = 0.0;
     if (!_timer.everCalled())
     {
         _timer.reset();
@@ -46,11 +41,11 @@ void PD::process(double val, double target)
     }
     else
     {
-        sec = _timer.msTime() / 1000.0;
+        delta = _timer.msTime() * 10;
 
         // ゼロ除算を避ける
-        if (sec > 1e-6)
-            _d_power = _kd * _gap_of_value / sec; // D = Kd * (変化量 / 時間)
+        if (delta > 1e-6)
+            _d_power = _kd * _gap_of_value / delta; // D = Kd * (変化量 / 時間)
         else
             _d_power = 0.0;
 
@@ -58,9 +53,17 @@ void PD::process(double val, double target)
     }
 #endif
 
+#ifndef D_USE_TIMER
+    // D項の計算（通常は変化量にKdをかける）
+    _d_power = _kd * _gap_of_value;
+#endif
+
+    // 過去の値を更新
+    _oldvalue = _value;
+
     // P項とD項を合計し、出力を -100.0 から 100.0 の範囲に制限
     double power = 0.0;
     power += (_useP) ? _p_power : 0.0;
-    power += (_useD) ? _d_power : 0.0;
+    power -= (_useD) ? _d_power : 0.0; // D成分は動きを抑える作用
     _output = constrain(power, -100.0, 100.0);
 }
