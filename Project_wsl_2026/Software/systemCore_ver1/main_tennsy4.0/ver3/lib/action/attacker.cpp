@@ -3,11 +3,13 @@
 // #define LINE_MEMORY
 #define LINE_FIELD
 
-static PD pdGyro(0.90, 2.6); // ジャイロ用のPD調節値
-static PD pdCam(0.90, 1.1);  // カメラ用のPD調節値
+static PD pdGyro(0.4, 1.6); // ジャイロ用のPD調節値
+static PD pdCam(0.9, 1.1);  // カメラ用のPD調節値
 
 static Timer camTimer;
 static Timer lineTimer;
+
+static Movement_average move_deg_ave;
 
 #ifdef LINE_MEMORY
 static bool lineSensor_memory[16] = {false};
@@ -55,7 +57,7 @@ void playAttacker(Attacker::Mode mode)
     kicker1.kick(catchSensor.read() == HIGH);
 
     // ライン計算と出力の計算
-    const int max_power = 90; // パワーの最大値
+    const int max_power = 50; // パワーの最大値
     int power = max_power;    // デフォルトは最大値
 
     bool line_escape = false; // ラインから離れる動きをするかどうか
@@ -125,34 +127,54 @@ void playAttacker(Attacker::Mode mode)
     }
 #endif
 
+    int move_deg = 0;
+    int move_power = 0.0;
+    bool move_deg_ave_reset = false;
+    move_deg_ave.set(5); // 5個の平均をとる
     // 制御
     if (line_escape)
     {
-        motorsMove(line_deg + 180, power);
+        move_deg = line_deg + 180;
+        move_power = power;
+
+        move_deg_ave_reset = true;
     }
     else if (irDetected())
     {
         if (abs(irDeg()) < 9)
         {
-            motorsMove(0, power);
+            move_deg = 0;
+            move_power = power;
         }
         else if (abs(irDeg()) < 40 && irDis() < 60)
         {
-            int toHoldDeg = mapDeg(irDeg(), 20, 80, MapMode::HIREI);
-
-            motorsMove(toHoldDeg, power * 0.75);
+            move_deg = mapDeg(irDeg(), 20, 80, MapMode::HIREI);
+            move_power = power * 0.75;
         }
         else
         {
             double diffMawarikomiDeg = (irDis() > 200) ? 0 : (irDis() > 50) ? irVal() / 3.6
                                                                             : 60;
-            int mawarikomiDeg = (irDeg() > 0) ? irDeg() + (int)diffMawarikomiDeg : irDeg() - (int)diffMawarikomiDeg;
-
-            motorsMove(mawarikomiDeg, power);
+            move_deg = (irDeg() > 0) ? irDeg() + (int)diffMawarikomiDeg : irDeg() - (int)diffMawarikomiDeg;
+            move_power = power;
         }
     }
     else
     {
-        motorsPdMove();
+        move_deg = 0;
+        move_power = 0;
+
+        move_deg_ave_reset = true;
     }
+
+    if (move_deg_ave_reset)
+    {
+        move_deg_ave.reset();
+    }
+    else
+    {
+        move_deg = move_deg_ave.add(move_deg);
+    }
+
+    motorsMove(move_deg, move_power);
 }

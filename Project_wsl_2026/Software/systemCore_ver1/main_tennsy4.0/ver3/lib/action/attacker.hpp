@@ -5,6 +5,7 @@
 #include "pd.hpp"
 #include "timer.hpp"
 #include "vector.hpp"
+#include "movement_average.hpp"
 // driver類
 #include "dribbler.hpp"
 #include "kicker.hpp"
