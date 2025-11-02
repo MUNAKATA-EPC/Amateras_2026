@@ -218,14 +218,14 @@ void uiDrawMain(bool enterbtn, bool rightbtn, bool leftbtn)
         {
             switch (_modeNumber)
             {
-            case Attacker::Mode::GYRO:
-                modeName = "Gyro";
-                break;
             case Attacker::Mode::YELLOWGOAL:
                 modeName = "YellowGoal";
                 break;
             case Attacker::Mode::BLUEGOAL:
                 modeName = "BlueGoal";
+                break;
+            case Attacker::Mode::GYRO:
+                modeName = "Gyro";
                 break;
             default:
                 modeName = "Unknown";
@@ -244,9 +244,6 @@ void uiDrawMain(bool enterbtn, bool rightbtn, bool leftbtn)
         {
             switch (_modeNumber)
             {
-            case Defender::Mode::GYRO:
-                modeName = "Gyro";
-                break;
             case Defender::Mode::YELLOWGOAL:
                 modeName = "YellowGoal";
                 break;

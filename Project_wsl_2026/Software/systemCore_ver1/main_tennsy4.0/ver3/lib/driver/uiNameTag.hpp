@@ -1,19 +1,34 @@
 #pragma once
 
-namespace Action {
-    enum Type {
+namespace Action
+{
+    enum Type
+    {
         ATTACKER,
         DEFENDER,
         TEST,
         RADICON,
-        
+
         COUNT
     };
 }
 
-namespace Attacker {
-    enum Mode {
+namespace Attacker
+{
+    enum Mode
+    {
+        YELLOWGOAL,
+        BLUEGOAL,
         GYRO,
+
+        MODE_COUNT
+    };
+}
+
+namespace Defender
+{
+    enum Mode
+    {
         YELLOWGOAL,
         BLUEGOAL,
 
@@ -21,18 +36,10 @@ namespace Attacker {
     };
 }
 
-namespace Defender {
-    enum Mode {
-        GYRO,
-        YELLOWGOAL,
-        BLUEGOAL,
-
-        MODE_COUNT
-    };
-}
-
-namespace Test {
-    enum Mode {
+namespace Test
+{
+    enum Mode
+    {
         KICKER,
         GYRO,
         CAM,
@@ -41,8 +48,10 @@ namespace Test {
     };
 }
 
-namespace Radicon {
-    enum Mode {
+namespace Radicon
+{
+    enum Mode
+    {
         SPEED_50CC,
         SPEED_100CC,
         SPEED_200CC,
@@ -50,4 +59,3 @@ namespace Radicon {
         MODE_COUNT
     };
 }
-

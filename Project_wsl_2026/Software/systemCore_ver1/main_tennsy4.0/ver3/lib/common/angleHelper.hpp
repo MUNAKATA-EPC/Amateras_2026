@@ -3,19 +3,21 @@
 #include <Arduino.h>
 
 // 関数
-int diffDeg(int deg1, int deg2); // 二つの角度の差を返す
+int normalizeDeg(int deg); // 角度を -180度から180度の範囲に正規化する関数
+
+int diffDeg(int deg1, int deg2); // 角度の差分を -180度から180度の範囲で計算する
 
 int nearSeesenDeg(int targetDeg, int enterDeg); // targetDegの接線の角度を出しその2つ角度の内enterDegに近いほうを返す
 
-int areaIndexFromDeg(int n, int deg);   // n分割したときのdegに最も近いエリアを返す
-int degFromAreaIndex(int n, int index); // n分割したときのindex番目のエリアの角度を返す
+int areaIndexFromDeg(int n, int deg);   // 角度からエリアインデックスを計算
+int degFromAreaIndex(int n, int index); // エリアインデックスからエリアの中心角度を計算
 
 enum class MapMode
 {
     HIREI,
     NIJI
 };
-int mapDeg(int deg, int deg_in, int deg_out, MapMode mode); // 角度をin->outになるように変形させその角度を返す
+int mapDeg(int deg, int deg_in, int deg_out, MapMode mode); // マッピング関数
 
 // 4・8・16分割の時は特別定義
 enum class Area4

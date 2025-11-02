@@ -4,6 +4,7 @@
 #include "attacker.hpp"
 #include "defender.hpp"
 #include "radicon.hpp"
+#include "test.hpp"
 
 // common類
 #include "angleHelper.hpp"
@@ -177,7 +178,7 @@ void loop()
             playDefender(Defender::Mode(uiModeNumber()));
             break;
         case Action::TEST:
-            motorsMove(0, 50);
+            playTest();
             break;
         case Action::RADICON:
             playRadicon();

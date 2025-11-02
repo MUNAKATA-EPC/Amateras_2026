@@ -1,230 +1,195 @@
 #include "defender.hpp"
 
-// defenceで使う行動パターン
-static Vector Defence(int power, bool onlyLineTrace, bool useTaikaku, bool backToLineMiddle);
-static Vector TeiitiModoru(int power, int keepDis);
-static Vector LineEscape(int power);
+// PD制御
+static PD pdGyro(0.4, 1.6); // ジャイロ用のPD調節値
+static PD pdCam(0.9, 1.1);  // カメラ用のPD調節値
 
-static PD pdGyro(0.90, 2.6); // ジャイロ用のPD調節値
-static PD pdCam(0.90, 0.26);  // カメラ用のPD調節値
+// 攻撃ゴールの位置
+static bool attack_goal_detected;
+static int attack_goal_deg, attack_goal_dis;
+// 守備ゴールの位置
+static bool defence_goal_detected;
+static int defence_goal_deg, defence_goal_dis;
+
+// 動き
+static Vector LineTraceVec(PD *pd, int power);                               // ラインの中心に行こうとする（D成分は使わない）
+static Vector LineTraceAndTargetVec(PD *line_trace_vec, int deg, int power); // ライントレースしながらdegが0のなる方向へに行く
 
 void playDefender(Defender::Mode mode)
 {
-    Vector defenderVec;         // 最終的な移動方向・力格納
-    bool irCarefulFlag = false; // これがtrueならIRの位置に気を付けて動作する
-
     motorsPdProcess(&pdGyro, bnoDeg(), 0);
 
-    if (yellowGoalDetected()) // 黄色ゴール見えてて
+    if (mode == Defender::Mode::YELLOWGOAL)
     {
-        // 後ろを0度として範囲指定
-        const int backDeg = 60;         // 守備範囲
-        const int defenceLimitDeg = 35; // ボールを追おうとするが守れる範囲のギリギリだったらそこで停止する
-        const int TaikakuBackDeg = 20;  // 対角線で”守備しない”角度
+        attack_goal_detected = yellowGoalDetected();
+        attack_goal_deg = yellowGoalDeg();
+        attack_goal_dis = yellowGoalDis();
 
-        Serial.print(String(irVal()) + " " + String(irDis()));
+        defence_goal_detected = blueGoalDetected();
+        defence_goal_deg = blueGoalDeg();
+        defence_goal_dis = blueGoalDis();
+    }
+    else // mode == Defender::Mode::BLUEGOAL
 
-        if (abs(yellowGoalDeg() - 180) < backDeg) // 後ろにゴールあって
+    {
+        defence_goal_detected = yellowGoalDetected();
+        defence_goal_deg = yellowGoalDeg();
+        defence_goal_dis = yellowGoalDis();
+
+        attack_goal_detected = blueGoalDetected();
+        attack_goal_deg = blueGoalDeg();
+        attack_goal_dis = blueGoalDis();
+    }
+
+    const int max_power = 90; // パワーの最大値
+
+    const int defence_max_deg = 70;    // ディフェンスする最大角
+    const int defence_limit_deg = 60;  // ボールの守備を継続する最大角
+    const int defence_normal_deg = 30; // 対角線を使用せずディフェンスする最大角
+
+    if (defence_goal_detected && defence_goal_dis < 100.0) // 守備ゴールが見え、一定距離以内にゴールがあるなら
+    {
+        if (defence_goal_deg > 180 - defence_max_deg || defence_goal_deg < defence_max_deg - 180) // 後ろにゴールがあるなら(60~-60)（でフェンダーとしての動きにうつる）
         {
-            if (yellowGoalDis() < 61) // 距離が近かったら危険だから逃げる
+            if (lineRingDetected()) // ライン上にいるなら
             {
-                defenderVec = getVec(yellowGoalDeg() + 180, 60);
-            }
-            else if (lineRingDetected())
-            {
-                bool irDefence = (irDetected() && irDis() < 120) ? true : false; // irボールがありかつ近くなら
+                PD pd(0.92, 0.0); // ライントレースのpd成分（d成分は使わない）
+                Vector defence_vec;
 
-                if (abs(yellowGoalDeg() - 180) < TaikakuBackDeg) // かなり後ろにゴールがあって
+                if (irDetected()) // ボールが見えるなら
                 {
-                    defenderVec = Defence(90, false, false, irDefence);
-                }
-                else
-                {
-                    defenderVec = Defence(90, false, true, irDefence);
-                }
-
-                if (irDetected())
-                {
-                    if (yellowGoalDeg() - 180 > defenceLimitDeg && diffDeg(yellowGoalDeg(), irDeg()) > 0) // リミットを超えたら停止(左のラインにいる)
+                    if (defence_goal_deg > 180 - defence_limit_deg || defence_goal_deg < defence_limit_deg - 180)
                     {
-                        defenderVec = Defence(90, true, false, false); // ベクター数再計算
-                    }
+                        if (defence_goal_deg > 180 - defence_normal_deg || defence_goal_deg < defence_normal_deg - 180) // かなり後ろにあるなら(20~-20)
+                        {
+                            defence_vec = LineTraceAndTargetVec(&pd, irDeg(), max_power); // 守備する
+                        }
+                        else
+                        {
+                            int resetDeg = normalizeDeg(defence_goal_deg + 180);       // ゴールの対角方向の角度
+                            int taikakuIrDeg = normalizeDeg(irDeg() - resetDeg + 360); // ゴールの対角方向の角度を基準とした時のIR角度
 
-                    if (180 - yellowGoalDeg() > defenceLimitDeg && diffDeg(yellowGoalDeg(), irDeg()) < 0) // リミットを超えたら停止(右のラインにいる)
+                            defence_vec = LineTraceAndTargetVec(&pd, taikakuIrDeg, max_power); // 対角線で守備する
+                        }
+                    }
+                    else
                     {
-                        defenderVec = Defence(90, true, false, false); // ベクター数再計算
+                        int resetDeg = normalizeDeg(defence_goal_deg + 180);       // ゴールの対角方向の角度
+                        int taikakuIrDeg = normalizeDeg(irDeg() - resetDeg + 360); // ゴールの対角方向の角度を基準とした時のIR角度
+
+                        // Serial.print(taikakuIrDeg);
+
+                        if (defence_goal_deg > 0 && taikakuIrDeg < 0) // リミットを超えたなら（右にいてボールはさらに右）
+                        {
+                            defence_vec = LineTraceVec(&pd, max_power); // ライントレースのみ
+                        }
+                        else if (defence_goal_deg < 0 && taikakuIrDeg > 0) // リミットを超えたなら（左にいてボールはさらに左）
+                        {
+                            defence_vec = LineTraceVec(&pd, max_power); // ライントレースのみ
+                        }
+                        else
+                        {
+                            defence_vec = LineTraceAndTargetVec(&pd, taikakuIrDeg, max_power); // 対角線で守備する
+                        }
                     }
                 }
+                else // ボールが見えないなら
+                {
+                    defence_vec = LineTraceAndTargetVec(&pd, -(defence_goal_deg + 180), max_power); // 後ろを0度としてゴール中心に行こうとする
+                }
+
+                motorsVectorMove(&defence_vec); // 実行する
             }
             else
             {
-                irCarefulFlag = true; // この動作ではIRの位置に気を付ける
-
-                defenderVec = getVec(yellowGoalDeg(), 60);
+                if (defence_goal_dis < 65.0) // ゴールが近くにあるなら（ラインより前）
+                {
+                    motorsMove(defence_goal_deg + 180, max_power); // ゴールから離れる
+                }
+                else // ゴールが遠くにあるなら
+                {
+                    motorsMove(defence_goal_deg, max_power); // ゴールに近寄る
+                }
             }
         }
-        else
+        else // 後ろにゴールがないなら
         {
-            if (lineRingDetected())
-            {
-                defenderVec = getVec(fieldDeg(), 90);
-            }
-            else
-            {
-                irCarefulFlag = true; // この動作ではIRの位置に気を付ける
-
-                defenderVec = TeiitiModoru(60, 90);
-            }
+            motorsMove(fieldDeg(), max_power); // コートの中心へ行く
         }
     }
-    else if (lineRingDetected()) // ラインが反応していてるならラインから逃れる動き
+    else if (lineRingDetected()) // （ゴールが見えていないときに）ラインが反応したなら
     {
-        // LineEscape(90);
-        defenderVec = getVec(fieldDeg(), 60);
-    }
-    else // 円形ラインで反応なしならば
-    {
-        if (fieldDeg() > 90 && fieldDeg() < 270)
-        {
-            irCarefulFlag = true; // この動作ではIRの位置に気を付ける
-
-            defenderVec = getVec(fieldDeg(), 75);
-        }
-        else
-        {
-            irCarefulFlag = true; // この動作ではIRの位置に気を付ける
-
-            if (fieldDeg() < 0) // 右のコートの中心があるなら
-            {
-                defenderVec = getVec(225, 75);
-            }
-            else
-            {
-                defenderVec = getVec(135, 75);
-            }
-        }
-    }
-
-    bool isDangerBallPosi = irDetected() ? abs(diffDeg(defenderVec.deg(), irDeg())) < 80 && irDis() < 100.0 : false; // 移動方向と同じ方向にボールがあると危険
-
-    if (irCarefulFlag && isDangerBallPosi) // IRの位置に気を付けるフラッグが有効で危険な位置にボールがあるなら
-    {
-        playAttacker(Attacker::Mode::GYRO); // 攻撃の動き（よける）
+        motorsMove(fieldDeg(), max_power); // コートの中心へ行く
     }
     else
     {
-        motorsVectorMove(&defenderVec); // ディフェンダーの動き
+        if (defence_goal_detected) // 守備ゴールが見えるなら
+        {
+            motorsMove(defence_goal_deg, max_power);
+        }
+        else // 守備ゴールが見えないなら
+        {
+            if (abs(fieldDeg()) > 90) // 前にコートの中心があるなら
+            {
+                motorsMove(180, max_power); // 後ろへ行く
+            }
+            else // 後ろにコートの中心があるなら
+            {
+                if (fieldDeg() < 0) // 右にコートの中心があるなら
+                {
+                    motorsMove(-135, max_power); // 右後ろへ行く
+                }
+                else
+                {
+                    motorsMove(135, max_power); // 左後ろへ行く
+                }
+            }
+        }
     }
 }
 
-// ディフェンス
-static PD pdLineTraceWithIr(0.30, 0.0); // IR検出時のライントレース用のPD調節値
-static PD pdLineTrace(1.0, 0.0);        // ライントレース用のPD調節値
-
-static Vector Defence(int power, bool onlyLineTrace, bool useTaikaku, bool irDefence)
+Vector LineTraceVec(PD *pd, int power)
 {
-    PD pd = onlyLineTrace ? pdLineTrace : (irDefence) ? pdLineTraceWithIr
-                                                      : pdLineTrace;
+    pd->useD(false);                 // D成分は使わなくて十分
+    pd->process(lineRingDis(), 0.0); // 計算
+    double len = map(fabs(pd->output()), 0.0, 100.0, 0, power);
 
-    int resetDeg = (yellowGoalDetected() && useTaikaku) ? (yellowGoalDeg() + 180) % 360 : 0; // ゴールの対角方向の角度
-
-    int ballDeg = irDeg();                               // backToLineMiddleがtrueならラインの中心に戻るようにする
-    int taikakuIrDeg = (ballDeg - resetDeg + 360) % 360; // ゴールの対角方向の角度を基準とした時のIR角度
-
-    /* --詳しい算出方法は物xを見るべし-- */
-    double maxLen = (double)power; // ディフェンス時の最大長さ
-    const int irFrontDeg = 25;     // 対角線を基準としたIRの角度の前の範囲（この角度を区切りにロボットは停止する制御に移る）
-    const int yellowFrontDeg = 20; // 黄色ゴールの角度の前の範囲（この角度を区切りにロボットは停止する制御に移る）
-
-    pd.process(lineRingDis(), 0.0); // ライントレース用PD計算
-
-    // ライトレース用ベクトル
-    double lineLen = constrain(fabs((double)pd.output()), 0.0, maxLen);
-    Vector lineTraceVec(lineRingDeg(), lineLen);
-
-    // ライトレースの残りのベクトルの長さ
-    double behindMaxLen = sqrt(maxLen * maxLen - lineTraceVec.length() * lineTraceVec.length());
-
-    // 精度向上のため粗目のラインの角度を計算（矛盾）
-    int lineRingRoundDeg = areaIndexFromDeg(8, lineRingDeg()) * 360 / 8;
-
-    // IRボール用のベクトル
-    // 対角方向を基準としたIRボールの方向の接線方向の算出
-    int irSessenDeg = nearSeesenDeg(lineRingRoundDeg, taikakuIrDeg); // どっちの接線がIRボールの角度に近いか
-    // 対角方向を基準としたIRボールの角度によってベクトルの長さを変える
-    double irDegVal = (taikakuIrDeg < 180) ? (double)taikakuIrDeg : 360.0 - (double)taikakuIrDeg;
-    double irLen = (taikakuIrDeg < irFrontDeg || taikakuIrDeg > 360 - irFrontDeg) ? fabs(irDegVal * behindMaxLen / (double)irFrontDeg) : behindMaxLen;
-    irLen = constrain(irLen, 0.0, behindMaxLen);
-    irLen = (taikakuIrDeg < 5 || taikakuIrDeg > 360 - 5) ? 0.0 : irLen; // ほんとの前だったらもう停止する！
-    // ベクトル生成
-    Vector irSessenVec(irSessenDeg, irLen);
-
-    // ライン中心に戻る用のベクトル
-    int yellowSessenDeg = nearSeesenDeg(lineRingRoundDeg, yellowGoalDeg()); // ラインの施栓方向の角度の内yellowDeg()に近いほうを返す
-    // 黄色ゴールの角度によってベクトルの長さを変えながら中心に戻る // 後ろを0度としてvalueを計算
-    double yellowDegVal = yellowGoalDeg() - 180;
-    double yellowLen = abs(yellowDegVal) < yellowFrontDeg ? fabs(yellowDegVal * behindMaxLen / (double)yellowFrontDeg) : behindMaxLen;
-    yellowLen = constrain(yellowLen, 0.0, behindMaxLen);
-    // ベクトル生成
-    Vector yellowSessenVec(yellowSessenDeg, yellowLen);
-
-    // 移動ベクトルの合成(irDefenceがfalseの時はラインの中心に戻るベクトルの成分を足す)
-    Vector moveVec = onlyLineTrace ? lineTraceVec : !irDefence ? lineTraceVec + yellowSessenVec
-                                                               : lineTraceVec + irSessenVec;
-    if (moveVec.length() > maxLen)
-    {
-        moveVec = moveVec * (maxLen / moveVec.length());
-    }
-
-    return moveVec;
-
-    /*
-    Serial.print("lineTraceVec(" + String(lineTraceVec.deg()) + "," + String(lineTraceVec.length()) + ")");
-    Serial.print(" + ");
-    Serial.print("irSessenVec(" + String(irSessenVec.deg()) + "," + String(irSessenVec.length()) + ")");
-    Serial.print(" = ");
-    Serial.println("moveVec(" + String(moveVec.deg()) + "," + String(moveVec.length()) + ")");
-    */
+    return getVec(lineRingDeg(), len);
 }
 
-// ゴールと距離保ちながら戻る
-static PD pdKeepDisFromGoal(4.8, 0); // ゴールと一定の距離を保ちながら定位置へ移動用のPD調整値
-
-static Vector TeiitiModoru(int power, int keepDis)
+Vector LineTraceAndTargetVec(PD *pd_line_trace, int deg, int power)
 {
-    double maxLen = (double)power; // ディフェンス時の最大長さ
+    // -180~180に変換する
+    deg = normalizeDeg(deg);
 
-    pdKeepDisFromGoal.process(yellowGoalDis(), keepDis); // pd計算
+    // ライントレースベクトルの算出
+    Vector line_trace_vec = LineTraceVec(pd_line_trace, power);
 
-    int keepDisDeg = yellowGoalDis() < keepDis ? yellowGoalDeg() + 180 : yellowGoalDeg() + 0; // ゴールからの距離によって移動方向をかえる
-    double keepDisLen = fabs(pdKeepDisFromGoal.output());
-    keepDisLen = constrain(keepDisLen, 0.0, maxLen);
-    Vector keepDisVec(keepDisDeg, keepDisLen);
+    double behind_len = sqrt(power * power - line_trace_vec.length() * line_trace_vec.length()); // 残りのベクトルの長さ
 
-    int goalSessenDeg = nearSeesenDeg(yellowGoalDeg(), (yellowGoalDeg() < 180) ? 90 : 270);
-    double goalSessenLen = sqrt(maxLen * maxLen - keepDisVec.length() * keepDisVec.length());
-    goalSessenLen = constrain(goalSessenLen, 0.0, maxLen);
-    Vector goalSessenVec(goalSessenDeg, goalSessenLen);
+    // 接線ベクトル角度の算出（lineRingDeg()の接線方向の内degに近いほう）
+    int round_line_ring_deg = areaIndexFromDeg(lineRingDeg(), 8) * 360 / 8;
+    int sessen_deg = lineRingDeg() < 0.1 ? nearSeesenDeg(0, deg) : nearSeesenDeg(round_line_ring_deg, deg);
+    // 接線ベクトル長さの算出
+    double sessen_len;
+    if (abs(deg) < 6) // 目標角度がほぼ前
+        sessen_len = 0.0;
+    else if (abs(deg) < 30)                                     // 目標角度が前付近
+        sessen_len = map(abs(deg), 0.0, 30.0, 0.0, behind_len); // 角度によってp制御
+    else                                                        // 目標角度が前付近に無い
+        sessen_len = behind_len;                                // マックスで動かす
+    // 接線ベクトル算出
+    Vector sessen_vec(sessen_deg, sessen_len);
 
-    Vector moveVec = keepDisVec + goalSessenVec;
-    if (moveVec.length() > maxLen)
+    // スケーリング（安全対策）
+    Vector vec = line_trace_vec + sessen_vec;
+    if (vec.length() > power)
     {
-        moveVec = moveVec * (maxLen / moveVec.length());
+        double scale = power / vec.length();
+        vec = vec * scale;
     }
 
-    return moveVec;
-}
+    // Serial.print(String(line_trace_vec.length()) + "  " + String(sessen_vec.length()) + "  " + String(vec.length()));
 
-static Vector LineEscape(int power)
-{
-    int moveDeg = lineRingDeg() + 180;
-
-    if (abs(diffDeg(lineRingDeg(), fieldDeg())) > 90)
-    {
-        moveDeg = lineRingDeg();
-    }
-
-    Vector moveVec(moveDeg, power);
-
-    return moveVec;
+    return vec;
 }

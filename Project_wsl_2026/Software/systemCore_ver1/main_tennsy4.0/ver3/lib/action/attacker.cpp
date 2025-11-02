@@ -1,16 +1,15 @@
 #include "attacker.hpp"
 
-// #define LINE_MEMORY
-#define LINE_FIELD
+#define LINE_MEMORY
+// #define LINE_FIELD
 
 static PD pdGyro(0.4, 1.6); // ジャイロ用のPD調節値
-static PD pdCam(0.9, 1.1);  // カメラ用のPD調節値
+static PD pdCam(0.5, 0.2);  // カメラ用のPD調節値
 
 static Timer camTimer;
 static Timer lineTimer;
 
-static Movement_average move_deg_ave;
-
+static int line_deg = 0xFF; // 計算したライン角度
 #ifdef LINE_MEMORY
 static bool lineSensor_memory[16] = {false};
 #endif
@@ -32,17 +31,10 @@ void playAttacker(Attacker::Mode mode)
     }
     else
     {
-        if (yellowGoalDetected() && (camTimer.msTime() < 1200 && camTimer.everCalled()))
+        if (camTimer.msTime() < 1200 && camTimer.everCalled())
         {
             angle_pd = &pdCam;
             angle_pd_deg = yellowGoalDeg();
-        }
-        else if (yellowGoalDetected() && yellowGoalDis() < 99)
-        {
-            angle_pd = &pdCam;
-            angle_pd_deg = yellowGoalDeg();
-
-            camTimer.reset();
         }
         else
         {
@@ -57,11 +49,10 @@ void playAttacker(Attacker::Mode mode)
     kicker1.kick(catchSensor.read() == HIGH);
 
     // ライン計算と出力の計算
-    const int max_power = 50; // パワーの最大値
-    int power = max_power;    // デフォルトは最大値
+    const int max_power = 90; // パワーの最大値
 
+    int power = max_power;    // デフォルトは最大値
     bool line_escape = false; // ラインから離れる動きをするかどうか
-    int line_deg = 0xFF;      // 計算したライン角度
 
 #ifdef LINE_MEMORY                   // 記憶方式
     int lineSensor_memory_count = 0; // 初期化
@@ -106,12 +97,13 @@ void playAttacker(Attacker::Mode mode)
         }
         else
         {
-            // power = (int)round(map(lineRingDis(), 0.0, 100.0, (double)max_power * 0.4, (double)max_power) * 0.6); // 出力を下げる
+            power = (int)round(map(lineRingDis(), 0.0, 100.0, (double)max_power * 0.4, (double)max_power) * 0.6); // 出力を下げる
 
-            line_deg = lineRingDeg(); // 今のライン角度
-            line_escape = true;       // ラインから離れる
+            // line_deg = lineRingDeg(); // 今のライン角度
+            // line_escape = true;       // ラインから離れる
         }
     }
+#endif
 
     // ゴールが見えたらline_degはゴール方向
     if (yellowGoalDetected() && yellowGoalDis() < 70)
@@ -125,56 +117,31 @@ void playAttacker(Attacker::Mode mode)
         line_deg = blueGoalDeg();
         line_escape = true; // ゴールから離れる
     }
-#endif
 
-    int move_deg = 0;
-    int move_power = 0.0;
-    bool move_deg_ave_reset = false;
-    move_deg_ave.set(5); // 5個の平均をとる
     // 制御
     if (line_escape)
     {
-        move_deg = line_deg + 180;
-        move_power = power;
-
-        move_deg_ave_reset = true;
+        motorsMove(line_deg + 180, power);
     }
     else if (irDetected())
     {
-        if (abs(irDeg()) < 9)
+        if (abs(irDeg()) <= 12)
         {
-            move_deg = 0;
-            move_power = power;
+            motorsMove(0, power);
         }
-        else if (abs(irDeg()) < 40 && irDis() < 60)
+        else if (abs(irDeg()) < 40 && irDis() < 50)
         {
-            move_deg = mapDeg(irDeg(), 20, 80, MapMode::HIREI);
-            move_power = power * 0.75;
+            motorsMove(mapDeg(irDeg(), 20, 80, MapMode::HIREI), power);
         }
         else
         {
-            double diffMawarikomiDeg = (irDis() > 200) ? 0 : (irDis() > 50) ? irVal() / 3.6
-                                                                            : 60;
-            move_deg = (irDeg() > 0) ? irDeg() + (int)diffMawarikomiDeg : irDeg() - (int)diffMawarikomiDeg;
-            move_power = power;
+            double diffMawarikomiDeg = (irDis() > 50) ? 0 : (irDis() > 20) ? irVal() / 2
+                                                                           : 45;
+            motorsMove(irDeg() > 0 ? irDeg() + (int)diffMawarikomiDeg : irDeg() - (int)diffMawarikomiDeg, power);
         }
     }
     else
     {
-        move_deg = 0;
-        move_power = 0;
-
-        move_deg_ave_reset = true;
+        motorsPdMove();
     }
-
-    if (move_deg_ave_reset)
-    {
-        move_deg_ave.reset();
-    }
-    else
-    {
-        move_deg = move_deg_ave.add(move_deg);
-    }
-
-    motorsMove(move_deg, move_power);
 }

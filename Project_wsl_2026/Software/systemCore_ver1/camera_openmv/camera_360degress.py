@@ -6,17 +6,17 @@ import math
 
 #############################################################
 # ゴールの色取り用変数(黄色)
-goal_yellow = (20, 40, -30, -3, 23, 56)
+goal_yellow = (45, 100, -36, 15, 26, 127)
 #############################################################
 # ゴールの色取り用変数(青色)
-goal_blue = (20, 40, -30, -3, 23, 56)
+goal_blue = (26, 65, -11, 25, -56, -31)
 #############################################################
 # コートの色（カーペット用）
-court_green = (7, 19, -22, 4, -32, 11)
+court_green = (58, 79, -13, 0, -8, 16)
 #############################################################
 # 画面の中央座標
-screen_center = [132, 96]
-screen_short_r = 38
+screen_center = [136, 120]
+screen_short_r = 41
 screen_long_r = 170
 
 court = [0, 0]
@@ -54,10 +54,10 @@ sensor.set_framesize(sensor.QVGA)  # フレームサイズをQVGA (320x240)に�
 sensor.skip_frames(time=2000)      # 設定が有効になるまで待機
 
 # 明るさ関連の設定（ここで反映される）
-sensor.set_auto_gain(False, gain_db=5)        # 自動ゲインオフ、ゲインを低めに
-sensor.set_auto_whitebal(False)                # ホワイトバランス固定
-sensor.set_auto_exposure(False, exposure_us=1900)  # 露出を短くして暗めに
-sensor.set_brightness(-1)                      # さらに暗く（-3 〜 +3）
+# sensor.set_auto_gain(False, gain_db=8)             # 自動ゲインオフ、ゲインを低めに
+# sensor.set_auto_whitebal(False)                    # ホワイトバランス固定
+# sensor.set_auto_exposure(False, exposure_us=1800)  # 露出を短くして暗めに
+# sensor.set_brightness(0)                           # さらに暗く（-3 〜 +3）
 
 clock = time.clock()
 uart = UART(3, 115200, timeout_char=1000)
@@ -175,12 +175,3 @@ while True:
     send_int16(uart, yellow_dis)
     send_int16(uart, blue_deg)
     send_int16(uart, blue_dis)
-
-    # デバッグ表示
-    print("--- Current Frame Data ---")
-    print(f"Yellow deg: {yellow_deg}")
-    print(f"Court deg: {court_deg}")
-    print(f"Blue deg: {blue_deg}")
-    print(f"Yellow Dis: {yellow_dis}")
-    print(f"Blue Dis: {blue_dis}")
-    print("\n")
