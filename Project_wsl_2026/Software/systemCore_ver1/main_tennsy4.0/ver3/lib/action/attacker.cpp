@@ -135,8 +135,14 @@ void playAttacker(Attacker::Mode mode)
         }
         else
         {
-            double diffMawarikomiDeg = (irDis() > 50) ? 0 : (irDis() > 20) ? irVal() / 2
-                                                                           : 45;
+            double diffMawarikomiDeg;
+            if (irDis() > 50)
+                diffMawarikomiDeg = 0;
+            else if (irDis() > 20)
+                diffMawarikomiDeg = irVal() / 2;
+            else
+                diffMawarikomiDeg = 45;
+
             motorsMove(irDeg() > 0 ? irDeg() + (int)diffMawarikomiDeg : irDeg() - (int)diffMawarikomiDeg, power);
         }
     }

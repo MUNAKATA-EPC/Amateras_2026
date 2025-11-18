@@ -113,7 +113,7 @@ void loop()
         uiClear();
         uiDrawMain(enterButton.isReleased(), rightButton.isReleased(), leftButton.isReleased()); // 10msに一回更新
 
-        if (!uiActionDecided())
+        if (!uiActionDecided()) // センサーモニター表示
         {
             switch (uiMeterNumber())
             {
@@ -150,11 +150,11 @@ void loop()
                 break;
             }
         }
-        else if (uiModeDecided())
+        else if (uiModeDecided()) // 動作設定表示
         {
-            uiConfigPrintAndGet(1, "goal Range", 5, -10, 10);
-            uiConfigPrintAndGet(2, "goal Range", 5, -20, 10);
-            uiConfigPrintAndGet(3, "goal Range", 10, -10, 20);
+            //uiConfigPrintAndGet(1, "goal Range", 5, -10, 10);
+            //uiConfigPrintAndGet(2, "goal Range", 5, -20, 10);
+            //uiConfigPrintAndGet(3, "goal Range", 10, -10, 20);
         }
 
         uiShow();

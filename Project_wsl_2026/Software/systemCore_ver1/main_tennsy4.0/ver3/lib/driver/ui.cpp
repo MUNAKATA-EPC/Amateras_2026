@@ -93,28 +93,6 @@ void uiDrawCircleMeter(int x0, int y0, int r, const char *s, int deg)
     _ssd->print(buf);
 }
 // 設定のプリント・出力
-int uiConfigPrintAndGet(int config_num, String msg, int default_num, int min_num, int max_num)
-{
-    config_num = constrain(config_num, 0 + 1, CONFIG_DATA_LIMIT);
-    default_num = constrain(default_num, min_num, max_num);
-
-    _ssd->setTextSize(1);
-
-    int start_y = 8 * 4 + (config_num - 1) * 8;
-    uiPrint(5 * 2, start_y, msg);
-    _ssd->setCursor(63, start_y);
-    _ssd->print(":");
-
-    int range = max_num - min_num; // 周期の長さ
-    int roundConfigData = (_configData[config_num]) % range;
-    String data_str = String(roundConfigData);
-    char data_char[20];
-    data_str.toCharArray(data_char, 20);
-
-    _ssd->print(data_char);
-
-    return roundConfigData;
-}
 
 // メインのuiの描画用
 void uiDrawMain(bool enterbtn, bool rightbtn, bool leftbtn)
@@ -207,8 +185,9 @@ void uiDrawMain(bool enterbtn, bool rightbtn, bool leftbtn)
     }
 
     // 表示
-    const char *actionName;
-    const char *modeName;
+    const char *actionName = nullptr;
+    const char *modeName = nullptr;
+    const char *configName[3] = {nullptr, nullptr, nullptr};
 
     switch (_actionNumber)
     {
@@ -231,10 +210,9 @@ void uiDrawMain(bool enterbtn, bool rightbtn, bool leftbtn)
                 modeName = "Unknown";
                 break;
             }
-        }
-        else
-        {
-            modeName = "";
+            configName[0] = "speed";
+            configName[1] = "speed";
+            configName[2] = "speed";
         }
         break;
 
@@ -254,10 +232,6 @@ void uiDrawMain(bool enterbtn, bool rightbtn, bool leftbtn)
                 modeName = "Unknown";
                 break;
             }
-        }
-        else
-        {
-            modeName = "";
         }
         break;
 
@@ -281,10 +255,6 @@ void uiDrawMain(bool enterbtn, bool rightbtn, bool leftbtn)
                 break;
             }
         }
-        else
-        {
-            modeName = "";
-        }
         break;
 
     case Action::Type::RADICON:
@@ -307,10 +277,6 @@ void uiDrawMain(bool enterbtn, bool rightbtn, bool leftbtn)
                 break;
             }
         }
-        else
-        {
-            modeName = "";
-        }
         break;
 
     default:
@@ -318,6 +284,23 @@ void uiDrawMain(bool enterbtn, bool rightbtn, bool leftbtn)
         modeName = "Unknown";
         break;
     }
+
+    if (actionName == nullptr)
+    {
+        actionName = "";
+    }
+    if (modeName == nullptr)
+    {
+        modeName = "";
+    }
+    for (int i = 0; i < 3; i++)
+    {
+        if (configName[i] == nullptr)
+        {
+            configName[i] = "";
+        }
+    }
+
     // 画面描画
     _ssd->setTextSize(1);
     _ssd->setTextColor(SSD1306_WHITE, SSD1306_BLACK);
