@@ -1,32 +1,31 @@
 import sensor
 import time
-import image
+#import image
 from pyb import UART
 import math
 
 #############################################################
 # ゴールの色取り用変数(黄色)
-#goal_yellow = (45, 100, -36, 15, 26, 127)
-goal_yellow = (73, 97, -15, -1, 22, 96) #old
+goal_yellow = (58, 100, -36, 15, 26, 127) #new
+#goal_yellow = (58, 100, -36, 15, 26, 127)  #old
 #############################################################
 # ゴールの色取り用変数(青色)
-#goal_blue = (26, 65, -11, 25, -56, -31)
-goal_blue = (35, 53, 3, 15, -42, -12) #old
+goal_blue = (62, 29, -13, 42, -113, -21) #new
+#goal_blue = (6, 38, -5, 20, -56, -10) #old
 #############################################################
 # コートの色（カーペット用）
-#court_green = (58, 79, -13, 0, -8, 16)
-court_green = (52, 87, -17, 11, -16, 20) #old
+court_green = (54, 94, -18, 9, -14, 15) #new
+#court_green = (54, 94, -18, 9, -14, 15) #old
 #############################################################
 # 画面の中央座標
 #old用
 #screen_center = [136, 120]
 #screen_short_r = 41
 #screen_long_r = 170
-
 #new用
-screen_center = [163, 98]
+screen_center = [164, 139]
 screen_short_r = 41
-screen_long_r = 166
+screen_long_r = 162
 
 court = [0, 0]
 yellow = [0, 0]

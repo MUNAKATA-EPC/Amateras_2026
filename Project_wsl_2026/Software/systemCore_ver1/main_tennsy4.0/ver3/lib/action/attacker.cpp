@@ -1,7 +1,7 @@
 #include "attacker.hpp"
 
-// #define LINE_MEMORY
-#define LINE_FIELD
+#define LINE_MEMORY
+// #define LINE_FIELD
 
 static PD pdGyro(0.55, 1.6); // ジャイロ用のPD調節値
 static PD pdCam(0.5, 0.2);   // カメラ用のPD調節値
@@ -62,69 +62,72 @@ void playAttacker(Attacker::Mode mode)
     int power = max_power;    // デフォルトは最大値
     bool line_escape = false; // ラインから離れる動きをするかどうか
 
-#ifdef LINE_MEMORY                   // 記憶方式
-    int lineSensor_memory_count = 0; // 初期化
-
-    if (lineRingDetected())
+    if (mode == Attacker::Mode::YELLOWGOAL || mode == Attacker::Mode::BLUEGOAL)
     {
-        double x = 0.0, y = 0.0;
-
-        for (uint8_t i = 0; i < 16; i++)
+        if (lineRingDetected()) // コート方式
         {
-            if (lineSensorDetected(i) == true || lineSensor_memory[i] == true)
-            {
-                x += cos(radians(22.5 * i));
-                y += sin(radians(22.5 * i));
-                lineSensor_memory[i] = true;
+            Serial.print(String(fieldDeg()) + " " + String(lineRingDeg()) + " " + String(diffDeg(fieldDeg(), lineRingDeg())));
 
-                lineSensor_memory_count++;
+            if (abs(diffDeg(fieldDeg(), lineRingDeg())) < 120) // ラインが半分以上出てしまったら
+            {
+                line_deg = lineRingDeg() + 180; // 今のライン角度と反対側に行く
+
+                line_escape = true; // ラインから離れる
+            }
+            else
+            {
+                power = (int)round(map(lineRingDis(), 0.0, 100.0, (double)max_power * 0.2, (double)max_power * 0.6)); // 出力を下げる
+
+                // line_deg = lineRingDeg(); // 今のライン角度
+                // line_escape = true;       // ラインから離れる
             }
         }
 
-        line_deg = (int)round(degrees(atan2(y, x)));
+        // ゴールが見えたらline_degはゴール方向
+        if (yellowGoalDetected() && yellowGoalDis() < 65)
+        {
+            line_deg = yellowGoalDeg();
+            line_escape = true; // ゴールから離れる
+        }
 
-        line_escape = true;
+        if (blueGoalDetected() && blueGoalDis() < 65)
+        {
+            line_deg = blueGoalDeg();
+            line_escape = true; // ゴールから離れる
+        }
     }
     else
     {
-        for (uint8_t i = 0; i < 16; i++)
-            lineSensor_memory[i] = false;
-    }
-#endif
+        int lineSensor_memory_count = 0; // 初期化
 
-#ifdef LINE_FIELD // コート方式
-    if (lineRingDetected())
-    {
-        Serial.print(String(fieldDeg()) + " " + String(lineRingDeg()) + " " + String(diffDeg(fieldDeg(), lineRingDeg())));
-
-        if (abs(diffDeg(fieldDeg(), lineRingDeg())) < 110) // ラインが半分以上出てしまったら
+        if (lineRingDetected()) // 記憶方式
         {
-            line_deg = lineRingDeg() + 180; // 今のライン角度と反対側に行く
+            double x = 0.0, y = 0.0;
 
-            line_escape = true; // ラインから離れる
+            for (uint8_t i = 0; i < 16; i++)
+            {
+                if (lineSensorDetected(i) == true || lineSensor_memory[i] == true)
+                {
+                    x += cos(radians(22.5 * i));
+                    y += sin(radians(22.5 * i));
+                    lineSensor_memory[i] = true;
+
+                    lineSensor_memory_count++;
+                }
+            }
+
+            line_deg = (int)round(degrees(atan2(y, x)));
+
+            line_escape = true;
         }
         else
         {
-            // power = (int)round(map(lineRingDis(), 0.0, 100.0, (double)max_power * 0.2, (double)max_power * 0.6)); // 出力を下げる
-
-            line_deg = lineRingDeg(); // 今のライン角度
-            line_escape = true;       // ラインから離れる
+            for (uint8_t i = 0; i < 16; i++)
+                lineSensor_memory[i] = false;
         }
     }
-#endif
 
-    // ゴールが見えたらline_degはゴール方向
-    if (yellowGoalDetected() && yellowGoalDis() < 70)
-    {
-        line_deg = yellowGoalDeg();
-        line_escape = true; // ゴールから離れる
-    }
-
-    if (blueGoalDetected() && blueGoalDis() < 70)
-    {
-        line_deg = blueGoalDeg();
-        line_escape = true; // ゴールから離れる
-    }
+    const int ir_near_dis = 600; // IRセンサーが近いと判断する距離
 
     // 制御
     if (line_escape)
@@ -133,37 +136,30 @@ void playAttacker(Attacker::Mode mode)
     }
     else if (irDetected())
     {
-        if (abs(irDeg()) <= 13)
+        if (abs(irDeg()) <= 10)
         {
-            motorsMove(0, power);
-        } /*
-        else if (abs(irDeg()) <= 18)
-         {
- #define HOLD_DIS 628.0
- #define MAX_POWER 60.0
-
-             motorsPdProcess(&pdGyro, bnoDeg(), 0);
-
-             Vector hold_vec(HOLD_DIS, 0, irX(), irY());
-
-             hold_vec = hold_vec * MAX_POWER / hold_vec.length();
-
-             motorsVectorMove(&hold_vec);
-         }*/
-        else if (abs(irDeg()) <= 16 && irDis() < 750)
+            if (irDis() < ir_near_dis)
+                motorsMove(0, power);
+            else
+                motorsMove(irDeg(), power);
+        }
+        else if (abs(irDeg()) <= 15)
         {
-            motorsMove(mapDeg(irDeg(), 16, 50, MapMode::HIREI), 50);
+            if (irDis() < ir_near_dis)
+                motorsMove(mapDeg(irDeg(), 15, 90, MapMode::HIREI), power * 0.7);
+            else
+                motorsMove(irDeg(), power);
         }
         else
         {
             double diffMawarikomiDeg = 0.0;
-            if (irDis() > 750)
-                diffMawarikomiDeg = 0;
+            if (irDis() < ir_near_dis)
+                diffMawarikomiDeg = irVal() * 0.08;
             else
-                diffMawarikomiDeg = irVal() * 0.07;
+                diffMawarikomiDeg = 0.0;
 
-            if (abs(irDeg()) > 76)
-                diffMawarikomiDeg += 30.0;
+            if (abs(irDeg()) > 90)
+                diffMawarikomiDeg += 25.0;
 
             motorsMove(irDeg() > 0 ? irDeg() + (int)diffMawarikomiDeg : irDeg() - (int)diffMawarikomiDeg, power);
         }
@@ -173,21 +169,3 @@ void playAttacker(Attacker::Mode mode)
         motorsPdMove();
     }
 }
-
-/*
-#define HOLD_DIS 30.0
-#define MAX_POWER 60.0
-
-void playAttacker(Attacker::Mode mode)
-{
-    motorsPdProcess(&pdGyro, bnoDeg(), 0);
-
-    Vector hold_vec(HOLD_DIS, 0, irX(), irY());
-
-    hold_vec = hold_vec;
-
-    Vector forward_vec(irDeg(), 0);
-
-    motorsVectorMove(&hold_vec);
-}
-*/
