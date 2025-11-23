@@ -138,7 +138,7 @@ void playAttacker(Attacker::Mode mode)
     }
     else if (irDetected())
     {
-        if (abs(irDeg()) < 12)
+        if (abs(irDeg()) < 10)
         {
             motorsMove(0, power);
         }
@@ -146,11 +146,11 @@ void playAttacker(Attacker::Mode mode)
         {
             if (irDis() < ir_front_near_dis)
             {
-                motorsMove(mapDeg(irDeg(), 40, 57, MapMode::HIREI), power * 0.81);
+                motorsMove(mapDeg(irDeg(), 40, 55, MapMode::HIREI), power * 0.81);
             }
             else
             {
-                motorsMove(mapDeg(irDeg(), 40, 57, MapMode::HIREI), power * 0.81);
+                motorsMove(mapDeg(irDeg(), 40, 55, MapMode::HIREI), power * 0.81);
             }
         }
         else
