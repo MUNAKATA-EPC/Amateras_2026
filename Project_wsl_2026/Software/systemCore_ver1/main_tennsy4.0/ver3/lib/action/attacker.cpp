@@ -68,7 +68,7 @@ void playAttacker(Attacker::Mode mode)
         {
             Serial.print(String(fieldDeg()) + " " + String(lineRingDeg()) + " " + String(diffDeg(fieldDeg(), lineRingDeg())));
 
-            if (abs(diffDeg(fieldDeg(), lineRingDeg())) < 120) // ラインが半分以上出てしまったら
+            if (abs(diffDeg(fieldDeg(), lineRingDeg())) < 115) // ラインが半分以上出てしまったら
             {
                 line_deg = lineRingDeg() + 180; // 今のライン角度と反対側に行く
 
@@ -76,10 +76,10 @@ void playAttacker(Attacker::Mode mode)
             }
             else
             {
-                power = (int)round(map(lineRingDis(), 0.0, 100.0, (double)max_power * 0.2, (double)max_power * 0.6)); // 出力を下げる
+                // power = (int)round(map(lineRingDis(), 0.0, 100.0, (double)max_power * 0.2, (double)max_power * 0.6)); // 出力を下げる
 
-                // line_deg = lineRingDeg(); // 今のライン角度
-                // line_escape = true;       // ラインから離れる
+                line_deg = lineRingDeg(); // 今のライン角度
+                line_escape = true;       // ラインから離れる
             }
         }
 
@@ -127,7 +127,9 @@ void playAttacker(Attacker::Mode mode)
         }
     }
 
-    const int ir_near_dis = 600; // IRセンサーが近いと判断する距離
+    const int ir_near_dis = 750; // IRセンサーが近いと判断する距離
+
+    const int ir_front_near_dis = 620; // IRセンサーが近いと判断する距離
 
     // 制御
     if (line_escape)
@@ -136,30 +138,31 @@ void playAttacker(Attacker::Mode mode)
     }
     else if (irDetected())
     {
-        if (abs(irDeg()) <= 10)
+        if (abs(irDeg()) < 12)
         {
-            if (irDis() < ir_near_dis)
-                motorsMove(0, power);
-            else
-                motorsMove(irDeg(), power);
+            motorsMove(0, power);
         }
-        else if (abs(irDeg()) <= 15)
+        else if (abs(irDeg()) <= 40)
         {
-            if (irDis() < ir_near_dis)
-                motorsMove(mapDeg(irDeg(), 15, 90, MapMode::HIREI), power * 0.7);
+            if (irDis() < ir_front_near_dis)
+            {
+                motorsMove(mapDeg(irDeg(), 40, 57, MapMode::HIREI), power * 0.81);
+            }
             else
-                motorsMove(irDeg(), power);
+            {
+                motorsMove(mapDeg(irDeg(), 40, 57, MapMode::HIREI), power * 0.81);
+            }
         }
         else
         {
             double diffMawarikomiDeg = 0.0;
             if (irDis() < ir_near_dis)
-                diffMawarikomiDeg = irVal() * 0.08;
+                diffMawarikomiDeg = irVal() * 0.166;
             else
                 diffMawarikomiDeg = 0.0;
 
-            if (abs(irDeg()) > 90)
-                diffMawarikomiDeg += 25.0;
+            if (abs(irDeg()) < 90)
+                diffMawarikomiDeg += 30.0;
 
             motorsMove(irDeg() > 0 ? irDeg() + (int)diffMawarikomiDeg : irDeg() - (int)diffMawarikomiDeg, power);
         }
