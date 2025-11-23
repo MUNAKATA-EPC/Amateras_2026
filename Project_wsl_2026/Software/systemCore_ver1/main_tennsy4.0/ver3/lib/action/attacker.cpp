@@ -152,7 +152,7 @@ void playAttacker(Attacker::Mode mode)
          }*/
         else if (abs(irDeg()) <= 16 && irDis() < 750)
         {
-            motorsMove(mapDeg(irDeg(), 20, 90, MapMode::HIREI), 50);
+            motorsMove(mapDeg(irDeg(), 16, 50, MapMode::HIREI), 50);
         }
         else
         {
@@ -160,10 +160,10 @@ void playAttacker(Attacker::Mode mode)
             if (irDis() > 750)
                 diffMawarikomiDeg = 0;
             else
-                diffMawarikomiDeg = irVal() * 0.067;
+                diffMawarikomiDeg = irVal() * 0.07;
 
-            if (abs(irDeg()) > 90)
-                diffMawarikomiDeg += 20.0;
+            if (abs(irDeg()) > 76)
+                diffMawarikomiDeg += 30.0;
 
             motorsMove(irDeg() > 0 ? irDeg() + (int)diffMawarikomiDeg : irDeg() - (int)diffMawarikomiDeg, power);
         }

@@ -2,16 +2,16 @@
 #include "movement_average.hpp"
 #include "multiplexer.hpp"
 
-/*黒ロボット用*/
+// #define NEW
+#define OLD
 
 const int head_byte = 0xAA; // 同期ヘッダー格納用
 
 // IRセンサーのピン番号。前から反時計回りに指定
 // センサー番号0がロボットの正面方向に対応していることを前提とします。
 const int IRsensor_pin[16] = {0, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1};
-
-const double ir_gain = 1;
-const double ir_adjust = 0;
+// const double ir_gain[16] = {1, 0.9, 0.9, 0.9, 0.9, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+const double ir_gain[16] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
 
 int IRsensor_value[16]; // IRセンサーの値を格納 (制約・ゲイン適用後, 0～1023)
 int IRsensor_min_index; // IRセンサーで最も反応の小さいセンサーの配列番号 (ボールの方向を示す)
@@ -30,8 +30,8 @@ void setup()
 
   // マルチプレクサのピン設定 (実際の配線に合わせてください)
   ir_mux.set_pin(1, 2, 3, 4, 5, -1);
-  // マルチプレクサの初期化、ここではアナログピン10を使用
-  ir_mux.init(10);
+  // マルチプレクサの初期化
+  ir_mux.init(100);
 
   for (int i = 0; i < 16; i++)
   {
@@ -53,9 +53,11 @@ void loop()
     if (ir_ave[i].cant_compute()) // 移動平均がまだ計算できない場合 (データ不足)
       ave_value = 1023;           // 無信号（最大値）を代入
 
+    // int ave_value = ir_mux.read(IRsensor_pin[i]);
+
     // ゲインと調整値を適用し、四捨五入してから値を0～1023の範囲に制限
     // これにより、小数点以下の丸め誤差を防ぐ
-    IRsensor_value[i] = constrain((int)round(ave_value * ir_gain + ir_adjust), 0, 1023);
+    IRsensor_value[i] = constrain((int)round(ave_value), 0, 1023);
 
     // 最も反応の小さいセンサー（最も強い信号）を探す
     if (IRsensor_value[i] < IRsensor_value[IRsensor_min_index])
@@ -95,7 +97,7 @@ void loop()
       double angle_rad = radians(IRsensor_min_around_index[i] * 22.5);
 
       // (1023.0 - IRsensor_value)で重みを算出
-      double weight = (1023.0 - IRsensor_value[IRsensor_min_around_index[i]]);
+      double weight = (1023.0 - IRsensor_value[IRsensor_min_around_index[i]] * ir_gain[IRsensor_min_around_index[i]]);
 
       IRball_of_x += cos(angle_rad) * weight; // 重みを加算
       IRball_of_y += sin(angle_rad) * weight; // 重みを加算
@@ -116,6 +118,14 @@ void loop()
     // 値を0.0～1023.0の範囲に制限し、整数に変換
     IRball_value_sub = constrain(IRball_value_sub, 0.0, 1023.0);
     IRball_value = (int)IRball_value_sub;
+
+#ifdef NEW
+    IRball_value += 0;
+#endif
+
+#ifdef OLD
+    IRball_value += 40;
+#endif
   }
 
   // IRball_deg と IRball_value を int16_t 型に変換

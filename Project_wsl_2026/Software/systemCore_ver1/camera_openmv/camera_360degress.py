@@ -6,18 +6,27 @@ import math
 
 #############################################################
 # ゴールの色取り用変数(黄色)
-goal_yellow = (45, 100, -36, 15, 26, 127)
+#goal_yellow = (45, 100, -36, 15, 26, 127)
+goal_yellow = (73, 97, -15, -1, 22, 96) #old
 #############################################################
 # ゴールの色取り用変数(青色)
-goal_blue = (26, 65, -11, 25, -56, -31)
+#goal_blue = (26, 65, -11, 25, -56, -31)
+goal_blue = (35, 53, 3, 15, -42, -12) #old
 #############################################################
 # コートの色（カーペット用）
-court_green = (58, 79, -13, 0, -8, 16)
+#court_green = (58, 79, -13, 0, -8, 16)
+court_green = (52, 87, -17, 11, -16, 20) #old
 #############################################################
 # 画面の中央座標
-screen_center = [136, 120]
+#old用
+#screen_center = [136, 120]
+#screen_short_r = 41
+#screen_long_r = 170
+
+#new用
+screen_center = [163, 98]
 screen_short_r = 41
-screen_long_r = 170
+screen_long_r = 166
 
 court = [0, 0]
 yellow = [0, 0]
@@ -57,7 +66,7 @@ sensor.skip_frames(time=2000)      # 設定が有効になるまで待機
 # sensor.set_auto_gain(False, gain_db=8)             # 自動ゲインオフ、ゲインを低めに
 # sensor.set_auto_whitebal(False)                    # ホワイトバランス固定
 # sensor.set_auto_exposure(False, exposure_us=1800)  # 露出を短くして暗めに
-# sensor.set_brightness(0)                           # さらに暗く（-3 〜 +3）
+sensor.set_brightness(-1)                           # さらに暗く（-3 〜 +3）
 
 clock = time.clock()
 uart = UART(3, 115200, timeout_char=1000)
@@ -85,6 +94,7 @@ while True:
 
     # 各方向と距離の初期化
     court_deg_temp = 0
+    court_deg = 0
 
     yellow_detected = False
     yellow_deg = 0xFF
