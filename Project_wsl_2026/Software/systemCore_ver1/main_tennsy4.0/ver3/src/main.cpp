@@ -46,7 +46,7 @@ void setup()
     motorsSetDegPosition(315, 45, 225, 135); // モータの位置をセット
 
     // デジタル
-    kicker1.init(2, 3, 700);
+    kicker1.init(2, 3, 1500);
     catchSensor.init(6); // キッカー用
 
     enterButton.init(11, INPUT_PULLDOWN); // ui用
@@ -118,7 +118,7 @@ void loop()
             switch (uiMeterNumber())
             {
             case 0:
-                uiPrint(0, 8, "[ir]\n deg:" + String(irDeg()) + "\n dis:" + String(irDis()));
+                uiPrint(0, 8, "[ir]\n deg:" + String(irDeg()) + "\n dis:" + String(irDis()) + "\n val:" + String(irVal()));
                 uiDrawCircleMeter(92, 32, 20, "deg", irDeg());
                 break;
             case 1:
@@ -146,15 +146,15 @@ void loop()
                 uiDrawCircleMeter(92, 32, 20, "deg", fieldDeg());
                 break;
             case 7:
-                uiPrint(0, 8, "[none]");
+                uiPrint(0, 8, "[catch]\n react:" + String(catchSensor.read()));
                 break;
             }
         }
         else if (uiModeDecided()) // 動作設定表示
         {
-            //uiConfigPrintAndGet(1, "goal Range", 5, -10, 10);
-            //uiConfigPrintAndGet(2, "goal Range", 5, -20, 10);
-            //uiConfigPrintAndGet(3, "goal Range", 10, -10, 20);
+            // uiConfigPrintAndGet(1, "goal Range", 5, -10, 10);
+            // uiConfigPrintAndGet(2, "goal Range", 5, -20, 10);
+            // uiConfigPrintAndGet(3, "goal Range", 10, -10, 20);
         }
 
         uiShow();

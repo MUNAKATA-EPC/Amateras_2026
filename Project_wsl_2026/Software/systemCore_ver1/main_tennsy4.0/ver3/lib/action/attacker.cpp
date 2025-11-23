@@ -1,12 +1,11 @@
 #include "attacker.hpp"
 
-#define LINE_MEMORY
-// #define LINE_FIELD
+// #define LINE_MEMORY
+#define LINE_FIELD
 
-static PD pdGyro(0.4, 1.6); // ジャイロ用のPD調節値
-static PD pdCam(0.5, 0.2);  // カメラ用のPD調節値
+static PD pdGyro(0.55, 1.6); // ジャイロ用のPD調節値
+static PD pdCam(0.5, 0.2);   // カメラ用のPD調節値
 
-static Timer camTimer;
 static Timer lineTimer;
 
 static int line_deg = 0xFF; // 計算したライン角度
@@ -16,9 +15,8 @@ static bool lineSensor_memory[16] = {false};
 
 void playAttacker(Attacker::Mode mode)
 {
-    // キャッチしたらゴール方向を一定時間向く
-    if (catchSensor.read() == HIGH)
-        camTimer.reset();
+    bool goal_detected = (mode == Attacker::Mode::YELLOWGOAL) ? yellowGoalDetected() : blueGoalDetected();
+    int goal_deg = (mode == Attacker::Mode::YELLOWGOAL) ? yellowGoalDeg() : blueGoalDeg();
 
     // PD制御
     PD *angle_pd = nullptr;
@@ -31,10 +29,11 @@ void playAttacker(Attacker::Mode mode)
     }
     else
     {
-        if (camTimer.msTime() < 1200 && camTimer.everCalled())
+        if (goal_detected)
         {
             angle_pd = &pdCam;
-            angle_pd_deg = yellowGoalDeg();
+
+            angle_pd_deg = goal_deg;
         }
         else
         {
@@ -46,10 +45,19 @@ void playAttacker(Attacker::Mode mode)
     motorsPdProcess(angle_pd, angle_pd_deg, 0);
 
     // キッカー
-    kicker1.kick(catchSensor.read() == HIGH);
+    bool is_catching = (catchSensor.read() == HIGH);
+
+    if (mode == Attacker::Mode::GYRO)
+    {
+        kicker1.kick(is_catching);
+    }
+    else
+    {
+        kicker1.kick(is_catching && goal_detected && abs(goal_deg) < 50);
+    }
 
     // ライン計算と出力の計算
-    const int max_power = 90; // パワーの最大値
+    const int max_power = 85; // パワーの最大値
 
     int power = max_power;    // デフォルトは最大値
     bool line_escape = false; // ラインから離れる動きをするかどうか
@@ -89,7 +97,7 @@ void playAttacker(Attacker::Mode mode)
     {
         Serial.print(String(fieldDeg()) + " " + String(lineRingDeg()) + " " + String(diffDeg(fieldDeg(), lineRingDeg())));
 
-        if (abs(diffDeg(fieldDeg(), lineRingDeg())) < 90) // ラインが半分以上出てしまったら
+        if (abs(diffDeg(fieldDeg(), lineRingDeg())) < 110) // ラインが半分以上出てしまったら
         {
             line_deg = lineRingDeg() + 180; // 今のライン角度と反対側に行く
 
@@ -97,10 +105,10 @@ void playAttacker(Attacker::Mode mode)
         }
         else
         {
-            power = (int)round(map(lineRingDis(), 0.0, 100.0, (double)max_power * 0.4, (double)max_power) * 0.6); // 出力を下げる
+            // power = (int)round(map(lineRingDis(), 0.0, 100.0, (double)max_power * 0.2, (double)max_power * 0.6)); // 出力を下げる
 
-            // line_deg = lineRingDeg(); // 今のライン角度
-            // line_escape = true;       // ラインから離れる
+            line_deg = lineRingDeg(); // 今のライン角度
+            line_escape = true;       // ラインから離れる
         }
     }
 #endif
@@ -125,23 +133,37 @@ void playAttacker(Attacker::Mode mode)
     }
     else if (irDetected())
     {
-        if (abs(irDeg()) <= 12)
+        if (abs(irDeg()) <= 13)
         {
             motorsMove(0, power);
-        }
-        else if (abs(irDeg()) < 40 && irDis() < 50)
+        } /*
+        else if (abs(irDeg()) <= 18)
+         {
+ #define HOLD_DIS 628.0
+ #define MAX_POWER 60.0
+
+             motorsPdProcess(&pdGyro, bnoDeg(), 0);
+
+             Vector hold_vec(HOLD_DIS, 0, irX(), irY());
+
+             hold_vec = hold_vec * MAX_POWER / hold_vec.length();
+
+             motorsVectorMove(&hold_vec);
+         }*/
+        else if (abs(irDeg()) <= 16 && irDis() < 750)
         {
-            motorsMove(mapDeg(irDeg(), 20, 80, MapMode::HIREI), power);
+            motorsMove(mapDeg(irDeg(), 20, 90, MapMode::HIREI), 50);
         }
         else
         {
-            double diffMawarikomiDeg;
-            if (irDis() > 50)
+            double diffMawarikomiDeg = 0.0;
+            if (irDis() > 750)
                 diffMawarikomiDeg = 0;
-            else if (irDis() > 20)
-                diffMawarikomiDeg = irVal() / 2;
             else
-                diffMawarikomiDeg = 45;
+                diffMawarikomiDeg = irVal() * 0.067;
+
+            if (abs(irDeg()) > 90)
+                diffMawarikomiDeg += 20.0;
 
             motorsMove(irDeg() > 0 ? irDeg() + (int)diffMawarikomiDeg : irDeg() - (int)diffMawarikomiDeg, power);
         }
@@ -151,3 +173,21 @@ void playAttacker(Attacker::Mode mode)
         motorsPdMove();
     }
 }
+
+/*
+#define HOLD_DIS 30.0
+#define MAX_POWER 60.0
+
+void playAttacker(Attacker::Mode mode)
+{
+    motorsPdProcess(&pdGyro, bnoDeg(), 0);
+
+    Vector hold_vec(HOLD_DIS, 0, irX(), irY());
+
+    hold_vec = hold_vec;
+
+    Vector forward_vec(irDeg(), 0);
+
+    motorsVectorMove(&hold_vec);
+}
+*/

@@ -71,6 +71,13 @@ void uiPrint(int x0, int y0, String msg)
 
     _ssd->print(msg_char);
 }
+// ssdプリント用
+void ssdPrint(String str)
+{
+    char buf[20];
+    str.toCharArray(buf, 20);
+    _ssd->print(buf);
+}
 // メータ描画用
 void uiDrawCircleMeter(int x0, int y0, int r, const char *s, int deg)
 {
@@ -185,9 +192,11 @@ void uiDrawMain(bool enterbtn, bool rightbtn, bool leftbtn)
     }
 
     // 表示
-    const char *actionName = nullptr;
-    const char *modeName = nullptr;
-    const char *configName[3] = {nullptr, nullptr, nullptr};
+    String actionName = "";
+    String modeName = "";
+
+    // CONFIG_DATA_LIMIT (4) から Run設定分 (1) を引いた3個のConfig名を表示
+    String configName[3] = {""};
 
     switch (_actionNumber)
     {
@@ -211,8 +220,8 @@ void uiDrawMain(bool enterbtn, bool rightbtn, bool leftbtn)
                 break;
             }
             configName[0] = "speed";
-            configName[1] = "speed";
-            configName[2] = "speed";
+            configName[1] = "p";
+            configName[2] = "d";
         }
         break;
 
@@ -285,29 +294,16 @@ void uiDrawMain(bool enterbtn, bool rightbtn, bool leftbtn)
         break;
     }
 
-    if (actionName == nullptr)
-    {
-        actionName = "";
-    }
-    if (modeName == nullptr)
-    {
-        modeName = "";
-    }
-    for (int i = 0; i < 3; i++)
-    {
-        if (configName[i] == nullptr)
-        {
-            configName[i] = "";
-        }
-    }
-
     // 画面描画
     _ssd->setTextSize(1);
     _ssd->setTextColor(SSD1306_WHITE, SSD1306_BLACK);
     _ssd->setCursor(0, 0);
+
     // action表示
     _ssd->print("> ");
-    _ssd->print(actionName);
+
+    ssdPrint(actionName);
+
     if (!_actionDecided)
     {
         _ssd->print(" <");
@@ -318,7 +314,7 @@ void uiDrawMain(bool enterbtn, bool rightbtn, bool leftbtn)
 
         // mode表示
         _ssd->print(" > ");
-        _ssd->print(modeName);
+        ssdPrint(modeName);
         if (!_modeDecided)
         {
             _ssd->println(" <");
@@ -326,28 +322,46 @@ void uiDrawMain(bool enterbtn, bool rightbtn, bool leftbtn)
         else
         {
             _ssd->println("");
+
+            // run系のプリント
+            String run_str = (_configNumber == 0) ? "|" : " ";
+            run_str += "Run:";
+            run_str += _configData[0] ? "on" : "off";
+
             _ssd->setTextSize(2);
-            if (_configNumber == 0)
+            ssdPrint(run_str);
+            _ssd->println(""); // Run表示の後に改行を追加
+
+            // config系のプリント
+            int maxLen = 0;
+            for (int i = 0; i < 3; i++)
             {
-                _ssd->print("|Run:");
+                int len = (int)configName[i].length();
 
-                String buf_str = (_configData[0]) ? "on" : "off";
-                char buf_char[5];
-                buf_str.toCharArray(buf_char, 5);
-
-                _ssd->print(buf_char);
+                if (len > maxLen)
+                    maxLen = len;
             }
-            else
+
+            // 文字列の末尾にスペースを詰める処理
+            for (int i = 0; i < 3; i++)
             {
-                _ssd->print(" Run:off");
+                // スペースを詰める幅を決定
+                int behindLen = maxLen - configName[i].length();
+
+                for (int ii = 0; ii < behindLen; ii++)
+                    configName[i] += " ";
+            }
+
+            String config_str = "";
+            for (int i = 0; i < 3; i++)
+            {
+                // 選択されているConfig (i+1) をチェック
+                config_str = (_configNumber == (i + 1)) ? " |" : "  ";
+                // configName[i] (スペース調整済み) とコロン':'を結合
+                config_str += configName[i] + ":" + String(_configData[(i + 1)]) + "\n";
 
                 _ssd->setTextSize(1);
-                _ssd->println("");
-                for (int i = 0; i < _configNumber; i++)
-                {
-                    _ssd->println("");
-                }
-                _ssd->print(" |");
+                ssdPrint(config_str);
             }
         }
     }
@@ -361,4 +375,3 @@ bool uiRunning() { return _modeDecided && _actionDecided && _configData[0]; }
 int uiActionNumber() { return _actionNumber; }
 int uiModeNumber() { return _modeNumber; }
 int uiConfigNumber() { return _configNumber; }
-bool uiConfigData(uint8_t index) { return _configData[index]; }

@@ -7,6 +7,7 @@ static Timer timer;
 
 void playTest()
 {
+    /*
     motorsPdProcess(&pdGyro, bnoDeg(), 0);
 
     if (!timer.everCalled() || timer.msTime() > 4000)
@@ -27,5 +28,15 @@ void playTest()
     else
     {
         motorsMove(-180, 60);
+    }
+    */
+
+    if (resetButton.isReleased())
+    {
+        kicker1.kick(true);
+    }
+    else
+    {
+        kicker1.kick(false);
     }
 }

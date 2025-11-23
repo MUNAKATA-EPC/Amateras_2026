@@ -12,8 +12,8 @@ private:
 public:
     // コンストラクタ
     Vector();
-    Vector(double x, double y, bool useXY);     // ベクトル生成 方法1
-    Vector(int deg, double length); // ベクトル生成 方法2
+    Vector(double x0, double y0, double x1, double y1); // ベクトル生成 方法1
+    Vector(int deg, double length);                     // ベクトル生成 方法2
 
     // 演算
     Vector operator+(const Vector &other) const; // ベクトル同士の足し算

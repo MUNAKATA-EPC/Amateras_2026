@@ -11,3 +11,6 @@ bool irDetected();
 int irDeg();
 int irVal();
 double irDis();
+
+double irX();
+double irY();

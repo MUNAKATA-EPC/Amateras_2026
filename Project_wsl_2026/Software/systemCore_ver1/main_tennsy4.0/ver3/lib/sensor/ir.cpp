@@ -22,8 +22,8 @@ bool irInit(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHeader)
     bool success = false;
     while (!success && timer.msTime() < 100)
     {
-        success = _serial->available() > 0;  // 1個以上データが来たら成功しているとみなす
-        delay(10);                           // irの通信開始待ち
+        success = _serial->available() > 0; // 1個以上データが来たら成功しているとみなす
+        delay(10);                          // irの通信開始待ち
     }
 
     return success;
@@ -61,7 +61,9 @@ void irUpdate()
             else
             {
                 _detected = true;
-                _dis = map(constrain(_val, 0, 300), 0, 300, 300, 0);
+                _dis = map(_val, 0, 1023, 1023, 0);
+                if (_dis < 0)
+                    _dis = 0;
             }
         }
         else
@@ -75,3 +77,19 @@ bool irDetected() { return _detected; }
 int irDeg() { return _deg; }
 int irVal() { return _val; }
 double irDis() { return _dis; }
+
+double irX()
+{
+    if (!_detected)
+        return 0.0;
+    double rad = radians(_deg);
+    return _dis * cos(rad);
+}
+
+double irY()
+{
+    if (!_detected)
+        return 0.0;
+    double rad = radians(_deg);
+    return _dis * sin(rad);
+}
