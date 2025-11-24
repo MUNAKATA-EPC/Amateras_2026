@@ -16,7 +16,7 @@ void Dribbler::setup()
     if (!_setupTimer.everCalled())
         _setupTimer.start();
 
-    if (_setupTimer.msTime() < 4000)
+    if (_setupTimer.msTime() < 4000UL)
     {
         _esc.writeMicroseconds(_min);
         _setup_count = _max;
@@ -27,7 +27,7 @@ void Dribbler::setup()
         if (!_setup_flag)
         {
             _esc.writeMicroseconds(_setup_count);
-            _setup_count -= (_setupTimer.msTime() - 4000) / 80;
+            _setup_count -= (_setupTimer.msTime() - 4000UL) / 80UL;
         }
         else
         {

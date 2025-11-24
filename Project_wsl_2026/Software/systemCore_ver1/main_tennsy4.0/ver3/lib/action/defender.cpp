@@ -1,15 +1,17 @@
 #include "defender.hpp"
 
 // PD制御
-static PD pdGyro(0.4, 1.6); // ジャイロ用のPD調節値
-static PD pdCam(0.9, 1.1);  // カメラ用のPD調節値
+static PD pdGyro(0.4f, 1.6f); // ジャイロ用のPD調節値
+static PD pdCam(0.9f, 1.1f);  // カメラ用のPD調節値
 
 // 攻撃ゴールの位置
 static bool attack_goal_detected;
-static int attack_goal_deg, attack_goal_dis;
+static int attack_goal_deg;
+static float attack_goal_dis;
 // 守備ゴールの位置
 static bool defence_goal_detected;
-static int defence_goal_deg, defence_goal_dis;
+static int defence_goal_deg;
+static float defence_goal_dis;
 
 // 動き
 static Vector LineTraceVec(PD *pd, int power);                               // ラインの中心に行こうとする（D成分は使わない）
@@ -47,13 +49,13 @@ void playDefender(Defender::Mode mode)
     const int defence_limit_deg = 60;  // ボールの守備を継続する最大角
     const int defence_normal_deg = 30; // 対角線を使用せずディフェンスする最大角
 
-    if (defence_goal_detected && defence_goal_dis < 100.0) // 守備ゴールが見え、一定距離以内にゴールがあるなら
+    if (defence_goal_detected && defence_goal_dis < 100.0f) // 守備ゴールが見え、一定距離以内にゴールがあるなら
     {
         if (defence_goal_deg > 180 - defence_max_deg || defence_goal_deg < defence_max_deg - 180) // 後ろにゴールがあるなら(60~-60)（でフェンダーとしての動きにうつる）
         {
             if (lineRingDetected()) // ライン上にいるなら
             {
-                PD pd(0.92, 0.0); // ライントレースのpd成分（d成分は使わない）
+                PD pd(0.92f, 0.0f); // ライントレースのpd成分（d成分は使わない）
                 Vector defence_vec;
 
                 if (irDetected()) // ボールが見えるなら
@@ -102,7 +104,7 @@ void playDefender(Defender::Mode mode)
             }
             else
             {
-                if (defence_goal_dis < 65.0) // ゴールが近くにあるなら（ラインより前）
+                if (defence_goal_dis < 65.0f) // ゴールが近くにあるなら（ラインより前）
                 {
                     motorsMove(defence_goal_deg + 180, max_power); // ゴールから離れる
                 }
@@ -151,8 +153,8 @@ void playDefender(Defender::Mode mode)
 Vector LineTraceVec(PD *pd, int power)
 {
     pd->useD(false);                 // D成分は使わなくて十分
-    pd->process(lineRingDis(), 0.0); // 計算
-    double len = map(fabs(pd->output()), 0.0, 100.0, 0, power);
+    pd->process(lineRingDis(), 0.0f); // 計算
+    double len = map(fabs(pd->output()), 0.0f, 100.0f, 0.0f, power);
 
     return getVec(lineRingDeg(), len);
 }
@@ -165,17 +167,17 @@ Vector LineTraceAndTargetVec(PD *pd_line_trace, int deg, int power)
     // ライントレースベクトルの算出
     Vector line_trace_vec = LineTraceVec(pd_line_trace, power);
 
-    double behind_len = sqrt(power * power - line_trace_vec.length() * line_trace_vec.length()); // 残りのベクトルの長さ
+    float behind_len = sqrtf(power * power - line_trace_vec.length() * line_trace_vec.length()); // 残りのベクトルの長さ
 
     // 接線ベクトル角度の算出（lineRingDeg()の接線方向の内degに近いほう）
     int round_line_ring_deg = areaIndexFromDeg(lineRingDeg(), 8) * 360 / 8;
-    int sessen_deg = lineRingDeg() < 0.1 ? nearSeesenDeg(0, deg) : nearSeesenDeg(round_line_ring_deg, deg);
+    int sessen_deg = nearSeesenDeg(round_line_ring_deg, deg);
     // 接線ベクトル長さの算出
-    double sessen_len;
+    float sessen_len;
     if (abs(deg) < 6) // 目標角度がほぼ前
-        sessen_len = 0.0;
+        sessen_len = 0.0f;
     else if (abs(deg) < 30)                                     // 目標角度が前付近
-        sessen_len = map(abs(deg), 0.0, 30.0, 0.0, behind_len); // 角度によってp制御
+        sessen_len = map(abs(deg), 0.0f, 30.0f, 0.0f, behind_len); // 角度によってp制御
     else                                                        // 目標角度が前付近に無い
         sessen_len = behind_len;                                // マックスで動かす
     // 接線ベクトル算出
@@ -185,11 +187,9 @@ Vector LineTraceAndTargetVec(PD *pd_line_trace, int deg, int power)
     Vector vec = line_trace_vec + sessen_vec;
     if (vec.length() > power)
     {
-        double scale = power / vec.length();
+        float scale = power / vec.length();
         vec = vec * scale;
     }
-
-    // Serial.print(String(line_trace_vec.length()) + "  " + String(sessen_vec.length()) + "  " + String(vec.length()));
 
     return vec;
 }

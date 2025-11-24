@@ -1,7 +1,7 @@
 #include "openmv.hpp"
 
 static HardwareSerial *_serial = nullptr;
-static uint32_t _baudrate = 9600;
+static uint32_t _baudrate = 9600U;
 static uint8_t _frameHeader = 0xAA;
 
 // コート
@@ -10,11 +10,11 @@ static int _fieldDeg = 0xFF;
 // 青ゴール
 static bool _blueGoalDetected = false;
 static int _blueGoalDeg = 0xFF;
-static double _blueGoalDis = 0xFF;
+static float _blueGoalDis = 0xFF;
 // 黄ゴール
 static bool _yellowGoalDetected = false;
 static int _yellowGoalDeg = 0xFF;
-static double _yellowGoalDis = 0xFF;
+static float _yellowGoalDis = 0xFF;
 
 bool openmvInit(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHeader)
 {
@@ -27,10 +27,10 @@ bool openmvInit(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHeader)
     Timer timer;
     timer.reset();
     bool success = false;
-    while (!success && timer.msTime() < 100)
+    while (!success && timer.msTime() < 100UL)
     {
-        success = _serial->available() > 0;  // 1個以上データが来たら成功しているとみなす
-        delay(10);                           // irの通信開始待ち
+        success = _serial->available() > 0; // 1個以上データが来たら成功しているとみなす
+        delay(10);                          // irの通信開始待ち
     }
 
     return success;
@@ -53,27 +53,27 @@ void openmvUpdate()
             _serial->read(); // ヘッダーを捨てる
 
             // コートの角度
-            uint8_t low1 = _serial->read();                                // ボールの角度の下位バイトを読み取る
-            uint8_t high1 = _serial->read();                               // ボールの角度の上位バイトを読み取る
+            uint8_t low1 = _serial->read();                               // ボールの角度の下位バイトを読み取る
+            uint8_t high1 = _serial->read();                              // ボールの角度の上位バイトを読み取る
             _fieldDeg = int16_t((uint16_t(high1) << 8) | uint16_t(low1)); // 上位バイトと下位バイトをつなげる
             _fieldDetected = (_fieldDeg != 0xFF);
 
             // 黄色ゴールの角度・距離
-            uint8_t low2 = _serial->read();                                     // ボールの角度の下位バイトを読み取る
-            uint8_t high2 = _serial->read();                                    // ボールの角度の上位バイトを読み取る
+            uint8_t low2 = _serial->read();                                    // ボールの角度の下位バイトを読み取る
+            uint8_t high2 = _serial->read();                                   // ボールの角度の上位バイトを読み取る
             _yellowGoalDeg = int16_t((uint16_t(high2) << 8) | uint16_t(low2)); // 上位バイトと下位バイトをつなげる
-            uint8_t low3 = _serial->read();                                     // ボールの角度の下位バイトを読み取る
-            uint8_t high3 = _serial->read();                                    // ボールの角度の上位バイトを読み取る
-            _yellowGoalDis = int16_t((uint16_t(high3) << 8) | uint16_t(low3)); // 上位バイトと下位バイトをつなげる
+            uint8_t low3 = _serial->read();                                    // ボールの角度の下位バイトを読み取る
+            uint8_t high3 = _serial->read();                                   // ボールの角度の上位バイトを読み取る
+            _yellowGoalDis = float((uint16_t(high3) << 8) | uint16_t(low3));   // 上位バイトと下位バイトをつなげる
             _yellowGoalDetected = (_yellowGoalDeg != 0xFF);
 
             // 青色ゴールの角度・距離
-            uint8_t low4 = _serial->read();                                   // ボールの角度の下位バイトを読み取る
-            uint8_t high4 = _serial->read();                                  // ボールの角度の上位バイトを読み取る
+            uint8_t low4 = _serial->read();                                  // ボールの角度の下位バイトを読み取る
+            uint8_t high4 = _serial->read();                                 // ボールの角度の上位バイトを読み取る
             _blueGoalDeg = int16_t((uint16_t(high4) << 8) | uint16_t(low4)); // 上位バイトと下位バイトをつなげる
-            uint8_t low5 = _serial->read();                                   // ボールの角度の下位バイトを読み取る
-            uint8_t high5 = _serial->read();                                  // ボールの角度の上位バイトを読み取る
-            _blueGoalDis = int16_t((uint16_t(high5) << 8) | uint16_t(low5)); // 上位バイトと下位バイトをつなげる
+            uint8_t low5 = _serial->read();                                  // ボールの角度の下位バイトを読み取る
+            uint8_t high5 = _serial->read();                                 // ボールの角度の上位バイトを読み取る
+            _blueGoalDis = float((uint16_t(high5) << 8) | uint16_t(low5));   // 上位バイトと下位バイトをつなげる
             _blueGoalDetected = (_blueGoalDeg != 0xFF);
         }
         else
@@ -88,8 +88,8 @@ int fieldDeg() { return _fieldDeg; }
 
 bool blueGoalDetected() { return _blueGoalDetected; }
 int blueGoalDeg() { return _blueGoalDeg; }
-double blueGoalDis() { return _blueGoalDis; }
+float blueGoalDis() { return _blueGoalDis; }
 
 bool yellowGoalDetected() { return _yellowGoalDetected; }
 int yellowGoalDeg() { return _yellowGoalDeg; }
-double yellowGoalDis() { return _yellowGoalDis; }
+float yellowGoalDis() { return _yellowGoalDis; }

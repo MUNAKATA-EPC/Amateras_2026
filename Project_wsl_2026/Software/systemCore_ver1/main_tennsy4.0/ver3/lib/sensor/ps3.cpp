@@ -13,13 +13,13 @@ static int _stickLx = 0;
 static int _stickLy = 0;
 static bool _stickLeftDetected = false;
 static int _stickLeftDeg = 0xFF;
-static double _stickLeftDis = 0xFF;
+static float _stickLeftDis = 0xFF;
 // 右ステック
 static int _stickRx = 0;
 static int _stickRy = 0;
 static bool _stickRightDetected = false;
 static int _stickRightDeg = 0xFF;
-static double _stickRightDis = 0xFF;
+static float _stickRightDis = 0xFF;
 // ボタン（14個）
 static uint16_t buttonBitMask = 0;
 
@@ -94,8 +94,8 @@ void ps3Update()
                 _stickLeftDeg = (_stickLeftDeg - 90 + 360) % 360; // 調整
                 _stickLeftDeg = _stickLeftDeg < 180 ? _stickLeftDeg : 360 - _stickLeftDeg;
 
-                _stickLeftDis = sqrt(_stickLx * _stickLx + _stickLy * _stickLy); // 距離を算出
-                _stickLeftDis = constrain(_stickLeftDis, 0, 128);
+                _stickLeftDis = sqrtf(_stickLx * _stickLx + _stickLy * _stickLy); // 距離を算出
+                _stickLeftDis = constrain(_stickLeftDis, 0.0f, 128.0f);
             }
 
             if (_stickRx == 0 && _stickRy == 0)
@@ -112,8 +112,8 @@ void ps3Update()
                 _stickRightDeg = (_stickRightDeg - 90 + 360) % 360; // 調整
                 _stickRightDeg = _stickRightDeg < 180 ? _stickRightDeg : 360 - _stickRightDeg;
 
-                _stickRightDis = sqrt(_stickRx * _stickRx + _stickRy * _stickRy); // 距離を算出
-                _stickRightDis = constrain(_stickRightDis, 0, 128);
+                _stickRightDis = sqrtf(_stickRx * _stickRx + _stickRy * _stickRy); // 距離を算出
+                _stickRightDis = constrain(_stickRightDis, 0.0f, 128.0f);
             }
 
             // ボタン
@@ -134,8 +134,8 @@ bool ps3RightStickDetected() { return _stickRightDetected; }
 int ps3LeftStickDeg() { return _stickLeftDeg; }
 int ps3RightStickDeg() { return _stickRightDeg; }
 
-double ps3LeftStickDis() { return _stickLeftDis; }
-double ps3RightStickDis() { return _stickRightDis; }
+float ps3LeftStickDis() { return _stickLeftDis; }
+float ps3RightStickDis() { return _stickRightDis; }
 
 bool ps3ButtonIsPushing(ButtonDataType type)
 {

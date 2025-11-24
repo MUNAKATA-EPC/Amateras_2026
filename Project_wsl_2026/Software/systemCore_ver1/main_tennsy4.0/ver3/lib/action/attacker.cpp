@@ -76,21 +76,21 @@ void playAttacker(Attacker::Mode mode)
             }
             else
             {
-                // power = (int)round(map(lineRingDis(), 0.0, 100.0, (double)max_power * 0.2, (double)max_power * 0.6)); // 出力を下げる
+                power = (int)round(map(lineRingDis(), 0.0f, 100.0f, (float)max_power * 0.2f, (float)max_power * 0.6f)); // 出力を下げる
 
-                line_deg = lineRingDeg(); // 今のライン角度
-                line_escape = true;       // ラインから離れる
+                // line_deg = lineRingDeg(); // 今のライン角度
+                // line_escape = true;       // ラインから離れる
             }
         }
 
         // ゴールが見えたらline_degはゴール方向
-        if (yellowGoalDetected() && yellowGoalDis() < 65)
+        if (yellowGoalDetected() && yellowGoalDis() < 55)
         {
             line_deg = yellowGoalDeg();
             line_escape = true; // ゴールから離れる
         }
 
-        if (blueGoalDetected() && blueGoalDis() < 65)
+        if (blueGoalDetected() && blueGoalDis() < 55)
         {
             line_deg = blueGoalDeg();
             line_escape = true; // ゴールから離れる
@@ -102,21 +102,21 @@ void playAttacker(Attacker::Mode mode)
 
         if (lineRingDetected()) // 記憶方式
         {
-            double x = 0.0, y = 0.0;
+            float x = 0.0f, y = 0.0f;
 
             for (uint8_t i = 0; i < 16; i++)
             {
                 if (lineSensorDetected(i) == true || lineSensor_memory[i] == true)
                 {
-                    x += cos(radians(22.5 * i));
-                    y += sin(radians(22.5 * i));
+                    x += cosf(radians(22.5f * i));
+                    y += sinf(radians(22.5f * i));
                     lineSensor_memory[i] = true;
 
                     lineSensor_memory_count++;
                 }
             }
 
-            line_deg = (int)round(degrees(atan2(y, x)));
+            line_deg = (int)round(degrees(atan2f(y, x)));
 
             line_escape = true;
         }
@@ -127,42 +127,52 @@ void playAttacker(Attacker::Mode mode)
         }
     }
 
-    const int ir_near_dis = 750; // IRセンサーが近いと判断する距離
-
-    const int ir_front_near_dis = 620; // IRセンサーが近いと判断する距離
+    const int ir_near_dis = 555; // IRセンサーが近いと判断する距離
 
     // 制御
-    if (line_escape)
+    if (lineSideDetected())
+    {
+        if (lineSideRightDetected() && lineSideLeftDetected())
+        {
+            motorsMove(fieldDeg(), power);
+        }
+        else
+        {
+            motorsMove(lineSideDeg() + 180, power);
+        }
+    }
+    else if (line_escape)
     {
         motorsMove(line_deg + 180, power);
     }
     else if (irDetected())
     {
-        if (abs(irDeg()) < 10)
+        const int front_deg = 10;
+        const int near_front_deg = 25;
+
+        if (abs(irDeg()) <= front_deg)
         {
             motorsMove(0, power);
         }
-        else if (abs(irDeg()) <= 40)
+        else if (abs(irDeg()) <= near_front_deg)
         {
-            if (irDis() < ir_front_near_dis)
-            {
-                motorsMove(mapDeg(irDeg(), 40, 55, MapMode::HIREI), power * 0.81);
-            }
-            else
-            {
-                motorsMove(mapDeg(irDeg(), 40, 55, MapMode::HIREI), power * 0.81);
-            }
+            int deg = irDeg() * (near_front_deg + 40) / (near_front_deg);
+            motorsMove(deg, power * 0.81);
         }
         else
         {
-            double diffMawarikomiDeg = 0.0;
-            if (irDis() < ir_near_dis)
-                diffMawarikomiDeg = irVal() * 0.166;
-            else
-                diffMawarikomiDeg = 0.0;
+            float diffMawarikomiDeg = 0.0f;
+            if (irDis() <= ir_near_dis)
+            {
+                diffMawarikomiDeg = (float)irVal() * 0.09f;
 
-            if (abs(irDeg()) < 90)
-                diffMawarikomiDeg += 30.0;
+                if (abs(irDeg()) >= 90)
+                    diffMawarikomiDeg += 10.0f;
+                else
+                    diffMawarikomiDeg += 10.0f;
+            }
+            else
+                diffMawarikomiDeg = 0.0f;
 
             motorsMove(irDeg() > 0 ? irDeg() + (int)diffMawarikomiDeg : irDeg() - (int)diffMawarikomiDeg, power);
         }

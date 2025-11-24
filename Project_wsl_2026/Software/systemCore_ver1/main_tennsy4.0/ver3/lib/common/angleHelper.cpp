@@ -37,23 +37,22 @@ int nearSeesenDeg(int targetDeg, int enterDeg)
 // 角度からエリアインデックスを計算
 int areaIndexFromDeg(int n, int deg)
 {
-    double area_size = 360.0 / n;
+    float area_size = 360.0f / n;
 
     // degを0〜359に変換（-180は180, 180は180として扱う）
     int positiveDeg = (deg + 360) % 360;
 
-    // 元のロジック: (positiveDeg + area_size / 2.0) / area_size
-    int index = int((positiveDeg + area_size / 2.0) / area_size) % n;
+    int index = int((positiveDeg + area_size / 2.0f) / area_size) % n;
     return index;
 }
 
 // エリアインデックスからエリアの中心角度を計算
 int degFromAreaIndex(int n, int index)
 {
-    double area_size = 360.0 / n;
+    float area_size = 360.0f / n;
 
     // 0〜359度の中心角を計算
-    int positiveDeg = int(index * area_size + area_size / 2.0);
+    int positiveDeg = int(index * area_size + area_size / 2.0f) % 360;
 
     // 0〜359 の角度を -180〜179 に正規化して返す
     return normalizeDeg(positiveDeg);
@@ -81,16 +80,16 @@ int mapDeg(int deg, int deg_in, int deg_out, MapMode mode)
     // deg_out は出力値の最大絶対値（例: 100）
 
     int output;
-    double scale;
+    float scale;
     switch (mode)
     {
     case MapMode::HIREI: // 比例 (y = a*x)
-        scale = (double)deg_out / deg_in;
+        scale = float(deg_out / deg_in);
         output = (int)round(deg * scale);
         break;
 
     case MapMode::NIJI: // 二次関数 (y = a*x^2 * sign(x))
-        scale = (double)deg_out / (deg_in * deg_in);
+        scale = float(deg_out / (deg_in * deg_in));
         output = (int)round(deg * abs(deg) * scale);
         break;
 

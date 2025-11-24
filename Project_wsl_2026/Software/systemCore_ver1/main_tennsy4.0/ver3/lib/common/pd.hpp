@@ -6,23 +6,23 @@
 class PD
 {
 private:
-    double _kp = 0.0; // 比例ゲイン
-    double _kd = 0.0; // 微分ゲイン
+    float _kp = 0.0f; // 比例ゲイン
+    float _kd = 0.0f; // 微分ゲイン
 
     bool _useP = true;
     bool _useD = true;
 
     Timer _timer;               // D制御用のタイマー
-    double _value = 0.0;        // 現在の値
-    double _oldvalue = 0.0;     // 昔の値
-    double _gap_of_value = 0.0; // 値の変化量
+    float _value = 0.0f;        // 現在の値
+    float _oldvalue = 0.0f;     // 昔の値
+    float _gap_of_value = 0.0f; // 値の変化量
 
-    double _p_power = 0.0; // P制御の出力
-    double _d_power = 0.0; // D制御の出力
-    double _output = 0;    // 出力
+    float _p_power = 0.0f; // P制御の出力
+    float _d_power = 0.0f; // D制御の出力
+    float _output = 0.0f;    // 出力
 public:
     // 関数・コンストラクタ
-    PD(double kp, double kd);
+    PD(float kp, float kd);
 
     void useP(bool use)
     {
@@ -33,10 +33,10 @@ public:
         _useD = use;
     }
 
-    void process(double val, double target);
+    void process(float val, float target);
 
-    // [-100.0~100.0]の値を返す
-    double const output()
+    // [-100.0f~100.0f]の値を返す
+    float const output()
     {
         return _output;
     }

@@ -4,8 +4,8 @@ static HardwareSerial *_serial = nullptr;
 static uint32_t _baudrate = 9600;
 static uint8_t _frameHeader = 0xAA;
 
-static double _x = 0.0;
-static double _y = 0.0;
+static float _x = 0.0f;
+static float _y = 0.0f;
 
 static bool _ringDetected = false;
 static bool _sideDetected = false;
@@ -18,7 +18,7 @@ static bool _sideBack = false;
 static int _ringDeg = 0xFF;
 static int _sideDeg = 0xFF;
 
-static double _dis = 0xFF;
+static float _dis = 0xFF;
 
 bool lineInit(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHeader)
 {
@@ -31,7 +31,7 @@ bool lineInit(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHeader)
     _ringDeg = _sideDeg = 0xFF;
     _dis = 0xFF;
     _sideRight = _sideLeft = _sideBack = false;
-    _x = _y = 0.0;
+    _x = _y = 0.0f;
 
     for (int i = 0; i < 19; i++)
         _sensor[i] = false;
@@ -41,7 +41,7 @@ bool lineInit(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHeader)
     Timer timer;
     timer.reset();
     bool success = false;
-    while (!success && timer.msTime() < 100)
+    while (!success && timer.msTime() < 100UL)
     {
         success = _serial->available() > 0; // 1個以上データが来たら成功しているとみなす
         delay(10);                          // irの通信開始待ち
@@ -96,8 +96,8 @@ void lineUpdate()
 
     // 計算
     // エンジェル
-    _x = 0.0; // 初期化
-    _y = 0.0; // 初期化
+    _x = 0.0f; // 初期化
+    _y = 0.0f; // 初期化
 
     if (_ringDetected)
     {
@@ -107,18 +107,18 @@ void lineUpdate()
             if (_sensor[i] == true)
             {
                 ringDetectedCount++;
-                _x += cos(radians(22.5 * i));
-                _y += sin(radians(22.5 * i));
+                _x += cosf(radians(22.5f * i));
+                _y += sinf(radians(22.5f * i));
             }
         }
 
         if (ringDetectedCount > 0)
         {
-            _x = _x * 100 / ringDetectedCount;
-            _y = _y * 100 / ringDetectedCount;
-            _dis = sqrt(_x * _x + _y * _y);
+            _x = _x * 100.0f / ringDetectedCount;
+            _y = _y * 100.0f / ringDetectedCount;
+            _dis = sqrtf(_x * _x + _y * _y);
 
-            _ringDeg = (int)round(degrees(atan2(_y, _x)));
+            _ringDeg = (int)round(degrees(atan2f(_y, _x)));
         }
         else // ringDetectedCount == 0 の場合 (リングセンサーの反応がない)
         {
@@ -133,19 +133,19 @@ void lineUpdate()
     }
 
     // サイドライン
-    double side_x = 0.0, side_y = 0.0;
+    float side_x = 0.0f, side_y = 0.0f;
 
     if (_sideDetected)
     {
-        side_x += (_sideRight == true) ? cos(radians(270.0)) : 0; // 前が0度としているのでx,yが反転する
-        side_x += (_sideLeft == true) ? cos(radians(90.0)) : 0;   // 前が0度としているのでx,yが反転する
-        side_x += (_sideBack == true) ? cos(radians(180.0)) : 0;  // 前が0度としているのでx,yが反転する
+        side_x += (_sideRight == true) ? cosf(radians(270.0f)) : 0.0f; // 前が0度としているのでx,yが反転する
+        side_x += (_sideLeft == true) ? cosf(radians(90.0f)) : 0.0f;   // 前が0度としているのでx,yが反転する
+        side_x += (_sideBack == true) ? cosf(radians(180.0f)) : 0.0f;  // 前が0度としているのでx,yが反転する
 
-        side_y += (_sideRight == true) ? sin(radians(270.0)) : 0; // 前が0度としているのでx,yが反転する
-        side_y += (_sideLeft == true) ? sin(radians(90.0)) : 0;   // 前が0度としているのでx,yが反転する
-        side_y += (_sideBack == true) ? sin(radians(180.0)) : 0;  // 前が0度としているのでx,yが反転する
+        side_y += (_sideRight == true) ? sinf(radians(270.0f)) : 0.0f; // 前が0度としているのでx,yが反転する
+        side_y += (_sideLeft == true) ? sinf(radians(90.0f)) : 0.0f;   // 前が0度としているのでx,yが反転する
+        side_y += (_sideBack == true) ? sinf(radians(180.0f)) : 0.0f;  // 前が0度としているのでx,yが反転する
 
-        _sideDeg = (int)round(degrees(atan2(side_y, side_x)));
+        _sideDeg = (int)round(degrees(atan2f(side_y, side_x)));
     }
     else
     {
@@ -165,7 +165,7 @@ bool lineSideBackDetected() { return _sideBack; }
 int lineRingDeg() { return _ringDeg; }
 int lineSideDeg() { return _sideDeg; }
 
-double lineRingDis() { return _dis; }
+float lineRingDis() { return _dis; }
 
-double lineRingX() { return _x; }
-double lineRingY() { return _y; }
+float lineRingX() { return _x; }
+float lineRingY() { return _y; }

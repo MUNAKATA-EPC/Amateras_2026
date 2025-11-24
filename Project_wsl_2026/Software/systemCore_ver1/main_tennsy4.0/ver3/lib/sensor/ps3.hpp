@@ -16,8 +16,8 @@ bool ps3RightStickDetected();
 int ps3LeftStickDeg();
 int ps3RightStickDeg();
 
-double ps3LeftStickDis();
-double ps3RightStickDis();
+float ps3LeftStickDis();
+float ps3RightStickDis();
 // ボタン
 enum ButtonDataType
 {

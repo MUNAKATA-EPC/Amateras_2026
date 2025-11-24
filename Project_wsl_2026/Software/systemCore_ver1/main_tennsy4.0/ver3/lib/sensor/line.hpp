@@ -25,6 +25,6 @@ bool lineSideBackDetected();
 int lineRingDeg();
 int lineSideDeg();
 
-double lineRingDis();
-double lineRingX();
-double lineRingY();
+float lineRingDis();
+float lineRingX();
+float lineRingY();

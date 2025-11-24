@@ -1,7 +1,7 @@
 #include "test.hpp"
 
-static PD pdGyro(0.4, 1.6); // ジャイロ用のPD調節値
-static PD pdCam(0.9, 1.1);  // カメラ用のPD調節値
+static PD pdGyro(0.4f, 1.6f); // ジャイロ用のPD調節値
+static PD pdCam(0.9f, 1.1f);  // カメラ用のPD調節値
 
 static Timer timer;
 

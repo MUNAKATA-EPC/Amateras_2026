@@ -1,7 +1,7 @@
 #include "radicon.hpp"
 
-static PD pdGyro(0.8, 0.1); // ジャイロ用のPD調節値
-static PD pdCam(0.6, 0.1);  // カメラ用のPD調節値
+static PD pdGyro(0.8f, 0.1f); // ジャイロ用のPD調節値
+static PD pdCam(0.6f, 0.1f);  // カメラ用のPD調節値
 
 void playRadicon()
 {

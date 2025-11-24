@@ -6,7 +6,7 @@
 class Button
 {
 private:
-    uint8_t _pin = 0;                // ボタンのピン番号
+    uint8_t _pin = 0U;                // ボタンのピン番号
     uint8_t _pinmode = INPUT_PULLUP; // ボタンのピンモード
 
     bool _pressed = false;
@@ -14,7 +14,7 @@ private:
     bool _released = false;
 
     Timer _pushingTimer; // 押されている時間計測用
-    unsigned long _pushingTime = 0;
+    unsigned long _pushingTime = 0UL;
 
 public:
     // 関数

@@ -4,9 +4,9 @@
 class Timer
 {
 private:
-    unsigned long _resetTime = 0; // リセット時の時間
-    unsigned long _stopTime = 0;  // 停止時の時間
-    unsigned long _nowTime = 0;   // 計測時間
+    unsigned long _resetTime = 0UL; // リセット時の時間
+    unsigned long _stopTime = 0UL;  // 停止時の時間
+    unsigned long _nowTime = 0UL;   // 計測時間
 
     bool _isStopped = false;  // タイマーは停止しているか
     bool _everCalled = false; // タイマーは今まで呼ばれたか

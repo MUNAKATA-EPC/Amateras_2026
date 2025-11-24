@@ -9,7 +9,7 @@ static DSR1202 *_dsr = nullptr;
 static int _deg_position[4] = {0};     // モータの物理的な配置角度（例: 315, 45, 225, 135など）
 static int _move_sign[4] = {1};        // 移動ベクトル計算後のパワーに対する符号
 static int _pd_sign[4] = {1};          // PD制御の回転トルクに対する符号
-static double _move_output[4] = {0.0}; // 移動成分の出力（スケーリング済み）
+static float _move_output[4] = {0.0f}; // 移動成分の出力（スケーリング済み）
 static int _output[4] = {0};           // 最終的なモーター出力（移動 + PD）
 
 // PD制御クラスのポインタ
@@ -33,7 +33,7 @@ bool motorsInit(HardwareSerial *serial, uint32_t baudrate)
     // PDクラスのインスタンスを確保（未設定時にNULLポインタ参照を防ぐため）
     if (_pd == nullptr)
     {
-        _pd = new PD(0.0, 0.0);
+        _pd = new PD(0.0f, 0.0f);
     }
 
     return true;
@@ -98,7 +98,7 @@ void motorsMove(int deg, int power)
     power = constrain(power, 0, 100); // powerを0~100に制限
 
     // 1. 移動成分の計算と最大出力の探索
-    double max_move_output = 0.0;
+    float max_move_output = 0.0f;
     for (int i = 0; i < 4; i++)
     {
         // モーターiから見た移動方向は (モーター位置 _deg_position[i]) - (移動方向 deg) で計算する
@@ -113,7 +113,7 @@ void motorsMove(int deg, int power)
 
     // 2. 移動成分の出力スケーリング
     // 出力が power になるようにするためのスケールを計算
-    double scale = (max_move_output != 0) ? (double)power / max_move_output : 0;
+    float scale = (max_move_output != 0.0f) ? (float)power / max_move_output : 0.0f;
     for (int i = 0; i < 4; i++)
     {
         // 移動出力をスケーリング
@@ -122,16 +122,16 @@ void motorsMove(int deg, int power)
 
     // 4. PD成分を付け加えて最終出力を決定
     // PD制御の出力は -100~100 (int)
-    double pd_output = (double)_pd->output();
+    float pd_output = (float)_pd->output();
 
     for (int i = 0; i < 4; i++)
     {
         // 最終出力 = 移動成分 + PD回転成分
-        double final_raw_output = _move_output[i] + pd_output * _pd_sign[i];
+        float final_raw_output = _move_output[i] + pd_output * _pd_sign[i];
 
         // 最終出力を -power から power の範囲に制限し、intに丸める
         // constrain の引数を double に明示的にキャスト
-        _output[i] = (int)round(constrain(final_raw_output, (double)-power, (double)power));
+        _output[i] = (int)round(constrain(final_raw_output, (float)-power, (float)power));
     }
 
     // 5. 制御

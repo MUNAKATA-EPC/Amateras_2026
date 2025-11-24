@@ -13,7 +13,7 @@ static int _modeNumber = 0;
 
 #define CONFIG_DATA_LIMIT 4
 static int _configNumber = 0;
-static unsigned int _configData[CONFIG_DATA_LIMIT] = {0}; // 0~3個のconfigがある（Runも含む）
+static unsigned int _configData[CONFIG_DATA_LIMIT] = {0U}; // 0~3個のconfigがある（Runも含む）
 
 // 初期化
 bool uiInit(TwoWire *wire, uint8_t address, uint8_t width, uint8_t height)
@@ -29,7 +29,7 @@ bool uiInit(TwoWire *wire, uint8_t address, uint8_t width, uint8_t height)
     Timer my_display_timer;
     my_display_timer.reset();
     bool success = _ssd->begin(SSD1306_SWITCHCAPVCC, _address);
-    while (!success && my_display_timer.msTime() < 100)
+    while (!success && my_display_timer.msTime() < 100UL)
     {
         delay(10); // SSD1306との通信開始待ち
     }
@@ -75,7 +75,7 @@ void uiPrint(int x0, int y0, String msg)
 void ssdPrint(String str)
 {
     char buf[20];
-    str.toCharArray(buf, 20);
+    str.toCharArray(buf, 20U);
     _ssd->print(buf);
 }
 // メータ描画用
@@ -84,8 +84,8 @@ void uiDrawCircleMeter(int x0, int y0, int r, const char *s, int deg)
     _ssd->drawCircle(x0, y0, r, SSD1306_WHITE);
 
     int x1 = x0, y1 = y0;
-    x1 = x0 - sin(radians(deg)) * r;
-    y1 = y0 - cos(radians(deg)) * r;
+    x1 = x0 - sinf(radians(deg)) * r;
+    y1 = y0 - cosf(radians(deg)) * r;
     _ssd->drawLine(x0, y0, x1, y1, SSD1306_WHITE);
 
     String buf = s;

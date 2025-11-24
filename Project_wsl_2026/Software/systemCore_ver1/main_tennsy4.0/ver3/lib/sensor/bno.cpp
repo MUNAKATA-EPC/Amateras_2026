@@ -16,7 +16,7 @@ bool bnoInit(TwoWire *wire, uint8_t address)
     Timer timer;
     timer.reset();
     bool success = _bno->begin(OPERATION_MODE_IMUPLUS);
-    while (!success && timer.msTime() < 100)
+    while (!success && timer.msTime() < 100UL)
     {
         delay(10); // BNO055の通信開始待ち
     }
@@ -28,7 +28,7 @@ bool bnoInit(TwoWire *wire, uint8_t address)
 void bnoUpdate(bool resetbtn)
 {
     imu::Vector<3> euler = _bno->getVector(Adafruit_BNO055::VECTOR_EULER);
-    _degNormal = euler.x(); // X軸の角度
+    _degNormal = (int)euler.x(); // X軸の角度
 
     if (resetbtn) // リセットボタンが押されたら
         _degReset = _degNormal;

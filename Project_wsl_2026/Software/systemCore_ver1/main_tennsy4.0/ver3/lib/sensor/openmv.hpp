@@ -12,8 +12,8 @@ int fieldDeg();
 
 bool blueGoalDetected();
 int blueGoalDeg();
-double blueGoalDis();
+float blueGoalDis();
 
 bool yellowGoalDetected();
 int yellowGoalDeg();
-double yellowGoalDis();
+float yellowGoalDis();

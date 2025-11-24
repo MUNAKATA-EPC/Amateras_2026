@@ -50,7 +50,7 @@ void irUpdate()
 
             uint8_t low2 = _serial->read();                          // ボールの値の下位バイトを読み取る
             uint8_t high2 = _serial->read();                         // ボールの値の上位バイトを読み取る
-            _val = int16_t((uint16_t(high2) << 8) | uint16_t(low2)); // 上位バイトと下位バイトをつなげる
+            _dis = int16_t((uint16_t(high2) << 8) | uint16_t(low2)); // 上位バイトと下位バイトをつなげる
 
             if (_deg == 0xFF)
             {
@@ -61,9 +61,9 @@ void irUpdate()
             else
             {
                 _detected = true;
-                _dis = map(_val, 0, 1023, 1023, 0);
-                if (_dis < 0)
-                    _dis = 0;
+                _val = map(_dis, 0, 1023, 1023, 0);
+                if (_val < 0)
+                    _val = 0;
             }
         }
         else

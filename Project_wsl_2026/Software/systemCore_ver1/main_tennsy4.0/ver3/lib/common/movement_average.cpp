@@ -29,7 +29,7 @@ int Movement_average::add(int data)
         }
     }
 
-    double ave = 0.0;
+    float ave = 0.0f;
     if (available_count > 0)
     {
         ave = sum / available_count;
