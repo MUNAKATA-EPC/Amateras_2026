@@ -30,6 +30,8 @@ void loop()
     {
       is_read_success = true;
     }
+
+    Serial.print(receive_data); // デバッグ用
   }
 
   if (is_read_success)
