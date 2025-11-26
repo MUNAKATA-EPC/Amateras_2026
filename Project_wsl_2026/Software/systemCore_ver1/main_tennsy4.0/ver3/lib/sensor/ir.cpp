@@ -6,8 +6,8 @@ static uint8_t _frameHeader = 0xAA;
 
 static bool _detected = false;
 static int _deg = 0xFF;
-static int _val = 0xFF;
-static double _dis = 0xFF;
+static float _val = 0xFF;
+static float _dis = 0xFF;
 
 bool irInit(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHeader)
 {
@@ -20,7 +20,7 @@ bool irInit(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHeader)
     Timer timer;
     timer.reset();
     bool success = false;
-    while (!success && timer.msTime() < 100)
+    while (!success && timer.msTime() < 100UL)
     {
         success = _serial->available() > 0; // 1個以上データが来たら成功しているとみなす
         delay(10);                          // irの通信開始待ち
@@ -48,9 +48,9 @@ void irUpdate()
             uint8_t high1 = _serial->read();                         // ボールの角度の上位バイトを読み取る
             _deg = int16_t((uint16_t(high1) << 8) | uint16_t(low1)); // 上位バイトと下位バイトをつなげる
 
-            uint8_t low2 = _serial->read();                          // ボールの値の下位バイトを読み取る
-            uint8_t high2 = _serial->read();                         // ボールの値の上位バイトを読み取る
-            _dis = int16_t((uint16_t(high2) << 8) | uint16_t(low2)); // 上位バイトと下位バイトをつなげる
+            uint8_t low2 = _serial->read();                        // ボールの値の下位バイトを読み取る
+            uint8_t high2 = _serial->read();                       // ボールの値の上位バイトを読み取る
+            _dis = float((uint16_t(high2) << 8) | uint16_t(low2)); // 上位バイトと下位バイトをつなげる
 
             if (_deg == 0xFF)
             {
@@ -61,9 +61,9 @@ void irUpdate()
             else
             {
                 _detected = true;
-                _val = map(_dis, 0, 1023, 1023, 0);
-                if (_val < 0)
-                    _val = 0;
+                _val = map(_dis, 0.0f, 1023.0f, 1023.0f, 0.0f);
+                if (_val < 0.0f)
+                    _val = 0.0f;
             }
         }
         else
@@ -76,20 +76,20 @@ void irUpdate()
 bool irDetected() { return _detected; }
 int irDeg() { return _deg; }
 int irVal() { return _val; }
-double irDis() { return _dis; }
+float irDis() { return _dis; }
 
-double irX()
+float irX()
 {
     if (!_detected)
-        return 0.0;
-    double rad = radians(_deg);
-    return _dis * cos(rad);
+        return 0.0f;
+    float rad = radians(_deg);
+    return _dis * cosf(rad);
 }
 
-double irY()
+float irY()
 {
     if (!_detected)
-        return 0.0;
-    double rad = radians(_deg);
+        return 0.0f;
+    float rad = radians(_deg);
     return _dis * sin(rad);
 }

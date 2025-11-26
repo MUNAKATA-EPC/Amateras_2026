@@ -44,4 +44,7 @@ public:
 // ベクター自動生成用
 Vector getVec(int deg, float length);
 
+// ベクターマッピング
+Vector mapVec(Vector vec,float in_scale,float out_scale);
+
 #endif

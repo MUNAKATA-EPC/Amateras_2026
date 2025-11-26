@@ -1,5 +1,42 @@
 #include "attacker.hpp"
 
+static PD pdGyro(0.55, 1.6); // ジャイロ用のPD調節値
+
+void playAttacker(Attacker::Mode mode)
+{
+    motorsPdProcess(&pdGyro, bnoDeg(), 0);
+
+    if (irY() > -70.0f && irY() < 70.0f) // 真正面
+    {
+        motorsMove(0, 50);
+    }
+    else if (irY() > -180.0f && irY() < 180.0f) // 右前や左前
+    {
+        const float d = 270.0f;
+        Vector move_vector(d, 0.0f, irX(), irY());
+
+        move_vector = mapVec(move_vector, move_vector.length(), 50.0f);
+
+        motorsVectorMove(&move_vector);
+    }
+    else
+    {
+        float diff_deg;
+
+        if (irDis() < 500.0f) // 近い
+            diff_deg = irVal() * 0.10f;
+        else if (irDis() < 750.0f) // 中くらい
+            diff_deg = irVal() * 0.06f;
+        else // 遠い
+            diff_deg = 0.0f;
+
+        int move_deg = irDeg() + int(irDeg() < 0 ? -diff_deg : diff_deg);
+
+        motorsMove(move_deg, 50);
+    }
+}
+
+/*
 #define LINE_MEMORY
 // #define LINE_FIELD
 
@@ -182,3 +219,4 @@ void playAttacker(Attacker::Mode mode)
         motorsPdMove();
     }
 }
+*/

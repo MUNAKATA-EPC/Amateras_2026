@@ -118,7 +118,7 @@ void loop()
             switch (uiMeterNumber())
             {
             case 0:
-                uiPrint(0, 8, "[ir]\n deg:" + String(irDeg()) + "\n dis:" + String(irDis()) + "\n val:" + String(irVal()));
+                uiPrint(0, 8, "[ir]\n deg:" + String(irDeg()) + "\n dis:" + String(irDis()) + "\n x:" + String(irX()) + "\n y:" + String(irY()));
                 uiDrawCircleMeter(92, 32, 20, "deg", irDeg());
                 break;
             case 1:
