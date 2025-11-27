@@ -5,10 +5,10 @@ Motor motors[4];
 
 void setup()
 {
-  motors[0].set_pin(4, 6, 5);
-  motors[1].set_pin(7, 10, 9);
-  motors[2].set_pin(11, 19, 20);
-  motors[3].set_pin(31, 32, 34);
+  motors[0].set_pin(2, 4, 3);
+  motors[1].set_pin(5, 7, 6);
+  motors[2].set_pin(8, 14, 15);
+  motors[3].set_pin(26, 27, 28);
 
   Serial.print(9600); // PC送信用
 
@@ -61,7 +61,7 @@ void loop()
       {
         if (rotate[i] == 'F')
           motors[i].move(power[i]);
-        else if (rotate[i] == 'B')
+        else if (rotate[i] == 'R')
           motors[i].move(-power[i]);
       }
     }

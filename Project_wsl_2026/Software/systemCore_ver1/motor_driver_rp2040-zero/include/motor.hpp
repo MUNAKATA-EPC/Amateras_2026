@@ -15,6 +15,8 @@ public:
         pinMode(_inA_pin, OUTPUT);
         pinMode(_inB_pin, OUTPUT);
         pinMode(_pwm_pin, OUTPUT);
+
+        analogWriteResolution(10); // 1023段階
     }
 
     void move(int power)
@@ -22,7 +24,7 @@ public:
         power = constrain(power, -100, 100);
         int output = abs(power) * 1023.0 / 100.0;
 
-        if (power > 0)
+        if (power >= 0)
         {
             digitalWrite(_inA_pin, HIGH);
             digitalWrite(_inB_pin, LOW);
