@@ -5,7 +5,6 @@
 #include "defender.hpp"
 #include "radicon.hpp"
 #include "test.hpp"
-
 // common類
 #include "angleHelper.hpp"
 #include "timer.hpp"
@@ -33,12 +32,13 @@ void setup()
     debugMessage += bnoInit(&Wire, 0x28) ? "bno    : found\n" : "bno    : not found\n";
 
     // シリアル
-    Serial.begin(9600); // デバッグ用
+    Serial.begin(9600L); // デバッグ用
 
     debugMessage += irInit(&Serial1, 115200, 0xAA) ? "ir     : found\n" : "ir     : not found\n";
     debugMessage += lineInit(&Serial5, 115200, 0xAA) ? "line   : found\n" : "line   : not found\n";
     debugMessage += openmvInit(&Serial3, 115200, 0xAA) ? "openmv : found\n" : "openmv : not found\n";
     debugMessage += ps3Init(&Serial2, 115200, 0xAA) ? "ps3    : found\n" : "ps3    : not found\n";
+    ps3StickAdjust(20.0f, 20.0f);
 
     debugMessage += motorsInit(&Serial1, 115200) ? "motors : found\n" : "motors : not found\n";
     motorsSetMoveSign(1, 1, 1, 1);           // 移動のための符号をセット
@@ -142,12 +142,25 @@ void loop()
                 uiDrawCircleMeter(92, 32, 20, "deg", blueGoalDeg());
                 break;
             case 6:
-                uiPrint(0, 8, "[field]\n deg:" + String(fieldDeg()));
+                uiPrint(0, 8, "[field]\n deg:" + String(fieldDeg()) + "\n\n[catch]\n react:" + String(catchSensor.read()));
                 uiDrawCircleMeter(92, 32, 20, "deg", fieldDeg());
                 break;
             case 7:
-                uiPrint(0, 8, "[catch]\n react:" + String(catchSensor.read()));
+                uiPrint(0, 8, "[ps3_left]\n x:" + String(ps3LeftStickX()) + "\n y:" + String(ps3LeftStickY()) + "\n deg:" + String(ps3LeftStickDeg()) + "\n dis:" + String(ps3LeftStickDis()));
+                uiDrawCircleMeter(92, 32, 20, "deg", ps3LeftStickDeg());
                 break;
+            case 8:
+                uiPrint(0, 8, "[ps3_right]\n x:" + String(ps3RightStickX()) + "\n y:" + String(ps3RightStickY()) + "\n deg:" + String(ps3RightStickDeg()) + "\n dis:" + String(ps3RightStickDis()));
+                uiDrawCircleMeter(92, 32, 20, "deg", ps3RightStickDeg());
+                break;
+            case 9:
+                ButtonDataType btns[] = {UP, DOWN, LEFT, RIGHT, TRIANGLE, CIRCLE, CROSS, SQUARE, L1, L2, L3, R1, R2, R3};
+                String message = "";
+                for (int i = 0; i < 14; i++)
+                {
+                    message += String((ps3ButtonIsPushing(btns[i])) ? "1" : "0");
+                }
+                uiPrint(0, 8, "[ps3_button]\n" + message);
             }
         }
         else if (uiModeDecided()) // 動作設定表示

@@ -6,12 +6,18 @@
 #include "timer.hpp"
 
 bool ps3Init(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHeader);
-void ps3StickAdjust(int left_adjust, int right_adjust);
+void ps3StickAdjust(float left_adjust, float right_adjust);
 void ps3Update();
 
 // ステック
 bool ps3LeftStickDetected();
 bool ps3RightStickDetected();
+
+int ps3LeftStickX();
+int ps3LeftStickY();
+
+int ps3RightStickX();
+int ps3RightStickY();
 
 int ps3LeftStickDeg();
 int ps3RightStickDeg();

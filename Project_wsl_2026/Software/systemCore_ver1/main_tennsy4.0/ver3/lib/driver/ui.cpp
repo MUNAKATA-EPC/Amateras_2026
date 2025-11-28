@@ -7,6 +7,7 @@ static uint8_t _address;
 static bool _actionDecided = false;
 static bool _modeDecided = false;
 
+#define METER_COUNT 10
 static int _meterNumber = 0;
 static int _actionNumber = 0;
 static int _modeNumber = 0;
@@ -125,7 +126,7 @@ void uiDrawMain(bool enterbtn, bool rightbtn, bool leftbtn)
         }
         else
         {
-            _meterNumber = (_meterNumber + 1 + 8) % 8; // 0~7を周期するようにする
+            _meterNumber = (_meterNumber + 1 + METER_COUNT) % METER_COUNT; // 0~(METER_COUNT-1)を周期するようにする
         }
     }
 

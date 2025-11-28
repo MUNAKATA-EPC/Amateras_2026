@@ -5,8 +5,8 @@ static uint32_t _baudrate = 9600;
 static uint8_t _frameHeader = 0xAA;
 
 // 調整
-static int _stickLeftAdjust = 0;
-static int _stickRightAdjust = 0;
+static float _stickLeftAdjust = 0.0f;
+static float _stickRightAdjust = 0.0f;
 
 // 左ステック
 static int _stickLx = 0;
@@ -36,14 +36,14 @@ bool ps3Init(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHeader)
     bool success = false;
     while (!success && timer.msTime() < 100)
     {
-        success = _serial->available() > 0;  // 1個以上データが来たら成功しているとみなす
-        delay(10);                           // irの通信開始待ち
+        success = _serial->available() > 0; // 1個以上データが来たら成功しているとみなす
+        delay(10);                          // irの通信開始待ち
     }
 
     return success;
 }
 
-void ps3StickAdjust(int leftAdjust, int rightAdjust)
+void ps3StickAdjust(float leftAdjust, float rightAdjust)
 {
     _stickLeftAdjust = leftAdjust;
     _stickRightAdjust = rightAdjust;
@@ -66,23 +66,20 @@ void ps3Update()
             _serial->read(); // ヘッダーを捨てる
 
             // ステックのx,y
-            _stickLx = (int8_t)_serial->read(); // 左ステックX (-128~127)
-            if (abs(_stickLx) < abs(_stickLeftAdjust))
-                _stickLx = 0;
-            _stickLy = -(int8_t)(_serial->read()); // 左ステックY
-            if (abs(_stickLy) < abs(_stickLeftAdjust))
-                _stickLy = 0;
-            _stickRx = (int8_t)_serial->read(); // 右ステックX
-            if (abs(_stickRx) < abs(_stickRightAdjust))
-                _stickRx = 0;
-            _stickRy = -(int8_t)(_serial->read()); // 右ステックY
-            if (abs(_stickRy) < abs(_stickRightAdjust))
-                _stickRy = 0;
+            _stickLx = int8_t(_serial->read());  // 左ステックX (-128~127)
+            _stickLy = -int8_t(_serial->read()); // 左ステックY
+            _stickRx = int8_t(_serial->read());  // 右ステックX
+            _stickRy = -int8_t(_serial->read()); // 右ステックY
 
-            // ステックの角度・距離
-            if (_stickLx == 0 && _stickLy == 0)
+            // 左ステックの角度・距離
+            _stickLeftDis = sqrtf(_stickLx * _stickLx + _stickLy * _stickLy); // 距離を算出
+            _stickLeftDis = constrain(_stickLeftDis, 0.0f, 128.0f);
+
+            if (_stickLeftDis <= _stickLeftAdjust)
             {
                 _stickLeftDetected = false;
+                _stickLx = 0;
+                _stickLy = 0;
                 _stickLeftDeg = 0xFF;
                 _stickLeftDis = 0xFF;
             }
@@ -90,17 +87,18 @@ void ps3Update()
             {
                 _stickLeftDetected = true;
 
-                _stickLeftDeg = (int)round(degrees(atan2(_stickLy, _stickLx)));
-                _stickLeftDeg = (_stickLeftDeg - 90 + 360) % 360; // 調整
-                _stickLeftDeg = _stickLeftDeg < 180 ? _stickLeftDeg : 360 - _stickLeftDeg;
-
-                _stickLeftDis = sqrtf(_stickLx * _stickLx + _stickLy * _stickLy); // 距離を算出
-                _stickLeftDis = constrain(_stickLeftDis, 0.0f, 128.0f);
+                _stickLeftDeg = (int)round(degrees(atan2(-_stickLx, _stickLy)));
             }
 
-            if (_stickRx == 0 && _stickRy == 0)
+            // 右ステックの角度・距離
+            _stickRightDis = sqrtf(_stickRx * _stickRx + _stickRy * _stickRy); // 距離を算出
+            _stickRightDis = constrain(_stickRightDis, 0.0f, 128.0f);
+
+            if (_stickRightDis <= _stickRightAdjust)
             {
                 _stickRightDetected = false;
+                _stickRx = 0;
+                _stickRy = 0;
                 _stickRightDeg = 0xFF;
                 _stickRightDis = 0xFF;
             }
@@ -108,12 +106,7 @@ void ps3Update()
             {
                 _stickRightDetected = true;
 
-                _stickRightDeg = (int)round(degrees(atan2(_stickRy, _stickRx)));
-                _stickRightDeg = (_stickRightDeg - 90 + 360) % 360; // 調整
-                _stickRightDeg = _stickRightDeg < 180 ? _stickRightDeg : 360 - _stickRightDeg;
-
-                _stickRightDis = sqrtf(_stickRx * _stickRx + _stickRy * _stickRy); // 距離を算出
-                _stickRightDis = constrain(_stickRightDis, 0.0f, 128.0f);
+                _stickRightDeg = (int)round(degrees(atan2(-_stickRx, _stickRy)));
             }
 
             // ボタン
@@ -130,6 +123,12 @@ void ps3Update()
 
 bool ps3LeftStickDetected() { return _stickLeftDetected; }
 bool ps3RightStickDetected() { return _stickRightDetected; }
+
+int ps3LeftStickX() { return _stickLx; }
+int ps3LeftStickY() { return _stickLy; }
+
+int ps3RightStickX() { return _stickRx; }
+int ps3RightStickY() { return _stickRy; }
 
 int ps3LeftStickDeg() { return _stickLeftDeg; }
 int ps3RightStickDeg() { return _stickRightDeg; }
