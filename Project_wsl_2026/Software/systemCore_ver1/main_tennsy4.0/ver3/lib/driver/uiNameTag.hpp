@@ -52,9 +52,9 @@ namespace Radicon
 {
     enum Mode
     {
-        SPEED_50CC,
-        SPEED_100CC,
-        SPEED_200CC,
+        RECORD,
+        COMPLEMENT,
+        REPLAY,
 
         MODE_COUNT
     };

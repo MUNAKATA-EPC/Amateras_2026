@@ -102,8 +102,8 @@ void uiDrawCircleMeter(int x0, int y0, int r, const char *s, int deg)
 }
 // 設定のプリント・出力
 
-// メインのuiの描画用
-void uiDrawMain(bool enterbtn, bool rightbtn, bool leftbtn)
+// ボタンの更新
+void uiButtonUpdate(bool enterbtn, bool rightbtn, bool leftbtn)
 {
     // 操作
     if (leftbtn)
@@ -191,14 +191,15 @@ void uiDrawMain(bool enterbtn, bool rightbtn, bool leftbtn)
             }
         }
     }
+}
+// メインのuiの描画用
+static String actionName = "";
+static String modeName = "";
+static String configName[3] = {""}; // CONFIG_DATA_LIMIT (4) から Run設定分 (1) を引いた3個のConfig名を表示
 
+void uiDrawMain()
+{
     // 表示
-    String actionName = "";
-    String modeName = "";
-
-    // CONFIG_DATA_LIMIT (4) から Run設定分 (1) を引いた3個のConfig名を表示
-    String configName[3] = {""};
-
     switch (_actionNumber)
     {
     case Action::Type::ATTACKER:
@@ -273,14 +274,14 @@ void uiDrawMain(bool enterbtn, bool rightbtn, bool leftbtn)
         {
             switch (_modeNumber)
             {
-            case Radicon::Mode::SPEED_50CC:
-                modeName = "50cc";
+            case Radicon::Mode::RECORD:
+                modeName = "Record";
                 break;
-            case Radicon::Mode::SPEED_100CC:
-                modeName = "100cc";
+            case Radicon::Mode::COMPLEMENT:
+                modeName = "Complement";
                 break;
-            case Radicon::Mode::SPEED_200CC:
-                modeName = "200cc";
+            case Radicon::Mode::REPLAY:
+                modeName = "Replay";
                 break;
             default:
                 modeName = "Unknown";

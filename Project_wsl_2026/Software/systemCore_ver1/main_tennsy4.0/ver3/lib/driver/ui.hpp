@@ -22,7 +22,8 @@ void uiClear();
 
 // 描画
 void uiDrawCircleMeter(int x0, int y0, int r, const char *s, int deg);
-void uiDrawMain(bool enterbtn, bool rightbtn, bool leftbtn);
+void uiButtonUpdate(bool enterbtn, bool rightbtn, bool leftbtn);
+void uiDrawMain();
 void uiPrint(int x0, int y0, String msg);
 void uiPrintDebug(const char *msg);
 

@@ -106,72 +106,7 @@ void loop()
     dribbler1.move(1500);
 
     // uiを実行・描画
-    if (!timer.everCalled() || timer.msTime() > 10) // まだ呼ばれていない場合もタイマーをリセットさせる
-    {
-        timer.reset();
-
-        uiClear();
-        uiDrawMain(enterButton.isReleased(), rightButton.isReleased(), leftButton.isReleased()); // 10msに一回更新
-
-        if (!uiActionDecided()) // センサーモニター表示
-        {
-            switch (uiMeterNumber())
-            {
-            case 0:
-                uiPrint(0, 8, "[ir]\n deg:" + String(irDeg()) + "\n dis:" + String(irDis()) + "\n x:" + String(irX()) + "\n y:" + String(irY()));
-                uiDrawCircleMeter(92, 32, 20, "deg", irDeg());
-                break;
-            case 1:
-                uiPrint(0, 8, "[ringLine]\n deg:" + String(lineRingDeg()) + "\n dis:" + String(lineRingDis()));
-                uiDrawCircleMeter(92, 32, 20, "deg", lineRingDeg());
-                break;
-            case 2:
-                uiPrint(0, 8, "[sideLine]\n deg:" + String(lineSideDeg()));
-                uiDrawCircleMeter(92, 32, 20, "deg", lineSideDeg());
-                break;
-            case 3:
-                uiPrint(0, 8, "[bno055]\n deg:" + String(bnoDeg()));
-                uiDrawCircleMeter(92, 32, 20, "deg", bnoDeg());
-                break;
-            case 4:
-                uiPrint(0, 8, "[yellowGoal]\n deg:" + String(yellowGoalDeg()) + "\n dis:" + String(yellowGoalDis()));
-                uiDrawCircleMeter(92, 32, 20, "deg", yellowGoalDeg());
-                break;
-            case 5:
-                uiPrint(0, 8, "[blueGoal]\n deg:" + String(blueGoalDeg()) + "\n dis:" + String(blueGoalDis()));
-                uiDrawCircleMeter(92, 32, 20, "deg", blueGoalDeg());
-                break;
-            case 6:
-                uiPrint(0, 8, "[field]\n deg:" + String(fieldDeg()) + "\n\n[catch]\n react:" + String(catchSensor.read()));
-                uiDrawCircleMeter(92, 32, 20, "deg", fieldDeg());
-                break;
-            case 7:
-                uiPrint(0, 8, "[ps3_left]\n x:" + String(ps3LeftStickX()) + "\n y:" + String(ps3LeftStickY()) + "\n deg:" + String(ps3LeftStickDeg()) + "\n dis:" + String(ps3LeftStickDis()));
-                uiDrawCircleMeter(92, 32, 20, "deg", ps3LeftStickDeg());
-                break;
-            case 8:
-                uiPrint(0, 8, "[ps3_right]\n x:" + String(ps3RightStickX()) + "\n y:" + String(ps3RightStickY()) + "\n deg:" + String(ps3RightStickDeg()) + "\n dis:" + String(ps3RightStickDis()));
-                uiDrawCircleMeter(92, 32, 20, "deg", ps3RightStickDeg());
-                break;
-            case 9:
-                ButtonDataType btns[] = {UP, DOWN, LEFT, RIGHT, TRIANGLE, CIRCLE, CROSS, SQUARE, L1, L2, L3, R1, R2, R3};
-                String message = "";
-                for (int i = 0; i < 14; i++)
-                {
-                    message += String((ps3ButtonIsPushing(btns[i])) ? "1" : "0");
-                }
-                uiPrint(0, 8, "[ps3_button]\n" + message);
-            }
-        }
-        else if (uiModeDecided()) // 動作設定表示
-        {
-            // uiConfigPrintAndGet(1, "goal Range", 5, -10, 10);
-            // uiConfigPrintAndGet(2, "goal Range", 5, -20, 10);
-            // uiConfigPrintAndGet(3, "goal Range", 10, -10, 20);
-        }
-
-        uiShow();
-    }
+    uiButtonUpdate(enterButton.isReleased(), rightButton.isReleased(), leftButton.isReleased()); // ボタンの更新
 
     // 動作を実行
     if (!uiRunning())
@@ -179,6 +114,67 @@ void loop()
         Serial.print("now sellecting...");
         kicker1.kick(false); // キッカーを動かさない
         motorsStop();        // 動作選択中はモータを止める
+
+        if (!timer.everCalled() || timer.msTime() > 10) // runningではないので10msに一回描画
+        {
+            timer.reset();
+
+            uiClear();
+            uiDrawMain(); // 10msに一回更新
+
+            if (!uiActionDecided()) // センサーモニター表示
+            {
+                switch (uiMeterNumber())
+                {
+                case 0:
+                    uiPrint(0, 8, "[ir]\n deg:" + String(irDeg()) + "\n dis:" + String(irDis()) + "\n x:" + String(irX()) + "\n y:" + String(irY()));
+                    uiDrawCircleMeter(92, 32, 20, "deg", irDeg());
+                    break;
+                case 1:
+                    uiPrint(0, 8, "[ringLine]\n deg:" + String(lineRingDeg()) + "\n dis:" + String(lineRingDis()));
+                    uiDrawCircleMeter(92, 32, 20, "deg", lineRingDeg());
+                    break;
+                case 2:
+                    uiPrint(0, 8, "[sideLine]\n deg:" + String(lineSideDeg()));
+                    uiDrawCircleMeter(92, 32, 20, "deg", lineSideDeg());
+                    break;
+                case 3:
+                    uiPrint(0, 8, "[bno055]\n deg:" + String(bnoDeg()));
+                    uiDrawCircleMeter(92, 32, 20, "deg", bnoDeg());
+                    break;
+                case 4:
+                    uiPrint(0, 8, "[yellowGoal]\n deg:" + String(yellowGoalDeg()) + "\n dis:" + String(yellowGoalDis()));
+                    uiDrawCircleMeter(92, 32, 20, "deg", yellowGoalDeg());
+                    break;
+                case 5:
+                    uiPrint(0, 8, "[blueGoal]\n deg:" + String(blueGoalDeg()) + "\n dis:" + String(blueGoalDis()));
+                    uiDrawCircleMeter(92, 32, 20, "deg", blueGoalDeg());
+                    break;
+                case 6:
+                    uiPrint(0, 8, "[field]\n deg:" + String(fieldDeg()) + "\n\n[catch]\n react:" + String(catchSensor.read()));
+                    uiDrawCircleMeter(92, 32, 20, "deg", fieldDeg());
+                    break;
+                case 7:
+                    uiPrint(0, 8, "[ps3_left]\n x:" + String(ps3LeftStickX()) + "\n y:" + String(ps3LeftStickY()) + "\n deg:" + String(ps3LeftStickDeg()) + "\n dis:" + String(ps3LeftStickDis()));
+                    uiDrawCircleMeter(92, 32, 20, "deg", ps3LeftStickDeg());
+                    break;
+                case 8:
+                    uiPrint(0, 8, "[ps3_right]\n x:" + String(ps3RightStickX()) + "\n y:" + String(ps3RightStickY()) + "\n deg:" + String(ps3RightStickDeg()) + "\n dis:" + String(ps3RightStickDis()));
+                    uiDrawCircleMeter(92, 32, 20, "deg", ps3RightStickDeg());
+                    break;
+                case 9:
+                    ButtonDataType btns[] = {UP, DOWN, LEFT, RIGHT, TRIANGLE, CIRCLE, CROSS, SQUARE, L1, L2, L3, R1, R2, R3};
+                    String message = "";
+                    for (int i = 0; i < 14; i++)
+                    {
+                        message += String((ps3ButtonIsPushing(btns[i])) ? "1" : "0");
+                    }
+                    uiPrint(0, 8, "[ps3_button]\n" + message);
+                }
+            }
+
+            uiShow();
+        }
     }
     else
     {
