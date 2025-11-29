@@ -86,6 +86,7 @@ void setup()
 }
 
 Timer timer; // ui用
+bool old_running_flag = false;
 
 void loop()
 {
@@ -111,6 +112,8 @@ void loop()
     // 動作を実行
     if (!uiRunning())
     {
+        old_running_flag = false;
+
         Serial.print("now sellecting...");
         kicker1.kick(false); // キッカーを動かさない
         motorsStop();        // 動作選択中はモータを止める
@@ -178,6 +181,14 @@ void loop()
     }
     else
     {
+        if (old_running_flag == false)
+        {
+            uiClear();
+            uiDrawMain();
+            uiShow();
+        }
+        old_running_flag = true;
+
         switch (uiActionNumber())
         {
         case Action::ATTACKER:
