@@ -103,7 +103,7 @@ void uiButtonUpdate(bool enterbtn, bool backbtn, bool rightbtn, bool leftbtn)
     // 操作
     if (backbtn)
     {
-        tone(BUZZER_PIN, BUZZER_ONKAI::MyC4, 50);
+        tone(BUZZER_PIN, BUZZER_PITCHES::MyC4, 50);
 
         if (_modeDecided)
         {
@@ -131,7 +131,7 @@ void uiButtonUpdate(bool enterbtn, bool backbtn, bool rightbtn, bool leftbtn)
     {
         if (rightbtn)
         {
-            tone(BUZZER_PIN, BUZZER_ONKAI::MyC4, 50);
+            tone(BUZZER_PIN, BUZZER_PITCHES::MyC4, 50);
 
             _actionNumber++;
             if (_actionNumber > Action::Type::COUNT - 1)
@@ -139,7 +139,7 @@ void uiButtonUpdate(bool enterbtn, bool backbtn, bool rightbtn, bool leftbtn)
         }
         if (leftbtn)
         {
-            tone(BUZZER_PIN, BUZZER_ONKAI::MyC4, 50);
+            tone(BUZZER_PIN, BUZZER_PITCHES::MyC4, 50);
 
             _actionNumber--;
             if (_actionNumber < 0)
@@ -148,7 +148,7 @@ void uiButtonUpdate(bool enterbtn, bool backbtn, bool rightbtn, bool leftbtn)
 
         if (enterbtn)
         {
-            tone(BUZZER_PIN, BUZZER_ONKAI::MyE4, 50);
+            tone(BUZZER_PIN, BUZZER_PITCHES::MyE4, 50);
 
             _actionDecided = true;
         }
@@ -157,7 +157,7 @@ void uiButtonUpdate(bool enterbtn, bool backbtn, bool rightbtn, bool leftbtn)
     {
         if (rightbtn)
         {
-            tone(BUZZER_PIN, BUZZER_ONKAI::MyC4, 50);
+            tone(BUZZER_PIN, BUZZER_PITCHES::MyC4, 50);
 
             _modeNumber++;
             switch (_actionNumber)
@@ -182,7 +182,7 @@ void uiButtonUpdate(bool enterbtn, bool backbtn, bool rightbtn, bool leftbtn)
         }
         if (leftbtn)
         {
-            tone(BUZZER_PIN, BUZZER_ONKAI::MyC4, 50);
+            tone(BUZZER_PIN, BUZZER_PITCHES::MyC4, 50);
 
             _modeNumber--;
             switch (_actionNumber)
@@ -208,7 +208,7 @@ void uiButtonUpdate(bool enterbtn, bool backbtn, bool rightbtn, bool leftbtn)
 
         if (enterbtn)
         {
-            tone(BUZZER_PIN, BUZZER_ONKAI::MyE4, 50);
+            tone(BUZZER_PIN, BUZZER_PITCHES::MyE4, 50);
 
             _modeDecided = true;
         }
@@ -217,7 +217,7 @@ void uiButtonUpdate(bool enterbtn, bool backbtn, bool rightbtn, bool leftbtn)
     {
         if (rightbtn)
         {
-            tone(BUZZER_PIN, BUZZER_ONKAI::MyC4, 50);
+            tone(BUZZER_PIN, BUZZER_PITCHES::MyC4, 50);
 
             _configNumber = (_configNumber + 1) % CONFIG_DATA_LIMIT; // 0~CONFIG_DATA_LIMIT-1個のconfigがある
 
@@ -226,7 +226,7 @@ void uiButtonUpdate(bool enterbtn, bool backbtn, bool rightbtn, bool leftbtn)
         }
         if (leftbtn)
         {
-            tone(BUZZER_PIN, BUZZER_ONKAI::MyC4, 50);
+            tone(BUZZER_PIN, BUZZER_PITCHES::MyC4, 50);
 
             _configNumber = (_configNumber - 1 + CONFIG_DATA_LIMIT) % CONFIG_DATA_LIMIT; // 0~CONFIG_DATA_LIMIT-1個のconfigがある
 
@@ -236,7 +236,7 @@ void uiButtonUpdate(bool enterbtn, bool backbtn, bool rightbtn, bool leftbtn)
 
         if (enterbtn)
         {
-            tone(BUZZER_PIN, BUZZER_ONKAI::MyE4, 50);
+            tone(BUZZER_PIN, BUZZER_PITCHES::MyE4, 50);
 
             if (_configNumber == 0)
             {

@@ -11,7 +11,7 @@ extern const char zenzenzense[]; // 前前前世
 extern const char shokei_part3[]; // 第三部処刑用BGM
 
 // tone関数用の周波数
-enum BUZZER_ONKAI
+enum BUZZER_PITCHES
 {
     // C0: ゼロオクターブ（非常に低い音）
     MyC0 = 16,
