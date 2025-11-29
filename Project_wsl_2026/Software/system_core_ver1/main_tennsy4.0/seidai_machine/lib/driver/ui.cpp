@@ -19,10 +19,6 @@ static unsigned int _configData[CONFIG_DATA_LIMIT] = {0U}; // 0~3個のconfigが
 // 初期化
 bool uiInit(TwoWire *wire, uint8_t address, uint8_t width, uint8_t height)
 {
-    /*if (_ssd != nullptr)
-        {
-            delete _ssd;
-        }*/
     _ssd = new Adafruit_SSD1306(width, height, wire, -1);
 
     _address = address;
@@ -100,7 +96,6 @@ void uiDrawCircleMeter(int x0, int y0, int r, const char *s, int deg)
 
     _ssd->print(buf);
 }
-// 設定のプリント・出力
 
 // ボタンの更新
 void uiButtonUpdate(bool enterbtn, bool backbtn, bool rightbtn, bool leftbtn)
@@ -108,6 +103,8 @@ void uiButtonUpdate(bool enterbtn, bool backbtn, bool rightbtn, bool leftbtn)
     // 操作
     if (backbtn)
     {
+        tone(BUZZER_PIN, BUZZER_ONKAI::MyC4, 50);
+
         if (_modeDecided)
         {
             _modeDecided = false;
@@ -134,24 +131,34 @@ void uiButtonUpdate(bool enterbtn, bool backbtn, bool rightbtn, bool leftbtn)
     {
         if (rightbtn)
         {
+            tone(BUZZER_PIN, BUZZER_ONKAI::MyC4, 50);
+
             _actionNumber++;
             if (_actionNumber > Action::Type::COUNT - 1)
                 _actionNumber = 0;
         }
         if (leftbtn)
         {
+            tone(BUZZER_PIN, BUZZER_ONKAI::MyC4, 50);
+
             _actionNumber--;
             if (_actionNumber < 0)
                 _actionNumber = Action::Type::COUNT - 1;
         }
-        
+
         if (enterbtn)
+        {
+            tone(BUZZER_PIN, BUZZER_ONKAI::MyE4, 50);
+
             _actionDecided = true;
+        }
     }
     else if (!_modeDecided)
     {
         if (rightbtn)
         {
+            tone(BUZZER_PIN, BUZZER_ONKAI::MyC4, 50);
+
             _modeNumber++;
             switch (_actionNumber)
             {
@@ -175,6 +182,8 @@ void uiButtonUpdate(bool enterbtn, bool backbtn, bool rightbtn, bool leftbtn)
         }
         if (leftbtn)
         {
+            tone(BUZZER_PIN, BUZZER_ONKAI::MyC4, 50);
+
             _modeNumber--;
             switch (_actionNumber)
             {
@@ -198,12 +207,18 @@ void uiButtonUpdate(bool enterbtn, bool backbtn, bool rightbtn, bool leftbtn)
         }
 
         if (enterbtn)
+        {
+            tone(BUZZER_PIN, BUZZER_ONKAI::MyE4, 50);
+
             _modeDecided = true;
+        }
     }
     else
     {
         if (rightbtn)
         {
+            tone(BUZZER_PIN, BUZZER_ONKAI::MyC4, 50);
+
             _configNumber = (_configNumber + 1) % CONFIG_DATA_LIMIT; // 0~CONFIG_DATA_LIMIT-1個のconfigがある
 
             // runは右が押されたらfalseになる
@@ -211,6 +226,8 @@ void uiButtonUpdate(bool enterbtn, bool backbtn, bool rightbtn, bool leftbtn)
         }
         if (leftbtn)
         {
+            tone(BUZZER_PIN, BUZZER_ONKAI::MyC4, 50);
+
             _configNumber = (_configNumber - 1 + CONFIG_DATA_LIMIT) % CONFIG_DATA_LIMIT; // 0~CONFIG_DATA_LIMIT-1個のconfigがある
 
             // runは左が押されたらfalseになる
@@ -219,6 +236,8 @@ void uiButtonUpdate(bool enterbtn, bool backbtn, bool rightbtn, bool leftbtn)
 
         if (enterbtn)
         {
+            tone(BUZZER_PIN, BUZZER_ONKAI::MyE4, 50);
+
             if (_configNumber == 0)
             {
                 _configData[_configNumber] = !_configData[_configNumber]; // これはRunだからスイッチする

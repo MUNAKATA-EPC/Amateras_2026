@@ -8,6 +8,7 @@
 // sensor類
 #include "bno.hpp"
 #include "button.hpp"
+#include "buzzer.hpp"
 #include "digitalSensor.hpp"
 #include "ir.hpp"
 #include "line.hpp"

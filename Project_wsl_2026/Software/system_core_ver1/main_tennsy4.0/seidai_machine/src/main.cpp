@@ -17,6 +17,7 @@
 // sensor類
 #include "bno.hpp"
 #include "button.hpp"
+#include "buzzer.hpp"
 #include "digitalSensor.hpp"
 #include "ir.hpp"
 #include "line.hpp"
@@ -62,9 +63,12 @@ void setup()
     uiShow();
 
     // どれかのボタンを押すまで待機
+    anyrtttl::nonblocking::begin(9, zenzenzense); // 前前前世演奏開始
     bool wait = true;
     while (wait)
     {
+        anyrtttl::nonblocking::play(); // 演奏を続ける
+
         enterButton.update();
         backButton.update();
         rightButton.update();
@@ -74,16 +78,14 @@ void setup()
     }
     while (enterButton.isPushing() || backButton.isPushing() || rightButton.isPushing() || leftButton.isPushing())
     {
+        anyrtttl::nonblocking::play(); // 演奏を続ける
+
         enterButton.update();
         backButton.update();
         rightButton.update();
         leftButton.update();
-    } // 押しっぱなし防止
-
-    // ドリブラー
-    dribbler1.init(13, 1000, 2000);
-    while (!dribbler1.available()) // ドリブラーの初期化が完了していなかったら初期化
-        dribbler1.setup();
+    }
+    anyrtttl::nonblocking::stop(); // 曲の演奏停止
 }
 
 Timer timer; // ui用
@@ -104,9 +106,6 @@ void loop()
     openmvUpdate();
     ps3Update();
     bnoUpdate(resetButton.isReleased()); // bno更新
-
-    // ドリブラーを動かす
-    dribbler1.move(1500);
 
     // uiを実行・描画
     uiButtonUpdate(enterButton.isReleased(), backButton.isReleased(), rightButton.isReleased(), leftButton.isReleased()); // ボタンの更新
