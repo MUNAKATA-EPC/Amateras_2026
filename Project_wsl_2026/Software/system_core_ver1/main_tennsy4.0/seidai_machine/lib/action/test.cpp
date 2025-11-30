@@ -35,8 +35,6 @@ void testCam()
     motorsPdMove();
 }
 
-
-
 void playTest()
 {
     Test::Mode mode = (Test::Mode)uiModeNumber();
