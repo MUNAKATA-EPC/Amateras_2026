@@ -4,7 +4,7 @@ static PD pdCam(0.6f, 0.1f);  // カメラ用のPD調節値
 
 #define MOVE_DEG_INDEX 0
 #define MOVE_POWER_INDEX 1
-static int data[360][2]; // 0~359度、距離10段階の記録用配列
+static int data[360][2]; // 移動角度とパワー記録用配列
 
 /*　ボールの位置によってロボットの進むべき方向(ステックの角度)とパワーを記録する　*/
 /*　ボールがあって◎ボタンが押されている：データ記録　*/
