@@ -6,9 +6,14 @@
 #define BUZZER_PIN 9 // 今回の機体は9ピン
 
 // rtttl用の曲データ -made from nakano-
-extern const char zenzenzense[]; // 前前前世
-
+extern const char zenzenzense[];  // 前前前世
 extern const char shokei_part3[]; // 第三部処刑用BGM
+extern const char mission_imp[];  // ミッションインポッシブル
+extern const char mario_bro[];    // マリオ
+
+extern const char startup0[]; // 起動音
+extern const char startup1[]; // 起動音
+extern const char startup2[]; // 起動音
 
 // tone関数用の周波数
 enum BUZZER_PITCHES

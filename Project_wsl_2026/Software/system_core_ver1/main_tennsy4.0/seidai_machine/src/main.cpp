@@ -56,6 +56,8 @@ void setup()
     leftButton.init(12, INPUT_PULLDOWN);  // ui用
     resetButton.init(37, INPUT_PULLDOWN); // bno用
 
+    fullColorLed1.init(36, 35, 34); // デバッグ用
+
     // デバッグメッセージの出力
     Serial.println(debugMessage);
     uiClear();
@@ -63,29 +65,50 @@ void setup()
     uiShow();
 
     // どれかのボタンを押すまで待機
-    anyrtttl::nonblocking::begin(9, zenzenzense); // 前前前世演奏開始
+    int music_type = 0;
+    anyrtttl::nonblocking::begin(BUZZER_PIN, zenzenzense); // 前前前世演奏開始（デフォルト）
+
     bool wait = true;
     while (wait)
     {
-        anyrtttl::nonblocking::play(); // 演奏を続ける
-
         enterButton.update();
         backButton.update();
         rightButton.update();
         leftButton.update();
+        resetButton.update();
+
+        if (resetButton.isReleased())
+        {
+            anyrtttl::blocking::play(BUZZER_PIN, startup2); // 起動音2
+
+            music_type = (music_type + 1) % 4;
+
+            if (music_type == 0)
+                anyrtttl::nonblocking::begin(BUZZER_PIN, zenzenzense); // 前前前世演奏開始
+            else if (music_type == 1)
+                anyrtttl::nonblocking::begin(BUZZER_PIN, shokei_part3); // 処刑用BGM演奏開始
+            else if (music_type == 2)
+                anyrtttl::nonblocking::begin(BUZZER_PIN, mission_imp); // ミッションインポッシブル
+            else if (music_type == 3)
+                anyrtttl::nonblocking::begin(BUZZER_PIN, mario_bro); // マリオ
+        }
+
+        anyrtttl::nonblocking::play(); // 演奏中
 
         wait = !(enterButton.isReleased() || backButton.isReleased() || rightButton.isReleased() || leftButton.isReleased());
     }
+    anyrtttl::nonblocking::stop(); // 曲の演奏停止
+
+    anyrtttl::blocking::play(BUZZER_PIN, startup0); // 起動音0
+
+    // 押し続け防止
     while (enterButton.isPushing() || backButton.isPushing() || rightButton.isPushing() || leftButton.isPushing())
     {
-        anyrtttl::nonblocking::play(); // 演奏を続ける
-
         enterButton.update();
         backButton.update();
         rightButton.update();
         leftButton.update();
     }
-    anyrtttl::nonblocking::stop(); // 曲の演奏停止
 }
 
 Timer timer; // ui用
@@ -126,6 +149,8 @@ void loop()
             uiClear();
             uiDrawMain(); // 10msに一回更新
 
+            const int led_brightness = 10; // フルカラーLEDの光の強さ
+
             if (!uiActionDecided()) // センサーモニター表示
             {
                 switch (uiMeterNumber())
@@ -133,38 +158,56 @@ void loop()
                 case 0:
                     uiPrint(0, 8, "[ir]\n deg:" + String(irDeg()) + "\n dis:" + String(irDis()) + "\n x:" + String(irX()) + "\n y:" + String(irY()));
                     uiDrawCircleMeter(92, 32, 20, "deg", irDeg());
+
+                    fullColorLed1.angleLightUp(irDeg(), irDetected() ? led_brightness : 0);
                     break;
                 case 1:
                     uiPrint(0, 8, "[ringLine]\n deg:" + String(lineRingDeg()) + "\n dis:" + String(lineRingDis()));
                     uiDrawCircleMeter(92, 32, 20, "deg", lineRingDeg());
+
+                    fullColorLed1.angleLightUp(lineRingDeg(), lineRingDetected() ? led_brightness : 0);
                     break;
                 case 2:
                     uiPrint(0, 8, "[sideLine]\n deg:" + String(lineSideDeg()));
                     uiDrawCircleMeter(92, 32, 20, "deg", lineSideDeg());
+
+                    fullColorLed1.angleLightUp(lineSideDeg(), lineSideDetected() ? led_brightness : 0);
                     break;
                 case 3:
                     uiPrint(0, 8, "[bno055]\n deg:" + String(bnoDeg()));
                     uiDrawCircleMeter(92, 32, 20, "deg", bnoDeg());
+
+                    fullColorLed1.angleLightUp(bnoDeg(), led_brightness);
                     break;
                 case 4:
                     uiPrint(0, 8, "[yellowGoal]\n deg:" + String(yellowGoalDeg()) + "\n dis:" + String(yellowGoalDis()));
                     uiDrawCircleMeter(92, 32, 20, "deg", yellowGoalDeg());
+
+                    fullColorLed1.angleLightUp(yellowGoalDeg(), yellowGoalDetected() ? led_brightness : 0);
                     break;
                 case 5:
                     uiPrint(0, 8, "[blueGoal]\n deg:" + String(blueGoalDeg()) + "\n dis:" + String(blueGoalDis()));
                     uiDrawCircleMeter(92, 32, 20, "deg", blueGoalDeg());
+
+                    fullColorLed1.angleLightUp(blueGoalDeg(), blueGoalDetected() ? led_brightness : 0);
                     break;
                 case 6:
                     uiPrint(0, 8, "[field]\n deg:" + String(fieldDeg()) + "\n\n[catch]\n react:" + String(catchSensor.read()));
                     uiDrawCircleMeter(92, 32, 20, "deg", fieldDeg());
+
+                    fullColorLed1.angleLightUp(fieldDeg(), fieldDetected() ? led_brightness : 0);
                     break;
                 case 7:
                     uiPrint(0, 8, "[ps3_left]\n x:" + String(ps3LeftStickX()) + "\n y:" + String(ps3LeftStickY()) + "\n deg:" + String(ps3LeftStickDeg()) + "\n dis:" + String(ps3LeftStickDis()));
                     uiDrawCircleMeter(92, 32, 20, "deg", ps3LeftStickDeg());
+
+                    fullColorLed1.angleLightUp(ps3LeftStickDeg(), ps3LeftStickDetected() ? led_brightness : 0);
                     break;
                 case 8:
                     uiPrint(0, 8, "[ps3_right]\n x:" + String(ps3RightStickX()) + "\n y:" + String(ps3RightStickY()) + "\n deg:" + String(ps3RightStickDeg()) + "\n dis:" + String(ps3RightStickDis()));
                     uiDrawCircleMeter(92, 32, 20, "deg", ps3RightStickDeg());
+
+                    fullColorLed1.angleLightUp(ps3RightStickDeg(), ps3RightStickDetected() ? led_brightness : 0);
                     break;
                 case 9:
                     ButtonDataType btns[] = {UP, DOWN, LEFT, RIGHT, TRIANGLE, CIRCLE, CROSS, SQUARE, L1, L2, L3, R1, R2, R3};
