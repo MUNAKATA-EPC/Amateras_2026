@@ -17,20 +17,20 @@ PD::PD(float kp, float kd)
 #endif
 }
 
-void PD::process(float val, float target)
+void PD::process(float val, float target, bool angle)
 {
     // 現在値を設定
     _value = val;
     // P制御（比例項）の計算
     // 誤差を計算 (目標 - 現在値)
-    float error = target - _value;
+    float error = angle ? diffDeg(target, _value) : target - _value;
 
     // P制御の計算
     _p_power = error * _kp;
 
     // D制御（微分項）の計算
     // 角度の変化量 (_gap_of_value) を計算
-    _gap_of_value = _value - _oldvalue;
+    _gap_of_value = angle ? diffDeg(_value, _oldvalue) : _value - _oldvalue;
 
 #ifdef D_USE_TIMER
     float delta = 0.0f;

@@ -87,7 +87,7 @@ void motorsPdProcess(PD *pd, int deg, int target)
 // ここでPDポインタを更新し、計算を実行
 {
     _pd = pd;
-    _pd->process(deg, target);
+    _pd->process(deg, target, true);
 }
 
 // 移動制御とPD制御を合成してモーターを駆動

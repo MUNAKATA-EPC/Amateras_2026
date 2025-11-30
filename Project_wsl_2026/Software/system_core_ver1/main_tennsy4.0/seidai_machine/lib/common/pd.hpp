@@ -2,6 +2,7 @@
 
 #include <Arduino.h>
 #include "timer.hpp"
+#include "angleHelper.hpp"
 
 class PD
 {
@@ -33,7 +34,7 @@ public:
         _useD = use;
     }
 
-    void process(float val, float target);
+    void process(float val, float target, bool angle);
 
     // [-100.0f~100.0f]の値を返す
     float const output()

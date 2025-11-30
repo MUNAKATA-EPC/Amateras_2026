@@ -152,8 +152,8 @@ void playDefender(Defender::Mode mode)
 
 Vector LineTraceVec(PD *pd, int power)
 {
-    pd->useD(false);                 // D成分は使わなくて十分
-    pd->process(lineRingDis(), 0.0f); // 計算
+    pd->useD(false);                         // D成分は使わなくて十分
+    pd->process(lineRingDis(), 0.0f, false); // 計算
     double len = map(fabs(pd->output()), 0.0f, 100.0f, 0.0f, power);
 
     return getVec(lineRingDeg(), len);
@@ -176,10 +176,10 @@ Vector LineTraceAndTargetVec(PD *pd_line_trace, int deg, int power)
     float sessen_len;
     if (abs(deg) < 6) // 目標角度がほぼ前
         sessen_len = 0.0f;
-    else if (abs(deg) < 30)                                     // 目標角度が前付近
+    else if (abs(deg) < 30)                                        // 目標角度が前付近
         sessen_len = map(abs(deg), 0.0f, 30.0f, 0.0f, behind_len); // 角度によってp制御
-    else                                                        // 目標角度が前付近に無い
-        sessen_len = behind_len;                                // マックスで動かす
+    else                                                           // 目標角度が前付近に無い
+        sessen_len = behind_len;                                   // マックスで動かす
     // 接線ベクトル算出
     Vector sessen_vec(sessen_deg, sessen_len);
 
