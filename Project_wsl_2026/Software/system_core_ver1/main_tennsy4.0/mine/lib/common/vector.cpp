@@ -41,7 +41,7 @@ Vector getVec(int deg, float length)
     return vec;
 }
 
-Vector mapVec(Vector vec,float in_scale,float out_scale)
+Vector mapVec(Vector vec, float in_scale, float out_scale)
 {
     vec = vec / in_scale * out_scale;
     return vec;

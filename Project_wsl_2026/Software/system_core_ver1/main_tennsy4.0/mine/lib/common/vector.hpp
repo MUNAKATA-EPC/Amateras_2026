@@ -13,17 +13,19 @@ public:
     // コンストラクタ
     Vector();
     Vector(float x0, float y0, float x1, float y1); // ベクトル生成 方法1
-    Vector(int deg, float length);                     // ベクトル生成 方法2
+    Vector(int deg, float length);                  // ベクトル生成 方法2
 
     // 演算
     Vector operator+(const Vector &other) const; // ベクトル同士の足し算
     Vector operator-(const Vector &other) const; // ベクトル同士の引き算
-    Vector operator*(const float &scale) const; // ベクトル同士の掛け算
-    Vector operator/(const float &scale) const; // ベクトル同士の割り算
+    Vector operator*(const float &scale) const;  // ベクトル同士の掛け算
+    Vector operator/(const float &scale) const;  // ベクトル同士の割り算
 
     // データの取得
-    float x() const { return _vector_x; }                                                // x
-    float y() const { return _vector_y; }                                                // y
+    bool is_empty() const { return (_vector_x == 0.0f && _vector_y == 0.0f); }
+
+    float x() const { return _vector_x; }                                                 // x
+    float y() const { return _vector_y; }                                                 // y
     float length() const { return sqrtf(_vector_x * _vector_x + _vector_y * _vector_y); } // 大きさ
 
     int deg() const // 度数法[0~180]
@@ -45,6 +47,6 @@ public:
 Vector getVec(int deg, float length);
 
 // ベクターマッピング
-Vector mapVec(Vector vec,float in_scale,float out_scale);
+Vector mapVec(Vector vec, float in_scale, float out_scale);
 
 #endif
