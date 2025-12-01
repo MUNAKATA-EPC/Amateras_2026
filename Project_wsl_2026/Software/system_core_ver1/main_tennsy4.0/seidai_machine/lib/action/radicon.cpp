@@ -4,69 +4,13 @@ static PD pdCam(0.6f, 0.1f);  // カメラ用のPD調節値
 
 #define MOVE_DEG_INDEX 0
 #define MOVE_POWER_INDEX 1
-static int data[360][2]; // 移動角度とパワー記録用配列
+static int data[360][2]; // 角度と距離で360*5段階で記録　移動角度とパワー記録用配列
 
 /*　ボールの位置によってロボットの進むべき方向(ステックの角度)とパワーを記録する　*/
 /*　ボールがあって◎ボタンが押されている：データ記録　*/
 /*　×ボタンが押される：データ削除　*/
 void radiconRecord()
 {
-    // キッカー
-    bool on = (catchSensor.read() == HIGH) || ps3ButtonIsPushing(ButtonDataType::L3) || ps3ButtonIsPushing(ButtonDataType::R3);
-    kicker1.kick(on);
-
-    // コントローラー
-    int pd_stick_deg = ps3LeftStickDeg();
-    bool pd_stick_detected = ps3LeftStickDetected();
-
-    int move_stick_deg = ps3RightStickDeg();
-    float move_stick_dis = ps3RightStickDis();
-    bool move_stick_detected = ps3RightStickDetected();
-
-    // PD制御
-    if (pd_stick_detected)
-    {
-        motorsPdProcess(&pdGyro, bnoDeg(), -pd_stick_deg); // PD成分計算(右ステック補正付き)
-    }
-    else
-    {
-        motorsPdProcess(&pdGyro, bnoDeg(), 0); // PD成分計算
-    }
-
-    // パワー
-    const int power = 85;
-
-    // 制御
-    if (move_stick_detected)
-    {
-        int moveDeg = normalizeDeg(move_stick_deg + bnoDeg()); // 移動方向
-        int movePower = int(power * move_stick_dis / 128.0f);
-
-        motorsMove(moveDeg, movePower);
-
-        // 記録処理
-        if (irDetected() && ps3ButtonIsPushing(ButtonDataType::CIRCLE))
-        {
-            int index = (irDeg() + 360) % 360; // 0~359度に変換
-
-            data[index][MOVE_DEG_INDEX] = moveDeg;     // ”ボールの方向”番号にステックの角度を記録
-            data[index][MOVE_POWER_INDEX] = movePower; // ”ボールの方向”番号にパワーを記録
-        }
-    }
-    else
-    {
-        motorsPdMove();
-    }
-
-    // データ削除
-    if (ps3ButtonIsPushing(ButtonDataType::CROSS))
-    {
-        for (int i = 0; i < 360; i++)
-        {
-            data[i][MOVE_DEG_INDEX] = 0xFF;
-            data[i][MOVE_POWER_INDEX] = 0xFF;
-        }
-    }
 }
 
 /*　補正成功：LEDが青緑色に光る　*/
