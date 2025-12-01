@@ -29,7 +29,7 @@ void setup()
   Serial1.begin(115200);
 
   // マルチプレクサのピン設定 (実際の配線に合わせてください)
-  ir_mux.set_pin(1, 2, 3, 4, 5, -1);
+  ir_mux.set_pin(1, 2, 3, 4, 0, -1);
   // マルチプレクサの初期化
   ir_mux.init(100);
 

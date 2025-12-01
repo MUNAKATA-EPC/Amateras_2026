@@ -9,7 +9,7 @@ void setup()
 {
     Serial.begin(9600);
 
-    line_mux.set_pin(1, 2, 3, 4, 5, -1); // ピンを指定
+    line_mux.set_pin(1, 2, 3, 4, 0, -1); // ピンを指定
     line_mux.init(10);                   // 時間を指定
 }
 
