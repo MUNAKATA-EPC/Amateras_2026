@@ -99,8 +99,8 @@ void setup()
     }
     anyrtttl::nonblocking::stop(); // 曲の演奏停止
 
-    anyrtttl::blocking::play(BUZZER_PIN, startup0); // 起動音0
-
+    tone(BUZZER_PIN, BUZZER_PITCHES::MyC5, 50);
+    
     // 押し続け防止
     while (enterButton.isPushing() || backButton.isPushing() || rightButton.isPushing() || leftButton.isPushing())
     {

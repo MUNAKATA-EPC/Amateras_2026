@@ -121,8 +121,8 @@ uint8_t complementData(Vector (&data)[360][5], bool (*range)[5])
 }
 
 /*●ボタンを押している間は記録*/
-/*➡その後▲ボタンでデータ補正・record_dataに代入*/
-/*➡その後×ボタンでtemp_record_data削除*/
+/* その後▲ボタンでデータ補正・record_dataに代入*/
+/* その後×ボタンでtemp_record_data削除*/
 bool old_triangle_button = false; // 昔のps3の▲ボタン記録用
 
 void record()

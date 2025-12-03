@@ -148,7 +148,7 @@ void uiButtonUpdate(bool enterbtn, bool backbtn, bool rightbtn, bool leftbtn)
 
         if (enterbtn)
         {
-            tone(BUZZER_PIN, BUZZER_PITCHES::MyE4, 50);
+            tone(BUZZER_PIN, BUZZER_PITCHES::MyC5, 50);
 
             _actionDecided = true;
         }
@@ -208,7 +208,7 @@ void uiButtonUpdate(bool enterbtn, bool backbtn, bool rightbtn, bool leftbtn)
 
         if (enterbtn)
         {
-            tone(BUZZER_PIN, BUZZER_PITCHES::MyE4, 50);
+            tone(BUZZER_PIN, BUZZER_PITCHES::MyC5, 50);
 
             _modeDecided = true;
         }
@@ -236,7 +236,7 @@ void uiButtonUpdate(bool enterbtn, bool backbtn, bool rightbtn, bool leftbtn)
 
         if (enterbtn)
         {
-            tone(BUZZER_PIN, BUZZER_PITCHES::MyE4, 50);
+            tone(BUZZER_PIN, BUZZER_PITCHES::MyC5, 50);
 
             if (_configNumber == 0)
             {
