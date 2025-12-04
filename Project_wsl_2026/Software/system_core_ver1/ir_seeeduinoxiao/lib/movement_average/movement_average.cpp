@@ -5,16 +5,21 @@ void Movement_average::set(int average_count)
     _average_count = constrain(average_count, 1, AVERAGE_COUNT_LIMIT);
 }
 
-void Movement_average::add(int data)
+void Movement_average::add(float data)
 {
     _data[_add_index] = data;
 
     _add_index = (_add_index + 1) % _average_count; // 加算して次更新する
 }
 
-int Movement_average::output()
+void Movement_average::addNone()
 {
-    int sum = 0, available_count = 0;
+    add(0xFFFF);
+}
+
+float Movement_average::output()
+{
+    float sum = 0.0f, available_count = 0;
     for (int i = 0; i < _average_count; i++)
     {
         if (_data[i] != 0xFFFF)

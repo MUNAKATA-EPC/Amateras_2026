@@ -79,7 +79,7 @@ void setup()
 
         if (resetButton.isReleased())
         {
-            anyrtttl::blocking::play(BUZZER_PIN, startup2); // 起動音2
+            delay(300);
 
             music_type = (music_type + 1) % 4;
 
@@ -99,8 +99,8 @@ void setup()
     }
     anyrtttl::nonblocking::stop(); // 曲の演奏停止
 
-    tone(BUZZER_PIN, BUZZER_PITCHES::MyC5, 50);
-    
+    anyrtttl::blocking::play(BUZZER_PIN, startup0); // 起動音0
+
     // 押し続け防止
     while (enterButton.isPushing() || backButton.isPushing() || rightButton.isPushing() || leftButton.isPushing())
     {

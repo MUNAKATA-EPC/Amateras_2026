@@ -8,7 +8,7 @@ class Movement_average
 {
 private:
     int _average_count = AVERAGE_COUNT_LIMIT;
-    int _data[10] = {0xFFFF};
+    float _data[10] = {0xFFFF};
 
     int _add_index = 0;
 
@@ -17,9 +17,10 @@ private:
 public:
     void set(int average_count);
 
-    void add(int data);
+    void add(float data);
+    void addNone();
 
-    int output();
+    float output();
 
     bool cant_compute() const { return _cant_compute; }
 };

@@ -8,6 +8,8 @@ const int head_byte = 0xAA; // 同期ヘッダー格納用
 
 Multiplexer ir_mux;
 Movement_average ir_ave[IR_SENSOR_COUNT];
+Movement_average IRball_x_ave;
+Movement_average IRball_y_ave;
 
 const int IRsensor_pin[IR_SENSOR_COUNT] = {0, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1}; // 前から左回りにピン番号を指定
 
@@ -31,6 +33,9 @@ void setup()
         IRsensor_x[i] = cosf(radians(i * diff_angle)); // 座標の計算
         IRsensor_y[i] = sinf(radians(i * diff_angle)); // 座標の計算
     }
+
+    IRball_x_ave.set(5);
+    IRball_y_ave.set(5);
 }
 
 void loop()
@@ -72,8 +77,16 @@ void loop()
         float IRball_x = weight_sum_x / weight_sum;
         float IRball_y = weight_sum_y / weight_sum;
 
-        IRball_deg_to_send = static_cast<int16_t>(round(degrees(atan2(IRball_y, IRball_x))));
+        IRball_x_ave.add(IRball_x);
+        IRball_y_ave.add(IRball_y);
+
+        IRball_deg_to_send = static_cast<int16_t>(round(degrees(atan2(IRball_y_ave.output(), IRball_x_ave.output()))));
         IRball_value_to_send = static_cast<int16_t>(min_value);
+    }
+    else
+    {
+        IRball_x_ave.addNone();
+        IRball_y_ave.addNone();
     }
 
     Serial1.write(head_byte); // 同期ヘッダー
