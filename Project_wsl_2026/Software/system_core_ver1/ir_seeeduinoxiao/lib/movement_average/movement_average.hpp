@@ -17,10 +17,10 @@ private:
 public:
     void set(int average_count);
 
-    void add(float data);
+    void add(int data);
     void addNone();
 
-    float output();
+    int output();
 
     bool cant_compute() const { return _cant_compute; }
 };

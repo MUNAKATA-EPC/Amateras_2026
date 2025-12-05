@@ -27,7 +27,7 @@ void setup()
   // seidai_machineに搭載しているm5のアドレス : E8:6B:EA:31:0A:3A
 
   while (!Ps3.isConnected()) // 接続されるまで待つ
-    ;z
+    ;
 }
 
 void loop()
