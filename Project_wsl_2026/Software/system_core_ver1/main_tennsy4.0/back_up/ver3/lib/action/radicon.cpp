@@ -233,8 +233,8 @@ void record()
                     if (record_data[i][j].is_empty() == false)
                     {
                         // すでにデータがあるなら平均を取る
-                        Vector avg_vec = (record_data[i][j] + temp_record_data[i][j]) / 2.0f;
-                        record_data[i][j] = avg_vec;
+                        Vector avg_vec = record_data[i][j] + temp_record_data[i][j];
+                        record_data[i][j] = avg_vec / 2.0f;
                     }
                     else
                     {
