@@ -1,10 +1,9 @@
 #include <Arduino.h>
 #include "multiplexer.hpp"
 
-/*kanameロボット用*/
-uint8_t LINE_SIDE_PINS[3] = {8, 9, 10}; // 右・左・後サイドのピン
-
+/*seidaiロボット用*/
 const uint8_t head_byte = 0xAA; // 同期ヘッダー格納用
+const uint8_t LINE_SIDE_PINS[3] = {8, 9, 10}; // 右・左・後サイドのピン
 
 uint32_t lines_data_bit_mask; // 16+3個のラインセンサーの状況格納用
 
