@@ -35,9 +35,9 @@ void setup()
     Serial.begin(9600L); // デバッグ用
 
     debugMessage += irInit(&Serial1, 115200, 0xAA) ? "ir     : found\n" : "ir     : not found\n";
-    debugMessage += lineInit(&Serial5, 115200, 0xAA) ? "line   : found\n" : "line   : not found\n";
-    debugMessage += openmvInit(&Serial3, 115200, 0xAA) ? "openmv : found\n" : "openmv : not found\n";
-    debugMessage += ps3Init(&Serial2, 115200, 0xAA) ? "ps3    : found\n" : "ps3    : not found\n";
+    debugMessage += lineInit(&Serial5, 9600, 0xAA) ? "line   : found\n" : "line   : not found\n";
+    debugMessage += openmvInit(&Serial3, 9600, 0xAA) ? "openmv : found\n" : "openmv : not found\n";
+    debugMessage += ps3Init(&Serial2, 9600, 0xAA) ? "ps3    : found\n" : "ps3    : not found\n";
     ps3StickAdjust(20.0f, 20.0f);
 
     debugMessage += motorsInit(&Serial1, 115200) ? "motors : found\n" : "motors : not found\n";

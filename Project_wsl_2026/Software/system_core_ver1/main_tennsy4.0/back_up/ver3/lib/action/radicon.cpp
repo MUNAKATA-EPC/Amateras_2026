@@ -6,19 +6,22 @@ static Vector temp_record_data[360][5]; // 一時的なデータ保管庫
 
 bool is_temp_record_data_empty = true;
 
+#define MIN_POWER 20.0f
+#define MAX_POWER 80.0f
+
 /*距離を5段階に変換する*/
 int disToIndex(float dis)
 {
     if (dis < 350.0f)
         return 0;
     else if (dis < 450.0f)
-        return 1;
+        return 0;
     else if (dis < 550.0f)
-        return 2;
+        return 0;
     else if (dis < 650.0f)
-        return 3;
+        return 1;
 
-    return 4;
+    return 1;
 }
 
 /*dataの補正　成功した距離段階を2進数で返す 例:段階0,1,3が成功➡0b11010*/
@@ -97,6 +100,14 @@ uint8_t complementData(Vector (&data)[360][5], bool (*range)[5])
                     // 合力 = (マイナス方向のベクトル * マイナス方向の重み) + (プラス方向のベクトル * プラス方向の重み)
                     Vector combine_found_vec = (minus_found_vec * weight_minus) + (plus_found_vec * weight_plus);
 
+                    // もし出力が最小値よりも小さかったら最小値にする
+                    if (combine_found_vec.length() < MIN_POWER)
+                        combine_found_vec = Vector(combine_found_vec.deg(), MIN_POWER);
+
+                    // もし出力が最大値よりも大きかったら最大値にする
+                    if (combine_found_vec.length() > MAX_POWER)
+                        combine_found_vec = Vector(combine_found_vec.deg(), MAX_POWER);
+
                     current_data[i][j] = combine_found_vec / total_weight; // 補間ベクトル = 重み付き合力 ÷ 合計重み
                 }
             }
@@ -120,9 +131,10 @@ uint8_t complementData(Vector (&data)[360][5], bool (*range)[5])
     return output;
 }
 
-/*●ボタンを押している間は記録*/
-/* その後▲ボタンでデータ補正・record_dataに代入*/
-/* その後×ボタンでtemp_record_data削除*/
+/* ●ボタンを押している間は記録 */
+/* その後▲ボタンでデータ補正・record_dataに代入 */
+/* その後×ボタンでtemp_record_data削除 */
+/* その後■ボタンでrecord_data削除 */
 bool old_triangle_button = false; // 昔のps3の▲ボタン記録用
 
 void record()
@@ -131,7 +143,7 @@ void record()
 
     /*ps3からの読み取り　移動方向の計算*/
     int move_deg = ps3RightStickDeg();
-    int move_power = (int)constrain(80.0f * ps3RightStickDis() / 128.0f, 0.0f, 80.0f);
+    int move_power = (int)constrain(80.0f * ps3RightStickDis() / 128.0f, 0.0f, MAX_POWER);
     if (!ps3RightStickDetected())
     {
         move_deg = 0xFF;
@@ -141,7 +153,7 @@ void record()
     if (ps3ButtonIsPushing(ButtonDataType::CIRCLE))
     {
         /*データの記録*/
-        if (move_deg != 0xFF && irDetected())
+        if (move_deg != 0xFF && irDetected() && move_power >= (int)MIN_POWER)
         {
             int deg_index = (irDeg() + 360) % 360; // 角度を0~359の配列用に変換
             int dis_index = disToIndex(irDis());   // 距離を0~4の配列用に変換
@@ -216,8 +228,20 @@ void record()
         {
             for (int i = 0; i < 360; i++)
             {
-                if (temp_record_data[i][j].is_empty() == false)
-                    record_data[i][j] = temp_record_data[i][j]; // 空データではないなら代入
+                if (temp_record_data[i][j].is_empty() == false) // 空データではないなら代入
+                {
+                    if (record_data[i][j].is_empty() == false)
+                    {
+                        // すでにデータがあるなら平均を取る
+                        Vector avg_vec = (record_data[i][j] + temp_record_data[i][j]) / 2.0f;
+                        record_data[i][j] = avg_vec;
+                    }
+                    else
+                    {
+                        // すでにデータがないならそのまま代入
+                        record_data[i][j] = temp_record_data[i][j];
+                    }
+                }
             }
         }
 
@@ -236,6 +260,13 @@ void record()
                 temp_record_data[i][j] = Vector();
 
         is_temp_record_data_empty = true;
+    }
+    else if (ps3ButtonIsPushing(ButtonDataType::SQUARE))
+    {
+        /*record_dataの内容を削除*/
+        for (int j = 0; j < 5; j++)
+            for (int i = 0; i < 360; i++)
+                record_data[i][j] = Vector();
     }
 
     /*モータ制御*/
@@ -279,6 +310,8 @@ static bool first_call_flag = false; // 配列初期化用
 void playRadicon()
 {
     Radicon::Mode mode = (Radicon::Mode)uiModeNumber();
+
+    motorsPdProcess(&pdGyro, bnoDeg(), 0);
 
     if (first_call_flag == false) // record_data・temp_record_dataの初期化
     {

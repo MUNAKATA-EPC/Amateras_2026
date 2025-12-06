@@ -18,7 +18,7 @@ Multiplexer line_mux; // 定義
 void setup()
 {
   Serial.begin(9600);
-  Serial1.begin(115200);
+  Serial1.begin(9600);
 
   pinMode(LINE_SIDE_RIGHT_PIN, INPUT); // サイド用のピン
   pinMode(LINE_SIDE_LEFT_PIN, INPUT);  // サイド用のピン

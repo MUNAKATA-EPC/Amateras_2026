@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include "multiplexer.hpp"
 
-/*黒ロボット用*/
+/*kanameロボット用*/
 uint8_t LINE_SIDE_PINS[3] = {8, 9, 10}; // 右・左・後サイドのピン
 
 const uint8_t head_byte = 0xAA; // 同期ヘッダー格納用
@@ -17,7 +17,7 @@ unsigned int LINE_SIDE_JUDGE_VALUE[3] = {790}; // 右・左・後サイドライ
 void setup()
 {
   Serial.begin(9600);
-  Serial1.begin(115200);
+  Serial1.begin(9600);
 
   for (int i = 0; i < 3; i++)
   {

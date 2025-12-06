@@ -83,11 +83,21 @@ void motorsStop()
 // pd 使用するPDオブジェクトのポインタ
 // deg 現在の角度（BNOなど）
 // target 目標角度
+static PD *_old_pd = nullptr;
 void motorsPdProcess(PD *pd, int deg, int target)
 // ここでPDポインタを更新し、計算を実行
 {
     _pd = pd;
+
+    if (_pd != _old_pd)
+    {
+        // PDオブジェクトが変更された場合、D成分は計算しない
+        _pd->useP(true);
+        _pd->useD(false);
+    }
     _pd->process(deg, target);
+
+    _old_pd = pd;
 }
 
 // 移動制御とPD制御を合成してモーターを駆動
