@@ -2,41 +2,41 @@
 
 void Timer::reset()
 {
-    _resetTime = millis();
-    _isStopped = false;
+    _reset_time = millis();
+    _is_stopped = false;
 }
 
 void Timer::stop()
 {
-    if (!_isStopped)
+    if (!_is_stopped)
     {
-        _isStopped = true;
-        _stopTime = millis();
+        _is_stopped = true;
+        _stop_time = millis();
     }
 }
 
 void Timer::start()
 {
-    if (_isStopped)
+    if (_is_stopped)
     {
-        _isStopped = false;
-        _resetTime = millis() - _stopTime + _resetTime;
+        _is_stopped = false;
+        _reset_time = millis() - _stop_time + _reset_time;
     }
 }
 
 unsigned long Timer::msTime()
 {
-    if (!_everCalled)
-        _everCalled = true;
+    if (!_ever_called)
+        _ever_called = true;
 
-    if (!_isStopped)
+    if (!_is_stopped)
     {
-        _nowTime = millis() - _resetTime;
+        _now_time = millis() - _reset_time;
     }
     else
     {
-        _nowTime = _stopTime - _resetTime;
+        _now_time = _stop_time - _reset_time;
     }
 
-    return _nowTime;
+    return _now_time;
 }

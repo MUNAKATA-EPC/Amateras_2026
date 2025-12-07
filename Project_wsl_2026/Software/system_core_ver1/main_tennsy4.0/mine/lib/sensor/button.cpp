@@ -26,11 +26,11 @@ void Button::update()
         if (!_oldpressed)
             _pushingTimer.reset();
 
-        _pushingTime = _pushingTimer.msTime();
+        _pushing_time = _pushingTimer.msTime();
     }
     else
     {
-        _pushingTime = 0;
+        _pushing_time = 0;
     }
 
     // 変化を検出
@@ -44,11 +44,11 @@ bool Button::isPushing() { return _pressed; }
 
 bool Button::isReleased() { return _released; }
 
-unsigned long Button::pushingTime() { return _pushingTime; } // 押されている時間を貸す
+unsigned long Button::pushingTime() { return _pushing_time; } // 押されている時間を貸す
 
 void Button::pushingTimeReset()
 {
-    _pushingTime = 0;      // 押されている時間をリセット
+    _pushing_time = 0;      // 押されている時間をリセット
     _pushingTimer.reset(); // タイマーもリセット
 }
 

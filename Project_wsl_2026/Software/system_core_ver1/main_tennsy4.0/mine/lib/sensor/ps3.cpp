@@ -4,23 +4,23 @@ static HardwareSerial *_serial = nullptr;
 static uint32_t _baudrate = 9600;
 
 // 調整
-static float _stickLeftAdjust = 0.0f;
-static float _stickRightAdjust = 0.0f;
+static float _stick_left_adjust = 0.0f;
+static float _stick_right_adjust = 0.0f;
 
 // 左ステック
-static int _stickLx = 0;
-static int _stickLy = 0;
-static bool _stickLeftDetected = false;
-static int _stickLeftDeg = 0xFF;
-static float _stickLeftDis = 0xFF;
+static int _stick_lx = 0;
+static int _stick_ly = 0;
+static bool _stick_left_detected = false;
+static int _stick_left_deg = 0xFF;
+static float _stick_left_dis = 0xFF;
 // 右ステック
-static int _stickRx = 0;
-static int _stickRy = 0;
-static bool _stickRightDetected = false;
-static int _stickRightDeg = 0xFF;
-static float _stickRightDis = 0xFF;
+static int _stick_rx = 0;
+static int _stick_ry = 0;
+static bool _stick_right_detected = false;
+static int _stick_right_deg = 0xFF;
+static float _stick_right_dis = 0xFF;
 // ボタン（14個）
-static uint16_t buttonBitMask = 0;
+static uint16_t _button_bit_mask = 0;
 
 static Packet_manager packet; // パケットマネージャー
 
@@ -47,8 +47,8 @@ bool ps3Init(HardwareSerial *serial, uint32_t baudrate)
 
 void ps3StickAdjust(float leftAdjust, float rightAdjust)
 {
-    _stickLeftAdjust = leftAdjust;
-    _stickRightAdjust = rightAdjust;
+    _stick_left_adjust = leftAdjust;
+    _stick_right_adjust = rightAdjust;
 }
 
 void ps3Update()
@@ -62,75 +62,75 @@ void ps3Update()
         if (packet.isComplete())
         {
             // ステックのx,y
-            _stickLx = int8_t(packet.get(1));  // 左ステックX (-128~127)
-            _stickLy = -int8_t(packet.get(2)); // 左ステックY
-            _stickRx = int8_t(packet.get(3));  // 右ステックX
-            _stickRy = -int8_t(packet.get(4)); // 右ステックY
+            _stick_lx = int8_t(packet.get(1));  // 左ステックX (-128~127)
+            _stick_ly = -int8_t(packet.get(2)); // 左ステックY
+            _stick_rx = int8_t(packet.get(3));  // 右ステックX
+            _stick_ry = -int8_t(packet.get(4)); // 右ステックY
 
             // 左ステックの角度・距離
-            _stickLeftDis = sqrtf(_stickLx * _stickLx + _stickLy * _stickLy); // 距離を算出
-            _stickLeftDis = constrain(_stickLeftDis, 0.0f, 128.0f);
+            _stick_left_dis = sqrtf(_stick_lx * _stick_lx + _stick_ly * _stick_ly); // 距離を算出
+            _stick_left_dis = constrain(_stick_left_dis, 0.0f, 128.0f);
 
-            if (_stickLeftDis <= _stickLeftAdjust)
+            if (_stick_left_dis <= _stick_left_adjust)
             {
-                _stickLeftDetected = false;
-                _stickLx = 0;
-                _stickLy = 0;
-                _stickLeftDeg = 0xFF;
-                _stickLeftDis = 0xFF;
+                _stick_left_detected = false;
+                _stick_lx = 0;
+                _stick_ly = 0;
+                _stick_left_deg = 0xFF;
+                _stick_left_dis = 0xFF;
             }
             else
             {
-                _stickLeftDetected = true;
+                _stick_left_detected = true;
 
-                _stickLeftDeg = (int)round(degrees(atan2(-_stickLx, _stickLy)));
+                _stick_left_deg = (int)round(degrees(atan2(-_stick_lx, _stick_ly)));
             }
 
             // 右ステックの角度・距離
-            _stickRightDis = sqrtf(_stickRx * _stickRx + _stickRy * _stickRy); // 距離を算出
-            _stickRightDis = constrain(_stickRightDis, 0.0f, 128.0f);
+            _stick_right_dis = sqrtf(_stick_rx * _stick_rx + _stick_ry * _stick_ry); // 距離を算出
+            _stick_right_dis = constrain(_stick_right_dis, 0.0f, 128.0f);
 
-            if (_stickRightDis <= _stickRightAdjust)
+            if (_stick_right_dis <= _stick_right_adjust)
             {
-                _stickRightDetected = false;
-                _stickRx = 0;
-                _stickRy = 0;
-                _stickRightDeg = 0xFF;
-                _stickRightDis = 0xFF;
+                _stick_right_detected = false;
+                _stick_rx = 0;
+                _stick_ry = 0;
+                _stick_right_deg = 0xFF;
+                _stick_right_dis = 0xFF;
             }
             else
             {
-                _stickRightDetected = true;
+                _stick_right_detected = true;
 
-                _stickRightDeg = (int)round(degrees(atan2(-_stickRx, _stickRy)));
+                _stick_right_deg = (int)round(degrees(atan2(-_stick_rx, _stick_ry)));
             }
 
             // ボタン
             uint8_t low = packet.get(5);                 // ボタン下位バイト
             uint8_t high = packet.get(6);                // ボタン上位バイト
-            buttonBitMask = (uint16_t(high) << 8) | low; // 16bit にまとめる
+            _button_bit_mask = (uint16_t(high) << 8) | low; // 16bit にまとめる
 
             packet.reset();
         }
     }
 }
 
-bool ps3LeftStickDetected() { return _stickLeftDetected; }
-bool ps3RightStickDetected() { return _stickRightDetected; }
+bool ps3LeftStickDetected() { return _stick_left_detected; }
+bool ps3RightStickDetected() { return _stick_right_detected; }
 
-int ps3LeftStickX() { return _stickLx; }
-int ps3LeftStickY() { return _stickLy; }
+int ps3LeftStickX() { return _stick_lx; }
+int ps3LeftStickY() { return _stick_ly; }
 
-int ps3RightStickX() { return _stickRx; }
-int ps3RightStickY() { return _stickRy; }
+int ps3RightStickX() { return _stick_rx; }
+int ps3RightStickY() { return _stick_ry; }
 
-int ps3LeftStickDeg() { return _stickLeftDeg; }
-int ps3RightStickDeg() { return _stickRightDeg; }
+int ps3LeftStickDeg() { return _stick_left_deg; }
+int ps3RightStickDeg() { return _stick_right_deg; }
 
-float ps3LeftStickDis() { return _stickLeftDis; }
-float ps3RightStickDis() { return _stickRightDis; }
+float ps3LeftStickDis() { return _stick_left_dis; }
+float ps3RightStickDis() { return _stick_right_dis; }
 
 bool ps3ButtonIsPushing(ButtonDataType type)
 {
-    return ((1 << (int)type) & buttonBitMask) > 0; // (int)type分だけシフトした1との論理積が0よりも大きかったらそのbitは1
+    return ((1 << (int)type) & _button_bit_mask) > 0; // (int)type分だけシフトした1との論理積が0よりも大きかったらそのbitは1
 }

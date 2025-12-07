@@ -21,17 +21,17 @@ int diffDeg(int deg1, int deg2)
     return mod;
 }
 
-// targetDegに対する接線方向のうち、enterDegに近い方を返す
-int nearSeesenDeg(int targetDeg, int enterDeg)
+// target_degに対する接線方向のうち、enter_Degに近い方を返す
+int nearSeesenDeg(int target_deg, int enter_deg)
 {
     // targetDegに±90°を加算した角度を正規化する
-    int sessen1Deg = normalizeDeg(targetDeg + 90);
-    int sessen2Deg = normalizeDeg(targetDeg - 90); // targetDeg + 270 は targetDeg - 90 と同じ
+    int sessen1_deg = normalizeDeg(target_deg + 90);
+    int sessen2_deg = normalizeDeg(target_deg - 90); // target_deg + 270 は target_deg - 90 と同じ
 
     // 差分を -180〜180 の範囲で計算
-    bool isSessen1DegNear = abs(diffDeg(sessen1Deg, enterDeg)) < abs(diffDeg(sessen2Deg, enterDeg));
+    bool is_sessen1_deg_near = abs(diffDeg(sessen1_deg, enter_deg)) < abs(diffDeg(sessen2_deg, enter_deg));
 
-    return isSessen1DegNear ? sessen1Deg : sessen2Deg;
+    return is_sessen1_deg_near ? sessen1_deg : sessen2_deg;
 }
 
 // 角度からエリアインデックスを計算

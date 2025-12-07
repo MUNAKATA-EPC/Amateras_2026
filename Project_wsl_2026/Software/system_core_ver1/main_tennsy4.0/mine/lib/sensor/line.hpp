@@ -14,6 +14,9 @@ enum LineDataType
     SIDE
 };
 
+bool lineIsAdjusting();
+int lineValueToAdjust(uint8_t index);
+
 bool lineRingDetected();
 bool lineSideDetected();
 

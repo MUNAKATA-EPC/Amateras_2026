@@ -162,14 +162,38 @@ void loop()
                     fullColorLed1.angleLightUp(irDeg(), irDetected() ? led_brightness : 0);
                     break;
                 case 1:
-                    uiPrint(0, 8, "[ringLine]\n deg:" + String(lineRingDeg()) + "\n dis:" + String(lineRingDis()));
-                    uiDrawCircleMeter(92, 32, 20, "deg", lineRingDeg());
+                    if (lineIsAdjusting()) // 調整中ならセンサーの値を表示
+                    {
+                        String adjust_message = "[line_adjust(0~7)]\n";
+                        for (int i = 0; i < 8; i++)
+                        {
+                            adjust_message += " l" + String(i) + ":" + String(lineValueToAdjust(i)) + "\n";
+                        }
+                        uiPrint(0, 8, adjust_message);
+                    }
+                    else // 通常表示
+                    {
+                        uiPrint(0, 8, "[ringLine]\n deg:" + String(lineRingDeg()) + "\n dis:" + String(lineRingDis()));
+                        uiDrawCircleMeter(92, 32, 20, "deg", lineRingDeg());
+                    }
 
                     fullColorLed1.angleLightUp(lineRingDeg(), lineRingDetected() ? led_brightness : 0);
                     break;
                 case 2:
-                    uiPrint(0, 8, "[sideLine]\n deg:" + String(lineSideDeg()));
-                    uiDrawCircleMeter(92, 32, 20, "deg", lineSideDeg());
+                    if (lineIsAdjusting()) // 調整中ならセンサーの値を表示
+                    {
+                        String adjust_message = "[line_adjust(8~15)]\n";
+                        for (int i = 8; i < 16; i++)
+                        {
+                            adjust_message += " l" + String(i) + ":" + String(lineValueToAdjust(i)) + "\n";
+                        }
+                        uiPrint(0, 8, adjust_message);
+                    }
+                    else // 通常表示
+                    {
+                        uiPrint(0, 8, "[sideLine]\n deg:" + String(lineSideDeg()) + "\n dis:" + String(lineSideDeg()));
+                        uiDrawCircleMeter(92, 32, 20, "deg", lineSideDeg());
+                    }
 
                     fullColorLed1.angleLightUp(lineSideDeg(), lineSideDetected() ? led_brightness : 0);
                     break;

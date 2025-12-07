@@ -4,17 +4,17 @@ static Adafruit_SSD1306 *_ssd = nullptr;
 
 static uint8_t _address;
 
-static bool _actionDecided = false;
-static bool _modeDecided = false;
+static bool _action_decided = false;
+static bool _mode_decided = false;
 
 #define METER_COUNT 10
-static int _meterNumber = 0;
-static int _actionNumber = 0;
-static int _modeNumber = 0;
+static int _meter_number = 0;
+static int _action_number = 0;
+static int _mode_number = 0;
 
 #define CONFIG_DATA_LIMIT 4
-static int _configNumber = 0;
-static unsigned int _configData[CONFIG_DATA_LIMIT] = {0U}; // 0~3個のconfigがある（Runも含む）
+static int _config_number = 0;
+static unsigned int _config_data[CONFIG_DATA_LIMIT] = {0U}; // 0~3個のconfigがある（Runも含む）
 
 // 初期化
 bool uiInit(TwoWire *wire, uint8_t address, uint8_t width, uint8_t height)
@@ -105,78 +105,78 @@ void uiButtonUpdate(bool enterbtn, bool backbtn, bool rightbtn, bool leftbtn)
     {
         tone(BUZZER_PIN, BUZZER_PITCHES::MyC4, 50);
 
-        if (_modeDecided)
+        if (_mode_decided)
         {
-            _modeDecided = false;
+            _mode_decided = false;
             for (int i = 0; i < CONFIG_DATA_LIMIT; i++)
-                _configData[i] = 0;
-            _configNumber = 0;
+                _config_data[i] = 0;
+            _config_number = 0;
 
-            _meterNumber = 0; // リセット
+            _meter_number = 0; // リセット
         }
-        else if (_actionDecided)
+        else if (_action_decided)
         {
-            _actionDecided = false;
-            _modeNumber = 0;
+            _action_decided = false;
+            _mode_number = 0;
 
-            _meterNumber = 0; // リセット
+            _meter_number = 0; // リセット
         }
         else
         {
-            _meterNumber = (_meterNumber + 1 + METER_COUNT) % METER_COUNT; // 0~(METER_COUNT-1)を周期するようにする
+            _meter_number = (_meter_number + 1 + METER_COUNT) % METER_COUNT; // 0~(METER_COUNT-1)を周期するようにする
         }
     }
 
-    if (!_actionDecided)
+    if (!_action_decided)
     {
         if (rightbtn)
         {
             tone(BUZZER_PIN, BUZZER_PITCHES::MyC4, 50);
 
-            _actionNumber++;
-            if (_actionNumber > Action::Type::COUNT - 1)
-                _actionNumber = 0;
+            _action_number++;
+            if (_action_number > Action::Type::COUNT - 1)
+                _action_number = 0;
         }
         if (leftbtn)
         {
             tone(BUZZER_PIN, BUZZER_PITCHES::MyC4, 50);
 
-            _actionNumber--;
-            if (_actionNumber < 0)
-                _actionNumber = Action::Type::COUNT - 1;
+            _action_number--;
+            if (_action_number < 0)
+                _action_number = Action::Type::COUNT - 1;
         }
 
         if (enterbtn)
         {
             tone(BUZZER_PIN, BUZZER_PITCHES::MyC5, 50);
 
-            _actionDecided = true;
+            _action_decided = true;
         }
     }
-    else if (!_modeDecided)
+    else if (!_mode_decided)
     {
         if (rightbtn)
         {
             tone(BUZZER_PIN, BUZZER_PITCHES::MyC4, 50);
 
-            _modeNumber++;
-            switch (_actionNumber)
+            _mode_number++;
+            switch (_action_number)
             {
             case Action::Type::ATTACKER:
-                if (_modeNumber > Attacker::Mode::MODE_COUNT - 1)
-                    _modeNumber = 0;
+                if (_mode_number > Attacker::Mode::MODE_COUNT - 1)
+                    _mode_number = 0;
                 break;
             case Action::Type::DEFENDER:
-                if (_modeNumber > Defender::Mode::MODE_COUNT - 1)
-                    _modeNumber = 0;
+                if (_mode_number > Defender::Mode::MODE_COUNT - 1)
+                    _mode_number = 0;
                 break;
             case Action::Type::TEST:
-                if (_modeNumber > Test::Mode::MODE_COUNT - 1)
-                    _modeNumber = 0;
+                if (_mode_number > Test::Mode::MODE_COUNT - 1)
+                    _mode_number = 0;
                 break;
             case Action::Type::RADICON:
-                if (_modeNumber > Radicon::Mode::MODE_COUNT - 1)
-                    _modeNumber = 0;
+                if (_mode_number > Radicon::Mode::MODE_COUNT - 1)
+                    _mode_number = 0;
                 break;
             }
         }
@@ -184,24 +184,24 @@ void uiButtonUpdate(bool enterbtn, bool backbtn, bool rightbtn, bool leftbtn)
         {
             tone(BUZZER_PIN, BUZZER_PITCHES::MyC4, 50);
 
-            _modeNumber--;
-            switch (_actionNumber)
+            _mode_number--;
+            switch (_action_number)
             {
             case Action::Type::ATTACKER:
-                if (_modeNumber < 0)
-                    _modeNumber = Attacker::Mode::MODE_COUNT - 1;
+                if (_mode_number < 0)
+                    _mode_number = Attacker::Mode::MODE_COUNT - 1;
                 break;
             case Action::Type::DEFENDER:
-                if (_modeNumber < 0)
-                    _modeNumber = Defender::Mode::MODE_COUNT - 1;
+                if (_mode_number < 0)
+                    _mode_number = Defender::Mode::MODE_COUNT - 1;
                 break;
             case Action::Type::TEST:
-                if (_modeNumber < 0)
-                    _modeNumber = Test::Mode::MODE_COUNT - 1;
+                if (_mode_number < 0)
+                    _mode_number = Test::Mode::MODE_COUNT - 1;
                 break;
             case Action::Type::RADICON:
-                if (_modeNumber < 0)
-                    _modeNumber = Radicon::Mode::MODE_COUNT - 1;
+                if (_mode_number < 0)
+                    _mode_number = Radicon::Mode::MODE_COUNT - 1;
                 break;
             }
         }
@@ -210,7 +210,7 @@ void uiButtonUpdate(bool enterbtn, bool backbtn, bool rightbtn, bool leftbtn)
         {
             tone(BUZZER_PIN, BUZZER_PITCHES::MyC5, 50);
 
-            _modeDecided = true;
+            _mode_decided = true;
         }
     }
     else
@@ -219,32 +219,32 @@ void uiButtonUpdate(bool enterbtn, bool backbtn, bool rightbtn, bool leftbtn)
         {
             tone(BUZZER_PIN, BUZZER_PITCHES::MyC4, 50);
 
-            _configNumber = (_configNumber + 1) % CONFIG_DATA_LIMIT; // 0~CONFIG_DATA_LIMIT-1個のconfigがある
+            _config_number = (_config_number + 1) % CONFIG_DATA_LIMIT; // 0~CONFIG_DATA_LIMIT-1個のconfigがある
 
             // runは右が押されたらfalseになる
-            _configData[0] = false;
+            _config_data[0] = false;
         }
         if (leftbtn)
         {
             tone(BUZZER_PIN, BUZZER_PITCHES::MyC4, 50);
 
-            _configNumber = (_configNumber - 1 + CONFIG_DATA_LIMIT) % CONFIG_DATA_LIMIT; // 0~CONFIG_DATA_LIMIT-1個のconfigがある
+            _config_number = (_config_number - 1 + CONFIG_DATA_LIMIT) % CONFIG_DATA_LIMIT; // 0~CONFIG_DATA_LIMIT-1個のconfigがある
 
             // runは左が押されたらfalseになる
-            _configData[0] = false;
+            _config_data[0] = false;
         }
 
         if (enterbtn)
         {
             tone(BUZZER_PIN, BUZZER_PITCHES::MyC5, 50);
 
-            if (_configNumber == 0)
+            if (_config_number == 0)
             {
-                _configData[_configNumber] = !_configData[_configNumber]; // これはRunだからスイッチする
+                _config_data[_config_number] = !_config_data[_config_number]; // これはRunだからスイッチする
             }
             else
             {
-                _configData[_configNumber]++; // 加算する
+                _config_data[_config_number]++; // 加算する
             }
         }
     }
@@ -257,13 +257,13 @@ static String configName[3] = {""}; // CONFIG_DATA_LIMIT (4) から Run設定分
 void uiDrawMain()
 {
     // 表示
-    switch (_actionNumber)
+    switch (_action_number)
     {
     case Action::Type::ATTACKER:
         actionName = "Attacker";
-        if (_actionDecided)
+        if (_action_decided)
         {
-            switch (_modeNumber)
+            switch (_mode_number)
             {
             case Attacker::Mode::YELLOWGOAL:
                 modeName = "YellowGoal";
@@ -286,9 +286,9 @@ void uiDrawMain()
 
     case Action::Type::DEFENDER:
         actionName = "Defender";
-        if (_actionDecided)
+        if (_action_decided)
         {
-            switch (_modeNumber)
+            switch (_mode_number)
             {
             case Defender::Mode::YELLOWGOAL:
                 modeName = "YellowGoal";
@@ -305,9 +305,9 @@ void uiDrawMain()
 
     case Action::Type::TEST:
         actionName = "Test";
-        if (_actionDecided)
+        if (_action_decided)
         {
-            switch (_modeNumber)
+            switch (_mode_number)
             {
             case Test::Mode::KICKER:
                 modeName = "Kicker";
@@ -327,9 +327,9 @@ void uiDrawMain()
 
     case Action::Type::RADICON:
         actionName = "Radicon";
-        if (_actionDecided)
+        if (_action_decided)
         {
-            switch (_modeNumber)
+            switch (_mode_number)
             {
             case Radicon::Mode::RECORD:
                 modeName = "Record";
@@ -363,7 +363,7 @@ void uiDrawMain()
 
     ssdPrint(actionName);
 
-    if (!_actionDecided)
+    if (!_action_decided)
     {
         _ssd->print(" <");
     }
@@ -374,7 +374,7 @@ void uiDrawMain()
         // mode表示
         _ssd->print(" > ");
         ssdPrint(modeName);
-        if (!_modeDecided)
+        if (!_mode_decided)
         {
             _ssd->println(" <");
         }
@@ -383,9 +383,9 @@ void uiDrawMain()
             _ssd->println("");
 
             // run系のプリント
-            String run_str = (_configNumber == 0) ? "|" : " ";
+            String run_str = (_config_number == 0) ? "|" : " ";
             run_str += "Run:";
-            run_str += _configData[0] ? "on" : "off";
+            run_str += _config_data[0] ? "on" : "off";
 
             _ssd->setTextSize(2);
             ssdPrint(run_str);
@@ -415,9 +415,9 @@ void uiDrawMain()
             for (int i = 0; i < 3; i++)
             {
                 // 選択されているConfig (i+1) をチェック
-                config_str = (_configNumber == (i + 1)) ? " |" : "  ";
+                config_str = (_config_number == (i + 1)) ? " |" : "  ";
                 // configName[i] (スペース調整済み) とコロン':'を結合
-                config_str += configName[i] + ":" + String(_configData[(i + 1)]) + "\n";
+                config_str += configName[i] + ":" + String(_config_data[(i + 1)]) + "\n";
 
                 _ssd->setTextSize(1);
                 ssdPrint(config_str);
@@ -427,10 +427,10 @@ void uiDrawMain()
 }
 
 // 　データ取得
-int uiMeterNumber() { return _meterNumber; }
-bool uiActionDecided() { return _actionDecided; }
-bool uiModeDecided() { return _modeDecided; }
-bool uiRunning() { return _modeDecided && _actionDecided && _configData[0]; }
-int uiActionNumber() { return _actionNumber; }
-int uiModeNumber() { return _modeNumber; }
-int uiConfigNumber() { return _configNumber; }
+int uiMeterNumber() { return _meter_number; }
+bool uiActionDecided() { return _action_decided; }
+bool uiModeDecided() { return _mode_decided; }
+bool uiRunning() { return _mode_decided && _action_decided && _config_data[0]; }
+int uiActionNumber() { return _action_number; }
+int uiModeNumber() { return _mode_number; }
+int uiConfigNumber() { return _config_number; }

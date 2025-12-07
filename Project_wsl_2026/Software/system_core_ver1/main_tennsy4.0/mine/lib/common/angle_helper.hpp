@@ -7,7 +7,7 @@ int normalizeDeg(int deg); // 角度を -180度から180度の範囲に正規化
 
 int diffDeg(int deg1, int deg2); // 角度の差分を -180度から180度の範囲で計算する
 
-int nearSeesenDeg(int targetDeg, int enterDeg); // targetDegの接線の角度を出しその2つ角度の内enterDegに近いほうを返す
+int nearSeesenDeg(int target_deg, int enter_deg); // targetDegの接線の角度を出しその2つ角度の内enterDegに近いほうを返す
 
 int areaIndexFromDeg(int n, int deg);   // 角度からエリアインデックスを計算
 int degFromAreaIndex(int n, int index); // エリアインデックスからエリアの中心角度を計算

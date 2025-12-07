@@ -4,12 +4,12 @@
 class Timer
 {
 private:
-    unsigned long _resetTime = 0UL; // リセット時の時間
-    unsigned long _stopTime = 0UL;  // 停止時の時間
-    unsigned long _nowTime = 0UL;   // 計測時間
+    unsigned long _reset_time = 0UL; // リセット時の時間
+    unsigned long _stop_time = 0UL;  // 停止時の時間
+    unsigned long _now_time = 0UL;   // 計測時間
 
-    bool _isStopped = false;  // タイマーは停止しているか
-    bool _everCalled = false; // タイマーは今まで呼ばれたか
+    bool _is_stopped = false;  // タイマーは停止しているか
+    bool _ever_called = false; // タイマーは今まで呼ばれたか
 
 public:
     // 関数
@@ -20,6 +20,6 @@ public:
     // データの取得
     unsigned long msTime();
 
-    bool isStopped() const { return _isStopped; }
-    bool everCalled() const { return _everCalled; }
+    bool isStopped() const { return _is_stopped; }
+    bool everCalled() const { return _ever_called; }
 };

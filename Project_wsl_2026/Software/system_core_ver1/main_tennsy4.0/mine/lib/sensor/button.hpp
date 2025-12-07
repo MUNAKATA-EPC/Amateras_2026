@@ -14,7 +14,7 @@ private:
     bool _released = false;
 
     Timer _pushingTimer; // 押されている時間計測用
-    unsigned long _pushingTime = 0UL;
+    unsigned long _pushing_time = 0UL;
 
 public:
     // 関数

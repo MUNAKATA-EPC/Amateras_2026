@@ -1,8 +1,8 @@
 #include "bno.hpp"
 static Adafruit_BNO055 *_bno = nullptr;
 
-static int _degNormal = 0; // BNO055からの生角度
-static int _degReset = 0;  // リセット時の角度
+static int _deg_normal = 0; // BNO055からの生角度
+static int _deg_reset = 0;  // リセット時の角度
 static int _deg = 0;       // 補正後の角度格納用
 
 bool bnoInit(TwoWire *wire, uint8_t address)
@@ -28,13 +28,13 @@ bool bnoInit(TwoWire *wire, uint8_t address)
 void bnoUpdate(bool resetbtn)
 {
     imu::Vector<3> euler = _bno->getVector(Adafruit_BNO055::VECTOR_EULER);
-    _degNormal = (int)euler.x(); // X軸の角度
+    _deg_normal = (int)euler.x(); // X軸の角度
 
     if (resetbtn) // リセットボタンが押されたら
-        _degReset = _degNormal;
+        _deg_reset = _deg_normal;
 
     // 補正後の角度
-    _deg = (int)((_degNormal - _degReset + 360) % 360);
+    _deg = (int)((_deg_normal - _deg_reset + 360) % 360);
 
     _deg = (_deg > 180) ? _deg - 360 : _deg; // -180 ~ 180に変換
 }

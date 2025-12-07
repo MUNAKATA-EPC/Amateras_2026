@@ -17,7 +17,7 @@ unsigned int LINE_SIDE_JUDGE_VALUE[3] = {790}; // 右・左・後サイドライ
 void setup()
 {
   Serial.begin(9600);
-  Serial1.begin(9600);
+  Serial1.begin(115200);
 
   for (int i = 0; i < 3; i++)
   {
