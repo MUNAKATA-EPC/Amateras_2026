@@ -3,7 +3,8 @@
 
 /*ps3の情報をシリアル通信で送る*/
 
-const uint8_t head_byte = 0xAA; // 同期ヘッダー格納用
+const int start_header = 0x55; // 同期ヘッダー格納用
+const int end_header = 0xAA;   // 同期ヘッダー格納用
 
 int8_t stick_lx, stick_ly, stick_rx, stick_ry; // それぞれのコントローラの情報が格納用(範囲は-128~127)
 uint16_t buttons_data_bit_mask = 0;            // ボタンは14個なので16bitで足りる
@@ -32,13 +33,14 @@ void setup()
 
 void loop()
 {
-  Serial.write(head_byte);                  // teensyとの通信開始
+  Serial.write(start_header);               // teensyとの通信開始
   Serial.write(stick_lx);                   // 左ステックのx座標を送信
   Serial.write(stick_ly);                   // 左ステックのy座標を送信
   Serial.write(stick_rx);                   // 右ステックのx座標を送信
   Serial.write(stick_ry);                   // 右ステックのy座標を送信
   Serial.write(buttons_data_bit_mask);      // 2byteのデータなので下位の1byteのみ送信
   Serial.write(buttons_data_bit_mask >> 8); // 8bit分右にシフトして上位の1byteを送信
+  Serial.write(end_header);                 // teensyとの通信終了
 
   delay(10); // 10ms待機
 }

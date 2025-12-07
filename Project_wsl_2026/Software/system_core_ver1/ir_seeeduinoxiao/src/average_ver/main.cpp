@@ -5,7 +5,8 @@
 // #define NEW
 #define OLD
 
-const int head_byte = 0xAA; // 同期ヘッダー格納用
+const int start_header = 0x55; // 同期ヘッダー格納用
+const int end_header = 0xAA;   // 同期ヘッダー格納用
 
 // IRセンサーのピン番号。前から反時計回りに指定
 // センサー番号0がロボットの正面方向に対応していることを前提とします。
@@ -142,16 +143,17 @@ void loop()
     val_to_send = 0xFF;
   }
 
-  /* 4. 送信処理 (Serial1: Teensyなどとの通信) */
-  Serial1.write(head_byte); // 同期ヘッダー (0xAA)
+  /* 4. 送信処理 */
+  Serial1.write(start_header); // 通信開始
 
   // IRball_deg (2バイト送信: 下位バイト -> 上位バイトの順)
   Serial1.write((uint8_t)(deg_to_send & 0xFF));        // 下位バイト (low1)
   Serial1.write((uint8_t)((deg_to_send >> 8) & 0xFF)); // 上位バイト (high1)
-
   // IRball_value (2バイト送信: 下位バイト -> 上位バイトの順)
   Serial1.write((uint8_t)(val_to_send & 0xFF));        // 下位バイト (low2)
   Serial1.write((uint8_t)((val_to_send >> 8) & 0xFF)); // 上位バイト (high2)
+
+  Serial1.write(start_header); // 通信終了
 
   /* デバッグ用シリアル出力 */
   Serial.print(IRball_of_x);

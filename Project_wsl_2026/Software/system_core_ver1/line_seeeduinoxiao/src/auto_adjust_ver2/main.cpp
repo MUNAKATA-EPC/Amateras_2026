@@ -3,7 +3,8 @@
 #include "multiplexer.hpp"
 #include "button.hpp"
 
-const int head_byte = 0xAA; // 同期ヘッダー格納用
+const int start_header = 0x55; // 同期ヘッダー格納用
+const int end_header = 0xAA;   // 同期ヘッダー格納用
 
 #define LINE_SENSOR_COUNT 16
 

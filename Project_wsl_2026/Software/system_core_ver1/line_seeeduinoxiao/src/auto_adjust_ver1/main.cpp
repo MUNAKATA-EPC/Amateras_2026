@@ -2,7 +2,8 @@
 #include "multiplexer.hpp"
 
 /*seidaiロボット用*/
-const uint8_t head_byte = 0xAA; // 同期ヘッダー格納用
+const int start_header = 0x55;                // 同期ヘッダー格納用
+const int end_header = 0xAA;                  // 同期ヘッダー格納用
 const uint8_t LINE_SIDE_PINS[3] = {8, 9, 10}; // 右・左・後サイドのピン
 
 uint32_t lines_data_bit_mask; // 16+3個のラインセンサーの状況格納用
@@ -102,10 +103,11 @@ void loop()
     lines_data_bit_mask |= (1UL << 18);*/
 
   /*送信*/
-  Serial1.write(head_byte);                                     // teensyとの通信開始
+  Serial1.write(start_header);                                  // teensyとの通信開始
   Serial1.write((uint8_t)(lines_data_bit_mask & 0xFF));         // 3byteのデータなので下位の1byteのみ送信
   Serial1.write((uint8_t)((lines_data_bit_mask >> 8) & 0xFF));  // 3byteのデータなので中位の1byteのみ送信
   Serial1.write((uint8_t)((lines_data_bit_mask >> 16) & 0xFF)); // 3byteのデータなので上位の1byteを送信
+  Serial1.write(start_header);                                  // teensyとの通信終了
 
   Serial.print(lines_data_bit_mask, BIN); // pcに送る
   Serial.print("l");
