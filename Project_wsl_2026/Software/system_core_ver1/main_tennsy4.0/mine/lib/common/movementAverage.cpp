@@ -1,11 +1,11 @@
-#include "movement_average.hpp"
+#include "movementAverage.hpp"
 
-void Movement_average::set(int average_count)
+void MovementAverage::set(int average_count)
 {
     _average_count = constrain(average_count, 1, AVERAGE_COUNT_LIMIT);
 }
 
-void Movement_average::reset()
+void MovementAverage::reset()
 {
     for (int i = 0; i < AVERAGE_COUNT_LIMIT; i++)
     {
@@ -13,7 +13,7 @@ void Movement_average::reset()
     }
 }
 
-int Movement_average::add(int data)
+int MovementAverage::add(int data)
 {
     _data[_add_index] = data;
 

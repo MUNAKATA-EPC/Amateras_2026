@@ -2,7 +2,7 @@
 
 #include "Arduino.h"
 
-class Packet_manager
+class PacketManager
 {
 private:
     uint8_t *_data = nullptr; // ヒープメモリへのポインタ
@@ -14,11 +14,12 @@ private:
     uint8_t _end_header = 0xAA;
 
 public:
-    ~Packet_manager(); // デストラクタ：確保したメモリを解放
+    PacketManager() = default; // デフォルトコンストラクタ
+    ~PacketManager();          // デストラクタ：確保したメモリを解放
 
     // コピー禁止 (安全のため)
-    Packet_manager(const Packet_manager &) = delete;
-    Packet_manager &operator=(const Packet_manager &) = delete;
+    PacketManager(const PacketManager &) = delete;
+    PacketManager &operator=(const PacketManager &) = delete;
 
     void setup(uint8_t start_header, int byte_size, uint8_t end_header);
 

@@ -1,7 +1,7 @@
-#include "packet_manager.hpp"
+#include "packetManager.hpp"
 
 // メモリ解放
-Packet_manager::~Packet_manager()
+PacketManager::~PacketManager()
 {
     if (_data != nullptr)
     {
@@ -10,7 +10,7 @@ Packet_manager::~Packet_manager()
     }
 }
 
-void Packet_manager::setup(uint8_t start_header, int byte_size, uint8_t end_header)
+void PacketManager::setup(uint8_t start_header, int byte_size, uint8_t end_header)
 {
     // 既にメモリが確保されていたら一度解放する (再セットアップへの対応)
     if (_data != nullptr)
@@ -52,12 +52,12 @@ void Packet_manager::setup(uint8_t start_header, int byte_size, uint8_t end_head
     reset();
 }
 
-void Packet_manager::reset()
+void PacketManager::reset()
 {
     _next_index = 0;
 }
 
-void Packet_manager::add(uint8_t byte)
+void PacketManager::add(uint8_t byte)
 {
     // メモリが確保されていない、または無効なサイズの場合は処理しない
     if (_data == nullptr || _data_capacity == 0)
@@ -105,7 +105,7 @@ void Packet_manager::add(uint8_t byte)
     }
 }
 
-bool Packet_manager::isComplete()
+bool PacketManager::isComplete()
 {
     // _next_index がパケット全体のサイズ (_data_capacity) と等しいとき、全バイト受信済み
     if (_data_capacity > 0 && _next_index == _data_capacity)
@@ -114,7 +114,7 @@ bool Packet_manager::isComplete()
     return false;
 }
 
-uint8_t Packet_manager::get(int index)
+uint8_t PacketManager::get(int index)
 {
     // メモリが確保されていない、または無効なインデックスの場合はエラー
     if (_data == nullptr || index < 0 || index >= _data_capacity)

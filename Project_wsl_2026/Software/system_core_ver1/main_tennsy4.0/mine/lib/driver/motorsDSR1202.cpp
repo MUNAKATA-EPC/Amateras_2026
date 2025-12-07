@@ -1,4 +1,4 @@
-#include "motorsDsr1202.hpp"
+#include "motorsDSR1202.hpp"
 
 DSR1202::DSR1202(HardwareSerial *serial, uint32_t baudrate)
 {

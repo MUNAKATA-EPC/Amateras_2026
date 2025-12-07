@@ -1,11 +1,11 @@
 #pragma once
 
 // common類
-#include "angle_helper.hpp"
+#include "angleHelper.hpp"
 #include "pd.hpp"
 #include "timer.hpp"
 #include "vector.hpp"
-#include "movement_average.hpp"
+#include "movementAverage.hpp"
 // driver類
 #include "dribbler.hpp"
 #include "kicker.hpp"

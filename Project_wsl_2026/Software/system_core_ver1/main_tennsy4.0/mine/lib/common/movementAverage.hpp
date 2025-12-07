@@ -4,7 +4,7 @@
 
 #define AVERAGE_COUNT_LIMIT 10
 
-class Movement_average
+class MovementAverage
 {
 private:
     int _average_count = AVERAGE_COUNT_LIMIT;

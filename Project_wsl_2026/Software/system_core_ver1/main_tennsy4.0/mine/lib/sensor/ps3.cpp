@@ -22,7 +22,7 @@ static float _stick_right_dis = 0xFF;
 // ボタン（14個）
 static uint16_t _button_bit_mask = 0;
 
-static Packet_manager packet; // パケットマネージャー
+static PacketManager packet; // パケットマネージャー
 
 bool ps3Init(HardwareSerial *serial, uint32_t baudrate)
 {

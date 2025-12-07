@@ -24,8 +24,8 @@ static int _side_deg = 0xFF;
 
 static float _dis = 0xFF;
 
-static Packet_manager packet_to_adjust; // 調整用パケットマネージャー
-static Packet_manager packet;           // パケットマネージャー
+static PacketManager packet_to_adjust; // 調整用パケットマネージャー
+static PacketManager packet;           // パケットマネージャー
 
 bool lineInit(HardwareSerial *serial, uint32_t baudrate)
 {

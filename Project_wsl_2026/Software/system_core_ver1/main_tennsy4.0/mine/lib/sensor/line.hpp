@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 #include "timer.hpp"
-#include "packet_manager.hpp"
+#include "packetManager.hpp"
 
 bool lineInit(HardwareSerial *serial, uint32_t baudrate);
 void lineUpdate();

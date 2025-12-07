@@ -15,7 +15,7 @@ static bool _yellow_goal_detected = false;
 static int _yellow_goal_deg = 0xFF;
 static float _yellow_goal_dis = 0xFF;
 
-static Packet_manager packet; // パケットマネージャー
+static PacketManager packet; // パケットマネージャー
 
 bool openmvInit(HardwareSerial *serial, uint32_t baudrate)
 {

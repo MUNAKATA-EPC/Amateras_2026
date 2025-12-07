@@ -7,7 +7,7 @@ static int _deg = 0xFF;
 static float _val = 0xFF;
 static float _dis = 0xFF;
 
-static Packet_manager packet; // パケットマネージャー
+static PacketManager packet; // パケットマネージャー
 
 bool irInit(HardwareSerial *serial, uint32_t baudrate)
 {
