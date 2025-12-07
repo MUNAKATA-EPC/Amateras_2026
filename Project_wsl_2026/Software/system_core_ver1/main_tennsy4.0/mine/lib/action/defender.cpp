@@ -17,8 +17,30 @@ static float defence_goal_dis;
 static Vector LineTraceVec(PD *pd, int power);                               // ラインの中心に行こうとする（D成分は使わない）
 static Vector LineTraceAndTargetVec(PD *line_trace_vec, int deg, int power); // ライントレースしながらdegが0のなる方向へに行く
 
+// 昔のボールの角度記録
+static int now_ir_deg = 0, old_ir_deg = 0;
+static Timer ir_keep_deg_timer;
+static Timer attacking_timer;
+
 void playDefender(Defender::Mode mode)
 {
+    now_ir_deg = irDeg(); // 今のirの角度更新
+    if (!irDetected() || abs(diffDeg(now_ir_deg, old_ir_deg)) > 30)
+        ir_keep_deg_timer.reset();
+
+    if (attacking_timer.everCalled() && attacking_timer.msTime() < 10000)
+    {
+        playAttacker((mode == Defender::YELLOWGOAL) ? Attacker::YELLOWGOAL : Attacker::BLUEGOAL);
+        return;
+    }
+    else if (ir_keep_deg_timer.everCalled() && ir_keep_deg_timer.msTime() > 5000)
+    {
+        playAttacker((mode == Defender::YELLOWGOAL) ? Attacker::YELLOWGOAL : Attacker::BLUEGOAL);
+        attacking_timer.reset();
+        return;
+    }
+    old_ir_deg = now_ir_deg; // 昔の角度記録
+
     motorsPdProcess(&pdGyro, bnoDeg(), 0);
 
     if (mode == Defender::Mode::YELLOWGOAL)
@@ -32,7 +54,6 @@ void playDefender(Defender::Mode mode)
         defence_goal_dis = blueGoalDis();
     }
     else // mode == Defender::Mode::BLUEGOAL
-
     {
         defence_goal_detected = yellowGoalDetected();
         defence_goal_deg = yellowGoalDeg();
@@ -51,7 +72,7 @@ void playDefender(Defender::Mode mode)
 
     if (defence_goal_detected && defence_goal_dis < 100.0f) // 守備ゴールが見え、一定距離以内にゴールがあるなら
     {
-        if (defence_goal_deg > 180 - defence_max_deg || defence_goal_deg < defence_max_deg - 180) // 後ろにゴールがあるなら(60~-60)（でフェンダーとしての動きにうつる）
+        if (abs(diffDeg(defence_goal_deg, 180)) < defence_max_deg) // 後ろにゴールがあるなら(60~-60)（でフェンダーとしての動きにうつる）
         {
             if (lineRingDetected()) // ライン上にいるなら
             {
@@ -60,32 +81,30 @@ void playDefender(Defender::Mode mode)
 
                 if (irDetected()) // ボールが見えるなら
                 {
-                    if (defence_goal_deg > 180 - defence_limit_deg || defence_goal_deg < defence_limit_deg - 180)
+                    if (abs(diffDeg(defence_goal_deg, 180)) < defence_limit_deg)
                     {
-                        if (defence_goal_deg > 180 - defence_normal_deg || defence_goal_deg < defence_normal_deg - 180) // かなり後ろにあるなら(20~-20)
+                        if (abs(diffDeg(defence_goal_deg, 180)) < defence_normal_deg) // かなり後ろにあるなら(20~-20)
                         {
-                            defence_vec = LineTraceAndTargetVec(&pd, irDeg(), max_power); // 守備する
+                            defence_vec = LineTraceAndTargetVec(&pd, now_ir_deg, max_power); // 守備する
                         }
                         else
                         {
-                            int resetDeg = normalizeDeg(defence_goal_deg + 180);       // ゴールの対角方向の角度
-                            int taikakuIrDeg = normalizeDeg(irDeg() - resetDeg + 360); // ゴールの対角方向の角度を基準とした時のIR角度
+                            int resetDeg = normalizeDeg(defence_goal_deg + 180);          // ゴールの対角方向の角度
+                            int taikakuIrDeg = normalizeDeg(now_ir_deg - resetDeg + 360); // ゴールの対角方向の角度を基準とした時のIR角度
 
                             defence_vec = LineTraceAndTargetVec(&pd, taikakuIrDeg, max_power); // 対角線で守備する
                         }
                     }
                     else
                     {
-                        int resetDeg = normalizeDeg(defence_goal_deg + 180);       // ゴールの対角方向の角度
-                        int taikakuIrDeg = normalizeDeg(irDeg() - resetDeg + 360); // ゴールの対角方向の角度を基準とした時のIR角度
+                        int resetDeg = normalizeDeg(defence_goal_deg + 180);          // ゴールの対角方向の角度
+                        int taikakuIrDeg = normalizeDeg(now_ir_deg - resetDeg + 360); // ゴールの対角方向の角度を基準とした時のIR角度
 
-                        // Serial.print(taikakuIrDeg);
-
-                        if (defence_goal_deg > 0 && taikakuIrDeg < 0) // リミットを超えたなら（右にいてボールはさらに右）
+                        if (defence_goal_deg > 0 && taikakuIrDeg < 0) // リミットを超えたなら（左に傾いていてボールはさらに右）
                         {
                             defence_vec = LineTraceVec(&pd, max_power); // ライントレースのみ
                         }
-                        else if (defence_goal_deg < 0 && taikakuIrDeg > 0) // リミットを超えたなら（左にいてボールはさらに左）
+                        else if (defence_goal_deg < 0 && taikakuIrDeg > 0) // リミットを超えたなら（右に傾いていてボールはさらに左）
                         {
                             defence_vec = LineTraceVec(&pd, max_power); // ライントレースのみ
                         }
