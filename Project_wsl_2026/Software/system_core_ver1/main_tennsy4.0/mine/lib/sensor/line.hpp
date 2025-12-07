@@ -3,8 +3,9 @@
 
 #include <Arduino.h>
 #include "timer.hpp"
+#include "packet_manager.hpp"
 
-bool lineInit(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHeader);
+bool lineInit(HardwareSerial *serial, uint32_t baudrate);
 void lineUpdate();
 
 enum LineDataType

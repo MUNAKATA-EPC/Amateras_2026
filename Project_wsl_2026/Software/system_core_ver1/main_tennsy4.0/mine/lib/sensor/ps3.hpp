@@ -4,8 +4,9 @@
 
 #include <Arduino.h>
 #include "timer.hpp"
+#include "packet_manager.hpp"
 
-bool ps3Init(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHeader);
+bool ps3Init(HardwareSerial *serial, uint32_t baudrate);
 void ps3StickAdjust(float left_adjust, float right_adjust);
 void ps3Update();
 

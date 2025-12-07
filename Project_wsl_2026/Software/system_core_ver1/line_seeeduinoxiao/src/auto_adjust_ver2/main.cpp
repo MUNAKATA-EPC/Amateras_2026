@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include "movement_average.hpp"
 #include "multiplexer.hpp"
+#include "button.hpp"
 
 const int head_byte = 0xAA; // 同期ヘッダー格納用
 
@@ -10,8 +11,13 @@ Multiplexer line_mux;
 
 const int LINEsensor_pin[LINE_SENSOR_COUNT] = {0, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1}; // 前から左回りにピン番号を指定
 
+const int button_pin = 0; // ボタンのピン番号
+const int led_pin = 7;    // LEDのピン番号
+
 float LINEsensor_x[LINE_SENSOR_COUNT]; // 前をx正方向
 float LINEsensor_y[LINE_SENSOR_COUNT]; // 前をx正方向
+
+Button button;
 
 void setup()
 {
@@ -28,8 +34,25 @@ void setup()
     LINEsensor_x[i] = cosf(radians(i * diff_angle)); // 座標の計算
     LINEsensor_y[i] = sinf(radians(i * diff_angle)); // 座標の計算
   }
+
+  button.init(button_pin, INPUT_PULLUP); // ボタン初期化
+  pinMode(led_pin, OUTPUT);              // LEDピン初期化
 }
+
+// ボタンのコンディション格納用
+int button_state = 0;
+enum STATE
+{
+  COURT_ADJUST,
+  LINE_ADJUST,
+  COUNT
+};
 
 void loop()
 {
+  button.update();
+
+  if (button.isReleased())
+    button_state += 1;
+  button_state %= STATE::COUNT;
 }

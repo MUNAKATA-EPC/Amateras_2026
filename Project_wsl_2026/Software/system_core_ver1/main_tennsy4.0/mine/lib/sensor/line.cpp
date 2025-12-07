@@ -2,7 +2,6 @@
 
 static HardwareSerial *_serial = nullptr;
 static uint32_t _baudrate = 9600;
-static uint8_t _frameHeader = 0xAA;
 
 static float _x = 0.0f;
 static float _y = 0.0f;
@@ -20,11 +19,12 @@ static int _sideDeg = 0xFF;
 
 static float _dis = 0xFF;
 
-bool lineInit(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHeader)
+static Packet_manager packet; // パケットマネージャー
+
+bool lineInit(HardwareSerial *serial, uint32_t baudrate)
 {
     _serial = serial;
     _baudrate = baudrate;
-    _frameHeader = frameHeader;
 
     // 初期化
     _ringDetected = _sideDetected = false;
@@ -37,6 +37,8 @@ bool lineInit(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHeader)
         _sensor[i] = false;
 
     _serial->begin(_baudrate);
+
+    packet.setup(0x55, 3, 0xAA); // フレームヘッダー、データサイズ、エンドヘッダーを設定
 
     Timer timer;
     timer.reset();
@@ -52,19 +54,14 @@ bool lineInit(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHeader)
 
 void lineUpdate()
 {
-    // データの読み取り
-    while (_serial->available() >= 4)
+    // データの受け取り
+    int data_count = _serial->available();
+    for (int i = 0; i < data_count; i++)
     {
-        while (_serial->available() > 0 && _serial->peek() != _frameHeader)
-            _serial->read();
+        packet.add(_serial->read());
 
-        if (_serial->available() < 4)
-            break;
-
-        if (_serial->peek() == _frameHeader)
+        if (packet.isComplete())
         {
-            _serial->read(); // ヘッダー読み捨て
-
             uint8_t low = _serial->read();
             uint8_t middle = _serial->read();
             uint8_t high = _serial->read();
@@ -87,10 +84,8 @@ void lineUpdate()
             _sideBack = _sensor[18];
 
             _sideDetected = _sideLeft || _sideRight || _sideBack;
-        }
-        else
-        {
-            _serial->read();
+
+            packet.reset();
         }
     }
 

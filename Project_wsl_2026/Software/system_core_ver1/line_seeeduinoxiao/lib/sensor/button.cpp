@@ -51,8 +51,3 @@ void Button::pushingTimeReset()
     _pushingTime = 0;      // 押されている時間をリセット
     _pushingTimer.reset(); // タイマーもリセット
 }
-
-Button enterButton; // 共通で使えるようにしておく
-Button rightButton; // 共通で使えるようにしておく
-Button leftButton;  // 共通で使えるようにしておく
-Button resetButton; // 共通で使えるようにしておく

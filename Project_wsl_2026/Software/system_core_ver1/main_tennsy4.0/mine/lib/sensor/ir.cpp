@@ -2,20 +2,21 @@
 
 static HardwareSerial *_serial = nullptr;
 static uint32_t _baudrate = 9600;
-static uint8_t _frameHeader = 0xAA;
-
 static bool _detected = false;
 static int _deg = 0xFF;
 static float _val = 0xFF;
 static float _dis = 0xFF;
 
-bool irInit(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHeader)
+static Packet_manager packet; // パケットマネージャー
+
+bool irInit(HardwareSerial *serial, uint32_t baudrate)
 {
     _serial = serial;
     _baudrate = baudrate;
-    _frameHeader = frameHeader;
 
     _serial->begin(_baudrate);
+
+    packet.setup(0x55, 4, 0xAA); // フレームヘッダー、データサイズ、エンドヘッダーを設定
 
     Timer timer;
     timer.reset();
@@ -32,25 +33,20 @@ bool irInit(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHeader)
 void irUpdate()
 {
     // データの受け取り
-    while (_serial->available() >= 5)
+    int data_count = _serial->available();
+    for (int i = 0; i < data_count; i++)
     {
-        while (_serial->available() > 0 && _serial->peek() != _frameHeader)
-            _serial->read();
+        packet.add(_serial->read());
 
-        if (_serial->available() < 5)
-            break;
-
-        if (_serial->peek() == _frameHeader)
+        if (packet.isComplete())
         {
-            _serial->read(); // 同期ヘッダーを捨てる
+            uint8_t low1 = packet.get(1);  // ボールの角度の下位バイトを読み取る
+            uint8_t high1 = packet.get(2); // ボールの角度の上位バイトを読み取る
+            uint8_t low2 = packet.get(3);  // ボールの値の下位バイトを読み取る
+            uint8_t high2 = packet.get(4); // ボールの値の上位バイトを読み取る
 
-            uint8_t low1 = _serial->read();                          // ボールの角度の下位バイトを読み取る
-            uint8_t high1 = _serial->read();                         // ボールの角度の上位バイトを読み取る
             _deg = int16_t((uint16_t(high1) << 8) | uint16_t(low1)); // 上位バイトと下位バイトをつなげる
-
-            uint8_t low2 = _serial->read();                        // ボールの値の下位バイトを読み取る
-            uint8_t high2 = _serial->read();                       // ボールの値の上位バイトを読み取る
-            _dis = float((uint16_t(high2) << 8) | uint16_t(low2)); // 上位バイトと下位バイトをつなげる
+            _dis = float((uint16_t(high2) << 8) | uint16_t(low2));   // 上位バイトと下位バイトをつなげる
 
             if (_deg == 0xFF)
             {
@@ -65,10 +61,8 @@ void irUpdate()
                 if (_val < 0.0f)
                     _val = 0.0f;
             }
-        }
-        else
-        {
-            _serial->read();
+
+            packet.reset();
         }
     }
 }

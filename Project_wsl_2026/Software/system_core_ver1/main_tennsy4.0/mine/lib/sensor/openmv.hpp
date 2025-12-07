@@ -3,8 +3,9 @@
 
 #include <Arduino.h>
 #include "timer.hpp"
+#include "packet_manager.hpp"
 
-bool openmvInit(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHeader);
+bool openmvInit(HardwareSerial *serial, uint32_t baudrate);
 void openmvUpdate();
 
 bool fieldDetected();

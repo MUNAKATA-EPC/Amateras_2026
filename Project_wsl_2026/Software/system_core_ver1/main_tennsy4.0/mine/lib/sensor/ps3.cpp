@@ -2,7 +2,6 @@
 
 static HardwareSerial *_serial = nullptr;
 static uint32_t _baudrate = 9600;
-static uint8_t _frameHeader = 0xAA;
 
 // 調整
 static float _stickLeftAdjust = 0.0f;
@@ -23,13 +22,16 @@ static float _stickRightDis = 0xFF;
 // ボタン（14個）
 static uint16_t buttonBitMask = 0;
 
-bool ps3Init(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHeader)
+static Packet_manager packet; // パケットマネージャー
+
+bool ps3Init(HardwareSerial *serial, uint32_t baudrate)
 {
     _serial = serial;
     _baudrate = baudrate;
-    _frameHeader = frameHeader;
 
     _serial->begin(_baudrate);
+
+    packet.setup(0x55, 8, 0xAA); // フレームヘッダー、データサイズ、エンドヘッダーを設定
 
     Timer timer;
     timer.reset();
@@ -51,25 +53,19 @@ void ps3StickAdjust(float leftAdjust, float rightAdjust)
 
 void ps3Update()
 {
-    while (_serial->available() >= 11)
+    // データの受け取り
+    int data_count = _serial->available();
+    for (int i = 0; i < data_count; i++)
     {
-        while (_serial->available() > 0 && _serial->peek() != _frameHeader)
+        packet.add(_serial->read());
+
+        if (packet.isComplete())
         {
-            _serial->read();
-        }
-
-        if (_serial->available() < 11)
-            break;
-
-        if (_serial->peek() == _frameHeader)
-        {
-            _serial->read(); // ヘッダーを捨てる
-
             // ステックのx,y
-            _stickLx = int8_t(_serial->read());  // 左ステックX (-128~127)
-            _stickLy = -int8_t(_serial->read()); // 左ステックY
-            _stickRx = int8_t(_serial->read());  // 右ステックX
-            _stickRy = -int8_t(_serial->read()); // 右ステックY
+            _stickLx = int8_t(packet.get(1));  // 左ステックX (-128~127)
+            _stickLy = -int8_t(packet.get(2)); // 左ステックY
+            _stickRx = int8_t(packet.get(3));  // 右ステックX
+            _stickRy = -int8_t(packet.get(4)); // 右ステックY
 
             // 左ステックの角度・距離
             _stickLeftDis = sqrtf(_stickLx * _stickLx + _stickLy * _stickLy); // 距離を算出
@@ -110,13 +106,11 @@ void ps3Update()
             }
 
             // ボタン
-            uint8_t low = _serial->read();               // ボタン下位バイト
-            uint8_t high = _serial->read();              // ボタン上位バイト
+            uint8_t low = packet.get(5);                 // ボタン下位バイト
+            uint8_t high = packet.get(6);                // ボタン上位バイト
             buttonBitMask = (uint16_t(high) << 8) | low; // 16bit にまとめる
-        }
-        else
-        {
-            _serial->read();
+
+            packet.reset();
         }
     }
 }

@@ -3,8 +3,9 @@
 
 #include <Arduino.h>
 #include "timer.hpp"
+#include "packet_manager.hpp"
 
-bool irInit(HardwareSerial *serial, uint32_t baudrate, uint8_t frameHeader);
+bool irInit(HardwareSerial *serial, uint32_t baudrate);
 void irUpdate();
 
 bool irDetected();

@@ -27,8 +27,3 @@ public:
     unsigned long pushingTime();
     void pushingTimeReset();
 };
-
-extern Button enterButton; // 共通で使えるようにしておく
-extern Button rightButton; // 共通で使えるようにしておく
-extern Button leftButton;  // 共通で使えるようにしておく
-extern Button resetButton; // 共通で使えるようにしておく
