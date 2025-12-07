@@ -137,8 +137,7 @@ void loop()
     if (!uiRunning())
     {
         old_running_flag = false;
-
-        Serial.print("now sellecting...");
+        
         kicker1.kick(false); // キッカーを動かさない
         motorsStop();        // 動作選択中はモータを止める
 
