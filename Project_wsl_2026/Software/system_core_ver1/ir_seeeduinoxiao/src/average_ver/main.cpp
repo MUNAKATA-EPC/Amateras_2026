@@ -153,7 +153,7 @@ void loop()
   Serial1.write((uint8_t)(val_to_send & 0xFF));        // 下位バイト (low2)
   Serial1.write((uint8_t)((val_to_send >> 8) & 0xFF)); // 上位バイト (high2)
 
-  Serial1.write(start_header); // 通信終了
+  Serial1.write(end_header); // 通信終了
 
   /* デバッグ用シリアル出力 */
   Serial.print(IRball_of_x);

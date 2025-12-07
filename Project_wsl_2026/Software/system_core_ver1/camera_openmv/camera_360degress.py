@@ -178,9 +178,10 @@ while True:
         blue_dis = int(blue_dis)
 
     # UART送信
-    uart.write(bytearray([0xAA]))  # 同期ヘッダー
+    uart.write(bytearray([0x55]))  # 通信開始
     send_int16(uart, court_deg)
     send_int16(uart, yellow_deg)
     send_int16(uart, yellow_dis)
     send_int16(uart, blue_deg)
     send_int16(uart, blue_dis)
+    uart.write(bytearray([0xAA]))  # 通信終了
