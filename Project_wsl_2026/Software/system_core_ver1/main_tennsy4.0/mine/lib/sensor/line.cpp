@@ -13,7 +13,7 @@ static float _y = 0.0f;
 
 static bool _ring_detected = false;
 static bool _side_detected = false;
-static bool _sensor[19] = {false};
+static bool _sensor[19] = {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false};
 
 static bool _side_right = false;
 static bool _side_left = false;
@@ -44,8 +44,8 @@ bool lineInit(HardwareSerial *serial, uint32_t baudrate)
 
     _serial->begin(_baudrate);
 
-    packet_to_adjust.setup(0x66, 32, 0xBB); // フレームヘッダー、データサイズ、エンドヘッダーを設定
-    packet.setup(0x55, 3, 0xAA);            // フレームヘッダー、データサイズ、エンドヘッダーを設定
+    packet_to_adjust.setup(0x66, 3, 0xBB); // フレームヘッダー、データサイズ、エンドヘッダーを設定
+    packet.setup(0x55, 3, 0xAA);           // フレームヘッダー、データサイズ、エンドヘッダーを設定
 
     Timer timer;
     timer.reset();
@@ -99,7 +99,7 @@ void lineUpdate()
 
             for (int i = 0; i < 19; i++)
             {
-                _sensor[i] = (bit_mask & (1UL << i)) != 0;
+                _sensor[i] = (bit_mask & (1UL << i)) == true;
                 if (_sensor[i] == true && i < 16)
                     _ring_detected = true;
             }

@@ -47,7 +47,7 @@ void motorsSetTogglePin(uint8_t pin)
 {
     _toggle_pin = pin;
 
-    pinMode(_toggle_pin, INPUT);
+    pinMode(pin, INPUT);
 }
 
 // 各モーターの物理的な配置角度を設定（度数法）

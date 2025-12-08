@@ -1,4 +1,4 @@
-#include "packetManager.hpp"
+/*#include "packetManager.hpp"
 
 // メモリ解放
 PacketManager::~PacketManager()
@@ -119,6 +119,82 @@ uint8_t PacketManager::get(int index)
     // メモリが確保されていない、または無効なインデックスの場合はエラー
     if (_data == nullptr || index < 0 || index >= _data_capacity)
         return 0x00;
+
+    return _data[index];
+}*/
+
+#include "packetManager.hpp"
+
+void PacketManager::setup(uint8_t start_header, int data_size, uint8_t end_header)
+{
+    _start_header = start_header;
+    byte_size = data_size;
+    _end_header = end_header;
+
+    for (int i = 0; i < PACKET_MAX_SIZE; i++)
+    {
+        _data[i] = 0;
+    }
+}
+
+void PacketManager::reset()
+{
+    _next_index = 0;
+
+    for (int i = 0; i < PACKET_MAX_SIZE; i++)
+    {
+        _data[i] = 0;
+    }
+}
+
+void PacketManager::add(uint8_t byte)
+{
+    if (_next_index == 0)
+    {
+        if (byte == _start_header)
+        {
+            _data[_next_index] = byte;
+            _next_index++;
+
+            return;
+        }
+    }
+    else if (_next_index < byte_size + 1)
+    {
+        _data[_next_index] = byte;
+        _next_index++;
+
+        return;
+    }
+    else if (_next_index == byte_size + 1)
+    {
+        if (byte == _end_header)
+        {
+            _data[_next_index] = byte;
+            _next_index++;
+
+            return;
+        }
+    }
+
+    reset();
+    return;
+}
+
+bool PacketManager::isComplete()
+{
+    if (_next_index == byte_size + 2)
+        return true;
+
+    return false;
+}
+
+uint8_t PacketManager::get(int index)
+{
+    if (index < 0 || index > byte_size + 1)
+    {
+        return 0;
+    }
 
     return _data[index];
 }
