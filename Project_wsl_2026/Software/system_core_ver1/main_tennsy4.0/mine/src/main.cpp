@@ -42,7 +42,7 @@ void setup()
     ps3StickAdjust(20.0f, 20.0f);
 
     debugMessage += motorsInit(&Serial1, 115200) ? "motors : found\n" : "motors : not found\n";
-    motorsSetTogglePin(4);                   // モータの起動トグルスイッチのピン設定
+    motorsSetTogglePin(4, INPUT_PULLDOWN);   // モータの起動トグルスイッチのピン設定
     motorsSetMoveSign(1, 1, 1, 1);           // 移動のための符号をセット
     motorsSetPdSign(1, 1, 1, 1);             // PD制御のための符号をセット
     motorsSetDegPosition(315, 45, 225, 135); // モータの位置をセット

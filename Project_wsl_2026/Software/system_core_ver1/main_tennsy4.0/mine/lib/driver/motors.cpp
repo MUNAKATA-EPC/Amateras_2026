@@ -16,7 +16,7 @@ static int _output[4] = {0};           // 最終的なモーター出力（移�
 static PD *_pd = nullptr;
 
 // トグルスイッチのピン番号
-static uint8_t _toggle_pin = -1;
+static uint8_t _toggle_pin = 0xFF;
 
 // モーター制御の初期化
 // serial 使用するシリアルポート
@@ -43,11 +43,11 @@ bool motorsInit(HardwareSerial *serial, uint32_t baudrate)
 }
 
 // モータの起動トグルスイッチのピン設定
-void motorsSetTogglePin(uint8_t pin)
+void motorsSetTogglePin(uint8_t pin, uint8_t pinmode)
 {
     _toggle_pin = pin;
 
-    pinMode(pin, INPUT);
+    pinMode(_toggle_pin, pinmode);
 }
 
 // 各モーターの物理的な配置角度を設定（度数法）
@@ -106,7 +106,7 @@ void motorsPdProcess(PD *pd, int deg, int target)
 // power 移動の強さ（最大値）
 void motorsMove(int deg, int power)
 {
-    if (_toggle_pin != (uint8_t)-1)
+    if (_toggle_pin != 0xFF)
     {
         // トグルスイッチがオフならモーターを停止して終了
         if (digitalRead(_toggle_pin) == LOW)
@@ -167,7 +167,7 @@ void motorsVectorMove(Vector *vec)
 // PD制御のみで機体を回転させる
 void motorsPdMove()
 {
-    if (_toggle_pin != (uint8_t)-1)
+    if (_toggle_pin != 0xFF)
     {
         // トグルスイッチがオフならモーターを停止して終了
         if (digitalRead(_toggle_pin) == LOW)

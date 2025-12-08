@@ -6,7 +6,7 @@
 #include "vector.hpp"
 
 bool motorsInit(HardwareSerial *serial, uint32_t baudrate);
-void motorsSetTogglePin(uint8_t pin);                                           // モータの起動トグルスイッチのピン設定
+void motorsSetTogglePin(uint8_t pin, uint8_t pinmode);                          // モータの起動トグルスイッチのピン設定
 void motorsSetDegPosition(int deg_1ch, int deg_2ch, int deg_3ch, int deg_4ch);  // モータの位置をセット
 void motorsSetMoveSign(int sign_1ch, int sign_2ch, int sign_3ch, int sign_4ch); // 移動のための符号をセット
 void motorsSetPdSign(int sign_1ch, int sign_2ch, int sign_3ch, int sign_4ch);   // PD制御のための符号をセット
