@@ -15,6 +15,9 @@ static int _output[4] = {0};           // 最終的なモーター出力（移�
 // PD制御クラスのポインタ
 static PD *_pd = nullptr;
 
+// トグルスイッチのピン番号
+static uint8_t _toggle_pin = -1;
+
 // モーター制御の初期化
 // serial 使用するシリアルポート
 // baudrate 通信速度
@@ -37,6 +40,14 @@ bool motorsInit(HardwareSerial *serial, uint32_t baudrate)
     }
 
     return true;
+}
+
+// モータの起動トグルスイッチのピン設定
+void motorsSetTogglePin(uint8_t pin)
+{
+    _toggle_pin = pin;
+
+    pinMode(_toggle_pin, INPUT);
 }
 
 // 各モーターの物理的な配置角度を設定（度数法）
@@ -95,6 +106,16 @@ void motorsPdProcess(PD *pd, int deg, int target)
 // power 移動の強さ（最大値）
 void motorsMove(int deg, int power)
 {
+    if (_toggle_pin != (uint8_t)-1)
+    {
+        // トグルスイッチがオフならモーターを停止して終了
+        if (digitalRead(_toggle_pin) == LOW)
+        {
+            motorsStop();
+            return;
+        }
+    }
+
     power = constrain(power, 0, 100); // powerを0~100に制限
 
     // 1. 移動成分の計算と最大出力の探索
@@ -146,6 +167,16 @@ void motorsVectorMove(Vector *vec)
 // PD制御のみで機体を回転させる
 void motorsPdMove()
 {
+    if (_toggle_pin != (uint8_t)-1)
+    {
+        // トグルスイッチがオフならモーターを停止して終了
+        if (digitalRead(_toggle_pin) == LOW)
+        {
+            motorsStop();
+            return;
+        }
+    }
+
     // 制御
     // PD制御の出力は -100~100 (int)
     int pd_output = _pd->output();

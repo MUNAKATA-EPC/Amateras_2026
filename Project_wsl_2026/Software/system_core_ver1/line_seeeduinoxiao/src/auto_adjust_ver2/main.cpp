@@ -17,7 +17,7 @@ const int LINEsensor_pin[LINE_SENSOR_COUNT] = {0, 15, 14, 13, 12, 11, 10, 9, 8, 
 float LINEsensor_x[LINE_SENSOR_COUNT];                                                                // 前をx正方向
 float LINEsensor_y[LINE_SENSOR_COUNT];                                                                // 前をx正方向
 
-int LINEsensor_adjust_value[LINE_SENSOR_COUNT] = {500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500}; // センサー調整用値格納用
+unsigned int LINEsensor_adjust_value[LINE_SENSOR_COUNT] = {500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500}; // センサー調整用値格納用
 
 const int button_pin = 0; // ボタンのピン番号
 const int led_pin = 7;    // LEDのピン番号

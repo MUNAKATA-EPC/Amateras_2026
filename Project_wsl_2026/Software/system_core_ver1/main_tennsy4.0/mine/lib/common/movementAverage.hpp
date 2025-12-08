@@ -8,7 +8,7 @@ class MovementAverage
 {
 private:
     int _average_count = AVERAGE_COUNT_LIMIT;
-    int _data[10] = {0xFFFF};
+    int _data[10] = {0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF};
 
     int _add_index = 0;
 
