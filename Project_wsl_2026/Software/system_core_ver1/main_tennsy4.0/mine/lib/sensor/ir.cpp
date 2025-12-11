@@ -57,7 +57,7 @@ void irUpdate()
             else
             {
                 _detected = true;
-                _val = map(_dis, 0.0f, 1023.0f, 1023.0f, 0.0f);
+                _val = 1023.0f - _dis;
                 if (_val < 0.0f)
                     _val = 0.0f;
             }

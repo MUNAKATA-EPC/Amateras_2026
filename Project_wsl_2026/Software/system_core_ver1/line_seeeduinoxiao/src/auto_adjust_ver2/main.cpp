@@ -17,10 +17,11 @@ const int LINEsensor_pin[LINE_SENSOR_COUNT] = {0, 15, 14, 13, 12, 11, 10, 9, 8, 
 float LINEsensor_x[LINE_SENSOR_COUNT];                                                                // 前をx正方向
 float LINEsensor_y[LINE_SENSOR_COUNT];                                                                // 前をx正方向
 
-unsigned int LINEsensor_adjust_value[LINE_SENSOR_COUNT] = {500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500}; // センサー調整用値格納用
+unsigned int LINEsensor_adjust_value[LINE_SENSOR_COUNT] = {150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150}; // センサー調整用値格納用
 
-const int button_pin = 0; // ボタンのピン番号
-const int led_pin = 7;    // LEDのピン番号
+const int button_pin = 0;     // ボタンのピン番号
+const int led_pin = 7;        // LEDのピン番号
+const int max_led_power = 64; // LEDの最大出力
 
 Button button;
 Timer led_timer;
@@ -41,8 +42,8 @@ void setup()
     LINEsensor_y[i] = sinf(radians(i * diff_angle)); // 座標の計算
   }
 
-  button.init(button_pin, INPUT_PULLUP); // ボタン初期化
-  pinMode(led_pin, OUTPUT);              // LEDピン初期化
+  button.init(button_pin, INPUT_PULLDOWN); // ボタン初期化
+  pinMode(led_pin, OUTPUT);                // LEDピン初期化
 
   // 一定時間以内にボタンを押すとセンサーの状況を送信するようになる
   bool adjust_flag = false;
@@ -57,8 +58,8 @@ void setup()
       break;
     }
 
-    int brightness = round(127.5 * sin(double(led_timer.msTime()) * 2.0 * PI / 500.0) + 127.5); // 500ms周期
-    brightness = constrain(brightness, 0, 255);
+    int brightness = round(double(max_led_power / 2) * sin(double(led_timer.msTime()) * 2.0 * PI / 500.0) + double(max_led_power / 2)); // 500ms周期
+    brightness = constrain(brightness, 0, max_led_power);
 
     analogWrite(led_pin, brightness); // LEDを滑らかに点滅
   }
@@ -90,7 +91,7 @@ void setup()
 
     // LED点滅処理
     if (led_timer.msTime() <= 1000UL)
-      analogWrite(led_pin, 255); // LED点灯
+      analogWrite(led_pin, max_led_power); // LED点灯
     else if (led_timer.msTime() <= 2000UL)
       analogWrite(led_pin, 0); // LED消灯
     else
@@ -98,6 +99,8 @@ void setup()
 
     delay(10); // 10ms待機
   }
+
+  analogWrite(led_pin, 0); // LED消灯
 }
 
 void loop()

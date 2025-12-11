@@ -32,3 +32,8 @@ int lineSideDeg();
 float lineRingDis();
 float lineRingX();
 float lineRingY();
+
+// ライン制御に使える関数
+bool lineRingFirstDetedcted();
+int lineRingFirstDeg();
+unsigned long lineRingDetectingTime();

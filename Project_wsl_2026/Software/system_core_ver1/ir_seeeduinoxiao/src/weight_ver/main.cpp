@@ -9,6 +9,8 @@ const int end_header = 0xAA;   // 同期ヘッダー格納用
 
 Multiplexer ir_mux;
 Movement_average ir_ave[IR_SENSOR_COUNT];
+Movement_average x;
+Movement_average y;
 
 const int IRsensor_pin[IR_SENSOR_COUNT] = {0, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1}; // 前から左回りにピン番号を指定
 
@@ -29,13 +31,15 @@ void setup()
 
     for (int i = 0; i < IR_SENSOR_COUNT; i++)
     {
-        ir_ave[i].set(3); // 3個の平均をとる
+        ir_ave[i].set(5); // 5個の平均をとる
 
         IRsensor_x[i] = cosf(radians(i * diff_angle)); // 座標の計算
         IRsensor_y[i] = sinf(radians(i * diff_angle)); // 座標の計算
 
         IRsensor_value[i] = 1023;
     }
+    x.set(5);
+    y.set(5);
 }
 
 void loop()
@@ -96,7 +100,13 @@ void loop()
         float IRball_x = weight_sum_x / weight_sum;
         float IRball_y = weight_sum_y / weight_sum;
 
-        IRball_deg_to_send = static_cast<int16_t>(round(degrees(atan2(IRball_y, IRball_x))));
+        x.add((int)roundf(IRball_x * 10.0f));
+        y.add((int)roundf(IRball_y * 10.0f));
+
+        IRball_x = x.cant_compute() ? 0.0f : x.output();
+        IRball_y = y.cant_compute() ? 0.0f : y.output();
+
+        IRball_deg_to_send = static_cast<int16_t>(roundf(degrees(atan2f(IRball_y, IRball_x))));
         IRball_value_to_send = static_cast<int16_t>(IRsensor_value[min_index]);
     }
 

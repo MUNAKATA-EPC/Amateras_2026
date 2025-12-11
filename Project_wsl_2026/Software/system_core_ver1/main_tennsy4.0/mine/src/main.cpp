@@ -42,7 +42,7 @@ void setup()
     ps3StickAdjust(20.0f, 20.0f);
 
     debugMessage += motorsInit(&Serial1, 115200) ? "motors : found\n" : "motors : not found\n";
-    motorsSetTogglePin(4, INPUT_PULLDOWN);   // モータの起動トグルスイッチのピン設定
+    // motorsSetTogglePin(4, INPUT_PULLDOWN);   // モータの起動トグルスイッチのピン設定
     motorsSetMoveSign(1, 1, 1, 1);           // 移動のための符号をセット
     motorsSetPdSign(1, 1, 1, 1);             // PD制御のための符号をセット
     motorsSetDegPosition(315, 45, 225, 135); // モータの位置をセット
@@ -67,7 +67,7 @@ void setup()
 
     // どれかのボタンを押すまで待機
     int music_type = 0;
-    anyrtttl::nonblocking::begin(BUZZER_PIN, zenzenzense); // 前前前世演奏開始（デフォルト）
+    // anyrtttl::nonblocking::begin(BUZZER_PIN, zenzenzense); // 前前前世演奏開始（デフォルト）
 
     bool wait = true;
     while (wait)
@@ -100,7 +100,8 @@ void setup()
     }
     anyrtttl::nonblocking::stop(); // 曲の演奏停止
 
-    anyrtttl::blocking::play(BUZZER_PIN, startup0); // 起動音0
+    tone(BUZZER_PIN, BUZZER_PITCHES::MyC4, 100); // 決定音
+    // anyrtttl::blocking::play(BUZZER_PIN, startup2); // 起動音2
 
     // 押し続け防止
     while (enterButton.isPushing() || backButton.isPushing() || rightButton.isPushing() || leftButton.isPushing())
@@ -156,7 +157,7 @@ void loop()
                 switch (uiMeterNumber())
                 {
                 case 0:
-                    uiPrint(0, 8, "[ir]\n deg:" + String(irDeg()) + "\n dis:" + String(irDis()) + "\n x:" + String(irX()) + "\n y:" + String(irY()));
+                    uiPrint(0, 8, "[ir]\n deg:" + String(irDeg()) + "\n dis:" + String(irDis()) + "\n val:" + String(irVal()));
                     uiDrawCircleMeter(92, 32, 20, "deg", irDeg());
 
                     fullColorLed1.angleLightUp(irDeg(), irDetected() ? led_brightness : 0);
@@ -164,12 +165,12 @@ void loop()
                 case 1:
                     if (lineIsAdjusting()) // 調整中ならセンサーの値を表示
                     {
-                        String adjust_message = "[line_adjust(0~7)]\n";
-                        for (int i = 0; i < 8; i++)
+                        uiPrint(0, 8, "[line_adjust(0~7)]");
+                        for (int i = 0; i < 4; i++)
                         {
-                            adjust_message += " l" + String(i) + ":" + String(lineValueToAdjust(i)) + "\n";
+                            uiPrint(0, 16 + i * 8, " " + String(i * 2) + ":" + String(lineValueToAdjust(i)));
+                            uiPrint(63, 16 + i * 8, " " + String(i * 2 + 1) + ":" + String(lineValueToAdjust(i * 2 + 1)));
                         }
-                        uiPrint(0, 8, adjust_message);
                     }
                     else // 通常表示
                     {
@@ -182,12 +183,12 @@ void loop()
                 case 2:
                     if (lineIsAdjusting()) // 調整中ならセンサーの値を表示
                     {
-                        String adjust_message = "[line_adjust(8~15)]\n";
-                        for (int i = 8; i < 16; i++)
+                        uiPrint(0, 8, "[line_adjust(8~15)]");
+                        for (int i = 4; i < 8; i++)
                         {
-                            adjust_message += " l" + String(i) + ":" + String(lineValueToAdjust(i)) + "\n";
+                            uiPrint(0, 16 + (i - 4) * 8, " " + String(i * 2) + ":" + String(lineValueToAdjust(i)));
+                            uiPrint(63, 16 + (i - 4) * 8, " " + String(i * 2 + 1) + ":" + String(lineValueToAdjust(i * 2 + 1)));
                         }
-                        uiPrint(0, 8, adjust_message);
                     }
                     else // 通常表示
                     {

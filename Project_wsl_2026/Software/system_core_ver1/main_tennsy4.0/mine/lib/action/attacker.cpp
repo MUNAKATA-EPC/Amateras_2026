@@ -1,8 +1,57 @@
 #include "attacker.hpp"
 
-static PD pdGyro(0.55, 1.6); // ジャイロ用のPD調節値
+static PD pd(0.8f, -10.0f); // ジャイロ用のPD調節値
 
 void playAttacker(Attacker::Mode mode)
 {
-    motorsPdProcess(&pdGyro, bnoDeg(), 0); // ジャイロで姿勢制御
+
+    if (mode == Attacker::Mode::YELLOWGOAL)
+        motorsPdProcess(&pd, yellowGoalDeg(), 0); // カメラで姿勢制御
+    else if (mode == Attacker::Mode::BLUEGOAL)
+        motorsPdProcess(&pd, blueGoalDeg(), 0); // カメラで姿勢制御
+    else
+        motorsPdProcess(&pd, bnoDeg(), 0); // ジャイロで姿勢制御
+
+    Vector moveVec;
+    if (lineRingDetected())
+    {
+        moveVec = Vector(lineRingDeg() + 180, 80); // ラインの方向へ移動
+    }
+    else if (irDetected())
+    {
+        if (abs(irDeg()) < 10)
+        {
+            moveVec = Vector(0, 80); // 前進
+        }
+        else if (abs(irDeg()) < 35)
+        {
+            int deg = int(roundf(float(irDeg() * irDeg()) * (irDeg() > 0 ? 0.0666f : -0.0666f)));
+
+            moveVec = Vector(deg, 60); // 赤外線センサーの方向へ移動
+        }
+        else if (irDis() > 530.0f)
+        {
+            moveVec = Vector(irDeg(), 80);
+        }
+        else
+        {
+            if (abs(irDeg()) < 100)
+            {
+                int diff = int(irVal() * 0.066f);
+
+                moveVec = Vector(irDeg() > 0 ? irDeg() + diff : irDeg() - diff, 80); // 赤外線センサーの方向へ移動
+            }
+            else
+            {
+                int diff = int(irVal() * 0.1f);
+
+                moveVec = Vector(irDeg() > 0 ? irDeg() + diff : irDeg() - diff, 80); // 赤外線センサーの方向へ移動
+            }
+        }
+    }
+
+    if (!moveVec.is_empty())
+        motorsVectorMove(&moveVec); // 回り込み
+    else
+        motorsPdMove(); // 回転のみ
 }

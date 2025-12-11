@@ -12,6 +12,12 @@ void DSR1202::begin()
     _serial->setTimeout(50);   // 50msでタイムアウトとする
 }
 
+void DSR1202::setTogglePin(uint8_t pin, uint8_t pinmode)
+{
+    pinMode(pin, pinmode);
+    _toggle_pin = pin;
+}
+
 void DSR1202::stop()
 {
     _serial->println("1R0002R0003R0004R000"); // モータを停止させる
@@ -19,6 +25,15 @@ void DSR1202::stop()
 
 void DSR1202::move(int value_1ch, int value_2ch, int value_3ch, int value_4ch)
 {
+    if (_toggle_pin != 0xFF)
+    {
+        if (digitalRead(_toggle_pin) == LOW)
+        {
+            stop();
+            return;
+        }
+    }
+
     // 1chについて
     value_1ch = constrain(value_1ch, -100, 100);       // -100~100の範囲に収める
     String str_abs_value_1ch = String(abs(value_1ch)); // 符号を除いた値をString型に変換

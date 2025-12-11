@@ -11,15 +11,18 @@ static int _values_to_adjust[16] = {1023, 1023, 1023, 1023, 1023, 1023, 1023, 10
 static float _x = 0.0f;
 static float _y = 0.0f;
 
-static bool _ring_detected = false;
+static bool _ring_detected = false, _old_ring_detected = false;
 static bool _side_detected = false;
 static bool _sensor[19] = {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false};
+
+static Timer _detecting_timer;
+static unsigned long _line_ring_detecting_time = 0UL;
 
 static bool _side_right = false;
 static bool _side_left = false;
 static bool _side_back = false;
 
-static int _ring_deg = 0xFF;
+static int _ring_deg = 0xFF, _ring_first_deg = 0xFF;
 static int _side_deg = 0xFF;
 
 static float _dis = 0xFF;
@@ -44,8 +47,8 @@ bool lineInit(HardwareSerial *serial, uint32_t baudrate)
 
     _serial->begin(_baudrate);
 
-    packet_to_adjust.setup(0x66, 3, 0xBB); // フレームヘッダー、データサイズ、エンドヘッダーを設定
-    packet.setup(0x55, 3, 0xAA);           // フレームヘッダー、データサイズ、エンドヘッダーを設定
+    packet_to_adjust.setup(0x66, 32, 0xBB); // フレームヘッダー、データサイズ、エンドヘッダーを設定
+    packet.setup(0x55, 3, 0xAA);            // フレームヘッダー、データサイズ、エンドヘッダーを設定
 
     Timer timer;
     timer.reset();
@@ -61,9 +64,9 @@ bool lineInit(HardwareSerial *serial, uint32_t baudrate)
 
 void lineUpdate()
 {
-    // データの受け取り
-    _is_adjusting = false;
+    _old_ring_detected = _ring_detected; // 前回のフレームのリング検出状態を保存
 
+    // データの受け取り
     int data_count = _serial->available();
     for (int i = 0; i < data_count; i++)
     {
@@ -83,11 +86,14 @@ void lineUpdate()
                 _values_to_adjust[i] = (int16_t((uint16_t(high) << 8) | uint16_t(low))); // 上位バイトと下位バイトをつなげる
             }
 
+            packet.reset();
             packet_to_adjust.reset();
         }
 
         if (packet.isComplete())
         {
+            _is_adjusting = false; // 調整中フラグを下ろす
+
             uint8_t low = packet.get(1);
             uint8_t middle = packet.get(2);
             uint8_t high = packet.get(3);
@@ -112,6 +118,7 @@ void lineUpdate()
             _side_detected = _side_left || _side_right || _side_back;
 
             packet.reset();
+            packet_to_adjust.reset();
         }
     }
 
@@ -139,7 +146,7 @@ void lineUpdate()
             _y = _y * 100.0f / ringDetectedCount;
             _dis = sqrtf(_x * _x + _y * _y);
 
-            _ring_deg = (int)round(degrees(atan2f(_y, _x)));
+            _ring_deg = (int)roundf(degrees(atan2f(_y, _x)));
         }
         else // ringDetectedCount == 0 の場合 (リングセンサーの反応がない)
         {
@@ -172,6 +179,18 @@ void lineUpdate()
     {
         _side_deg = 0xFF;
     }
+
+    // エンジェル初検出時の処理
+    if (_ring_detected == true && _old_ring_detected == false)
+    {
+        _ring_first_deg = _ring_deg;
+        _detecting_timer.reset();
+    }
+    else if (_ring_detected == false)
+    {
+        _ring_first_deg = 0xFF;
+    }
+    _line_ring_detecting_time = _detecting_timer.msTime();
 }
 
 bool lineIsAdjusting() { return _is_adjusting; }
@@ -193,3 +212,7 @@ float lineRingDis() { return _dis; }
 
 float lineRingX() { return _x; }
 float lineRingY() { return _y; }
+
+bool lineRingFirstDetedcted() { return _ring_detected == true && _old_ring_detected == false; }
+int lineRingFirstDeg() { return _ring_first_deg; }
+unsigned long lineRingDetectingTime() { return _line_ring_detecting_time; }

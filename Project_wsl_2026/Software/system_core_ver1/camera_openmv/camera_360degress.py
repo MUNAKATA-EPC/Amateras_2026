@@ -18,12 +18,12 @@ court_green = (54, 94, -18, 9, -14, 15) #new
 #court_green = (54, 94, -18, 9, -14, 15) #old
 #############################################################
 # 画面の中央座標
-#old用
+#要機
 #screen_center = [136, 120]
 #screen_short_r = 41
 #screen_long_r = 170
-#new用
-screen_center = [164, 139]
+#セイダイ機
+screen_center = [157, 89]
 screen_short_r = 41
 screen_long_r = 162
 
