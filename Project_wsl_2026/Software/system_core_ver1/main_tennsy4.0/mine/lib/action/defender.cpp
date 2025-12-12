@@ -28,12 +28,12 @@ void playDefender(Defender::Mode mode)
     if (!irDetected() || abs(diffDeg(now_ir_deg, old_ir_deg)) > 30)
         ir_keep_deg_timer.reset();
 
-    if (attacking_timer.everCalled() && attacking_timer.msTime() < 10000)
+    if (attacking_timer.everReset() && attacking_timer.msTime() < 10000)
     {
         playAttacker((mode == Defender::YELLOWGOAL) ? Attacker::YELLOWGOAL : Attacker::BLUEGOAL);
         return;
     }
-    else if (ir_keep_deg_timer.everCalled() && ir_keep_deg_timer.msTime() > 5000)
+    else if (ir_keep_deg_timer.everReset() && ir_keep_deg_timer.msTime() > 5000)
     {
         playAttacker((mode == Defender::YELLOWGOAL) ? Attacker::YELLOWGOAL : Attacker::BLUEGOAL);
         attacking_timer.reset();

@@ -22,8 +22,6 @@ const int led_pin = 7;        // LEDのピン番号
 const int max_led_power = 64; // LEDの最大出力
 
 Button button;
-Timer led_timer;
-
 void setup()
 {
   Serial.begin(9600);
@@ -38,6 +36,7 @@ void setup()
   // 一定時間以内にボタンを押すとセンサーの状況を送信するようになる
   bool adjust_flag = false;
   int brightness = 0;
+  Timer led_timer;
   led_timer.reset();
 
   while (led_timer.msTime() < 5000UL) // 5秒待機
@@ -58,10 +57,12 @@ void setup()
   for (int i = brightness; i >= 0; i--)
   {
     analogWrite(led_pin, min(i, 0)); // LEDを滑らかに消灯
-    delay(1);
+    delay(50);
   }
 
   // センサーの状況を調整用にTeensyに送信する
+  Timer send_timer;
+  send_timer.reset();
   led_timer.reset();
 
   if (adjust_flag)
@@ -78,13 +79,18 @@ void setup()
       }
 
       // 送信　ラインのアナログ値を送信
-      Serial1.write(start_header_to_adjust); // teensyとの通信開始
-      for (uint8_t i = 0; i < LINE_SENSOR_COUNT; i++)
+      if (send_timer.msTime() >= 10UL)
       {
-        Serial1.write((uint8_t)(LINEsensor_values[i] & 0xFF));        // 2byteのデータなので下位の1byteのみ送信
-        Serial1.write((uint8_t)((LINEsensor_values[i] >> 8) & 0xFF)); // 2byteのデータなので上位の1byteを送信
+        Serial1.write(start_header_to_adjust); // teensyとの通信開始
+        for (uint8_t i = 0; i < LINE_SENSOR_COUNT; i++)
+        {
+          Serial1.write((uint8_t)(LINEsensor_values[i] & 0xFF));        // 2byteのデータなので下位の1byteのみ送信
+          Serial1.write((uint8_t)((LINEsensor_values[i] >> 8) & 0xFF)); // 2byteのデータなので上位の1byteを送信
+        }
+        Serial1.write(end_header_to_adjust); // teensyとの通信終了
+
+        send_timer.reset();
       }
-      Serial1.write(end_header_to_adjust); // teensyとの通信終了
 
       // LED点滅処理　遅
       if (led_timer.msTime() <= 1000UL)
@@ -93,8 +99,6 @@ void setup()
         analogWrite(led_pin, 0); // LED消灯
       else
         led_timer.reset();
-
-      delay(10); // 10ms待機
     } while (!button.isReleased());
 
     analogWrite(led_pin, max_led_power); // LED点灯
@@ -119,15 +123,15 @@ void setup()
           ring_court_max[mux_i] = ring_val;
       }
 
-      // LED点滅処理 中
-      if (led_timer.msTime() <= 500UL)
+      // LED点滅処理 速
+      if (led_timer.msTime() <= 100UL)
         analogWrite(led_pin, max_led_power); // LED点灯
-      else if (led_timer.msTime() <= 1000UL)
+      else if (led_timer.msTime() <= 200UL)
         analogWrite(led_pin, 0); // LED消灯
       else
         led_timer.reset();
 
-      delay(50);
+      delay(100);
     }
 
     // リングの平均値を出す
@@ -138,31 +142,34 @@ void setup()
       LINEsensor_adjust_value[i] = ring_court_max[i] + (ring_court_max[i] - (int)round(ave));
     }
 
-    analogWrite(led_pin, 0); // LED消灯
-    delay(1000);             // 1秒待機
+    analogWrite(led_pin, max_led_power); // LED点灯
+    delay(1000);                         // 1秒待機
 
     do
     {
       button.update();
 
       // 送信　調整した値を送信
-      Serial1.write(start_header_to_adjust); // teensyとの通信開始
-      for (uint8_t i = 0; i < LINE_SENSOR_COUNT; i++)
+      if (send_timer.msTime() >= 10UL)
       {
-        Serial1.write((uint8_t)(LINEsensor_adjust_value[i] & 0xFF));        // 2byteのデータなので下位の1byteのみ送信
-        Serial1.write((uint8_t)((LINEsensor_adjust_value[i] >> 8) & 0xFF)); // 2byteのデータなので上位の1byteを送信
-      }
-      Serial1.write(end_header_to_adjust); // teensyとの通信終了
+        Serial1.write(start_header_to_adjust); // teensyとの通信開始
+        for (uint8_t i = 0; i < LINE_SENSOR_COUNT; i++)
+        {
+          Serial1.write((uint8_t)(LINEsensor_adjust_value[i] & 0xFF));        // 2byteのデータなので下位の1byteのみ送信
+          Serial1.write((uint8_t)((LINEsensor_adjust_value[i] >> 8) & 0xFF)); // 2byteのデータなので上位の1byteを送信
+        }
+        Serial1.write(end_header_to_adjust); // teensyとの通信終了
 
-      // LED点滅処理　速
-      if (led_timer.msTime() <= 250UL)
+        send_timer.reset();
+      }
+
+      // LED点滅処理　遅
+      if (led_timer.msTime() <= 1000UL)
         analogWrite(led_pin, max_led_power); // LED点灯
-      else if (led_timer.msTime() <= 500UL)
+      else if (led_timer.msTime() <= 2000UL)
         analogWrite(led_pin, 0); // LED消灯
       else
         led_timer.reset();
-
-      delay(10); // 10ms待機
     } while (!button.isReleased());
 
     analogWrite(led_pin, 0); // LED消灯

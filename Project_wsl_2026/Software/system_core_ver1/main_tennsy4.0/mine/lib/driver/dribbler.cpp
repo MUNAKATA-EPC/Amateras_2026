@@ -13,8 +13,10 @@ bool Dribbler::init(uint8_t pin, int min, int max)
 
 void Dribbler::setup()
 {
-    if (!_setupTimer.everCalled())
-        _setupTimer.start();
+    if (!_setupTimer.everReset())
+    {
+        _setupTimer.reset();
+    }
 
     if (_setupTimer.msTime() < 4000UL)
     {

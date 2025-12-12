@@ -4,6 +4,11 @@ void Timer::reset()
 {
     _reset_time = millis();
     _is_stopped = false;
+
+    if (!_ever_reset)
+    {
+        _ever_reset = true;
+    }
 }
 
 void Timer::stop()
@@ -26,9 +31,6 @@ void Timer::start()
 
 unsigned long Timer::msTime()
 {
-    if (!_ever_called)
-        _ever_called = true;
-
     if (!_is_stopped)
     {
         _now_time = millis() - _reset_time;

@@ -147,7 +147,7 @@ void loop()
             Serial.print("m" + String(i) + ":" + String(lineSensorDetected(i)) + ",");
         Serial.print("\n");
 
-        if (!timer.everCalled() || timer.msTime() > 10) // runningではないので10msに一回描画
+        if (!timer.everReset() || timer.msTime() > 10) // runningではないので10msに一回描画
         {
             timer.reset();
 
