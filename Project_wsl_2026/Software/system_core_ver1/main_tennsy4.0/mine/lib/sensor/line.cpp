@@ -70,9 +70,11 @@ void lineUpdate()
     int data_count = _serial->available();
     for (int i = 0; i < data_count; i++)
     {
-        int data = _serial->read();
+        uint8_t data = _serial->read();
         packet_to_adjust.add(data);
         packet.add(data);
+
+        Serial.print(data);
 
         if (packet_to_adjust.isComplete())
         {
@@ -105,7 +107,7 @@ void lineUpdate()
 
             for (int i = 0; i < 19; i++)
             {
-                _sensor[i] = (bit_mask & (1UL << i)) == true;
+                _sensor[i] = (bit_mask & (1UL << i));
                 if (_sensor[i] == true && i < 16)
                     _ring_detected = true;
             }

@@ -11,8 +11,8 @@ uint32_t lines_data_bit_mask; // 16+3個のラインセンサーの状況格納�
 Multiplexer line_mux; // 定義
 
 // 自動調整する
-unsigned int LINE_RING_JUDGE_VALUE[16] = {80}; // エンジェルライン判定用の値
-unsigned int LINE_SIDE_JUDGE_VALUE[3] = {790}; // 右・左・後サイドライン判定用の値
+unsigned int LINE_RING_JUDGE_VALUE[16] = {150, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; // エンジェルライン判定用の値
+unsigned int LINE_SIDE_JUDGE_VALUE[3] = {790};                                   // 右・左・後サイドライン判定用の値
 
 void setup()
 {
@@ -91,7 +91,7 @@ void loop()
   /*サイドラインについて*/
   uint32_t right_val = analogRead(LINE_SIDE_PINS[0]); // 右サイドのラインセンサー
   uint32_t left_val = analogRead(LINE_SIDE_PINS[1]);  // 左サイドのラインセンサー
-  uint32_t back_val = analogRead(LINE_SIDE_PINS[2]);  // 後サイドのラインセンサー
+  // uint32_t back_val = analogRead(LINE_SIDE_PINS[2]);  // 後サイドのラインセンサー
 
   if (right_val > LINE_SIDE_JUDGE_VALUE[0] && right_val < 1020) // 右サイドのラインセンサーがラインを見ているか
     lines_data_bit_mask |= (1UL << 16);
@@ -108,14 +108,6 @@ void loop()
   Serial1.write((uint8_t)((lines_data_bit_mask >> 8) & 0xFF));  // 3byteのデータなので中位の1byteのみ送信
   Serial1.write((uint8_t)((lines_data_bit_mask >> 16) & 0xFF)); // 3byteのデータなので上位の1byteを送信
   Serial1.write(end_header);                                    // teensyとの通信終了
-
-  Serial.print(lines_data_bit_mask, BIN); // pcに送る
-  Serial.print("l");
-  Serial.print(left_val);
-  Serial.print("r");
-  Serial.print(right_val);
-  Serial.print("b");
-  Serial.println(back_val);
 
   delay(10); // 10ms待機
 }

@@ -6,16 +6,53 @@ void playAttacker(Attacker::Mode mode)
 {
 
     if (mode == Attacker::Mode::YELLOWGOAL)
-        motorsPdProcess(&pd, yellowGoalDeg(), 0); // カメラで姿勢制御
+    {
+        if (yellowGoalDetected())
+        {
+            motorsPdProcess(&pd, yellowGoalDeg(), 0); // カメラで姿勢制御
+        }
+        else
+        {
+            motorsPdProcess(&pd, bnoDeg(), 0); // ジャイロで姿勢制御
+        }
+    }
     else if (mode == Attacker::Mode::BLUEGOAL)
-        motorsPdProcess(&pd, blueGoalDeg(), 0); // カメラで姿勢制御
+    {
+        if (blueGoalDetected())
+        {
+            motorsPdProcess(&pd, blueGoalDeg(), 0); // カメラで姿勢制御
+        }
+        else
+        {
+            motorsPdProcess(&pd, bnoDeg(), 0); // ジャイロで姿勢制御
+        }
+    }
     else
+    {
         motorsPdProcess(&pd, bnoDeg(), 0); // ジャイロで姿勢制御
+    }
 
+    bool is_motors_stop = false;
     Vector moveVec;
     if (lineRingDetected())
     {
-        moveVec = Vector(lineRingDeg() + 180, 80); // ラインの方向へ移動
+        if (lineRingFirstDetedcted() || lineRingDetectingTime() < 50UL)
+        {
+            is_motors_stop = true;
+        }
+        else
+        {
+            if (abs(diffDeg(lineRingFirstDeg(), lineRingDeg())) < 80)
+            {
+                int power = (int)roundf((100.0f - lineRingDis()) * 0.40f + 40.0f);
+
+                moveVec = Vector(lineRingDeg() + 180, power);
+            }
+            else
+            {
+                moveVec = Vector(lineRingDeg(), 100);
+            }
+        }
     }
     else if (irDetected())
     {
@@ -50,8 +87,16 @@ void playAttacker(Attacker::Mode mode)
         }
     }
 
-    if (!moveVec.is_empty())
-        motorsVectorMove(&moveVec); // 回り込み
-    else
+    if (is_motors_stop)
+    {
+        motorsStop(); // モータ停止
+    }
+    else if (moveVec.is_empty())
+    {
         motorsPdMove(); // 回転のみ
+    }
+    else
+    {
+        motorsVectorMove(&moveVec); // 回り込み
+    }
 }

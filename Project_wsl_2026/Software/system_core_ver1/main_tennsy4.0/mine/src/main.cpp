@@ -143,6 +143,10 @@ void loop()
         kicker1.kick(false); // キッカーを動かさない
         motorsStop();        // 動作選択中はモータを止める
 
+        for (int i = 0; i < 16; i++)
+            Serial.print("m" + String(i) + ":" + String(lineSensorDetected(i)) + ",");
+        Serial.print("\n");
+
         if (!timer.everCalled() || timer.msTime() > 10) // runningではないので10msに一回描画
         {
             timer.reset();
@@ -273,7 +277,7 @@ void loop()
             playRadicon();
             break;
         }
-    }
 
-    Serial.print("\n");
+        Serial.print("\n");
+    }
 }
