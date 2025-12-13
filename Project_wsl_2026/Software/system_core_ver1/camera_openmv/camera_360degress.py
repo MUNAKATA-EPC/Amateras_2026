@@ -68,7 +68,7 @@ sensor.skip_frames(time=2000)      # 設定が有効になるまで待機
 sensor.set_brightness(-1)                           # さらに暗く（-3 〜 +3）
 
 clock = time.clock()
-uart = UART(3, 9600, timeout_char=1000)
+uart = UART(3, 115200, timeout_char=1000)
 
 # -----------------------------------
 # 2バイトのデータ送信関数

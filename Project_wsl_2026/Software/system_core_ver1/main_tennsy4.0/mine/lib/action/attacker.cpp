@@ -1,10 +1,9 @@
 #include "attacker.hpp"
 
-static PD pd(0.8f, -10.0f); // ジャイロ用のPD調節値
+static PD pd(0.8f, 0.0f); // ジャイロ用のPD調節値
 
 void playAttacker(Attacker::Mode mode)
 {
-
     if (mode == Attacker::Mode::YELLOWGOAL)
     {
         if (yellowGoalDetected())
@@ -36,13 +35,15 @@ void playAttacker(Attacker::Mode mode)
     Vector moveVec;
     if (lineRingDetected())
     {
-        if (lineRingFirstDetedcted() || lineRingDetectingTime() < 50UL)
+        fullColorLed1.rgbLightUp(100, 0, 0);
+
+        if (lineRingFirstDetedcted() || lineRingDetectingTime() < 80UL)
         {
             is_motors_stop = true;
         }
         else
         {
-            if (abs(diffDeg(lineRingFirstDeg(), lineRingDeg())) < 80)
+            if (abs(diffDeg(lineRingFirstDeg(), lineRingDeg())) < 100)
             {
                 int power = (int)roundf((100.0f - lineRingDis()) * 0.40f + 40.0f);
 
@@ -56,31 +57,54 @@ void playAttacker(Attacker::Mode mode)
     }
     else if (irDetected())
     {
-        if (abs(irDeg()) < 10)
+        if (irDeg() > -15 && irDeg() < 15)
         {
-            moveVec = Vector(0, 80); // 前進
+            // 50 = a * 15 + b
+            // 95 = a * 0 + b
+            // 50 - 95 = a * 15
+            // -45 = a * 15
+            // b = 95, a = -3
+            int power = (-3 * abs(irDeg()) + 95);
+            moveVec = Vector(0, power); // 前進
         }
         else if (abs(irDeg()) < 35)
         {
-            int deg = int(roundf(float(irDeg() * irDeg()) * (irDeg() > 0 ? 0.0666f : -0.0666f)));
+            // 70 = a * 35 + b
+            // 50 = a * 15 + b
+            // 20 = 20 * a
+            // a = 1, b = 35
+            int power = (abs(irDeg()) + 35);
 
-            moveVec = Vector(deg, 60); // 赤外線センサーの方向へ移動
-        }
-        else if (irDis() > 530.0f)
-        {
-            moveVec = Vector(irDeg(), 80);
-        }
-        else
-        {
-            if (abs(irDeg()) < 100)
+            if (irDis() < 555)
             {
-                int diff = int(irVal() * 0.066f);
+                int deg = irDeg() > 0 ? 90 : -90;
 
-                moveVec = Vector(irDeg() > 0 ? irDeg() + diff : irDeg() - diff, 80); // 赤外線センサーの方向へ移動
+                moveVec = Vector(deg, power); // 赤外線センサーの方向へ移動
             }
             else
             {
-                int diff = int(irVal() * 0.1f);
+                // int deg = int(roundf(float(irDeg() * irDeg()) * (irDeg() > 0 ? 0.071f : -0.071f)));
+                int diff = int(irVal() * 0.100f);
+                int deg = irDeg() > 0 ? irDeg() + diff : irDeg() - diff;
+
+                moveVec = Vector(deg, power); // 赤外線センサーの方向へ移動
+            }
+        }
+        else if (irDis() > 600.0f)
+        {
+            moveVec = Vector(irDeg(), 95);
+        }
+        else
+        {
+            if (abs(irDeg()) < 70)
+            {
+                int diff = int(irVal() * 0.088f);
+
+                moveVec = Vector(irDeg() > 0 ? irDeg() + diff : irDeg() - diff, 70); // 赤外線センサーの方向へ移動
+            }
+            else
+            {
+                int diff = int(irVal() * 0.099f);
 
                 moveVec = Vector(irDeg() > 0 ? irDeg() + diff : irDeg() - diff, 80); // 赤外線センサーの方向へ移動
             }

@@ -15,7 +15,7 @@ Multiplexer line_mux;
 #define LINE_SENSOR_COUNT 16
 const int LINEsensor_pin[LINE_SENSOR_COUNT] = {8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7}; // 前から左回りにピン番号を指定
 
-unsigned int LINEsensor_adjust_value[LINE_SENSOR_COUNT] = {150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150}; // センサー調整用値格納用
+unsigned int LINEsensor_adjust_value[LINE_SENSOR_COUNT] = {141, 155, 155, 138, 174, 160, 138, 136, 156, 137, 160, 163, 151, 150, 136, 108}; // センサー調整用値格納用
 
 const int button_pin = 0;     // ボタンのピン番号
 const int led_pin = 7;        // LEDのピン番号

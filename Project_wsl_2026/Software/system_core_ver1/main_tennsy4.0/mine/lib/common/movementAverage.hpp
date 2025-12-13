@@ -15,7 +15,7 @@ private:
     bool _cant_compute = false;
 
 public:
-    void set(int average_count);
+    MovementAverage(int average_count);
 
     void reset();
 

@@ -143,10 +143,6 @@ void loop()
         kicker1.kick(false); // キッカーを動かさない
         motorsStop();        // 動作選択中はモータを止める
 
-        for (int i = 0; i < 16; i++)
-            Serial.print("m" + String(i) + ":" + String(lineSensorDetected(i)) + ",");
-        Serial.print("\n");
-
         if (!timer.everReset() || timer.msTime() > 10) // runningではないので10msに一回描画
         {
             timer.reset();
@@ -161,7 +157,7 @@ void loop()
                 switch (uiMeterNumber())
                 {
                 case 0:
-                    uiPrint(0, 8, "[ir]\n deg:" + String(irDeg()) + "\n dis:" + String(irDis()) + "\n val:" + String(irVal()));
+                    uiPrint(0, 8, "[ir]\n deg:" + String(irDeg()) + "\n dis:" + String(irDis()) + "\n val:" + String(irVal()) + "\n irY:" + String(irY()));
                     uiDrawCircleMeter(92, 32, 20, "deg", irDeg());
 
                     fullColorLed1.angleLightUp(irDeg(), irDetected() ? led_brightness : 0);

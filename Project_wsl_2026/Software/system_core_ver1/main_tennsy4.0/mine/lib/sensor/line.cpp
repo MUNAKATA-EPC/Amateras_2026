@@ -74,8 +74,6 @@ void lineUpdate()
         packet_to_adjust.add(data);
         packet.add(data);
 
-        Serial.print(data);
-
         if (packet_to_adjust.isComplete())
         {
             _is_adjusting = true; // 調整中フラグを立てる

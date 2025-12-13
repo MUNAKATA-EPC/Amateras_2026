@@ -13,6 +13,7 @@ Movement_average x;
 Movement_average y;
 
 const int IRsensor_pin[IR_SENSOR_COUNT] = {0, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1}; // 前から左回りにピン番号を指定
+const float IRsensor_gain[IR_SENSOR_COUNT] = {1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f};
 
 float IRsensor_x[IR_SENSOR_COUNT]; // 前をx正方向
 float IRsensor_y[IR_SENSOR_COUNT]; // 前をx正方向
@@ -33,8 +34,8 @@ void setup()
     {
         ir_ave[i].set(5); // 5個の平均をとる
 
-        IRsensor_x[i] = cosf(radians(i * diff_angle)); // 座標の計算
-        IRsensor_y[i] = sinf(radians(i * diff_angle)); // 座標の計算
+        IRsensor_x[i] = cosf(radians(i * diff_angle)) * 5.0f; // 座標の計算
+        IRsensor_y[i] = sinf(radians(i * diff_angle)) * 5.0f; // 座標の計算
 
         IRsensor_value[i] = 1023;
     }
@@ -48,7 +49,7 @@ void loop()
 
     for (int i = 0; i < IR_SENSOR_COUNT; i++)
     {
-        ir_ave[i].add(ir_mux.read(IRsensor_pin[i]));
+        ir_ave[i].add((int)roundf(ir_mux.read(IRsensor_pin[i]) * IRsensor_gain[i]));
         int ave_value = ir_ave[i].output();
 
         if (ir_ave[i].cant_compute())
@@ -100,8 +101,8 @@ void loop()
         float IRball_x = weight_sum_x / weight_sum;
         float IRball_y = weight_sum_y / weight_sum;
 
-        x.add((int)roundf(IRball_x * 10.0f));
-        y.add((int)roundf(IRball_y * 10.0f));
+        x.add((int)roundf(IRball_x * 1000.0f));
+        y.add((int)roundf(IRball_y * 1000.0f));
 
         IRball_x = x.cant_compute() ? 0.0f : x.output();
         IRball_y = y.cant_compute() ? 0.0f : y.output();
