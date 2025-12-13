@@ -1,6 +1,4 @@
-#ifndef VECTOR_HPP
-#define VECTOR_HPP
-
+#pragma once
 #include <Arduino.h>
 
 class Vector
@@ -48,5 +46,3 @@ Vector getVec(int deg, float length);
 
 // ベクターマッピング
 Vector mapVec(Vector vec, float in_scale, float out_scale);
-
-#endif

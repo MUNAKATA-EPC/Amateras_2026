@@ -1,5 +1,3 @@
-/*M5Stamp-picoとSerial通信*/
-/*M5stamp-picoはps3とBluetooth通信*/
 #pragma once
 
 #include <Arduino.h>

@@ -3,7 +3,7 @@
 #include <Arduino.h>
 #include <cmath> // hsv計算用
 
-/*　キャッチセンサーなどに使える万能関数　*/
+// キャッチセンサーなどに使える万能関数
 class DigitalSensor
 {
 private:
@@ -18,7 +18,7 @@ public:
 
 extern DigitalSensor catchSensor; // 共通で使えるようにしておく
 
-/*　フルカラーLED用関数　*/
+// フルカラーLED用関数
 class FullColorLed
 {
 private:

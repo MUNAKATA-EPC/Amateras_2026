@@ -1,6 +1,6 @@
 #include "digitalSensor.hpp"
 
-/*　キャッチセンサーなどに使える万能関数　*/
+// キャッチセンサーなどに使える万能関数
 bool DigitalSensor::init(uint8_t pin)
 {
     _pin = pin;
@@ -17,7 +17,7 @@ bool DigitalSensor::read()
 
 DigitalSensor catchSensor; // 共通で使えるようにしておく
 
-/*　フルカラーLED用関数　*/
+// フルカラーLED用関数
 bool FullColorLed::init(uint r_pin, uint8_t g_pin, uint8_t b_pin)
 {
     _r_pin = r_pin;
