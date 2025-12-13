@@ -1,12 +1,35 @@
 #include "radicon.hpp"
-static PD pdGyro(0.8f, 0.1f); // ジャイロ用のPD調節値
 
 static Vector record_data[360][5];      // パワーと角度を5段階360分割で格納
 static Vector temp_record_data[360][5]; // 一時的なデータ保管庫
 
-bool is_temp_record_data_empty = true;
+static bool is_temp_record_data_empty = true; // 一時記録データがからかどうか
 
-/*距離を5段階に変換する*/
+// record関連
+int disToIndex(float dis);                                        // 距離を5段階に変換する
+uint8_t complementData(Vector (&data)[360][5], bool (*range)[5]); // dataの補正　成功した距離段階を2進数で返す 例:段階0,1,3が成功なら0b11010
+void record();                                                    // 記録
+
+// replay関連
+void replay();
+
+void playRadicon(Radicon::Mode mode)
+{
+    if (mode == Radicon::Mode::RECORD)
+    {
+        record();
+    }
+    else if (mode == Radicon::COMPLEMENT)
+    {
+        motorsPdProcess(&pd_gyro, bnoDeg(), 0);
+        motorsMove(0, 70);
+    }
+    else if (mode == Radicon::Mode::REPLAY)
+    {
+        replay();
+    }
+}
+
 int disToIndex(float dis)
 {
     if (dis < 350.0f)
@@ -21,7 +44,6 @@ int disToIndex(float dis)
     return 4;
 }
 
-/*dataの補正　成功した距離段階を2進数で返す 例:段階0,1,3が成功➡0b11010*/
 uint8_t complementData(Vector (&data)[360][5], bool (*range)[5])
 {
     bool is_data_lacking[5] = {false, false, false, false, false}; // データ不足かどうかのフラグ
@@ -120,14 +142,14 @@ uint8_t complementData(Vector (&data)[360][5], bool (*range)[5])
     return output;
 }
 
-/*●ボタンを押している間は記録*/
-/* その後▲ボタンでデータ補正・record_dataに代入*/
-/* その後×ボタンでtemp_record_data削除*/
+// ●ボタンを押している間は記録
+// その後▲ボタンでデータ補正・record_dataに代入
+// その後×ボタンでtemp_record_data削除
 bool old_triangle_button = false; // 昔のps3の▲ボタン記録用
 
 void record()
 {
-    motorsPdProcess(&pdGyro, bnoDeg(), 0);
+    motorsPdProcess(&pd_gyro, bnoDeg(), 0);
 
     /*ps3からの読み取り　移動方向の計算*/
     int move_deg = ps3RightStickDeg();
@@ -247,7 +269,7 @@ void record()
     old_triangle_button = ps3ButtonIsPushing(ButtonDataType::TRIANGLE); // 記録
 }
 
-/*記録したrecord_dataをもとに回り込みをする*/
+// 記録したrecord_dataをもとに回り込みをする
 void replay()
 {
     if (irDetected())
@@ -271,39 +293,5 @@ void replay()
     else
     {
         motorsStop();
-    }
-}
-
-static bool first_call_flag = false; // 配列初期化用
-
-void playRadicon()
-{
-    Radicon::Mode mode = (Radicon::Mode)uiModeNumber();
-
-    if (first_call_flag == false) // record_data・temp_record_dataの初期化
-    {
-        for (int j = 0; j < 5; j++)
-        {
-            for (int i = 0; i < 360; i++)
-            {
-                record_data[i][j] = Vector();
-                temp_record_data[i][j] = Vector();
-            }
-        }
-
-        first_call_flag = true;
-    }
-
-    switch (mode)
-    {
-    case Radicon::Mode::RECORD:
-        record();
-        break;
-    case Radicon::Mode::REPLAY:
-        replay();
-        break;
-    default:
-        motorsStop();
-        break;
     }
 }

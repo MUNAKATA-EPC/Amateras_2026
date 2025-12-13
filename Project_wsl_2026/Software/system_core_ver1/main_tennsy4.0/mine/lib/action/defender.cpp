@@ -1,9 +1,5 @@
 #include "defender.hpp"
 
-// PD制御
-static PD pdGyro(0.4f, 1.6f); // ジャイロ用のPD調節値
-static PD pdCam(0.9f, 1.1f);  // カメラ用のPD調節値
-
 // 攻撃ゴールの位置
 static bool attack_goal_detected;
 static int attack_goal_deg;
@@ -41,7 +37,7 @@ void playDefender(Defender::Mode mode)
     }
     old_ir_deg = now_ir_deg; // 昔の角度記録
 
-    motorsPdProcess(&pdGyro, bnoDeg(), 0);
+    motorsPdProcess(&pd_gyro, bnoDeg(), 0);
 
     if (mode == Defender::Mode::YELLOWGOAL)
     {
@@ -194,11 +190,17 @@ Vector LineTraceAndTargetVec(PD *pd_line_trace, int deg, int power)
     // 接線ベクトル長さの算出
     float sessen_len;
     if (abs(deg) < 6) // 目標角度がほぼ前
+    {
         sessen_len = 0.0f;
-    else if (abs(deg) < 30)                                        // 目標角度が前付近
+    }
+    else if (abs(deg) < 30) // 目標角度が前付近
+    {
         sessen_len = map(abs(deg), 0.0f, 30.0f, 0.0f, behind_len); // 角度によってp制御
-    else                                                           // 目標角度が前付近に無い
-        sessen_len = behind_len;                                   // マックスで動かす
+    }
+    else // 目標角度が前付近に無い
+    {
+        sessen_len = behind_len; // マックスで動かす
+    }
     // 接線ベクトル算出
     Vector sessen_vec(sessen_deg, sessen_len);
 

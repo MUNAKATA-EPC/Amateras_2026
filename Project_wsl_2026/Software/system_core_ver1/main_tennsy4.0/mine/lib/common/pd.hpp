@@ -20,7 +20,7 @@ private:
 
     float _p_power = 0.0f; // P制御の出力
     float _d_power = 0.0f; // D制御の出力
-    float _output = 0.0f;    // 出力
+    float _output = 0.0f;  // 出力
 public:
     // 関数・コンストラクタ
     PD(float kp, float kd);
@@ -42,3 +42,6 @@ public:
         return _output;
     }
 };
+
+extern PD pd_gyro; // 共通で使えるようにしておく
+extern PD pd_cam;  // 共通で使えるようにしておく

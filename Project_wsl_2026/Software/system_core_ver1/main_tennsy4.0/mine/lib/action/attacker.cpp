@@ -1,126 +1,198 @@
 #include "attacker.hpp"
 
-static PD pd(0.8f, 0.0f); // ジャイロ用のPD調節値
+void attackWithGyro();
+void attackWithCam(bool attack_goal_detacted, int attack_goal_deg, int attack_goal_dis, bool defence_goal_detected, int defence_goal_deg, int defence_goal_dis);
 
 void playAttacker(Attacker::Mode mode)
 {
-    if (mode == Attacker::Mode::YELLOWGOAL)
+    if (mode == Attacker::Mode::GYRO)
     {
-        if (yellowGoalDetected())
+        attackWithGyro();
+    }
+    else
+    {
+        if (mode == Attacker::Mode::YELLOWGOAL)
         {
-            motorsPdProcess(&pd, yellowGoalDeg(), 0); // カメラで姿勢制御
+            attackWithCam(yellowGoalDetected(), yellowGoalDeg(), yellowGoalDis(), blueGoalDetected(), blueGoalDeg(), blueGoalDis());
         }
         else
         {
-            motorsPdProcess(&pd, bnoDeg(), 0); // ジャイロで姿勢制御
+            attackWithCam(blueGoalDetected(), blueGoalDeg(), blueGoalDis(), yellowGoalDetected(), yellowGoalDeg(), yellowGoalDis());
         }
     }
-    else if (mode == Attacker::Mode::BLUEGOAL)
+}
+
+void attackWithGyro() // ジャイロで攻撃
+{
+    motorsPdProcess(&pd_gyro, bnoDeg(), 0); // ジャイロで姿勢制御
+
+    const int motor_line_max_power = 90;
+    const int motor_ir_max_power = 90;
+
+    if (lineRingDetected())
     {
-        if (blueGoalDetected())
+        if (lineRingDetectingTime() < 80UL) // ライン反応後80ms間はモータは停止させる
         {
-            motorsPdProcess(&pd, blueGoalDeg(), 0); // カメラで姿勢制御
+            motorsStop();
+        }
+        else if (abs(diffDeg(lineRingDeg(), lineRingFirstDeg())) > 90) // ハーフアウトした
+        {
+            motorsMove(lineRingDeg(), motor_line_max_power);
         }
         else
         {
-            motorsPdProcess(&pd, bnoDeg(), 0); // ジャイロで姿勢制御
+            motorsMove(lineRingDeg() + 180, motor_line_max_power);
+        }
+    }
+    else if (irDetected())
+    {
+        if (irDeg() > -10 && irDeg() > 10)
+        {
+            motorsMove(0, motor_ir_max_power);
+        }
+        else
+        {
+            if (irDis() > 560)
+            {
+                motorsMove(irDeg(), motor_ir_max_power);
+            }
+            else
+            {
+                if (irDeg() > 0) // 左にいるとき
+                {
+                    if (irDeg() <= 60)
+                    {
+                        motorsMove(irDeg() + 80, motor_ir_max_power);
+                    }
+                    else if (irDeg() <= 160)
+                    {
+                        motorsMove(irDeg() + 55, motor_ir_max_power);
+                    }
+                    else
+                    {
+                        motorsMove(irDeg() + 80, motor_ir_max_power);
+                    }
+                }
+                else // 右にいるとき
+                {
+                    if (irDeg() >= -60)
+                    {
+                        motorsMove(irDeg() - 80, motor_ir_max_power);
+                    }
+                    else if (irDeg() >= -160)
+                    {
+                        motorsMove(irDeg() - 55, motor_ir_max_power);
+                    }
+                    else
+                    {
+                        motorsMove(irDeg() - 80, motor_ir_max_power);
+                    }
+                }
+            }
         }
     }
     else
     {
-        motorsPdProcess(&pd, bnoDeg(), 0); // ジャイロで姿勢制御
+        motorsPdMove();
+    }
+}
+
+Timer cam_pd_timer;
+
+void attackWithCam(bool attack_goal_detacted, int attack_goal_deg, int attack_goal_dis, bool defence_goal_detected, int defence_goal_deg, int defence_goal_dis) // カメラで攻撃
+{
+    if (attack_goal_detacted && cam_pd_timer.everReset() && cam_pd_timer.msTime() < 600UL)
+    {
+        motorsPdProcess(&pd_cam, attack_goal_deg, 0); // ジャイロで姿勢制御
+    }
+    else if (attack_goal_detacted && attack_goal_dis < 120)
+    {
+        motorsPdProcess(&pd_cam, attack_goal_deg, 0); // ジャイロで姿勢制御
+        cam_pd_timer.reset();
+    }
+    else
+    {
+        motorsPdProcess(&pd_gyro, bnoDeg(), 0); // ジャイロで姿勢制御
     }
 
-    bool is_motors_stop = false;
-    Vector moveVec;
+    const int motor_line_max_power = 90;
+    const int motor_ir_max_power = 90;
+
     if (lineRingDetected())
     {
-        fullColorLed1.rgbLightUp(100, 0, 0);
-
-        if (lineRingFirstDetedcted() || lineRingDetectingTime() < 80UL)
+        if (lineRingDetectingTime() < 80UL) // ライン反応後80ms間はモータは停止させる
         {
-            is_motors_stop = true;
+            motorsStop();
+        }
+        else if (attack_goal_detacted && attack_goal_dis < 80)
+        {
+            motorsMove(attack_goal_deg + 180, motor_line_max_power);
+        }
+        else if (defence_goal_detected && defence_goal_dis < 80)
+        {
+            motorsMove(defence_goal_deg + 180, motor_line_max_power);
         }
         else
         {
-            if (abs(diffDeg(lineRingFirstDeg(), lineRingDeg())) < 100)
+            if (abs(diffDeg(lineRingDeg(), lineRingFirstDeg())) > 90) // ハーフアウトした
             {
-                int power = (int)roundf((100.0f - lineRingDis()) * 0.40f + 40.0f);
-
-                moveVec = Vector(lineRingDeg() + 180, power);
+                motorsMove(lineRingDeg(), motor_line_max_power);
             }
             else
             {
-                moveVec = Vector(lineRingDeg(), 100);
+                motorsMove(lineRingDeg() + 180, motor_line_max_power);
             }
         }
     }
     else if (irDetected())
     {
-        if (irDeg() > -15 && irDeg() < 15)
+        if (irDeg() > -10 && irDeg() > 10)
         {
-            // 50 = a * 15 + b
-            // 95 = a * 0 + b
-            // 50 - 95 = a * 15
-            // -45 = a * 15
-            // b = 95, a = -3
-            int power = (-3 * abs(irDeg()) + 95);
-            moveVec = Vector(0, power); // 前進
-        }
-        else if (abs(irDeg()) < 35)
-        {
-            // 70 = a * 35 + b
-            // 50 = a * 15 + b
-            // 20 = 20 * a
-            // a = 1, b = 35
-            int power = (abs(irDeg()) + 35);
-
-            if (irDis() < 555)
-            {
-                int deg = irDeg() > 0 ? 90 : -90;
-
-                moveVec = Vector(deg, power); // 赤外線センサーの方向へ移動
-            }
-            else
-            {
-                // int deg = int(roundf(float(irDeg() * irDeg()) * (irDeg() > 0 ? 0.071f : -0.071f)));
-                int diff = int(irVal() * 0.100f);
-                int deg = irDeg() > 0 ? irDeg() + diff : irDeg() - diff;
-
-                moveVec = Vector(deg, power); // 赤外線センサーの方向へ移動
-            }
-        }
-        else if (irDis() > 600.0f)
-        {
-            moveVec = Vector(irDeg(), 95);
+            motorsMove(0, motor_ir_max_power);
         }
         else
         {
-            if (abs(irDeg()) < 70)
+            if (irDis() > 560)
             {
-                int diff = int(irVal() * 0.088f);
-
-                moveVec = Vector(irDeg() > 0 ? irDeg() + diff : irDeg() - diff, 70); // 赤外線センサーの方向へ移動
+                motorsMove(irDeg(), motor_ir_max_power);
             }
             else
             {
-                int diff = int(irVal() * 0.099f);
-
-                moveVec = Vector(irDeg() > 0 ? irDeg() + diff : irDeg() - diff, 80); // 赤外線センサーの方向へ移動
+                if (irDeg() > 0) // 左にいるとき
+                {
+                    if (irDeg() <= 60)
+                    {
+                        motorsMove(irDeg() + 80, motor_ir_max_power);
+                    }
+                    else if (irDeg() <= 160)
+                    {
+                        motorsMove(irDeg() + 55, motor_ir_max_power);
+                    }
+                    else
+                    {
+                        motorsMove(irDeg() + 80, motor_ir_max_power);
+                    }
+                }
+                else // 右にいるとき
+                {
+                    if (irDeg() >= -60)
+                    {
+                        motorsMove(irDeg() - 80, motor_ir_max_power);
+                    }
+                    else if (irDeg() >= -160)
+                    {
+                        motorsMove(irDeg() - 55, motor_ir_max_power);
+                    }
+                    else
+                    {
+                        motorsMove(irDeg() - 80, motor_ir_max_power);
+                    }
+                }
             }
         }
     }
-
-    if (is_motors_stop)
-    {
-        motorsStop(); // モータ停止
-    }
-    else if (moveVec.is_empty())
-    {
-        motorsPdMove(); // 回転のみ
-    }
     else
     {
-        motorsVectorMove(&moveVec); // 回り込み
+        motorsPdMove();
     }
 }

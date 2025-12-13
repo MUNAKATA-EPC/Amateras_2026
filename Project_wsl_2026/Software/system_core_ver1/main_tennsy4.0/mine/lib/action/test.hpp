@@ -19,4 +19,4 @@
 #include "ps3.hpp"
 #include "openmv.hpp"
 
-void playTest();
+void playTest(Test::Mode mode);

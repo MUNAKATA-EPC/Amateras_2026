@@ -19,4 +19,4 @@
 #include "ps3.hpp"
 #include "openmv.hpp"
 
-void playRadicon();
+void playRadicon(Radicon::Mode mode);

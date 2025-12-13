@@ -136,7 +136,7 @@ void loop()
     uiButtonUpdate(enterButton.isReleased(), backButton.isReleased(), rightButton.isReleased(), leftButton.isReleased()); // ボタンの更新
 
     // 動作を実行
-    if (!uiRunning())
+    if (uiRunning() == false)
     {
         old_running_flag = false;
 
@@ -150,19 +150,18 @@ void loop()
             uiClear();
             uiDrawMain(); // 10msに一回更新
 
-            const int led_brightness = 10; // フルカラーLEDの光の強さ
-
             if (!uiActionDecided()) // センサーモニター表示
             {
                 switch (uiMeterNumber())
                 {
                 case 0:
+                {
                     uiPrint(0, 8, "[ir]\n deg:" + String(irDeg()) + "\n dis:" + String(irDis()) + "\n val:" + String(irVal()) + "\n irY:" + String(irY()));
                     uiDrawCircleMeter(92, 32, 20, "deg", irDeg());
-
-                    fullColorLed1.angleLightUp(irDeg(), irDetected() ? led_brightness : 0);
                     break;
+                }
                 case 1:
+                {
                     if (lineIsAdjusting()) // 調整中ならセンサーの値を表示
                     {
                         uiPrint(0, 8, "[line_adjust(0~7)]");
@@ -177,10 +176,10 @@ void loop()
                         uiPrint(0, 8, "[ringLine]\n deg:" + String(lineRingDeg()) + "\n dis:" + String(lineRingDis()));
                         uiDrawCircleMeter(92, 32, 20, "deg", lineRingDeg());
                     }
-
-                    fullColorLed1.angleLightUp(lineRingDeg(), lineRingDetected() ? led_brightness : 0);
                     break;
+                }
                 case 2:
+                {
                     if (lineIsAdjusting()) // 調整中ならセンサーの値を表示
                     {
                         uiPrint(0, 8, "[line_adjust(8~15)]");
@@ -195,46 +194,46 @@ void loop()
                         uiPrint(0, 8, "[sideLine]\n deg:" + String(lineSideDeg()) + "\n dis:" + String(lineSideDeg()));
                         uiDrawCircleMeter(92, 32, 20, "deg", lineSideDeg());
                     }
-
-                    fullColorLed1.angleLightUp(lineSideDeg(), lineSideDetected() ? led_brightness : 0);
                     break;
+                }
                 case 3:
+                {
                     uiPrint(0, 8, "[bno055]\n deg:" + String(bnoDeg()));
                     uiDrawCircleMeter(92, 32, 20, "deg", bnoDeg());
-
-                    fullColorLed1.angleLightUp(bnoDeg(), led_brightness);
                     break;
+                }
                 case 4:
+                {
                     uiPrint(0, 8, "[yellowGoal]\n deg:" + String(yellowGoalDeg()) + "\n dis:" + String(yellowGoalDis()));
                     uiDrawCircleMeter(92, 32, 20, "deg", yellowGoalDeg());
-
-                    fullColorLed1.angleLightUp(yellowGoalDeg(), yellowGoalDetected() ? led_brightness : 0);
                     break;
+                }
                 case 5:
+                {
                     uiPrint(0, 8, "[blueGoal]\n deg:" + String(blueGoalDeg()) + "\n dis:" + String(blueGoalDis()));
                     uiDrawCircleMeter(92, 32, 20, "deg", blueGoalDeg());
-
-                    fullColorLed1.angleLightUp(blueGoalDeg(), blueGoalDetected() ? led_brightness : 0);
                     break;
+                }
                 case 6:
+                {
                     uiPrint(0, 8, "[field]\n deg:" + String(fieldDeg()) + "\n\n[catch]\n react:" + String(catchSensor.read()));
                     uiDrawCircleMeter(92, 32, 20, "deg", fieldDeg());
-
-                    fullColorLed1.angleLightUp(fieldDeg(), fieldDetected() ? led_brightness : 0);
                     break;
+                }
                 case 7:
+                {
                     uiPrint(0, 8, "[ps3_left]\n x:" + String(ps3LeftStickX()) + "\n y:" + String(ps3LeftStickY()) + "\n deg:" + String(ps3LeftStickDeg()) + "\n dis:" + String(ps3LeftStickDis()));
                     uiDrawCircleMeter(92, 32, 20, "deg", ps3LeftStickDeg());
-
-                    fullColorLed1.angleLightUp(ps3LeftStickDeg(), ps3LeftStickDetected() ? led_brightness : 0);
                     break;
+                }
                 case 8:
+                {
                     uiPrint(0, 8, "[ps3_right]\n x:" + String(ps3RightStickX()) + "\n y:" + String(ps3RightStickY()) + "\n deg:" + String(ps3RightStickDeg()) + "\n dis:" + String(ps3RightStickDis()));
                     uiDrawCircleMeter(92, 32, 20, "deg", ps3RightStickDeg());
-
-                    fullColorLed1.angleLightUp(ps3RightStickDeg(), ps3RightStickDetected() ? led_brightness : 0);
                     break;
+                }
                 case 9:
+                {
                     ButtonDataType btns[] = {UP, DOWN, LEFT, RIGHT, TRIANGLE, CIRCLE, CROSS, SQUARE, L1, L2, L3, R1, R2, R3};
                     String message = "";
                     for (int i = 0; i < 14; i++)
@@ -242,6 +241,8 @@ void loop()
                         message += String((ps3ButtonIsPushing(btns[i])) ? "1" : "0");
                     }
                     uiPrint(0, 8, "[ps3_button]\n" + message);
+                    break;
+                }
                 }
             }
 
@@ -255,25 +256,32 @@ void loop()
             uiClear();
             uiDrawMain();
             uiShow();
+
+            old_running_flag = true;
         }
-        old_running_flag = true;
 
         switch (uiActionNumber())
         {
         case Action::ATTACKER:
+        {
             playAttacker(Attacker::Mode(uiModeNumber()));
             break;
+        }
         case Action::DEFENDER:
+        {
             playDefender(Defender::Mode(uiModeNumber()));
             break;
+        }
         case Action::TEST:
-            playTest();
-            break;
-        case Action::RADICON:
-            playRadicon();
+        {
+            playTest(Test::Mode(uiModeNumber()));
             break;
         }
-
-        Serial.print("\n");
+        case Action::RADICON:
+        {
+            playRadicon(Radicon::Mode(uiModeNumber()));
+            break;
+        }
+        }
     }
 }

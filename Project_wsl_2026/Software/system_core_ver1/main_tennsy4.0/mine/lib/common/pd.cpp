@@ -67,3 +67,6 @@ void PD::process(float val, float target, bool angle)
     power += (_useD) ? _d_power : 0.0f; // D成分は動きを抑える作用
     _output = constrain(power, -100.0f, 100.0f);
 }
+
+PD pd_gyro(0.65, -4.5); // 共通で使えるようにしておく
+PD pd_cam(0.65, -4.5);  // 共通で使えるようにしておく
