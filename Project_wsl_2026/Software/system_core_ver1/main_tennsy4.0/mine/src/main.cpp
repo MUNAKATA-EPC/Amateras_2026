@@ -26,22 +26,22 @@
 
 void setup()
 {
-    String debugMessage = "> setup <\n";
+    String debug_message = "> setup <\n";
 
     // I2C
-    debugMessage += uiInit(&Wire1, 0x3C, 128, 64) ? "ui     : found\n" : "ui     : not found\n";
-    debugMessage += bnoInit(&Wire, 0x28) ? "bno    : found\n" : "bno    : not found\n";
+    debug_message += uiInit(&Wire1, 0x3C, 128, 64) ? "ui     : found\n" : "ui     : not found\n";
+    debug_message += bnoInit(&Wire, 0x28) ? "bno    : found\n" : "bno    : not found\n";
 
     // シリアル
     Serial.begin(9600L); // デバッグ用
 
-    debugMessage += irInit(&Serial1, 115200) ? "ir     : found\n" : "ir     : not found\n";
-    debugMessage += lineInit(&Serial5, 115200) ? "line   : found\n" : "line   : not found\n";
-    debugMessage += openmvInit(&Serial3, 115200) ? "openmv : found\n" : "openmv : not found\n";
-    debugMessage += ps3Init(&Serial7, 115200) ? "ps3    : found\n" : "ps3    : not found\n";
+    debug_message += irInit(&Serial1, 115200) ? "ir     : found\n" : "ir     : not found\n";
+    debug_message += lineInit(&Serial5, 115200) ? "line   : found\n" : "line   : not found\n";
+    debug_message += openmvInit(&Serial3, 115200) ? "openmv : found\n" : "openmv : not found\n";
+    debug_message += ps3Init(&Serial7, 115200) ? "ps3    : found\n" : "ps3    : not found\n";
     ps3StickAdjust(20.0f, 20.0f);
 
-    debugMessage += motorsInit(&Serial1, 115200) ? "motors : found\n" : "motors : not found\n";
+    debug_message += motorsInit(&Serial1, 115200) ? "motors : found\n" : "motors : not found\n";
     // motorsSetTogglePin(4, INPUT_PULLDOWN);   // モータの起動トグルスイッチのピン設定
     motorsSetMoveSign(1, 1, 1, 1);           // 移動のための符号をセット
     motorsSetPdSign(1, 1, 1, 1);             // PD制御のための符号をセット
@@ -60,9 +60,9 @@ void setup()
     fullColorLed1.init(36, 35, 34); // デバッグ用
 
     // デバッグメッセージの出力
-    Serial.println(debugMessage);
+    Serial.println(debug_message);
     uiClear();
-    uiPrintDebug(debugMessage.c_str()); // uiにも表示
+    uiPrintDebug(debug_message.c_str()); // uiにも表示
     uiShow();
 
     // どれかのボタンを押すまで待機
@@ -113,7 +113,8 @@ void setup()
     }
 }
 
-Timer timer; // ui用
+Timer update_timer; // センサー更新用
+Timer ui_timer;     // ui用
 bool old_running_flag = false;
 
 void loop()
@@ -126,11 +127,16 @@ void loop()
     resetButton.update();
 
     // センサー類更新
-    irUpdate();
-    lineUpdate();
-    openmvUpdate();
-    ps3Update();
-    bnoUpdate(resetButton.isReleased()); // bno更新
+    if (!update_timer.everReset() || update_timer.msTime() < 5UL)
+    {
+        update_timer.reset();
+
+        irUpdate();
+        lineUpdate();
+        openmvUpdate();
+        ps3Update();
+        bnoUpdate(resetButton.isReleased()); // bno更新
+    }
 
     // uiを実行・描画
     uiButtonUpdate(enterButton.isReleased(), backButton.isReleased(), rightButton.isReleased(), leftButton.isReleased()); // ボタンの更新
@@ -143,9 +149,9 @@ void loop()
         kicker1.kick(false); // キッカーを動かさない
         motorsStop();        // 動作選択中はモータを止める
 
-        if (!timer.everReset() || timer.msTime() > 10) // runningではないので10msに一回描画
+        if (!ui_timer.everReset() || ui_timer.msTime() > 10UL) // runningではないので10msに一回描画
         {
-            timer.reset();
+            ui_timer.reset();
 
             uiClear();
             uiDrawMain(); // 10msに一回更新

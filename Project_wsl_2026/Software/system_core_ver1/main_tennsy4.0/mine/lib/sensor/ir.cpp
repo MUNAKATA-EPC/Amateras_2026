@@ -4,8 +4,8 @@ static HardwareSerial *_serial = nullptr;
 static uint32_t _baudrate = 9600;
 static bool _detected = false;
 static int _deg = 0xFF;
-static float _val = 0xFF;
-static float _dis = 0xFF;
+static int _val = 0xFF;
+static int _dis = 0xFF;
 
 static PacketManager packet; // パケットマネージャー
 
@@ -46,7 +46,7 @@ void irUpdate()
             uint8_t high2 = packet.get(4); // ボールの値の上位バイトを読み取る
 
             _deg = int16_t((uint16_t(high1) << 8) | uint16_t(low1)); // 上位バイトと下位バイトをつなげる
-            _dis = float((uint16_t(high2) << 8) | uint16_t(low2));   // 上位バイトと下位バイトをつなげる
+            _dis = int16_t((uint16_t(high2) << 8) | uint16_t(low2));   // 上位バイトと下位バイトをつなげる
 
             if (_deg == 0xFF)
             {
@@ -57,9 +57,9 @@ void irUpdate()
             else
             {
                 _detected = true;
-                _val = 1023.0f - _dis;
-                if (_val < 0.0f)
-                    _val = 0.0f;
+                _val = 100 - _dis;
+                if (_val < 0)
+                    _val = 0;
             }
 
             packet.reset();
@@ -70,7 +70,7 @@ void irUpdate()
 bool irDetected() { return _detected; }
 int irDeg() { return _deg; }
 int irVal() { return _val; }
-float irDis() { return _dis; }
+int irDis() { return _dis; }
 
 float irX()
 {

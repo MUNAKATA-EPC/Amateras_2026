@@ -10,7 +10,7 @@ void irUpdate();
 bool irDetected();
 int irDeg();
 int irVal();
-float irDis();
+int irDis();
 
 float irX();
 float irY();

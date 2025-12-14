@@ -101,34 +101,10 @@ void motorsMove(int deg, int power)
     }
 
     // PID制御の値を加算
+    float pd_value = constrain(_pd->output(), -PID_MOVING_MAX, PID_MOVING_MAX);
     for (int i = 0; i < 4; i++)
     {
-        float pd_value = _pd->output() * float(_pd_sign[i]);
-
-        if (powers[i] > -50.0f && powers[i] < 50.0f)
-        {
-            powers[i] += pd_value;
-        }
-        else
-        {
-            if (pd_value < 0.0f)
-            {
-                if (pd_value < -PID_MOVING_MAX)
-                {
-                    pd_value = -PID_MOVING_MAX;
-                }
-            }
-            else
-            {
-
-                if (pd_value > PID_MOVING_MAX)
-                {
-                    pd_value = PID_MOVING_MAX;
-                }
-            }
-
-            powers[i] += pd_value;
-        }
+        powers[i] += pd_value * float(_pd_sign[i]);
     }
 
     // 最大出力を再度探索
@@ -140,25 +116,21 @@ void motorsMove(int deg, int power)
             strongest_abs_power = fabs(powers[i]);
         }
     }
+
     // PDの値によって値が100より大きくなったとき補正する
     if (strongest_abs_power > 100.0f)
     {
-        float beyond_power = strongest_abs_power - 100.0f;
+        float scale = 100.0f / strongest_abs_power;
 
         for (int i = 0; i < 4; i++)
         {
-            if (powers[i] > 0.0f)
-                powers[i] = powers[i] - beyond_power;
-            else
-                powers[i] = powers[i] + beyond_power;
+            powers[i] = powers[i] * scale;
         }
     }
-    else
+    // 安全対策
+    for (int i = 0; i < 4; i++)
     {
-        for (int i = 0; i < 4; i++)
-        {
-            powers[i] = constrain(powers[i], -100.0f, 100.0f);
-        }
+        powers[i] = constrain(powers[i], -100.0f, 100.0f);
     }
 
     // 制御
