@@ -1,6 +1,6 @@
 #include "pd.hpp"
 
-// #define D_USE_TIMER // ループが短すぎてうまくいかないです
+#define D_USE_TIMER // ループが短すぎてうまくいかないです
 
 PD::PD(float kp, float kd)
 {
@@ -11,10 +11,6 @@ PD::PD(float kp, float kd)
     // 過去の値とタイマー関連の初期化
     _oldvalue = 0.0f;
     _output = 0.0f;
-
-#ifdef D_USE_TIMER
-    _timer.reset();
-#endif
 }
 
 void PD::process(float val, float target, bool angle)
@@ -33,23 +29,21 @@ void PD::process(float val, float target, bool angle)
     _gap_of_value = angle ? (float)diffDeg(_value, _oldvalue) : float(_value - _oldvalue);
 
 #ifdef D_USE_TIMER
-    float delta = 0.0f;
-    if (!_timer.everCalled())
+    if (old_micro_time != 0xFFFFFFFF) // 最初old_micro_timeには0xFFFFFFFFが格納されているから最初の呼び出しかどうか判定できる
     {
-        _timer.reset();
-        _d_power = 0.0f;
+        uint32_t now_micro_time = micros();
+        uint32_t delta_t = now_micro_time - old_micro_time; // Δt算出
+        old_micro_time = now_micro_time;                         // 更新
+
+        // ゼロ除算を避ける
+        if (delta_t > 0)
+            _d_power = _kd * _gap_of_value / float(delta_t); // D = Kd * (変化量 / 時間)
+        else
+            _d_power = 0.0f;
     }
     else
     {
-        delta = _timer.msTime() * 10UL;
-
-        // ゼロ除算を避ける
-        if (delta > 1e-6)
-            _d_power = _kd * _gap_of_value / delta; // D = Kd * (変化量 / 時間)
-        else
-            _d_power = 0.0f;
-
-        _timer.reset();
+        _d_power = 0.0f;
     }
 #endif
 

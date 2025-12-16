@@ -13,7 +13,8 @@ private:
     bool _useP = true;
     bool _useD = true;
 
-    Timer _timer;               // D制御用のタイマー
+    uint32_t old_micro_time = 0xFFFFFFFF; // 昔に時間記録用で最初は最大値を格納しておく（ミクロセカンド）
+
     float _value = 0.0f;        // 現在の値
     float _oldvalue = 0.0f;     // 昔の値
     float _gap_of_value = 0.0f; // 値の変化量

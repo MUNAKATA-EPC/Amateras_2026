@@ -59,7 +59,7 @@ void motorsSetPdSign(int sign_1ch, int sign_2ch, int sign_3ch, int sign_4ch)
 {
     _pd_sign[0] = sign_1ch / abs(sign_1ch);
     _pd_sign[1] = sign_2ch / abs(sign_2ch);
-    _pd_sign[2] = sign_3ch / abs(sign_2ch);
+    _pd_sign[2] = sign_3ch / abs(sign_3ch);
     _pd_sign[3] = sign_4ch / abs(sign_4ch);
 }
 
@@ -70,8 +70,8 @@ void motorsPdProcess(PD *pd, int deg, int target)
     _pd->process(deg, target, true);
 }
 
-#define PID_MAX 80.0f
-#define PID_MOVING_MAX 20.0f
+#define PD_MAX 80.0f
+#define PD_MOVING_MAX 20.0f
 
 void motorsMove(int deg, int power)
 {
@@ -100,37 +100,38 @@ void motorsMove(int deg, int power)
         }
     }
 
-    // PID制御の値を加算
-    float pd_value = constrain(_pd->output(), -PID_MOVING_MAX, PID_MOVING_MAX);
+    // PID制御の値を加算したパワーを一時的にtemp_powersに格納
+    float pd_value = constrain(_pd->output(), -PD_MOVING_MAX, PD_MOVING_MAX);
+    float temp_powers[4];
     for (int i = 0; i < 4; i++)
     {
-        powers[i] += pd_value * float(_pd_sign[i]);
+        temp_powers[i] = powers[i] + pd_value * float(_pd_sign[i]);
     }
 
     // 最大出力を再度探索
     strongest_abs_power = 0.0f;
     for (int i = 0; i < 4; i++)
     {
-        if (fabs(powers[i]) > strongest_abs_power)
+        if (fabs(temp_powers[i]) > strongest_abs_power)
         {
-            strongest_abs_power = fabs(powers[i]);
+            strongest_abs_power = fabs(temp_powers[i]);
         }
     }
 
-    // PDの値によって値が100より大きくなったとき補正する
+    // 100を超える用であればPD値のみを削る形で補正
     if (strongest_abs_power > 100.0f)
     {
-        float scale = 100.0f / strongest_abs_power;
+        float over_limit_abs_power = strongest_abs_power - 100.0f;        // 100をどれくらい超えたか
+        float pd_value_max_power = fabs(pd_value) - over_limit_abs_power; // それをもとにPD値の限界を計算
 
-        for (int i = 0; i < 4; i++)
-        {
-            powers[i] = powers[i] * scale;
-        }
+        pd_value = constrain(pd_value, -pd_value_max_power, pd_value_max_power); // 制限
     }
-    // 安全対策
+
+    // 補正済みPD値をpowersに加算
     for (int i = 0; i < 4; i++)
     {
-        powers[i] = constrain(powers[i], -100.0f, 100.0f);
+        powers[i] += pd_value * float(_pd_sign[i]);
+        powers[i] = constrain(powers[i], -100.0f, 100.0f); // 安全策
     }
 
     // 制御
@@ -141,6 +142,7 @@ void motorsMove(int deg, int power)
 void motorsPdMove()
 {
     float pd_output = _pd->output();
+    pd_output = constrain(pd_output, -PD_MAX, PD_MAX);
 
     int output1 = (int)roundf(pd_output * float(_pd_sign[0]));
     int output2 = (int)roundf(pd_output * float(_pd_sign[1]));
