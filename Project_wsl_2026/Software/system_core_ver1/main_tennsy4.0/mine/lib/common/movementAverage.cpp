@@ -13,7 +13,7 @@ void MovementAverage::reset()
     }
 }
 
-int MovementAverage::add(int data)
+float MovementAverage::add(float data)
 {
     _data[_add_index] = data;
 
@@ -41,5 +41,5 @@ int MovementAverage::add(int data)
         _cant_compute = true;
     }
 
-    return (int)round(ave);
+    return ave;
 }

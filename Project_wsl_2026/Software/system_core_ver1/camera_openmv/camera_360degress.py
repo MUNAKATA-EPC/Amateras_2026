@@ -6,11 +6,11 @@ import math
 
 #############################################################
 # ゴールの色取り用変数(黄色)
-goal_yellow = (58, 100, -36, 15, 26, 127) #new
+goal_yellow = (56, 98, -23, -12, 38, 65) #new
 #goal_yellow = (58, 100, -36, 15, 26, 127)  #old
 #############################################################
 # ゴールの色取り用変数(青色)
-goal_blue = (62, 29, -13, 42, -113, -21) #new
+goal_blue = (10, 44, -4, 27, -42, -24) #new
 #goal_blue = (6, 38, -5, 20, -56, -10) #old
 #############################################################
 # コートの色（カーペット用）
@@ -65,7 +65,7 @@ sensor.skip_frames(time=2000)      # 設定が有効になるまで待機
 # sensor.set_auto_gain(False, gain_db=8)             # 自動ゲインオフ、ゲインを低めに
 # sensor.set_auto_whitebal(False)                    # ホワイトバランス固定
 # sensor.set_auto_exposure(False, exposure_us=1800)  # 露出を短くして暗めに
-sensor.set_brightness(-1)                           # さらに暗く（-3 〜 +3）
+sensor.set_brightness(-3)                           # さらに暗く（-3 〜 +3）
 
 clock = time.clock()
 uart = UART(3, 115200, timeout_char=1000)
@@ -167,14 +167,18 @@ while True:
     # -----------------------------------
 
     # 整数化
-    court_deg = int(-court_deg) # 反転させてint型に変換
+    court_deg = int(-court_deg) + 180 # 反転させてint型に変換
 
     if yellow_detected == True:
-        yellow_deg = int(-yellow_deg) # 反転させてint型に変換
+        yellow_deg = int(-yellow_deg) + 180 # 反転させてint型に変換
+        if yellow_deg > 180:
+            yellow_deg -= 360
         yellow_dis = int(yellow_dis)
 
     if blue_detected == True:
-        blue_deg = int(-blue_deg) # 反転させてint型に変換
+        blue_deg = int(-blue_deg) + 180 # 反転させてint型に変換
+        if blue_deg > 180:
+            blue_deg -= 360
         blue_dis = int(blue_dis)
 
     # UART送信

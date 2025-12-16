@@ -28,25 +28,14 @@ void attackWithGyro() // ジャイロで攻撃
 {
     motorsPdProcess(&pd_gyro, bnoDeg(), 0); // ジャイロで姿勢制御
 
-    const int motor_line_max_power = 90;
-    const int motor_ir_max_power = 90;
+    const int motor_line_max_power = 80;
+    const int motor_ir_max_power = 95;
 
-    if (line_timer.everReset() && line_timer.msTime() < 500UL)
+    if (line_timer.everReset() && line_timer.msTime() < 100UL)
     {
-        if (lineRingDetected())
+        if (fieldDetected())
         {
-            if (lineRingDetectingTime() < 250UL) // ライン反応後250ms間はモータは停止させる
-            {
-                motorsStop();
-            }
-            else if (abs(diffDeg(lineRingDeg(), lineRingFirstDeg())) > 90) // ハーフアウトした
-            {
-                motorsMove(lineRingDeg(), motor_line_max_power);
-            }
-            else
-            {
-                motorsMove(lineRingDeg() + 180, motor_line_max_power);
-            }
+            motorsMove(fieldDeg(), motor_line_max_power);
         }
         else
         {
@@ -55,46 +44,38 @@ void attackWithGyro() // ジャイロで攻撃
     }
     else if (lineRingDetected())
     {
-        if (lineRingDetectingTime() < 250UL) // ライン反応後250ms間はモータは停止させる
+        if (fieldDetected())
         {
-            motorsStop();
-        }
-        else if (abs(diffDeg(lineRingDeg(), lineRingFirstDeg())) > 90) // ハーフアウトした
-        {
-            motorsMove(lineRingDeg(), motor_line_max_power);
+            motorsMove(fieldDeg(), motor_line_max_power);
         }
         else
         {
-            motorsMove(lineRingDeg() + 180, motor_line_max_power);
+            motorsMove(lineRingFirstDeg() + 180, motor_line_max_power);
         }
 
         line_timer.reset();
     }
     else if (irDetected())
     {
-        if (irDeg() >= -6 && irDeg() <= 6)
+        if (irDeg() >= -11 && irDeg() <= 9)
         {
             motorsMove(0, motor_ir_max_power);
         }
-        else if (irDeg() >= -10 && irDeg() <= 10)
-        {
-            motorsMove(irDeg() * 1.25f, motor_ir_max_power);
-        }
         else
         {
-            if (irDis() >= 56.0f)
+            if (irDis() >= 60.0f)
             {
                 motorsMove(irDeg(), motor_ir_max_power);
             }
             else
             {
-                int diff = irVal();
+                int diff = (int)roundf(irVal() * 1.11f);
 
                 if (irDeg() > 0) // 左にいるとき
                 {
-                    if (irDeg() <= 60)
+                    if (irDeg() <= 45)
                     {
-                        motorsMove(irDeg() + diff, motor_ir_max_power);
+                        motorsMove(irDeg() + diff, motor_ir_max_power * 0.65f);
                     }
                     else if (irDeg() <= 160)
                     {
@@ -107,9 +88,9 @@ void attackWithGyro() // ジャイロで攻撃
                 }
                 else // 右にいるとき
                 {
-                    if (irDeg() >= -60)
+                    if (irDeg() >= -45)
                     {
-                        motorsMove(irDeg() - diff, motor_ir_max_power);
+                        motorsMove(irDeg() - diff, motor_ir_max_power * 0.65f);
                     }
                     else if (irDeg() >= -160)
                     {
@@ -147,8 +128,8 @@ void attackWithCam(bool attack_goal_detacted, int attack_goal_deg, int attack_go
         motorsPdProcess(&pd_gyro, bnoDeg(), 0); // ジャイロで姿勢制御
     }
 
-    const int motor_line_max_power = 90;
-    const int motor_ir_max_power = 90;
+    const int motor_line_max_power = 80;
+    const int motor_ir_max_power = 75;
 
     if (lineRingDetected())
     {
@@ -178,13 +159,13 @@ void attackWithCam(bool attack_goal_detacted, int attack_goal_deg, int attack_go
     }
     else if (irDetected())
     {
-        if (irDeg() > -10 && irDeg() > 10)
+        if (irDeg() >= -11 && irDeg() >= 11)
         {
             motorsMove(0, motor_ir_max_power);
         }
         else
         {
-            if (irDis() > 560)
+            if (irDis() > 55)
             {
                 motorsMove(irDeg(), motor_ir_max_power);
             }

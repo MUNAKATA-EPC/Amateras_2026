@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <stdlib.h>
+#include "movement_average.hpp"
 
 #define PIN_DATA 0
 
@@ -8,8 +9,6 @@
 #define PIN_S2 3
 
 #define PIN_S3 4
-
-#define PIN_E 5
 
 /// @brief センサ反応チェック値
 #define DETECTED_CHECK_VALUE 960
@@ -84,7 +83,7 @@ int get_from_multiplexer(int idx)
         }
     }
 
-    delayMicroseconds(10);
+    delayMicroseconds(20);
 
     return analogRead(PIN_DATA);
 }
@@ -127,6 +126,9 @@ int compare_int(const void *a, const void *b)
     return 0;
 }
 
+Movement_average value_ave[16];
+Movement_average x;
+Movement_average y;
 void setup()
 {
     Serial.begin(9600);
@@ -137,23 +139,24 @@ void setup()
     pinMode(PIN_S2, OUTPUT);
     pinMode(PIN_S3, OUTPUT);
 
-    pinMode(PIN_E, OUTPUT);
-
     Serial1.begin(115200);
-    Serial1.setTimeout(10);
+
+    for (int i = 0; i < 16; i++)
+        value_ave[i].set(5);
+
+    x.set(5);
+    y.set(5);
 }
 
 void loop()
 {
-
-    // 出力時は常にPIN_EはLOWにする必要がある
-    digitalWrite(PIN_E, LOW);
-
     // 16ピン分のセンサーの値をマルチプレクサから取得する
     for (int i = 0; i < 16; i++)
     {
         sensor_data[i].index = i + 1;
-        sensor_data[i].value = get_from_multiplexer(i);
+
+        value_ave[i].add(get_from_multiplexer(i));
+        sensor_data[i].value = value_ave[i].output();
     }
 
     print_debug_value();
@@ -190,7 +193,10 @@ void loop()
             y_of_ball_deg += sin(radians(index_of_around_max_detected_sensor[i] * -22.5)) * (1023 - sensor_data_temp[index_of_around_max_detected_sensor[i]].value);
         }
 
-        double deg_of_ball = degrees(atan2(y_of_ball_deg, x_of_ball_deg));
+        x.add(x_of_ball_deg * 1000000);
+        y.add(y_of_ball_deg * 1000000);
+
+        double deg_of_ball = degrees(atan2(y.output(), x.output()));
 
         ball_deg = (int16_t)deg_of_ball;
         ball_distance = (int16_t)(sensor_data[0].value / 1023.0 * 100.0);

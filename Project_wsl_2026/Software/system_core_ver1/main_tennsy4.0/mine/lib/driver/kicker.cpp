@@ -16,18 +16,13 @@ bool Kicker::init(uint8_t kickpin, uint8_t chargepin, unsigned long cooldownTime
 
 void Kicker::kick(bool signal)
 {
-    if (!(_kickTimer.everReset()))
-    {
-        _kickTimer.reset();
-    }
-
-    if (signal && _kickTimer.msTime() > _cooldownTime)
+    if (signal && (!_kickTimer.everReset() || _kickTimer.msTime() > _cooldownTime))
     {
         digitalWrite(_kickpin, HIGH);
         digitalWrite(_chargepin, LOW);
         _kickTimer.reset();
     }
-    else if (_kickTimer.msTime() <= 200UL)
+    else if (_kickTimer.everReset() && _kickTimer.msTime() <= 200UL)
     {
         digitalWrite(_kickpin, HIGH);
         digitalWrite(_chargepin, LOW);

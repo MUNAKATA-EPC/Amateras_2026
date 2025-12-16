@@ -28,6 +28,12 @@ void testKicker()
 {
     if (resetButton.isReleased())
     {
+        Serial.print("kick");
+        kicker1.kick(true);
+    }
+    else if (catchSensor.read() == HIGH)
+    {
+        Serial.print("kick");
         kicker1.kick(true);
     }
     else

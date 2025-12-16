@@ -117,37 +117,38 @@ Timer update_timer; // センサー更新用
 Timer ui_timer;     // ui用
 bool old_running_flag = false;
 
+Timer kicker_timer;
+
 void loop()
 {
-    // ボタン更新
-    enterButton.update();
-    backButton.update();
-    rightButton.update();
-    leftButton.update();
-    resetButton.update();
-
-    // センサー類更新
-    if (!update_timer.everReset() || update_timer.msTime() < 5UL)
+    if (update_timer.msTime() >= 5UL)
     {
         update_timer.reset();
 
+        // ボタン更新
+        enterButton.update();
+        backButton.update();
+        rightButton.update();
+        leftButton.update();
+        resetButton.update();
+
+        // センサー類更新
         irUpdate();
         lineUpdate();
         openmvUpdate();
-        ps3Update();
+        // ps3Update();
         bnoUpdate(resetButton.isReleased()); // bno更新
-    }
 
-    // uiを実行・描画
-    uiButtonUpdate(enterButton.isReleased(), backButton.isReleased(), rightButton.isReleased(), leftButton.isReleased()); // ボタンの更新
+        // uiを実行・描画
+        uiButtonUpdate(enterButton.isReleased(), backButton.isReleased(), rightButton.isReleased(), leftButton.isReleased()); // ボタンの更新
+    }
 
     // 動作を実行
     if (uiRunning() == false)
     {
         old_running_flag = false;
 
-        kicker1.kick(false); // キッカーを動かさない
-        motorsStop();        // 動作選択中はモータを止める
+        motorsStop(); // 動作選択中はモータを止める
 
         if (!ui_timer.everReset() || ui_timer.msTime() > 10UL) // runningではないので10msに一回描画
         {

@@ -23,7 +23,7 @@ void setup()
   Ps3.attach(data_update);               // PS3のどれが反応すると呼ばれる関数
   Ps3.attachOnConnect(connect_success);  // 接続されたときに呼び出す関数
   Ps3.attachOnDisconnect(connect_false); // 切断されたときに呼び出す関数
-  Ps3.begin("4C:75:25:C4:14:F2");        // ps3_setupで取得したアドレスを記入
+  Ps3.begin("E8:6B:EA:31:0A:3A");        // ps3_setupで取得したアドレスを記入
   // kaname_machineに搭載しているm5のアドレス : 4C:75:25:C4:14:F2
   // seidai_machineに搭載しているm5のアドレス : E8:6B:EA:31:0A:3A
 
