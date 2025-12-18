@@ -33,7 +33,7 @@ void PD::process(float val, float target, bool angle)
     {
         uint32_t now_micro_time = micros();
         uint32_t delta_t = now_micro_time - old_micro_time; // Δt算出
-        old_micro_time = now_micro_time;                         // 更新
+        old_micro_time = now_micro_time;                    // 更新
 
         // ゼロ除算を避ける
         if (delta_t > 0)
@@ -62,5 +62,5 @@ void PD::process(float val, float target, bool angle)
     _output = constrain(power, -100.0f, 100.0f);
 }
 
-PD pd_gyro(0.65, -4.5); // 共通で使えるようにしておく
-PD pd_cam(0.65, -4.5);  // 共通で使えるようにしておく
+PD pd_gyro(0.65f, -1.5f); // 共通で使えるようにしておく
+PD pd_cam(0.65f, -1.5f);  // 共通で使えるようにしておく

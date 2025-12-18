@@ -226,9 +226,7 @@ Vector LineTraceAndTargetVec(PD *pd_line_trace, int deg, float dis, int power)
     return vec;
 }
 
-#endif
-
-#ifndef OLD
+#else
 
 // 攻撃ゴールの位置
 static bool attack_goal_detected;
@@ -321,7 +319,9 @@ void playDefender(Defender::Mode mode)
     // アタッカーモードの移行する処理
     now_ir_deg = irDeg(); // 今のirの角度更新
 
-    if (irDetected() && abs(diffDeg(now_ir_deg, old_ir_deg)) <= 10)
+    bool is_start_timer = irDetected() && abs(diffDeg(now_ir_deg, old_ir_deg)) <= 15 && irDis() <= 60 && (defence_goal_detected && defence_goal_dis <= 80 && (defence_goal_deg > 100 || defence_goal_deg < -110)); // 厳しい条件分岐でアタッカーに移行する
+
+    if (is_start_timer)
     {
         if (old_ir_keep_deg_flag == false) // 昔は一定ではなかったなら
         {
@@ -330,7 +330,7 @@ void playDefender(Defender::Mode mode)
         }
         old_ir_keep_deg_flag = true;
 
-        if (ir_keep_deg_flag == true && ir_keep_deg_timer.msTime() >= 7500UL) // 3秒以上もボールが一定の角度にあるなら
+        if (ir_keep_deg_flag == true && ir_keep_deg_timer.msTime() >= 4500UL) // 4.5秒以上もボールが一定の角度にあるなら
         {
             attacking_timer.reset(); // アタッカータイマー開始
             attack_flag = true;
@@ -347,15 +347,13 @@ void playDefender(Defender::Mode mode)
         attack_flag = false;
     }
 
-    if (attack_flag == true && attacking_timer.msTime() < 4500UL) // 4.5ms間アタッカーをする
+    if (attack_flag == true && attacking_timer.msTime() <= 3000UL) // 3ms間アタッカーをする
     {
-        fullColorLed1.rgbLightUp(0, 0, 50);
-        playAttacker(mode == Defender::Mode::YELLOWGOAL ? Attacker::Mode::YELLOWGOAL : Attacker::Mode::BLUEGOAL);
+        playAttacker(Attacker::Mode::GYRO);
         return;
     }
     else
     {
-        fullColorLed1.rgbLightUp(0, 0, 0);
         attack_flag = false;
     }
 
@@ -365,7 +363,7 @@ void playDefender(Defender::Mode mode)
     motorsPdProcess(&pd_gyro, bnoDeg(), 0);
 
     const int max_power = 95; // パワーの最大値
-    if (defence_goal_detected)
+    if (defence_goal_detected && defence_goal_dis <= 79)
     {
         if (lineRingDetected())
         {
@@ -377,7 +375,8 @@ void playDefender(Defender::Mode mode)
                 // 対角線の角度算出
                 int target_deg = normalizeDeg(defence_goal_deg + 180);
                 int block_ir_deg = normalizeDeg(irDeg() - target_deg);
-                if (defence_goal_deg >= 160 || defence_goal_deg <= -160) // （コート白線の横線の方にいる）なら普通に守る
+                float block_ir_y = irDis() * sinf(radians(block_ir_deg)); // y方向成分
+                if (defence_goal_deg >= 160 || defence_goal_deg <= -160)  // （コート白線の横線の方にいる）なら普通に守る
                 {
                     block_ir_deg = irDeg();
                 }
@@ -386,67 +385,130 @@ void playDefender(Defender::Mode mode)
                 int block_deg;
                 float block_len;
 
-                if (abs(defence_goal_deg) <= 110) // 前±120度にゴールが見えたなら（コート白線の後ろの端の方にいる）
+                if (abs(defence_goal_deg) <= 120) // 前±120度にゴールが見えたなら（コート白線の後ろの端の方にいる）
                 {
                     Serial.println("1");
                     block_deg = fieldDeg();
                     block_len = max_power;
                 }
-                else if (abs(defence_goal_deg) <= 150) // 前±150度にゴールが見えたなら（コート白線の縦線の方にいる）
+                else
                 {
                     Serial.println("2");
-                    if (irDis() < 57) // 近くにボールがある
+
+                    bool is_right_detected = false, is_left_detected = false;
+
+                    for (int i = 0; i < 15; i++)
                     {
-                        if (abs(block_ir_deg) < 90) // 前にボールがある
+                        if (lineSensorDetected(i))
+                        {
+                            if (i * 22.5f > 180.0f) // 右のラインがある
+                            {
+                                is_right_detected = true;
+                            }
+                            else // 左のラインがある
+                            {
+                                is_left_detected = true;
+                            }
+                        }
+
+                        if (is_right_detected && is_left_detected)
+                        {
+                            i = 16; // for文を抜ける
+                        }
+                    }
+
+                    if ((is_right_detected && !is_left_detected) || (!is_right_detected && is_left_detected)) // | (ゴール) | ←ここにいる可能性が高い
+                    {
+                        if (irDis() >= 65) // 遠くにあるなら (ロボット) | (ゴール) | (ボール) ←こうなっている可能性が高い
                         {
                             block_deg = 0;
-                            block_len = max_power * 0.5f;
+                            block_len = max_power;
                         }
-                        else // 後にボールがある
+                        else
                         {
-                            block_deg = 180;
-                            block_len = max_power * 0.4f;
+                            if (block_ir_deg >= -90 && block_ir_deg <= 90)
+                            {
+                                block_deg = 0;
+                                block_len = max_power * 0.45f;
+                            }
+                            else
+                            {
+                                block_deg = 180;
+                                block_len = max_power * 0.45f;
+                            }
                         }
                     }
                     else
                     {
-                        block_deg = 0;
-                        block_len = max_power * 0.5f;
-                    }
-                }
-                else // 後ろの150~180または-150~-180度にゴールが見えたなら（コート白線の横線の方にいる）
-                {
-                    Serial.println("3");
-                    if (block_ir_deg > 0) // 左にボールがある
-                    {
-                        block_deg = 90;
-                        block_len = max_power;
-                    }
-                    else // 右にボールがある
-                    {
-                        block_deg = -90;
-                        block_len = max_power;
+                        if (block_ir_deg > 0) // 左にボールがある
+                        {
+                            if (lineRingDis() >= 10.0f)
+                            {
+                                if (lineRingDeg() >= -90 && lineRingDeg() <= 90) // 後ろのロボットが行ってしまっているなら
+                                {
+                                    block_deg = 90 - 20;
+                                    block_len = max_power;
+                                }
+                                else
+                                {
+                                    block_deg = 90 + 20;
+                                    block_len = max_power;
+                                }
+                            }
+                            else
+                            {
+                                block_deg = 90;
+                                block_len = max_power;
+                            }
+                        }
+                        else // 右にボールがある
+                        {
+                            if (lineRingDis() >= 10.0f)
+                            {
+                                if (lineRingDeg() >= -90 && lineRingDeg() <= 90) // 後ろのロボットが行ってしまっているなら
+                                {
+                                    block_deg = -90 + 20;
+                                    block_len = max_power;
+                                }
+                                else
+                                {
+                                    block_deg = -90 - 20;
+                                    block_len = max_power;
+                                }
+                            }
+                            else
+                            {
+                                block_deg = -90;
+                                block_len = max_power;
+                            }
+                        }
                     }
 
-                    if (block_ir_deg >= 150 || block_ir_deg <= -150) // 後ろにボールがあるなら危険だからスピードを落とす
+                    if (block_ir_deg >= 90 || block_ir_deg <= -90) // 後ろにボールがあるなら危険だからスピードを落とす
                     {
-                        block_len = max_power * 0.5f;
+                        if (block_ir_y >= -10.0f && block_ir_y <= 10.0f)
+                        {
+                            block_len = max_power * 0.4f;
+                        }
                     }
                 }
+
                 // 長さ補正（ゴールの反対方向を基準にして出力を調整し適切な場所で止まるようにする）
-                float block_ir_y = sin(radians(block_ir_deg)) * irDis(); // y方向成分
+                if (block_ir_deg >= -90 && block_ir_deg <= 90) // 前方向にボールがあるなら
+                {
+                    if (block_ir_y >= -8.0f && block_ir_y <= 8.0f)
+                    {
+                        block_len = 0.0f;
+                    }
+                    else if (block_ir_y >= -5.0f && block_ir_y <= 5.0f)
+                    {
+                        // 1 = 17.5 * a + b
+                        // 0 = 10 * a + b
+                        // 1 / 7.5 = a,b = 1 - 17.5 * 1 / 7.5
+                        block_len = block_len * ((fabs(block_ir_y) - 5.0f) / 5.0f);
+                    }
+                }
 
-                if (block_ir_y >= -10.0f && block_ir_y <= 10.0f)
-                {
-                    block_len = 0.0f;
-                }
-                else if (block_ir_y >= -17.5f && block_ir_y <= 17.5f)
-                {
-                    // 1 = 17.5 * a + b
-                    // 0 = 10 * a + b
-                    // 1 / 7.5 = a,b = 1 - 17.5 * 1 / 7.5
-                    block_len = block_len * ((fabs(block_ir_y) - 10.0f) / 7.5f);
-                }
                 // ベクトル生成
                 Vector block_vec = Vector(block_deg, block_len); // 長さ最大：100
 
@@ -535,21 +597,21 @@ void playDefender(Defender::Mode mode)
             else
             {
                 // 後ろを0度としてゴール中心に行こうとするベクトル
-                PD pd(0.5f, 0.0f); // ライントレースのpd成分（d成分は使わない）
-                Vector goal_middle_vec = LineTraceAndTargetVec(&pd, -(defence_goal_deg + 180), max_power);
+                PD pd(0.3f, 0.0f); // ライントレースのpd成分（d成分は使わない）
+                Vector goal_middle_vec = LineTraceAndTargetVec(&pd, -(defence_goal_deg + 180), max_power * 0.5f);
                 // 制御
                 motorsVectorMove(&goal_middle_vec);
             }
         }
         else
         {
-            if (defence_goal_dis <= 80.0f)
+            if (defence_goal_dis <= 69.0f)
             {
-                motorsMove(defence_goal_deg + 180, max_power * 0.6f);
+                motorsMove(defence_goal_deg + 180, max_power * 0.5f);
             }
             else
             {
-                motorsMove(defence_goal_deg, max_power * 0.6f);
+                motorsMove(defence_goal_deg, max_power * 0.5f);
             }
         }
     }
@@ -563,7 +625,7 @@ void playDefender(Defender::Mode mode)
         int teiiti_deg;
         if (fieldDetected())
         {
-            if (fieldDeg() > 90 || fieldDeg() < -90)
+            if (fieldDeg() >= 80 || fieldDeg() <= -80)
             {
                 teiiti_deg = fieldDeg();
             }
@@ -577,11 +639,11 @@ void playDefender(Defender::Mode mode)
                 {
                     if (fieldDeg() > 0) // コート右にいる
                     {
-                        teiiti_deg = 120;
+                        teiiti_deg = 150;
                     }
                     else // コート左にいる
                     {
-                        teiiti_deg = -120;
+                        teiiti_deg = -150;
                     }
                 }
             }
@@ -591,9 +653,9 @@ void playDefender(Defender::Mode mode)
             teiiti_deg = 180;
         }
         // IRボールがあったらオウンゴールになってしまうからそれを避ける
-        if (irDetected())
+        if (false /*irDetected()*/)
         {
-            if (abs(diffDeg(irDeg(), teiiti_deg) <= 20) && irDis() <= 58) // 同じ方向にあり近い
+            if (abs(diffDeg(irDeg(), teiiti_deg)) <= 20 && irDis() <= 58) // 同じ方向にあり近い
             {
                 if (irDeg() > 0) // 左にある
                 {

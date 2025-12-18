@@ -126,15 +126,7 @@ void attackWithCam(bool attack_goal_detected, int attack_goal_deg, int attack_go
     const int motor_line_max_power = 80;
     const int motor_ir_max_power = 95;
 
-    if (attack_goal_detected && attack_goal_dis < 80)
-    {
-        motorsMove(attack_goal_deg + 180, motor_line_max_power);
-    }
-    else if (defence_goal_detected && defence_goal_dis < 80)
-    {
-        motorsMove(defence_goal_deg + 180, motor_line_max_power);
-    }
-    else if (line_timer.everReset() && line_timer.msTime() < 100UL)
+    if (line_timer.everReset() && line_timer.msTime() < 100UL)
     {
         if (fieldDetected())
         {
@@ -166,7 +158,7 @@ void attackWithCam(bool attack_goal_detected, int attack_goal_deg, int attack_go
         }
         else if (irDeg() >= -16 && irDeg() <= 16)
         {
-            motorsMove(irDeg(), motor_ir_max_power);
+            motorsMove(irDeg() * 1.11f, motor_ir_max_power);
         }
         else
         {
