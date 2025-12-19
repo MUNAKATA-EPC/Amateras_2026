@@ -8,6 +8,7 @@ static bool _action_decided = false;
 static bool _mode_decided = false;
 
 #define METER_COUNT 10
+static bool _meter_flag = false;
 static int _meter_number = 0;
 static int _action_number = 0;
 static int _mode_number = 0;
@@ -123,27 +124,41 @@ void uiButtonUpdate(bool enterbtn, bool backbtn, bool rightbtn, bool leftbtn)
         }
         else
         {
-            _meter_number = (_meter_number + 1 + METER_COUNT) % METER_COUNT; // 0~(METER_COUNT-1)を周期するようにする
+            _meter_flag = (_meter_flag == true) ? false : true;
         }
     }
 
     if (!_action_decided)
     {
-        if (rightbtn)
+        if (_meter_flag)
         {
-            tone(BUZZER_PIN, BUZZER_PITCHES::MyC4, 50);
-
-            _action_number++;
-            if (_action_number > Action::Type::COUNT - 1)
-                _action_number = 0;
+            if (rightbtn)
+            {
+                _meter_number = (_meter_number + 1 + METER_COUNT) % METER_COUNT; // 0~(METER_COUNT-1)を周期するようにする
+            }
+            if (leftbtn)
+            {
+                _meter_number = (_meter_number - 1 + METER_COUNT) % METER_COUNT; // 0~(METER_COUNT-1)を周期するようにする
+            }
         }
-        if (leftbtn)
+        else
         {
-            tone(BUZZER_PIN, BUZZER_PITCHES::MyC4, 50);
+            if (rightbtn)
+            {
+                tone(BUZZER_PIN, BUZZER_PITCHES::MyC4, 50);
 
-            _action_number--;
-            if (_action_number < 0)
-                _action_number = Action::Type::COUNT - 1;
+                _action_number++;
+                if (_action_number > Action::Type::COUNT - 1)
+                    _action_number = 0;
+            }
+            if (leftbtn)
+            {
+                tone(BUZZER_PIN, BUZZER_PITCHES::MyC4, 50);
+
+                _action_number--;
+                if (_action_number < 0)
+                    _action_number = Action::Type::COUNT - 1;
+            }
         }
 
         if (enterbtn)
@@ -376,7 +391,14 @@ void uiDrawMain()
         ssdPrint(modeName);
         if (!_mode_decided)
         {
-            _ssd->println(" <");
+            if (_meter_flag)
+            {
+                _ssd->println("  ");
+            }
+            else
+            {
+                _ssd->println(" <");
+            }
         }
         else
         {
