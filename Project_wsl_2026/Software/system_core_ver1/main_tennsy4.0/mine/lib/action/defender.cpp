@@ -319,7 +319,7 @@ void playDefender(Defender::Mode mode)
     // アタッカーモードの移行する処理
     now_ir_deg = irDeg(); // 今のirの角度更新
 
-    bool is_start_timer = irDetected() && abs(diffDeg(now_ir_deg, old_ir_deg)) <= 15 && irDis() <= 60 && (defence_goal_detected && defence_goal_dis <= 80 && (defence_goal_deg > 100 || defence_goal_deg < -110)); // 厳しい条件分岐でアタッカーに移行する
+    bool is_start_timer = irDetected() && abs(diffDeg(now_ir_deg, old_ir_deg)) <= 15 && irDis() <= 60 && (defence_goal_detected && defence_goal_dis <= 80 && (defence_goal_deg > 120 || defence_goal_deg < -120)); // 厳しい条件分岐でアタッカーに移行する
 
     if (is_start_timer)
     {
@@ -363,7 +363,7 @@ void playDefender(Defender::Mode mode)
     motorsPdProcess(&pd_gyro, bnoDeg(), 0);
 
     const int max_power = 95; // パワーの最大値
-    if (defence_goal_detected && defence_goal_dis <= 79)
+    if (defence_goal_detected && defence_goal_dis <= 80)
     {
         if (lineRingDetected())
         {
@@ -376,7 +376,7 @@ void playDefender(Defender::Mode mode)
                 int target_deg = normalizeDeg(defence_goal_deg + 180);
                 int block_ir_deg = normalizeDeg(irDeg() - target_deg);
                 float block_ir_y = irDis() * sinf(radians(block_ir_deg)); // y方向成分
-                if (defence_goal_deg >= 160 || defence_goal_deg <= -160)  // （コート白線の横線の方にいる）なら普通に守る
+                if (defence_goal_deg >= 155 || defence_goal_deg <= -155)  // （コート白線の横線の方にいる）なら普通に守る
                 {
                     block_ir_deg = irDeg();
                 }
@@ -385,56 +385,61 @@ void playDefender(Defender::Mode mode)
                 int block_deg;
                 float block_len;
 
-                if (abs(defence_goal_deg) <= 120) // 前±120度にゴールが見えたなら（コート白線の後ろの端の方にいる）
+                if (defence_goal_deg >= -116 && defence_goal_deg <= 103) // 前±110度にゴールが見えたなら（コート白線の後ろの端の方にいる）
                 {
-                    Serial.println("1");
                     block_deg = fieldDeg();
                     block_len = max_power;
                 }
                 else
                 {
-                    Serial.println("2");
+                    bool is_right_detected = false, is_left_detected = false, is_front_detected = false, is_back_detected = false;
 
-                    bool is_right_detected = false, is_left_detected = false;
-
-                    for (int i = 0; i < 15; i++)
+                    for (int i = 0; i < 16; i++)
                     {
                         if (lineSensorDetected(i))
                         {
-                            if (i * 22.5f > 180.0f) // 右のラインがある
+                            if (i >= 1 && i <= 7) // 右のラインがある
                             {
                                 is_right_detected = true;
                             }
-                            else // 左のラインがある
+                            if (i >= 9 && i <= 15) // 左のラインがある
                             {
                                 is_left_detected = true;
                             }
+                            if (i == 2 || i == 1 || i == 0 || i == 15 || i == 14) // 前にラインがある
+                            {
+                                is_front_detected = true;
+                            }
+                            if (i == 6 || i == 7 || i == 8 || i == 9 || i == 10) // 後にラインがある
+                            {
+                                is_back_detected = true;
+                            }
                         }
 
-                        if (is_right_detected && is_left_detected)
+                        if (is_right_detected && is_left_detected && is_front_detected && is_back_detected)
                         {
                             i = 16; // for文を抜ける
                         }
                     }
 
-                    if ((is_right_detected && !is_left_detected) || (!is_right_detected && is_left_detected)) // | (ゴール) | ←ここにいる可能性が高い
+                    if ((is_right_detected ^ is_left_detected) || (is_front_detected && is_back_detected)) // | (ゴール) | ←ここにいる可能性が高い
                     {
-                        if (irDis() >= 65) // 遠くにあるなら (ロボット) | (ゴール) | (ボール) ←こうなっている可能性が高い
+                        if (irDis() > 51)
                         {
                             block_deg = 0;
-                            block_len = max_power;
+                            block_len = max_power * 0.8f;
                         }
                         else
                         {
-                            if (block_ir_deg >= -90 && block_ir_deg <= 90)
+                            if (irDeg() >= -90 && irDeg() <= 90)
                             {
                                 block_deg = 0;
-                                block_len = max_power * 0.45f;
+                                block_len = max_power * 0.5f;
                             }
                             else
                             {
                                 block_deg = 180;
-                                block_len = max_power * 0.45f;
+                                block_len = max_power * 0.5f;
                             }
                         }
                     }
@@ -496,17 +501,19 @@ void playDefender(Defender::Mode mode)
                 // 長さ補正（ゴールの反対方向を基準にして出力を調整し適切な場所で止まるようにする）
                 if (block_ir_deg >= -90 && block_ir_deg <= 90) // 前方向にボールがあるなら
                 {
-                    if (block_ir_y >= -8.0f && block_ir_y <= 8.0f)
+                    if (block_ir_y >= -6.0f && block_ir_y <= 6.0f)
                     {
                         block_len = 0.0f;
                     }
+                    /*
                     else if (block_ir_y >= -5.0f && block_ir_y <= 5.0f)
                     {
                         // 1 = 17.5 * a + b
                         // 0 = 10 * a + b
                         // 1 / 7.5 = a,b = 1 - 17.5 * 1 / 7.5
-                        block_len = block_len * ((fabs(block_ir_y) - 5.0f) / 5.0f);
+                        block_len = block_len * ((fabs(block_ir_y) - 6.0f) / 5.0f);
                     }
+                    */
                 }
 
                 // ベクトル生成
@@ -524,11 +531,11 @@ void playDefender(Defender::Mode mode)
                     float block_deg_rad = block_vec.rad();
 
                     // 垂直線の境界処理: 89.5度から90.5度を垂直と見なす
-                    bool is_nearly_vertical = (abs(block_deg_rad) > radians(89.5f) && abs(block_deg_rad) < radians(90.5f));
+                    bool is_nearly_vertical = (abs(block_deg_rad) > radians(88.0f) && abs(block_deg_rad) < radians(92.0f));
 
                     if (is_nearly_vertical)
                     {
-                        line_gain_a = tanf(radians(block_vec.deg() + 0.01f)); // わずかに傾け、(0.0f,0.0f)を回避
+                        line_gain_a = tanf(radians(block_vec.deg() + 5.0f)); // わずかに傾け、(0.0f,0.0f)を回避
 
                         // 切片 b = yA - a * xA
                         line_gain_b = line_trace_vec.y() - line_gain_a * line_trace_vec.x();
@@ -605,13 +612,27 @@ void playDefender(Defender::Mode mode)
         }
         else
         {
-            if (defence_goal_dis <= 69.0f)
+            if (defence_goal_deg >= 155 || defence_goal_deg <= -155) // 真後ろにある場合
             {
-                motorsMove(defence_goal_deg + 180, max_power * 0.5f);
+                if (defence_goal_dis <= 67.0f)
+                {
+                    motorsMove(defence_goal_deg + 180, max_power * 0.5f);
+                }
+                else
+                {
+                    motorsMove(defence_goal_deg, max_power * 0.5f);
+                }
             }
-            else
+            else // 横にある場合
             {
-                motorsMove(defence_goal_deg, max_power * 0.5f);
+                if (defence_goal_dis <= 69.0f)
+                {
+                    motorsMove(defence_goal_deg + 180, max_power * 0.5f);
+                }
+                else
+                {
+                    motorsMove(defence_goal_deg, max_power * 0.5f);
+                }
             }
         }
     }
@@ -653,27 +674,27 @@ void playDefender(Defender::Mode mode)
             teiiti_deg = 180;
         }
         // IRボールがあったらオウンゴールになってしまうからそれを避ける
-        if (false /*irDetected()*/)
+        if (irDetected())
         {
             if (abs(diffDeg(irDeg(), teiiti_deg)) <= 20 && irDis() <= 58) // 同じ方向にあり近い
             {
                 if (irDeg() > 0) // 左にある
                 {
-                    motorsMove(irDeg() + 60, max_power * 0.5f);
+                    motorsMove(irDeg() + 60, max_power * 0.8f);
                 }
                 else // 右にある
                 {
-                    motorsMove(irDeg() - 60, max_power * 0.5f);
+                    motorsMove(irDeg() - 60, max_power * 0.8f);
                 }
             }
             else
             {
-                motorsMove(teiiti_deg, max_power * 0.5f);
+                motorsMove(teiiti_deg, max_power * 0.8f);
             }
         }
         else
         {
-            motorsMove(teiiti_deg, max_power * 0.5f);
+            motorsMove(teiiti_deg, max_power * 0.8f);
         }
     }
 }
