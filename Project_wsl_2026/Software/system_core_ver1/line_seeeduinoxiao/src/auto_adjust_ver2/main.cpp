@@ -15,7 +15,13 @@ Multiplexer line_mux;
 #define LINE_SENSOR_COUNT 16
 const int LINEsensor_pin[LINE_SENSOR_COUNT] = {8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7}; // 前から左回りにピン番号を指定
 
+const int LINEsensor_side_right_pin = A9; // 右サイドのピン
+const int LINEsensor_side_left_pin = A8;  // 左サイドのピン
+
 unsigned int LINEsensor_adjust_value[LINE_SENSOR_COUNT] = {151, 165, 165, 148, 184, 170, 148, 146, 166, 147, 170, 173, 161, 160, 146, 118}; // センサー調整用値格納用
+
+unsigned int LINEsensor_side_right_adjust_value = 600U; // 右サイドの調整値
+unsigned int LINEsensor_side_left_adjust_value = 600U;  // 左サイドの調整値
 
 const int button_pin = 0;     // ボタンのピン番号
 const int led_pin = 7;        // LEDのピン番号
@@ -32,6 +38,9 @@ void setup()
 
   button.init(button_pin, INPUT_PULLDOWN); // ボタン初期化
   pinMode(led_pin, OUTPUT);                // LEDピン初期化
+
+  pinMode(LINEsensor_side_right_pin, INPUT); // 右サイドのピン設定
+  pinMode(LINEsensor_side_left_pin, INPUT);  // 左サイドのピン設定
 
   // 一定時間以内にボタンを押すとセンサーの状況を送信するようになる
   bool adjust_flag = false;
@@ -189,6 +198,16 @@ void loop()
       lines_data_bit_mask |= (1UL << i);
   }
 
+  // サイドライン
+  if (analogRead(LINEsensor_side_right_pin) >= LINEsensor_side_right_adjust_value)
+  {
+    lines_data_bit_mask |= (1UL << 16);
+  }
+  if (analogRead(LINEsensor_side_left_pin) >= LINEsensor_side_left_adjust_value)
+  {
+    lines_data_bit_mask |= (1UL << 17);
+  }
+
   // 送信
   Serial1.write(start_header);                                  // teensyとの通信開始
   Serial1.write((uint8_t)(lines_data_bit_mask & 0xFF));         // 3byteのデータなので下位の1byteのみ送信
@@ -196,6 +215,7 @@ void loop()
   Serial1.write((uint8_t)((lines_data_bit_mask >> 16) & 0xFF)); // 3byteのデータなので上位の1byteを送信
   Serial1.write(end_header);                                    // teensyとの通信終了
 
+  Serial.print(String(analogRead(LINEsensor_side_right_pin)) + " " + String(analogRead(LINEsensor_side_left_pin)) + " ");
   Serial.println(lines_data_bit_mask, BIN); // pcに送る
 
   delay(10); // 10ms待機

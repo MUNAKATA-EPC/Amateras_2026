@@ -22,11 +22,33 @@ void playAttacker(Attacker::Mode mode)
     }
 }
 
-Timer line_timer;
+static Timer line_timer;
+static Timer kick_timer;
+static bool old_catch = false;
 
 void attackWithGyro() // ジャイロで攻撃
 {
     motorsPdProcess(&pd_gyro, bnoDeg(), 0); // ジャイロで姿勢制御
+
+    // キッカー
+    bool now_catch = (catchSensor.read() == HIGH);
+
+    if (now_catch == true && old_catch == false)
+    {
+        kick_timer.reset();
+    }
+
+    if (now_catch && kick_timer.everReset() && kick_timer.msTime() >= 100UL)
+    {
+        kicker1.kick(true);
+    }
+    else
+    {
+        kicker1.kick(false);
+    }
+
+    old_catch = now_catch;
+    // キッカー
 
     const int motor_line_max_power = 80;
     const int motor_ir_max_power = 95;
@@ -121,6 +143,15 @@ void attackWithCam(bool attack_goal_detected, int attack_goal_deg, int attack_go
     else
     {
         motorsPdProcess(&pd_gyro, bnoDeg(), 0); // ジャイロで姿勢制御
+    }
+
+    if (catchSensor.read() == HIGH && attack_goal_detected && abs(attack_goal_deg) < 70)
+    {
+        kicker1.kick(true);
+    }
+    else
+    {
+        kicker1.kick(false);
     }
 
     const int motor_line_max_power = 80;

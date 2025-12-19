@@ -110,7 +110,7 @@ void loop()
         IRball_y = y_ave.add(IRball_y);
 
         IRball_deg = (int)roundf(degrees(atan2f(IRball_y, IRball_x)));
-        IRball_dis = (int)roundf(((IRsensor[0].value + IRsensor[1].value + IRsensor[2].value) / 3.0f) * 100.0f / 1023.0f);
+        IRball_dis = (int)roundf(((IRsensor[0].value) / 1.0f) * 100.0f / 1023.0f); // ※重要：1個の平均をとる
     }
 
     int16_t deg_to_send = IRball_deg == 0xFF ? 0xFF : (int16_t)IRball_deg;

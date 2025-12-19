@@ -7,25 +7,17 @@ import math
 #############################################################
 # ゴールの色取り用変数(黄色)
 goal_yellow = (56, 98, -23, -12, 38, 65) #new
-#goal_yellow = (58, 100, -36, 15, 26, 127)  #old
 #############################################################
 # ゴールの色取り用変数(青色)
-goal_blue = (10, 44, -4, 27, -42, -24) #new
-#goal_blue = (6, 38, -5, 20, -56, -10) #old
+goal_blue = (18, 38, -17, 26, -30, -11) #new
 #############################################################
 # コートの色（カーペット用）
-court_green = (54, 94, -18, 9, -14, 15) #new
-#court_green = (54, 94, -18, 9, -14, 15) #old
+court_green = (40, 67, -24, 34, -9, 12) #new
 #############################################################
 # 画面の中央座標
-#要機
-#screen_center = [136, 120]
-#screen_short_r = 41
-#screen_long_r = 170
-#セイダイ機
-screen_center = [157, 89]
-screen_short_r = 41
-screen_long_r = 162
+screen_center = [156, 96]
+screen_short_r = 32
+screen_long_r = 160
 
 court = [0, 0]
 yellow = [0, 0]
@@ -62,10 +54,10 @@ sensor.set_framesize(sensor.QVGA)  # フレームサイズをQVGA (320x240)に�
 sensor.skip_frames(time=2000)      # 設定が有効になるまで待機
 
 # 明るさ関連の設定（ここで反映される）
-# sensor.set_auto_gain(False, gain_db=8)             # 自動ゲインオフ、ゲインを低めに
-# sensor.set_auto_whitebal(False)                    # ホワイトバランス固定
-# sensor.set_auto_exposure(False, exposure_us=1800)  # 露出を短くして暗めに
-sensor.set_brightness(-3)                           # さらに暗く（-3 〜 +3）
+sensor.set_auto_gain(False, gain_db=1)             # 自動ゲインオフ、ゲインを低めに
+sensor.set_auto_whitebal(True,)                    # ホワイトバランス固定
+sensor.set_auto_exposure(False, exposure_us=7000)  # 露出を短くして暗めに
+sensor.set_brightness(3)                          # さらに暗く（-3 〜 +3）
 
 clock = time.clock()
 uart = UART(3, 115200, timeout_char=1000)
@@ -84,7 +76,6 @@ def send_int16(uart, value):
 while True:
     clock.tick()
     frame_count += 1
-    img = sensor.snapshot()
     img.draw_cross(screen_center[0], screen_center[1])
 
     # 画面外周を黒く塗る
@@ -168,6 +159,8 @@ while True:
 
     # 整数化
     court_deg = int(-court_deg) + 180 # 反転させてint型に変換
+    if court_deg > 180:
+        court_deg -= 360
 
     if yellow_detected == True:
         yellow_deg = int(-yellow_deg) + 180 # 反転させてint型に変換

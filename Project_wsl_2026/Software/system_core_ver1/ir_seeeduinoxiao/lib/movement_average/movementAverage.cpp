@@ -1,5 +1,10 @@
 #include "movementAverage.hpp"
 
+MovementAverage::MovementAverage()
+{
+    _average_count = AVERAGE_COUNT_LIMIT;
+}
+
 MovementAverage::MovementAverage(int average_count)
 {
     _average_count = constrain(average_count, 1, AVERAGE_COUNT_LIMIT);

@@ -9,7 +9,7 @@ void setup()
   resetButton.init(1, INPUT_PULLDOWN); // ボタン設置
   is_ok = bnoInit(&Wire, 0x28);        // bno初期化
 
-  pinMode(0, OUTPUT);
+  pinMode(A0, OUTPUT);
   analogWriteResolution(10); // 10bitで出力
 }
 
@@ -18,10 +18,11 @@ void loop()
   resetButton.update();
   bnoUpdate(resetButton.isPushing());
 
-  Serial.println(String(is_ok) + " " + String(resetButton.isPushing()) + " " + String(bnoDeg()));
+  uint32_t output = (uint32_t)(bnoDeg() + 360 + 180) % 360;
+  output = (uint32_t)roundf(map(output, 0, 360, 400, 500)); // なぜか400~560の範囲でしか出せない
+  analogWrite(A0, output);
 
-  int output = (int)roundf((bnoDeg() + 360) % 360 * 1023.0f / 360.0f);
-  analogWrite(0, output);
+  Serial.println(output);
 
   delay(10);
 }
