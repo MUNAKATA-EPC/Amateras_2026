@@ -6,17 +6,17 @@ import math
 
 #############################################################
 # ゴールの色取り用変数(黄色)
-goal_yellow = (56, 98, -23, -12, 38, 65) #new
+goal_yellow = (34, 98, -27, -9, 30, 116)
 #############################################################
 # ゴールの色取り用変数(青色)
-goal_blue = (18, 38, -17, 26, -30, -11) #new
+goal_blue = (13, 42, -16, 30, -24, -14)
 #############################################################
 # コートの色（カーペット用）
-court_green = (40, 67, -24, 34, -9, 12) #new
+court_green = (30, 86, -11, 1, -13, 10)
 #############################################################
 # 画面の中央座標
-screen_center = [156, 96]
-screen_short_r = 32
+screen_center = [159, 97]
+screen_short_r = 33
 screen_long_r = 160
 
 court = [0, 0]
@@ -48,16 +48,22 @@ court_pos = None  # 最新のコート座標を保持
 
 # -----------------------------------
 # センサー設定
-sensor.reset()                     # センサーをリセットして初期化
-sensor.set_pixformat(sensor.RGB565)# ピクセルフォーマットをRGB565に設定
-sensor.set_framesize(sensor.QVGA)  # フレームサイズをQVGA (320x240)に設定
-sensor.skip_frames(time=2000)      # 設定が有効になるまで待機
+# 1. 露出時間（マイクロ秒）: 小さくすると暗く・速くなり、大きくすると明るくなる
+MANUAL_EXPOSURE = 10000
+# 2. RGBゲイン（赤, 緑, 青）: 各色の強さを調整する
+MANUAL_RGB_GAIN = (1.5, 1.0, 2.0)
+# 3. センサーゲイン（dB）: 全体的な明るさの増幅させる
+MANUAL_GAIN_DB = 3
 
-# 明るさ関連の設定（ここで反映される）
-sensor.set_auto_gain(False, gain_db=1)             # 自動ゲインオフ、ゲインを低めに
-sensor.set_auto_whitebal(True,)                    # ホワイトバランス固定
-sensor.set_auto_exposure(False, exposure_us=7000)  # 露出を短くして暗めに
-sensor.set_brightness(3)                          # さらに暗く（-3 〜 +3）
+sensor.reset()
+sensor.set_pixformat(sensor.RGB565)
+sensor.set_framesize(sensor.QVGA)
+
+# 自動調整をすべて無効化
+sensor.set_auto_whitebal(False, rgb_gain_db=MANUAL_RGB_GAIN)
+sensor.set_auto_exposure(False, exposure_us=MANUAL_EXPOSURE)
+sensor.set_auto_gain(False, gain_db=MANUAL_GAIN_DB)
+sensor.set_brightness(-1)
 
 clock = time.clock()
 uart = UART(3, 115200, timeout_char=1000)
@@ -76,6 +82,7 @@ def send_int16(uart, value):
 while True:
     clock.tick()
     frame_count += 1
+    img = sensor.snapshot()
     img.draw_cross(screen_center[0], screen_center[1])
 
     # 画面外周を黒く塗る
