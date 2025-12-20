@@ -125,40 +125,28 @@ void uiButtonUpdate(bool enterbtn, bool backbtn, bool rightbtn, bool leftbtn)
         else
         {
             _meter_flag = (_meter_flag == true) ? false : true;
+
+            _meter_number = (_meter_number + 1 + METER_COUNT) % METER_COUNT; // 0~(METER_COUNT-1)を周期するようにする
         }
     }
 
     if (!_action_decided)
     {
-        if (_meter_flag)
+        if (rightbtn)
         {
-            if (rightbtn)
-            {
-                _meter_number = (_meter_number + 1 + METER_COUNT) % METER_COUNT; // 0~(METER_COUNT-1)を周期するようにする
-            }
-            if (leftbtn)
-            {
-                _meter_number = (_meter_number - 1 + METER_COUNT) % METER_COUNT; // 0~(METER_COUNT-1)を周期するようにする
-            }
+            tone(BUZZER_PIN, BUZZER_PITCHES::MyC4, 50);
+
+            _action_number++;
+            if (_action_number > Action::Type::COUNT - 1)
+                _action_number = 0;
         }
-        else
+        if (leftbtn)
         {
-            if (rightbtn)
-            {
-                tone(BUZZER_PIN, BUZZER_PITCHES::MyC4, 50);
+            tone(BUZZER_PIN, BUZZER_PITCHES::MyC4, 50);
 
-                _action_number++;
-                if (_action_number > Action::Type::COUNT - 1)
-                    _action_number = 0;
-            }
-            if (leftbtn)
-            {
-                tone(BUZZER_PIN, BUZZER_PITCHES::MyC4, 50);
-
-                _action_number--;
-                if (_action_number < 0)
-                    _action_number = Action::Type::COUNT - 1;
-            }
+            _action_number--;
+            if (_action_number < 0)
+                _action_number = Action::Type::COUNT - 1;
         }
 
         if (enterbtn)
@@ -391,14 +379,7 @@ void uiDrawMain()
         ssdPrint(modeName);
         if (!_mode_decided)
         {
-            if (_meter_flag)
-            {
-                _ssd->println("  ");
-            }
-            else
-            {
-                _ssd->println(" <");
-            }
+            _ssd->println(" <");
         }
         else
         {

@@ -20,53 +20,11 @@ static Timer attacking_timer;
 static Vector LineTraceVec(PD *pd, int power);                               // ラインの中心に行こうとする（D成分は使わない）
 static Vector LineTraceAndTargetVec(PD *line_trace_vec, int deg, int power); // ライントレースしながらdegが0のなる方向へに行く
 
-// 直線y=ax+bと円r^2=x^2+y^2の交点算出関数
-#include <cmath> // std::sqrt, std::NAN, std::fabs
-int lineAndCircleCrossPoint(float a_of_line, float b_of_line, float r_of_circle, float *cross_point1_ptr, float *cross_point2_ptr)
-{
-    float a = a_of_line;
-    float b = b_of_line;
-    float r = r_of_circle;
-
-    // ルートの中身 (判別式の D/4): r^2 * (1 + a^2) - b^2
-    float roots_content = r * r * (1.0f + a * a) - b * b;
-    const float EPSILON = 1e-6f; // 浮動小数点比較の許容誤差
-
-    if (roots_content < -EPSILON)
-    {
-        cross_point1_ptr[0] = cross_point1_ptr[1] = 0.0f;
-        cross_point2_ptr[0] = cross_point2_ptr[1] = 0.0f;
-        return 0; // 交点なし
-    }
-
-    float sqrt_roots_content = std::sqrt(roots_content); // ルート部分の計算
-    float denominator_content = 1.0f + a * a;            // 分母部分の計算 (1 + a^2)
-
-    // x座標の計算 (二次方程式の解の公式)
-    // x = (-ab ± sqrt(D/4)) / (1 + a^2)
-
-    // 交点1 (x1)
-    cross_point1_ptr[0] = (-a * b + sqrt_roots_content) / denominator_content;
-    // 交点2 (x2)
-    cross_point2_ptr[0] = (-a * b - sqrt_roots_content) / denominator_content;
-
-    // y座標の計算
-
-    // y1 = a * x1 + b
-    cross_point1_ptr[1] = a * cross_point1_ptr[0] + b;
-    // y2 = a * x2 + b
-    cross_point2_ptr[1] = a * cross_point2_ptr[0] + b;
-
-    if (std::fabs(roots_content) <= EPSILON)
-    {
-        return 1; // わずかに接する場合
-    }
-    return 2; // 二点の交点を持つ場合
-}
-
 static Timer line_timer;
 static Timer kick_timer;
 static bool old_catch = false;
+
+static bool old_block_flag = false;
 
 void playDefender(Defender::Mode mode)
 {
@@ -115,7 +73,7 @@ void playDefender(Defender::Mode mode)
     // アタッカーモードの移行する処理
     now_ir_deg = irDeg(); // 今のirの角度更新
 
-    bool is_start_timer = irDetected() && abs(diffDeg(now_ir_deg, old_ir_deg)) <= 15 && irDis() <= 60 && (defence_goal_detected && defence_goal_dis <= 80 && (defence_goal_deg > 120 || defence_goal_deg < -120)); // 厳しい条件分岐でアタッカーに移行する
+    bool is_start_timer = irDetected() && abs(diffDeg(now_ir_deg, old_ir_deg)) <= 10 && irDis() <= 56 && (defence_goal_detected && defence_goal_dis <= 80 && (defence_goal_deg > 130 || defence_goal_deg < -130)) && old_block_flag == true && !(catchSensor.read() == HIGH); // 厳しい条件分岐でアタッカーに移行する
 
     if (is_start_timer)
     {
@@ -126,7 +84,7 @@ void playDefender(Defender::Mode mode)
         }
         old_ir_keep_deg_flag = true;
 
-        if (ir_keep_deg_flag == true && ir_keep_deg_timer.msTime() >= 4500UL) // 4.5秒以上もボールが一定の角度にあるなら
+        if (ir_keep_deg_flag == true && ir_keep_deg_timer.msTime() >= 5000UL) // 4.5秒以上もボールが一定の角度にあるなら
         {
             attacking_timer.reset(); // アタッカータイマー開始
             attack_flag = true;
@@ -138,14 +96,22 @@ void playDefender(Defender::Mode mode)
         ir_keep_deg_flag = false;
     }
 
-    if (attack_flag == true && !irDetected())
+    if (attack_flag == true && (!irDetected() || (attacking_timer.msTime() > 1000UL && lineRingDetected()))) // アタックモードに移行して1秒経った後ラインが反応したら戻る
     {
         attack_flag = false;
     }
 
     if (attack_flag == true && attacking_timer.msTime() <= 3000UL) // 3ms間アタッカーをする
     {
-        playAttacker((mode == Defender::Mode::YELLOWGOAL) ? Attacker::Mode::YELLOWGOAL : Attacker::Mode::BLUEGOAL);
+        if (attacking_timer.msTime() <= 500UL && (irDeg() >= -120 && irDeg() <= 120)) // とりあえずボールの方向へ行く
+        {
+            motorsPdProcess(&pd_gyro, bnoDeg(), 0);
+            motorsMove(irDeg(), 60);
+        }
+        else
+        {
+            playAttacker((mode == Defender::Mode::YELLOWGOAL) ? Attacker::Mode::YELLOWGOAL : Attacker::Mode::BLUEGOAL);
+        }
         return;
     }
     else
@@ -158,6 +124,8 @@ void playDefender(Defender::Mode mode)
     // ディフェンスの処理
     motorsPdProcess(&pd_gyro, bnoDeg(), 0);
 
+    old_block_flag = false; // falseにしておく
+
     const int max_power = 95; // パワーの最大値
     if (defence_goal_detected && defence_goal_dis <= 80)
     {
@@ -166,22 +134,22 @@ void playDefender(Defender::Mode mode)
             if (irDetected())
             {
                 // ライントレースのベクトル算出
-                Vector line_trace_vec = Vector(lineRingDeg(), float(lineRingDis() * lineRingDis() / 100.0f * 0.5f)); // 長さ最大：100
+                Vector line_trace_vec = Vector(lineRingDeg(), float(lineRingDis() * 0.3f)); // 長さ最大：30
 
                 // 対角線の角度算出
                 int target_deg = normalizeDeg(defence_goal_deg + 180);
                 int block_ir_deg = normalizeDeg(irDeg() - target_deg);
-                float block_ir_y = irDis() * sinf(radians(block_ir_deg)); // y方向成分
-                if (defence_goal_deg >= 155 || defence_goal_deg <= -155)  // （コート白線の横線の方にいる）なら普通に守る
+                if (defence_goal_deg >= 155 || defence_goal_deg <= -155) // （コート白線の横線の方にいる）なら普通に守る
                 {
                     block_ir_deg = irDeg();
                 }
+                float block_ir_y = irDis() * sinf(radians(block_ir_deg)); // y方向成分
 
                 // ブロックベクトルベクトル算出
                 int block_deg;
                 float block_len;
 
-                if (defence_goal_deg >= -116 && defence_goal_deg <= 103) // 前±110度にゴールが見えたなら（コート白線の後ろの端の方にいる）
+                if (/*defence_goal_deg >= -116 && defence_goal_deg <= 103*/ defence_goal_deg >= -105 && defence_goal_deg <= 120) // 前±110度にゴールが見えたなら（コート白線の後ろの端の方にいる）
                 {
                     block_deg = fieldDeg();
                     block_len = max_power;
@@ -220,7 +188,12 @@ void playDefender(Defender::Mode mode)
 
                     if ((is_right_detected ^ is_left_detected) || (is_front_detected && is_back_detected)) // | (ゴール) | ←ここにいる可能性が高い
                     {
-                        if (irDis() > 51)
+                        if (defence_goal_deg > 0 && irDeg() > 0 && irDeg() <= 140) // 右のラインにいてボールが左にある | (ゴール) (ボール) | (ロボット)
+                        {
+                            block_deg = 0;
+                            block_len = max_power * 0.8f;
+                        }
+                        else if (defence_goal_deg <= 0 && irDeg() <= 0 && irDeg() >= -140) // 左のラインにいてボールが右にある (ロボット) | (ボール) (ゴール) |
                         {
                             block_deg = 0;
                             block_len = max_power * 0.8f;
@@ -243,7 +216,7 @@ void playDefender(Defender::Mode mode)
                     {
                         if (block_ir_deg > 0) // 左にボールがある
                         {
-                            if (lineRingDis() >= 10.0f)
+                            if (false /*lineRingDis() >= 80.0f*/)
                             {
                                 if (lineRingDeg() >= -90 && lineRingDeg() <= 90) // 後ろのロボットが行ってしまっているなら
                                 {
@@ -264,7 +237,7 @@ void playDefender(Defender::Mode mode)
                         }
                         else // 右にボールがある
                         {
-                            if (lineRingDis() >= 10.0f)
+                            if (lineRingDis() >= 80.0f)
                             {
                                 if (lineRingDeg() >= -90 && lineRingDeg() <= 90) // 後ろのロボットが行ってしまっているなら
                                 {
@@ -297,9 +270,15 @@ void playDefender(Defender::Mode mode)
                 // 長さ補正（ゴールの反対方向を基準にして出力を調整し適切な場所で止まるようにする）
                 if (block_ir_deg >= -90 && block_ir_deg <= 90) // 前方向にボールがあるなら
                 {
-                    if (block_ir_y >= -6.0f && block_ir_y <= 6.0f)
+                    if (block_ir_y >= -8.0f && block_ir_y <= 8.0f)
                     {
+
                         block_len = 0.0f;
+                    }
+
+                    if (block_ir_y >= -12.0f && block_ir_y <= 12.0f)
+                    {
+                        old_block_flag = true; // 記録
                     }
                     /*
                     else if (block_ir_y >= -5.0f && block_ir_y <= 5.0f)
@@ -318,79 +297,19 @@ void playDefender(Defender::Mode mode)
                 // 守備ベクトル算出
                 Vector defence_vec = line_trace_vec + block_vec;
 
-                // defence_vec の長さが max_power を超えた場合の制限処理
                 if (defence_vec.length() >= max_power)
                 {
-                    // 直線の定義 (y = ax + b)
-                    float line_gain_a; // 傾き a
-                    float line_gain_b; // 切片 b
-                    float block_deg_rad = block_vec.rad();
-
-                    // 垂直線の境界処理: 88.0度から92.0度を垂直と見なす
-                    bool is_nearly_vertical = (abs(block_deg_rad) > radians(88.0f) && abs(block_deg_rad) < radians(92.0f));
-
-                    if (is_nearly_vertical)
+                    for (float i = block_len; i >= 0.0f; i -= 1.0f)
                     {
-                        line_gain_a = tanf(radians(block_vec.deg() + 5.0f)); // わずかに傾け、(0.0f,0.0f)を回避
+                        // ベクトル生成
+                        block_vec = Vector(block_deg, block_len); // 長さ最大：100
 
-                        // 切片 b = yA - a * xA
-                        line_gain_b = line_trace_vec.y() - line_gain_a * line_trace_vec.x();
-                    }
-                    else
-                    {
-                        // 通常の線 (y = ax + b) の場合
-                        // 傾き a は block_vec の角度から求める
-                        line_gain_a = tanf(block_deg_rad);
+                        // 守備ベクトル算出
+                        defence_vec = line_trace_vec + block_vec;
 
-                        // 切片 b = yA - a * xA (yA, xA は line_trace_vec の終点座標)
-                        line_gain_b = line_trace_vec.y() - line_gain_a * line_trace_vec.x();
-                    }
-
-                    // 交点計算
-                    float cross_point_of_max_power_ring1[2]; // 交点1 {x1, y1}
-                    float cross_point_of_max_power_ring2[2]; // 交点2 {x2, y2}
-
-                    int cross_point_count = lineAndCircleCrossPoint(
-                        line_gain_a,
-                        line_gain_b,
-                        (float)max_power,
-                        cross_point_of_max_power_ring1,
-                        cross_point_of_max_power_ring2); // 交点計算
-
-                    // 最終ベクトル (defence_vec) の決定
-                    if (cross_point_count == 0) // 交点が0個 (ありえないはずだが安全策)
-                    {
-                        // ライントレースのみをする
-                        defence_vec = line_trace_vec;
-                    }
-                    else if (cross_point_count == 1) // 交点が1個 (接する場合)
-                    {
-                        // 交点座標がそのまま制限された合力の終点となる
-                        defence_vec = Vector(0.0f, 0.0f, cross_point_of_max_power_ring1[0], cross_point_of_max_power_ring1[1]);
-                    }
-                    else // 交点が2個 (最も元の合力に近い交点を選ぶ)
-                    {
-                        // 元の合力 R の終点 (defence_vec.x, defence_vec.y)
-                        float rx = defence_vec.x();
-                        float ry = defence_vec.y();
-
-                        // 交点1 (P_R1) と元のRの距離の二乗
-                        float dist1_sq = powf(rx - cross_point_of_max_power_ring1[0], 2) +
-                                         powf(ry - cross_point_of_max_power_ring1[1], 2);
-
-                        // 交点2 (P_R2) と元のRの距離の二乗
-                        float dist2_sq = powf(rx - cross_point_of_max_power_ring2[0], 2) +
-                                         powf(ry - cross_point_of_max_power_ring2[1], 2);
-
-                        if (dist1_sq < dist2_sq)
+                        if (defence_vec.length() <= max_power)
                         {
-                            // 交点1が元のベクトルRに最も近い
-                            defence_vec = Vector(0.0f, 0.0f, cross_point_of_max_power_ring1[0], cross_point_of_max_power_ring1[1]);
-                        }
-                        else
-                        {
-                            // 交点2が元のベクトルRに最も近い
-                            defence_vec = Vector(0.0f, 0.0f, cross_point_of_max_power_ring2[0], cross_point_of_max_power_ring2[1]);
+                            break;
                         }
                     }
                 }
@@ -408,28 +327,47 @@ void playDefender(Defender::Mode mode)
         }
         else
         {
+            Vector modoru_vec;
             if (defence_goal_deg >= 155 || defence_goal_deg <= -155) // 真後ろにある場合
             {
                 if (defence_goal_dis <= 67.0f)
                 {
-                    motorsMove(defence_goal_deg + 180, max_power * 0.5f);
+                    modoru_vec = Vector(defence_goal_deg + 180, max_power * 0.3f);
                 }
                 else
                 {
-                    motorsMove(defence_goal_deg, max_power * 0.5f);
+                    modoru_vec = Vector(defence_goal_deg, max_power * 0.3f);
                 }
             }
             else // 横にある場合
             {
                 if (defence_goal_dis <= 69.0f)
                 {
-                    motorsMove(defence_goal_deg + 180, max_power * 0.5f);
+                    modoru_vec = Vector(defence_goal_deg + 180, max_power * 0.3f);
                 }
                 else
                 {
-                    motorsMove(defence_goal_deg, max_power * 0.5f);
+                    modoru_vec = Vector(defence_goal_deg, max_power * 0.3f);
                 }
             }
+
+            if (irDetected())
+            {
+                if (irDeg() > 0) // 左にある場合
+                {
+                    modoru_vec = modoru_vec + Vector(90, max_power * 0.44f);
+                }
+                else // 右にある場合
+                {
+                    modoru_vec = modoru_vec + Vector(-90, max_power * 0.44f);
+                }
+            }
+            else
+            {
+                modoru_vec = modoru_vec * 2.0f;
+            }
+
+            motorsVectorMove(&modoru_vec);
         }
     }
     else if (lineRingDetected())

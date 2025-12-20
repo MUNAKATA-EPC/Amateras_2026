@@ -63,4 +63,4 @@ void PD::process(float val, float target, bool angle)
 }
 
 PD pd_gyro(0.65f, -1.5f); // 共通で使えるようにしておく
-PD pd_cam(0.65f, -1.5f);  // 共通で使えるようにしておく
+PD pd_cam(0.50f, -0.8f);  // 共通で使えるようにしておく

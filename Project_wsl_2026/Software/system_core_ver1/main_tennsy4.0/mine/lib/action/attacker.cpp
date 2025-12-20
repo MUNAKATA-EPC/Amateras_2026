@@ -50,8 +50,8 @@ void attackWithGyro() // ジャイロで攻撃
     old_catch = now_catch;
     // キッカー
 
-    const int motor_line_max_power = 80;
-    const int motor_ir_max_power = 95;
+    const int motor_line_max_power = 75;
+    const int motor_ir_max_power = 75;
 
     if (line_timer.everReset() && line_timer.msTime() < 100UL)
     {
@@ -79,25 +79,36 @@ void attackWithGyro() // ジャイロで攻撃
     }
     else if (irDetected())
     {
-        if (irDeg() >= -11 && irDeg() <= 9)
+        if (irDeg() >= -8 && irDeg() <= 8)
         {
             motorsMove(0, motor_ir_max_power);
         }
+        else if (irDeg() >= -14 && irDeg() <= 14)
+        {
+            if (irDeg() > 0)
+            {
+                motorsMove(20, motor_ir_max_power);
+            }
+            else
+            {
+                motorsMove(-20, motor_ir_max_power);
+            }
+        }
         else
         {
-            if (irDis() >= 60.0f)
+            if (irDis() >= 56.0f)
             {
                 motorsMove(irDeg(), motor_ir_max_power);
             }
             else
             {
-                int diff = (int)roundf(irVal() * 1.11f);
+                int diff = (int)roundf(irVal() * 0.8f);
 
                 if (irDeg() > 0) // 左にいるとき
                 {
                     if (irDeg() <= 45)
                     {
-                        motorsMove(irDeg() + diff, motor_ir_max_power * 0.65f);
+                        motorsMove(irDeg() + diff, motor_ir_max_power);
                     }
                     else if (irDeg() <= 160)
                     {
@@ -112,7 +123,7 @@ void attackWithGyro() // ジャイロで攻撃
                 {
                     if (irDeg() >= -45)
                     {
-                        motorsMove(irDeg() - diff, motor_ir_max_power * 0.65f);
+                        motorsMove(irDeg() - diff, motor_ir_max_power);
                     }
                     else if (irDeg() >= -160)
                     {
@@ -136,7 +147,7 @@ Timer cam_pd_timer;
 
 void attackWithCam(bool attack_goal_detected, int attack_goal_deg, int attack_goal_dis, bool defence_goal_detected, int defence_goal_deg, int defence_goal_dis) // カメラで攻撃
 {
-    if (attack_goal_detected && attack_goal_dis < 110)
+    if (attack_goal_detected && attack_goal_dis <= 110)
     {
         motorsPdProcess(&pd_cam, attack_goal_deg, 0); // カメラで姿勢制御
     }
@@ -145,7 +156,7 @@ void attackWithCam(bool attack_goal_detected, int attack_goal_deg, int attack_go
         motorsPdProcess(&pd_gyro, bnoDeg(), 0); // ジャイロで姿勢制御
     }
 
-    if (catchSensor.read() == HIGH && attack_goal_detected && abs(attack_goal_deg) < 70)
+    if (catchSensor.read() == HIGH && attack_goal_detected && abs(attack_goal_deg) <= 70)
     {
         kicker1.kick(true);
     }
@@ -154,8 +165,8 @@ void attackWithCam(bool attack_goal_detected, int attack_goal_deg, int attack_go
         kicker1.kick(false);
     }
 
-    const int motor_line_max_power = 80;
-    const int motor_ir_max_power = 95;
+    const int motor_line_max_power = 75;
+    const int motor_ir_max_power = 75;
 
     if (line_timer.everReset() && line_timer.msTime() < 100UL)
     {
@@ -183,13 +194,24 @@ void attackWithCam(bool attack_goal_detected, int attack_goal_deg, int attack_go
     }
     else if (irDetected())
     {
-        if (irDeg() >= -11 && irDeg() <= 9)
+        if (irDeg() >= -8 && irDeg() <= 8)
         {
             motorsMove(0, motor_ir_max_power);
         }
-        else if (irDeg() >= -16 && irDeg() <= 16)
+        else if (irDeg() >= -10 && irDeg() <= 10)
         {
-            motorsMove(irDeg() * 1.11f, motor_ir_max_power);
+            motorsMove(irDeg() * 1.2f, motor_ir_max_power * 0.7f);
+        }
+        else if (irDis() < 50 && (irDeg() >= -14 && irDeg() <= 14))
+        {
+            if (irDeg() > 0)
+            {
+                motorsMove(90, motor_ir_max_power);
+            }
+            else
+            {
+                motorsMove(-90, motor_ir_max_power);
+            }
         }
         else
         {
@@ -199,13 +221,13 @@ void attackWithCam(bool attack_goal_detected, int attack_goal_deg, int attack_go
             }
             else
             {
-                int diff = (int)roundf(irVal() * 1.11f);
+                int diff = (int)roundf(irVal() * 0.7f);
 
                 if (irDeg() > 0) // 左にいるとき
                 {
                     if (irDeg() <= 45)
                     {
-                        motorsMove(irDeg() + diff, motor_ir_max_power * 0.65f);
+                        motorsMove(irDeg() + diff, motor_ir_max_power);
                     }
                     else if (irDeg() <= 160)
                     {
@@ -220,7 +242,7 @@ void attackWithCam(bool attack_goal_detected, int attack_goal_deg, int attack_go
                 {
                     if (irDeg() >= -45)
                     {
-                        motorsMove(irDeg() - diff, motor_ir_max_power * 0.65f);
+                        motorsMove(irDeg() - diff, motor_ir_max_power);
                     }
                     else if (irDeg() >= -160)
                     {
