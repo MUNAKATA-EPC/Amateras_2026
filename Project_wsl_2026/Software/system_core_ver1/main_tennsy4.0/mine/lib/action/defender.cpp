@@ -84,7 +84,7 @@ void playDefender(Defender::Mode mode)
         }
         old_ir_keep_deg_flag = true;
 
-        if (ir_keep_deg_flag == true && ir_keep_deg_timer.msTime() >= 5000UL) // 4.5秒以上もボールが一定の角度にあるなら
+        if (ir_keep_deg_flag == true && ir_keep_deg_timer.msTime() >= 5000UL) // 5秒以上もボールが一定の角度にあるなら
         {
             attacking_timer.reset(); // アタッカータイマー開始
             attack_flag = true;
@@ -149,7 +149,7 @@ void playDefender(Defender::Mode mode)
                 int block_deg;
                 float block_len;
 
-                if (/*defence_goal_deg >= -116 && defence_goal_deg <= 103*/ defence_goal_deg >= -105 && defence_goal_deg <= 120) // 前±110度にゴールが見えたなら（コート白線の後ろの端の方にいる）
+                if (defence_goal_deg >= -106 && defence_goal_deg <= 113 /*defence_goal_deg >= -105 && defence_goal_deg <= 109*/) // 前±110度にゴールが見えたなら（コート白線の後ろの端の方にいる）
                 {
                     block_deg = fieldDeg();
                     block_len = max_power;
@@ -182,7 +182,7 @@ void playDefender(Defender::Mode mode)
 
                         if (is_right_detected && is_left_detected && is_front_detected && is_back_detected)
                         {
-                            i = 16; // for文を抜ける
+                            break;
                         }
                     }
 
