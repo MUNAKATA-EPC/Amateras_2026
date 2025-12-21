@@ -40,7 +40,7 @@ void playDefender(Defender::Mode mode);
 #define DEFENCE_YOKO_IR_FOLLOW_POWER_MAX 40.0f
 #define DEFENCE_KADO_IR_FOLLOW_POWER_MAX 40.0f
 
-//// SAKAIME処理 ////
+//// SAKAIME処理(DEFENCE処理の中にある) ////
 #define SAKAIME_YELLOW_GOAL_DEG_MIN -120 // ゴールの横線の上限の角度
 #define SAKAIME_YELLOW_GOAL_DEG_MAX 120
 

@@ -127,7 +127,7 @@ void playDefender(Defender::Mode mode)
     {
         if (lineRingDetected() &&
             (defence_goal_deg > ((mode == Defender::Mode::YELLOWGOAL) ? SAKAIME_BLUE_GOAL_DEG_MAX : SAKAIME_YELLOW_GOAL_DEG_MAX) ||
-             defence_goal_deg < ((mode == Defender::Mode::YELLOWGOAL) ? SAKAIME_BLUE_GOAL_DEG_MIN : SAKAIME_YELLOW_GOAL_DEG_MIN)))
+             defence_goal_deg < ((mode == Defender::Mode::YELLOWGOAL) ? SAKAIME_BLUE_GOAL_DEG_MIN : SAKAIME_YELLOW_GOAL_DEG_MIN))) // (SAKAIME処理)
         {
             // ボールの方向を決める
             int defence_ir_deg;
