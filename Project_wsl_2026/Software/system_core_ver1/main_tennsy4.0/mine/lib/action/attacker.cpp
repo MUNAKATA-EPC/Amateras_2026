@@ -23,6 +23,7 @@ void playAttacker(Attacker::Mode mode)
 }
 
 static Timer line_timer;
+
 static Timer kick_timer;
 static bool old_catch = false;
 
@@ -53,27 +54,9 @@ void attackWithGyro() // ジャイロで攻撃
     const int motor_line_max_power = 75;
     const int motor_ir_max_power = 75;
 
-    if (line_timer.everReset() && line_timer.msTime() < 100UL)
+    if (lineRingDetected()) // エンジェルライン
     {
-        if (fieldDetected())
-        {
-            motorsMove(fieldDeg(), motor_line_max_power);
-        }
-        else
-        {
-            motorsMove(lineRingFirstDeg() + 180, motor_line_max_power);
-        }
-    }
-    else if (lineRingDetected())
-    {
-        if (fieldDetected())
-        {
-            motorsMove(fieldDeg(), motor_line_max_power);
-        }
-        else
-        {
-            motorsMove(lineRingFirstDeg() + 180, motor_line_max_power);
-        }
+        motorsMove(fieldDeg(), motor_line_max_power);
 
         line_timer.reset();
     }
@@ -83,26 +66,19 @@ void attackWithGyro() // ジャイロで攻撃
         {
             motorsMove(0, motor_ir_max_power);
         }
-        else if (irDeg() >= -14 && irDeg() <= 14)
+        else if (irDeg() >= -10 && irDeg() <= 10)
         {
-            if (irDeg() > 0)
-            {
-                motorsMove(20, motor_ir_max_power);
-            }
-            else
-            {
-                motorsMove(-20, motor_ir_max_power);
-            }
+            motorsMove(irDeg() * 1.11f, motor_ir_max_power);
         }
         else
         {
-            if (irDis() >= 56.0f)
+            if (irDis() >= 53.0f)
             {
                 motorsMove(irDeg(), motor_ir_max_power);
             }
             else
             {
-                int diff = (int)roundf(irVal() * 0.8f);
+                int diff = 50;
 
                 if (irDeg() > 0) // 左にいるとき
                 {
@@ -143,7 +119,7 @@ void attackWithGyro() // ジャイロで攻撃
     }
 }
 
-Timer cam_pd_timer;
+static Timer cam_pd_timer;
 
 void attackWithCam(bool attack_goal_detected, int attack_goal_deg, int attack_goal_dis, bool defence_goal_detected, int defence_goal_deg, int defence_goal_dis) // カメラで攻撃
 {
@@ -165,30 +141,23 @@ void attackWithCam(bool attack_goal_detected, int attack_goal_deg, int attack_go
         kicker1.kick(false);
     }
 
-    const int motor_line_max_power = 75;
-    const int motor_ir_max_power = 75;
+    const int motor_line_max_power = 50;
+    const int motor_ir_max_power = 50;
 
-    if (line_timer.everReset() && line_timer.msTime() < 100UL)
+    if (line_timer.everReset() && line_timer.msTime() < 50UL)
     {
-        if (fieldDetected())
+        if (lineRingDetected()) // エンジェルライン
         {
             motorsMove(fieldDeg(), motor_line_max_power);
         }
         else
         {
-            motorsMove(lineRingFirstDeg() + 180, motor_line_max_power);
+            motorsMove(fieldDeg(), motor_line_max_power);
         }
     }
-    else if (lineRingDetected())
+    else if (lineRingDetected()) // エンジェルライン
     {
-        if (fieldDetected())
-        {
-            motorsMove(fieldDeg(), motor_line_max_power);
-        }
-        else
-        {
-            motorsMove(lineRingFirstDeg() + 180, motor_line_max_power);
-        }
+        motorsMove(fieldDeg(), motor_line_max_power);
 
         line_timer.reset();
     }
@@ -200,28 +169,17 @@ void attackWithCam(bool attack_goal_detected, int attack_goal_deg, int attack_go
         }
         else if (irDeg() >= -10 && irDeg() <= 10)
         {
-            motorsMove(irDeg() * 1.2f, motor_ir_max_power * 0.7f);
-        }
-        else if (irDis() < 50 && (irDeg() >= -14 && irDeg() <= 14))
-        {
-            if (irDeg() > 0)
-            {
-                motorsMove(90, motor_ir_max_power);
-            }
-            else
-            {
-                motorsMove(-90, motor_ir_max_power);
-            }
+            motorsMove(irDeg() * 1.1f, motor_ir_max_power * 0.7f);
         }
         else
         {
-            if (irDis() >= 60.0f)
+            if (irDis() >= 55.0f)
             {
                 motorsMove(irDeg(), motor_ir_max_power);
             }
             else
             {
-                int diff = (int)roundf(irVal() * 0.7f);
+                int diff = 50;
 
                 if (irDeg() > 0) // 左にいるとき
                 {

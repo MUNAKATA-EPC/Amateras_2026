@@ -73,7 +73,7 @@ void playDefender(Defender::Mode mode)
     // アタッカーモードの移行する処理
     now_ir_deg = irDeg(); // 今のirの角度更新
 
-    bool is_start_timer = irDetected() && abs(diffDeg(now_ir_deg, old_ir_deg)) <= 10 && irDis() <= 56 && (defence_goal_detected && defence_goal_dis <= 80 && (defence_goal_deg > 130 || defence_goal_deg < -130)) && old_block_flag == true && !(catchSensor.read() == HIGH); // 厳しい条件分岐でアタッカーに移行する
+    bool is_start_timer = irDetected() && irDis() <= 70 && abs(diffDeg(now_ir_deg, old_ir_deg)) <= 15 && (defence_goal_detected && defence_goal_dis <= 75) /*&& old_block_flag == true*/ && !(catchSensor.read() == HIGH); // 厳しい条件分岐でアタッカーに移行する
 
     if (is_start_timer)
     {
@@ -84,7 +84,7 @@ void playDefender(Defender::Mode mode)
         }
         old_ir_keep_deg_flag = true;
 
-        if (ir_keep_deg_flag == true && ir_keep_deg_timer.msTime() >= 5000UL) // 5秒以上もボールが一定の角度にあるなら
+        if (ir_keep_deg_flag == true && ir_keep_deg_timer.msTime() >= 3000UL) // 5秒以上もボールが一定の角度にあるなら
         {
             attacking_timer.reset(); // アタッカータイマー開始
             attack_flag = true;
@@ -106,7 +106,7 @@ void playDefender(Defender::Mode mode)
         if (attacking_timer.msTime() <= 500UL && (irDeg() >= -120 && irDeg() <= 120)) // とりあえずボールの方向へ行く
         {
             motorsPdProcess(&pd_gyro, bnoDeg(), 0);
-            motorsMove(irDeg(), 60);
+            motorsMove(irDeg(), 40);
         }
         else
         {
@@ -126,15 +126,15 @@ void playDefender(Defender::Mode mode)
 
     old_block_flag = false; // falseにしておく
 
-    const int max_power = 95; // パワーの最大値
+    const int max_power = 60; // パワーの最大値
     if (defence_goal_detected && defence_goal_dis <= 80)
     {
-        if (lineRingDetected())
+        if (lineRingDetected() && defence_goal_dis > 30)
         {
             if (irDetected())
             {
                 // ライントレースのベクトル算出
-                Vector line_trace_vec = Vector(lineRingDeg(), float(lineRingDis() * 0.3f)); // 長さ最大：30
+                Vector line_trace_vec = Vector(lineRingDeg(), lineRingDis() * 0.3f); // 長さ最大：30
 
                 // 対角線の角度算出
                 int target_deg = normalizeDeg(defence_goal_deg + 180);
@@ -149,7 +149,7 @@ void playDefender(Defender::Mode mode)
                 int block_deg;
                 float block_len;
 
-                if (defence_goal_deg >= -106 && defence_goal_deg <= 113 /*defence_goal_deg >= -105 && defence_goal_deg <= 109*/) // 前±110度にゴールが見えたなら（コート白線の後ろの端の方にいる）
+                if (defence_goal_deg >= 96 && defence_goal_deg <= -101 /*defence_goal_deg >= -105 && defence_goal_deg <= 109*/) // 前±110度にゴールが見えたなら（コート白線の後ろの端の方にいる）
                 {
                     block_deg = fieldDeg();
                     block_len = max_power;
@@ -221,18 +221,18 @@ void playDefender(Defender::Mode mode)
                                 if (lineRingDeg() >= -90 && lineRingDeg() <= 90) // 後ろのロボットが行ってしまっているなら
                                 {
                                     block_deg = 90 - 20;
-                                    block_len = max_power;
+                                    block_len = max_power * 0.88f;
                                 }
                                 else
                                 {
                                     block_deg = 90 + 20;
-                                    block_len = max_power;
+                                    block_len = max_power * 0.88f;
                                 }
                             }
                             else
                             {
                                 block_deg = 90;
-                                block_len = max_power;
+                                block_len = max_power * 0.88f;
                             }
                         }
                         else // 右にボールがある
@@ -242,18 +242,18 @@ void playDefender(Defender::Mode mode)
                                 if (lineRingDeg() >= -90 && lineRingDeg() <= 90) // 後ろのロボットが行ってしまっているなら
                                 {
                                     block_deg = -90 + 20;
-                                    block_len = max_power;
+                                    block_len = max_power * 0.88f;
                                 }
                                 else
                                 {
                                     block_deg = -90 - 20;
-                                    block_len = max_power;
+                                    block_len = max_power * 0.88f;
                                 }
                             }
                             else
                             {
                                 block_deg = -90;
-                                block_len = max_power;
+                                block_len = max_power * 0.88f;
                             }
                         }
                     }
@@ -270,7 +270,7 @@ void playDefender(Defender::Mode mode)
                 // 長さ補正（ゴールの反対方向を基準にして出力を調整し適切な場所で止まるようにする）
                 if (block_ir_deg >= -90 && block_ir_deg <= 90) // 前方向にボールがあるなら
                 {
-                    if (block_ir_y >= -8.0f && block_ir_y <= 8.0f)
+                    if (block_ir_y >= -9.0f && block_ir_y <= 9.0f)
                     {
 
                         block_len = 0.0f;
@@ -280,15 +280,6 @@ void playDefender(Defender::Mode mode)
                     {
                         old_block_flag = true; // 記録
                     }
-                    /*
-                    else if (block_ir_y >= -5.0f && block_ir_y <= 5.0f)
-                    {
-                        // 1 = 17.5 * a + b
-                        // 0 = 10 * a + b
-                        // 1 / 7.5 = a,b = 1 - 17.5 * 1 / 7.5
-                        block_len = block_len * ((fabs(block_ir_y) - 6.0f) / 5.0f);
-                    }
-                    */
                 }
 
                 // ベクトル生成
@@ -328,43 +319,43 @@ void playDefender(Defender::Mode mode)
         else
         {
             Vector modoru_vec;
-            if (defence_goal_deg >= 155 || defence_goal_deg <= -155) // 真後ろにある場合
+            if (abs(defence_goal_deg) > 156)
             {
-                if (defence_goal_dis <= 67.0f)
+                if (defence_goal_dis <= 54.0f)
                 {
-                    modoru_vec = Vector(defence_goal_deg + 180, max_power * 0.3f);
+                    modoru_vec = Vector(defence_goal_deg + 180, 30.0f);
                 }
                 else
                 {
-                    modoru_vec = Vector(defence_goal_deg, max_power * 0.3f);
+                    modoru_vec = Vector(defence_goal_deg, 30.0f);
                 }
             }
-            else // 横にある場合
+            else
             {
-                if (defence_goal_dis <= 69.0f)
+                if (defence_goal_dis <= 57.0f)
                 {
-                    modoru_vec = Vector(defence_goal_deg + 180, max_power * 0.3f);
+                    modoru_vec = Vector(defence_goal_deg + 180, 30.0f);
                 }
                 else
                 {
-                    modoru_vec = Vector(defence_goal_deg, max_power * 0.3f);
+                    modoru_vec = Vector(defence_goal_deg, 30.0f);
                 }
             }
 
             if (irDetected())
             {
-                if (irDeg() > 0) // 左にある場合
+                int ir_follow_deg = (irDeg() > 0) ? 90 : -90;
+
+                if (abs(diffDeg(modoru_vec.deg(), ir_follow_deg)) <= 175) // 合力が相殺されるのを防ぐ
                 {
-                    modoru_vec = modoru_vec + Vector(90, max_power * 0.44f);
-                }
-                else // 右にある場合
-                {
-                    modoru_vec = modoru_vec + Vector(-90, max_power * 0.44f);
+                    modoru_vec = modoru_vec + Vector(ir_follow_deg, 10.0f);
+
+                    modoru_vec = Vector(modoru_vec.deg(), 40.0f); // 合力の力を50にする
                 }
             }
             else
             {
-                modoru_vec = modoru_vec * 2.0f;
+                modoru_vec = modoru_vec * 1.0f;
             }
 
             motorsVectorMove(&modoru_vec);
@@ -414,11 +405,11 @@ void playDefender(Defender::Mode mode)
             {
                 if (irDeg() > 0) // 左にある
                 {
-                    motorsMove(irDeg() + 60, max_power * 0.8f);
+                    motorsMove(teiiti_deg + 45, max_power * 0.8f);
                 }
                 else // 右にある
                 {
-                    motorsMove(irDeg() - 60, max_power * 0.8f);
+                    motorsMove(teiiti_deg - 45, max_power * 0.8f);
                 }
             }
             else

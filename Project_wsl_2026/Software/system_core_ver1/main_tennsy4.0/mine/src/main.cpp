@@ -2,7 +2,7 @@
 
 // action類
 #include "attacker.hpp"
-#include "defender.hpp"
+#include "defenderVer2.hpp"
 #include "radicon.hpp"
 #include "test.hpp"
 // common類
