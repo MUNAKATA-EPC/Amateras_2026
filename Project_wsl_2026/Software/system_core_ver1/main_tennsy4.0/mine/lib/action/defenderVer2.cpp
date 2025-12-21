@@ -133,7 +133,7 @@ void playDefender(Defender::Mode mode)
             int defence_ir_deg;
             if (abs(defence_goal_deg) >= ((mode == Defender::Mode::YELLOWGOAL) ? DEFENCE_BLUE_GOAL_NORMAL_DEG : DEFENCE_YELLOW_GOAL_NORMAL_DEG))
             {
-                defence_goal_deg = irDeg();
+                defence_ir_deg = irDeg();
             }
             else
             {
