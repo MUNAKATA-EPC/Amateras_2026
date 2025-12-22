@@ -3,6 +3,7 @@
 #include <Arduino.h>
 #include "timer.hpp"
 #include "packetManager.hpp"
+#include "angleHelper.hpp"
 
 bool lineInit(HardwareSerial *serial, uint32_t baudrate);
 void lineUpdate();

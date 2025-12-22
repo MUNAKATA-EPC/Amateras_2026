@@ -55,11 +55,11 @@ void playDefender(Defender::Mode mode);
 #define MODORU_IR_FOLLOW_POWER 40 // この力でボールを追う
 
 //// TEIITI処理 ////
-#define TEIITI_LINE_ESCAPE_POWER 40 // ラインが反応したときの力 (ラインから離れる動きの速さ)
+#define TEIITI_LINE_ESCAPE_POWER 40 // ラインが反応したときの力 (ラインから離れる動きの力)
 #define TEIITI_POWER 40             // 定位置に戻るときの力
 
 //// ATTACK処理 ////
-#define ATTACK_IR_FOLLOW_POWER 40 // アタッカーのときの一時的のボールに追う動作をするときの力
+#define ATTACK_IR_FOLLOW_POWER 40 // アタッカーのときの一時的にボールに追う動作をするときの力
 
 //// 角度計算関数 (1：前または後、2：斜め、3：横) ////
 int degJudge(int deg)

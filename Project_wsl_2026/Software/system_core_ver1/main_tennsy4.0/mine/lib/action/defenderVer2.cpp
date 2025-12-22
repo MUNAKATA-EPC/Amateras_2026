@@ -175,7 +175,7 @@ void playDefender(Defender::Mode mode)
 
             float defence_ir_y = irDis() * sinf(radians(defence_ir_deg)); // y方向成分
             if (defence_ir_y >= DEFENCE_IR_FRONT_Y_MIN &&
-                defence_ir_y < -DEFENCE_IR_FRONT_Y_MAX) // 一定の値の中に入るとボールを追わなくなる (停止)
+                defence_ir_y <= -DEFENCE_IR_FRONT_Y_MAX) // 一定の値の中に入るとボールを追わなくなる (停止)
             {
                 ir_defence_vec = Vector(0, 0.0f);
             }

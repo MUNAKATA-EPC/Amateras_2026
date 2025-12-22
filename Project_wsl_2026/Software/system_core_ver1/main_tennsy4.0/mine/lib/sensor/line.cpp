@@ -146,7 +146,21 @@ void lineUpdate()
             _y = _y * 100.0f / ringDetectedCount;
             _dis = sqrtf(_x * _x + _y * _y);
 
-            _ring_deg = (int)roundf(degrees(atan2f(_y, _x)));
+            if (_dis == 0.0f) // 合力が0なら反応したセンサーの位置で補完する
+            {
+                for (int i = 0; i < 16; i++)
+                {
+                    if (_sensor[i] == true)
+                    {
+                        _ring_deg = normalizeDeg(22.5f * i + 90);
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                _ring_deg = (int)roundf(degrees(atan2f(_y, _x)));
+            }
         }
         else // ringDetectedCount == 0 の場合 (リングセンサーの反応がない)
         {
