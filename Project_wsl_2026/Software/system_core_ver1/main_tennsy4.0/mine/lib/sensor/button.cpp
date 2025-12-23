@@ -48,7 +48,7 @@ unsigned long Button::pushingTime() { return _pushing_time; } // 押されてい
 
 void Button::pushingTimeReset()
 {
-    _pushing_time = 0;      // 押されている時間をリセット
+    _pushing_time = 0;     // 押されている時間をリセット
     _pushingTimer.reset(); // タイマーもリセット
 }
 
