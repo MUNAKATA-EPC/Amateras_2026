@@ -44,7 +44,7 @@ void FullColorLed::angleLightUp(int deg, uint8_t brightness)
     // 0 <= deg < 360 に正規化
     deg = (deg % 360 + 360) % 360;
 
-    // --- ステップ1: HSV値を設定 ---
+    // HSV値を設定
 
     // H = Hue (色相: 0〜360)
     float H = (float)deg;
@@ -112,7 +112,7 @@ void FullColorLed::angleLightUp(int deg, uint8_t brightness)
         }
     }
 
-    // --- ステップ2: 最終的なPWM値 (0〜255) に変換し、ピンに出力 ---
+    // 最終的なPWM値 (0〜255) に変換し、ピンに出力
 
     // R_f, G_f, B_f は V を含めて計算済みなので、255倍するだけでOK
     uint8_t r_val = (uint8_t)constrain(R_f * 255.0f, 0.0f, 255.0f);

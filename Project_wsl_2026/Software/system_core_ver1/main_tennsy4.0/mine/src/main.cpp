@@ -113,35 +113,29 @@ void setup()
     }
 }
 
-Timer update_timer; // センサー更新用
-Timer ui_timer;     // ui用
+Timer ui_timer; // ui用
 bool old_running_flag = false;
 
 Timer kicker_timer;
 
 void loop()
 {
-    if (update_timer.msTime() >= 5UL)
-    {
-        update_timer.reset();
+    // ボタン更新
+    enterButton.update();
+    backButton.update();
+    rightButton.update();
+    leftButton.update();
+    resetButton.update();
 
-        // ボタン更新
-        enterButton.update();
-        backButton.update();
-        rightButton.update();
-        leftButton.update();
-        resetButton.update();
+    // センサー類更新
+    irUpdate();
+    lineUpdate();
+    openmvUpdate();
+    ps3Update();
+    bnoUpdate(resetButton.isReleased()); // bno更新
 
-        // センサー類更新
-        irUpdate();
-        lineUpdate();
-        openmvUpdate();
-        // ps3Update();
-        bnoUpdate(resetButton.isReleased()); // bno更新
-
-        // uiを実行・描画
-        uiButtonUpdate(enterButton.isReleased(), backButton.isReleased(), rightButton.isReleased(), leftButton.isReleased()); // ボタンの更新
-    }
+    // uiを実行・描画
+    uiButtonUpdate(enterButton.isReleased(), backButton.isReleased(), rightButton.isReleased(), leftButton.isReleased()); // ボタンの更新
 
     // 動作を実行
     if (uiRunning() == false)
@@ -276,7 +270,7 @@ void loop()
         }
         case Action::DEFENDER:
         {
-            playDefender(Defender::Mode(uiModeNumber()));
+            playDefenderVer2(Defender::Mode(uiModeNumber()));
             break;
         }
         case Action::TEST:

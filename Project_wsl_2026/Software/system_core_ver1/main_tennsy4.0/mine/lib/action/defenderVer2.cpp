@@ -20,8 +20,95 @@ static Timer attacking_timer;
 static Timer kick_timer;
 static bool old_catch = false;
 
-void playDefender(Defender::Mode mode)
+//// 角度計算関数 (1：前または後、2：斜め、3：横) ////
+int degJudge(int deg)
 {
+    int abs_deg = abs(normalizeDeg(deg));
+
+    if (abs_deg <= 22.5 || abs_deg >= 157.5)
+    {
+        return 1;
+    }
+    else if ((abs_deg > 22.5 && abs_deg < 67.5) || (abs_deg > 112.5 && abs_deg < 157.5))
+    {
+        return 2;
+    }
+    return 3;
+}
+
+//// ラインの位置を計算する ////
+enum Position
+{
+    Tate_line,
+    Yoko_line,
+    Kado_line,
+    None_line
+};
+Position linePositionCheck()
+{
+    if (lineRingDetected())
+    {
+        if (lineRingDis() != 0.0f)
+        {
+            int true_line_ring_deg = normalizeDeg(lineRingDeg() - bnoDeg()); // 機体の傾きも考慮したエンジェルラインの角度
+            int judge = degJudge(true_line_ring_deg);                        // 判断する
+
+            if (judge == 1)
+            {
+                // Serial.println("yoko      :" + String(bnoDeg()) + " " + String(lineRingDeg()) + " " + String(true_line_ring_deg));
+                return Yoko_line;
+            }
+            else if (judge == 2)
+            {
+                // Serial.println("kado      :" + String(bnoDeg()) + " " + String(lineRingDeg()) + " " + String(true_line_ring_deg));
+                return Kado_line;
+            }
+            else // judge == 3
+            {
+                // Serial.println("tate      :" + String(bnoDeg()) + " " + String(lineRingDeg()) + " " + String(true_line_ring_deg));
+                return Tate_line;
+            }
+        }
+        else // 合力が0の時は反応しているセンサーを探索して角度探索
+        {
+            int line_deg = 0;
+            for (int i = 0; i < 16; i++)
+            {
+                if (lineSensorDetected(i) == true)
+                {
+                    line_deg = i * 22.5f;
+                    break;
+                }
+            }
+            int true_line_ring_deg = normalizeDeg(line_deg - bnoDeg()); // 機体の傾きも考慮したエンジェルラインの角度
+            int judge = degJudge(true_line_ring_deg);                   // 判断する
+
+            if (judge == 1)
+            {
+                // Serial.println("tate_zero :" + String(bnoDeg()) + " " + String(lineRingDeg()) + " " + String(true_line_ring_deg));
+                return Tate_line;
+            }
+            else if (judge == 2)
+            {
+                // Serial.println("kado_zero :" + String(bnoDeg()) + " " + String(lineRingDeg()) + " " + String(true_line_ring_deg));
+                return Kado_line;
+            }
+            else // judge == 3
+            {
+                // Serial.println("yoko_zero :" + String(bnoDeg()) + " " + String(lineRingDeg()) + " " + String(true_line_ring_deg));
+                return Yoko_line;
+            }
+        }
+    }
+
+    return None_line;
+}
+
+//// ディフェンスメイン ////
+void playDefenderVer2(Defender::Mode mode)
+{
+    // linePositionCheck();
+
     //// 角度更新 ////
     if (mode == Defender::Mode::YELLOWGOAL)
     {
@@ -33,7 +120,7 @@ void playDefender(Defender::Mode mode)
         defence_goal_deg = blueGoalDeg();
         defence_goal_dis = blueGoalDis();
     }
-    else /*if (mode == Defender::Mode::BLUEGOAL)*/
+    else // if (mode == Defender::Mode::BLUEGOAL)
     {
         defence_goal_detected = yellowGoalDetected();
         defence_goal_deg = yellowGoalDeg();
@@ -161,7 +248,7 @@ void playDefender(Defender::Mode mode)
 
                 ir_defence_vec = Vector(ir_near_sessen_deg, DEFENCE_KADO_IR_FOLLOW_POWER_MAX);
             }
-            else /*if (posi == Position::Tate_line)*/
+            else // if (posi == Position::Tate_line)
             {
                 if (abs(defence_ir_deg) < 90) // 前にある
                 {

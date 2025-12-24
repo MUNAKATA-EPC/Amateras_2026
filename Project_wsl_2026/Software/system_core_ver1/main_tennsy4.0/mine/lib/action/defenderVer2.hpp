@@ -22,7 +22,7 @@
 #include "ps3.hpp"
 #include "openmv.hpp"
 
-void playDefender(Defender::Mode mode);
+void playDefenderVer2(Defender::Mode mode);
 
 //// DEFENCE処理 ////
 #define DEFENCE_IR_FRONT_Y_MAX 8.8f  // ボールのy座標がこの値から
@@ -60,81 +60,3 @@ void playDefender(Defender::Mode mode);
 
 //// ATTACK処理 ////
 #define ATTACK_IR_FOLLOW_POWER 40 // アタッカーのときの一時的にボールに追う動作をするときの力
-
-//// 角度計算関数 (1：前または後、2：斜め、3：横) ////
-int degJudge(int deg)
-{
-    int abs_deg = abs(normalizeDeg(deg));
-
-    if (abs_deg <= 22.5 || abs_deg >= 157.5)
-    {
-        return 1;
-    }
-    else if ((abs_deg > 22.5 && abs_deg < 67.5) || (abs_deg > 112.5 && abs_deg < 157.5))
-    {
-        return 2;
-    }
-    return 3;
-}
-
-//// ラインの位置を計算する ////
-enum Position
-{
-    Tate_line,
-    Yoko_line,
-    Kado_line,
-    None_line
-};
-Position linePositionCheck()
-{
-    if (lineRingDetected())
-    {
-        if (lineRingDis() != 0.0f)
-        {
-            int true_line_ring_deg = normalizeDeg(lineRingDeg() - bnoDeg()); // 機体の傾きも考慮したエンジェルラインの角度
-            int judge = degJudge(true_line_ring_deg);                        // 判断する
-
-            if (judge == 1)
-            {
-                return Yoko_line;
-            }
-            else if (judge == 2)
-            {
-                return Kado_line;
-            }
-            else // judge == 3
-            {
-                return Tate_line;
-            }
-        }
-        else // 合力が0の時は反応しているセンサーを探索して角度探索
-        {
-            int line_deg = 0;
-            for (int i = 0; i < 16; i++)
-            {
-                if (lineSensorDetected(i) == true)
-                {
-                    line_deg = i * 22.5f;
-                    break;
-                }
-            }
-            int true_line_ring_deg = normalizeDeg(line_deg - bnoDeg()); // 機体の傾きも考慮したエンジェルラインの角度
-            int judge = degJudge(true_line_ring_deg);                   // 判断する
-
-            if (judge == 1)
-            {
-                return Tate_line;
-            }
-            else if (judge == 2)
-            {
-                return Kado_line;
-            }
-            else // judge == 3
-            {
-                return Yoko_line;
-            }
-        }
-    }
-
-    return None_line;
-}

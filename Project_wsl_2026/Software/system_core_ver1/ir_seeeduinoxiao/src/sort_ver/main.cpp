@@ -93,8 +93,8 @@ void loop()
               sizeof(Sensor),
               sensorsCompare); // 降順に並べ替え
 
-        IRsensorDebugPrint();
-        Serial.print("\n");
+        // IRsensorDebugPrint();
+        // Serial.print("\n");
 
         const int use_count = 5; // 値の小さな7個を計算に使う
 
@@ -103,14 +103,17 @@ void loop()
         {
             int weight = 1023 - IRsensor[i].value;
 
-            IRball_x += IRsensor[i].get_x() * weight * 1.25f;
+            IRball_x += IRsensor[i].get_x() * weight;
             IRball_y += IRsensor[i].get_y() * weight;
         }
-        IRball_x = x_ave.add(IRball_x);
-        IRball_y = y_ave.add(IRball_y);
+        IRball_x = x_ave.add(IRball_x / use_count);
+        IRball_y = y_ave.add(IRball_y / use_count);
+
+        // Serial.print(String(IRball_x) + " " + String(IRball_y) + "\n");
 
         IRball_deg = (int)roundf(degrees(atan2f(IRball_y, IRball_x)));
-        IRball_dis = (int)roundf(((IRsensor[0].value) / 1.0f) * 100.0f / 1023.0f); // ※重要：1個の平均をとる
+        IRball_dis = (int)roundf(((IRsensor[0].value) / 1.0f) * 1.25f); // ※重要：1個の平均をとる
+        // IRball_dis = sqrtf(IRball_x * IRball_x + IRball_y * IRball_y);
     }
 
     int16_t deg_to_send = IRball_deg == 0xFF ? 0xFF : (int16_t)IRball_deg;
