@@ -15,14 +15,14 @@ void replay();
 
 void playRadicon(Radicon::Mode mode)
 {
+    fullColorLed1.rgbLightUp(0, 0, 0); // リセット
+
     if (mode == Radicon::Mode::RECORD)
     {
         record();
     }
     else if (mode == Radicon::COMPLEMENT)
     {
-        motorsPdProcess(&pd_gyro, bnoDeg(), 0);
-        motorsMove(0, 70);
     }
     else if (mode == Radicon::Mode::REPLAY)
     {
@@ -292,6 +292,8 @@ void record()
 // 記録したrecord_dataをもとに回り込みをする
 void replay()
 {
+    motorsPdProcess(&pd_gyro, bnoDeg(), 0);
+
     if (irDetected())
     {
         int deg_index = (irDeg() + 360) % 360; // 角度を0~359の配列用に変換
