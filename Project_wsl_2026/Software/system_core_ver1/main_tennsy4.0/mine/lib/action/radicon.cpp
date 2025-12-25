@@ -145,16 +145,29 @@ uint8_t complementData(Vector (&data)[360][5], bool (*range)[5])
 // ●ボタンを押している間は記録
 // その後▲ボタンでデータ補正・record_dataに代入
 // その後×ボタンでtemp_record_data削除
+// その後■ボタンでrecord_dataに代入
 bool old_triangle_button = false; // 昔のps3の▲ボタン記録用
 
 void record()
 {
-    motorsPdProcess(&pd_gyro, bnoDeg(), 0);
+    int target_deg = ps3RightStickDetected() ? -ps3RightStickDeg() : 0;
+    motorsPdProcess(&pd_gyro, bnoDeg(), target_deg);
+
+    /*キッカー(記録時には使わない)*/
+    kicker1.kick(
+        ps3ButtonIsPushing(ButtonDataType::L1) ||
+        ps3ButtonIsPushing(ButtonDataType::L2) ||
+        ps3ButtonIsPushing(ButtonDataType::R1) ||
+        ps3ButtonIsPushing(ButtonDataType::R2));
 
     /*ps3からの読み取り　移動方向の計算*/
-    int move_deg = ps3RightStickDeg();
-    int move_power = (int)constrain(80.0f * ps3RightStickDis() / 128.0f, 0.0f, 80.0f);
-    if (!ps3RightStickDetected())
+    int move_deg = normalizeDeg(ps3LeftStickDeg() + bnoDeg());
+    int move_power = (int)constrain(80.0f * ps3LeftStickDis() / 128.0f, 0.0f, 80.0f);
+    if (ps3ButtonIsPushing(ButtonDataType::L3))
+    {
+        move_power = 95.0f;
+    }
+    if (!ps3LeftStickDetected())
     {
         move_deg = 0xFF;
         move_power = 0xFF;
@@ -258,6 +271,13 @@ void record()
                 temp_record_data[i][j] = Vector();
 
         is_temp_record_data_empty = true;
+    }
+    else if (ps3ButtonIsPushing(ButtonDataType::SQUARE))
+    {
+        /*record_dataの内容を削除*/
+        for (int j = 0; j < 5; j++)
+            for (int i = 0; i < 360; i++)
+                record_data[i][j] = Vector();
     }
 
     /*モータ制御*/
