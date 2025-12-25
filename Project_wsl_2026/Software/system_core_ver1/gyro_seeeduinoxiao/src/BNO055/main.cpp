@@ -2,14 +2,14 @@
 #include <Adafruit_BNO055.h>
 #include <Adafruit_Sensor.h>
 #include <utility/imumaths.h>
-#include <SPI.h>
+// #include <SPI.h>
 #include "button.hpp"
 
-static Adafruit_BNO055 *_bno = nullptr;
+Adafruit_BNO055 *_bno = nullptr;
 
-static int _deg_normal = 0; // BNO055からの生角度
-static int _deg_reset = 0;  // リセット時の角度
-static int _deg = 0;        // 補正後の角度格納用
+int _deg_normal = 0; // BNO055からの生角度
+int _deg_reset = 0;  // リセット時の角度
+int _deg = 0;        // 補正後の角度格納用
 
 bool bnoInit(TwoWire *wire, uint8_t address)
 {
