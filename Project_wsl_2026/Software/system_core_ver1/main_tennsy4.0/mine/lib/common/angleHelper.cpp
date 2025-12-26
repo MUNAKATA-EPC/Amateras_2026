@@ -74,7 +74,7 @@ Area16 area16(int deg)
 }
 
 // マッピング関数
-int mapDeg(int deg, int deg_in, int deg_out, MapMode mode)
+int mapDeg(int deg, int deg_in, int deg_out, Map mode)
 {
     // deg_in は入力値の最大絶対値（例: 180）
     // deg_out は出力値の最大絶対値（例: 100）
@@ -83,12 +83,12 @@ int mapDeg(int deg, int deg_in, int deg_out, MapMode mode)
     float scale;
     switch (mode)
     {
-    case MapMode::HIREI: // 比例 (y = a*x)
+    case Map::HIREI: // 比例 (y = a*x)
         scale = float(deg_out / deg_in);
         output = (int)round(deg * scale);
         break;
 
-    case MapMode::NIJI: // 二次関数 (y = a*x^2 * sign(x))
+    case Map::NIJI: // 二次関数 (y = a*x^2 * sign(x))
         scale = float(deg_out / (deg_in * deg_in));
         output = (int)round(deg * abs(deg) * scale);
         break;

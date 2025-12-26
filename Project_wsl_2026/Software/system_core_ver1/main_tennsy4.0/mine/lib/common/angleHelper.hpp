@@ -12,12 +12,12 @@ int nearSeesenDeg(int target_deg, int enter_deg); // targetDegの接線の角度
 int areaIndexFromDeg(int n, int deg);   // 角度からエリアインデックスを計算
 int degFromAreaIndex(int n, int index); // エリアインデックスからエリアの中心角度を計算
 
-enum class MapMode
+enum Map
 {
     HIREI,
     NIJI
 };
-int mapDeg(int deg, int deg_in, int deg_out, MapMode mode); // マッピング関数
+int mapDeg(int deg, int deg_in, int deg_out, Map mode); // マッピング関数
 
 // 4・8・16分割の時は特別定義
 enum class Area4
