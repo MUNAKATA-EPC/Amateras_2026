@@ -16,7 +16,7 @@ extern const char startup1[]; // 起動音
 extern const char startup2[]; // 起動音
 
 // tone関数用の周波数
-enum BUZZER_PITCHES
+enum BuzzerPitches
 {
     // C0: ゼロオクターブ（非常に低い音）
     MyC0 = 16,

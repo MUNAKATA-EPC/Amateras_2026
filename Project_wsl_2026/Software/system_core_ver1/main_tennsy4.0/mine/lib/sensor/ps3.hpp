@@ -24,7 +24,7 @@ int ps3RightStickDeg();
 float ps3LeftStickDis();
 float ps3RightStickDis();
 // ボタン
-enum ButtonDataType
+enum Ps3Button
 {
     UP,
     DOWN,
@@ -41,4 +41,4 @@ enum ButtonDataType
     R2,
     R3
 };
-bool ps3ButtonIsPushing(ButtonDataType type);
+bool ps3ButtonIsPushing(Ps3Button btn);

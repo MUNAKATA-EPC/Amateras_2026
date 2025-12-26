@@ -166,7 +166,7 @@ void record()
         move_power = 0xFF;
     }
 
-    if (ps3ButtonIsPushing(ButtonDataType::CIRCLE))
+    if (ps3ButtonIsPushing(Ps3Button::CIRCLE))
     {
         /*データの記録*/
         if (move_deg != 0xFF && irDetected())
@@ -179,7 +179,7 @@ void record()
             is_temp_record_data_empty = false;
         }
     }
-    else if (ps3ButtonIsPushing(ButtonDataType::TRIANGLE) && old_triangle_button == false && is_temp_record_data_empty == false) // ▲ボタンが押された一回だけ起動
+    else if (ps3ButtonIsPushing(Ps3Button::TRIANGLE) && old_triangle_button == false && is_temp_record_data_empty == false) // ▲ボタンが押された一回だけ起動
     {
         bool range[360][5]; // 範囲（共通で使う）
 
@@ -256,7 +256,7 @@ void record()
 
         complementData(record_data, range);
     }
-    else if (ps3ButtonIsPushing(ButtonDataType::CROSS))
+    else if (ps3ButtonIsPushing(Ps3Button::CROSS))
     {
         /*temp_record_dataの内容を削除*/
         for (int j = 0; j < 5; j++)
@@ -265,7 +265,7 @@ void record()
 
         is_temp_record_data_empty = true;
     }
-    else if (ps3ButtonIsPushing(ButtonDataType::SQUARE))
+    else if (ps3ButtonIsPushing(Ps3Button::SQUARE))
     {
         /*record_dataの内容を削除*/
         for (int j = 0; j < 5; j++)
@@ -283,7 +283,7 @@ void record()
         motorsPdMove();
     }
 
-    old_triangle_button = ps3ButtonIsPushing(ButtonDataType::TRIANGLE); // 記録
+    old_triangle_button = ps3ButtonIsPushing(Ps3Button::TRIANGLE); // 記録
 }
 
 // 記録したrecord_dataをもとに回り込みをする
@@ -323,15 +323,15 @@ void asobi()
 
     /*キッカー*/
     kicker1.kick(
-        ps3ButtonIsPushing(ButtonDataType::L1) ||
-        ps3ButtonIsPushing(ButtonDataType::L2) ||
-        ps3ButtonIsPushing(ButtonDataType::R1) ||
-        ps3ButtonIsPushing(ButtonDataType::R2));
+        ps3ButtonIsPushing(Ps3Button::L1) ||
+        ps3ButtonIsPushing(Ps3Button::L2) ||
+        ps3ButtonIsPushing(Ps3Button::R1) ||
+        ps3ButtonIsPushing(Ps3Button::R2));
 
     /*ps3からの読み取り　移動方向の計算*/
     int move_deg = normalizeDeg(ps3LeftStickDeg() + bnoDeg());
     int move_power = (int)constrain(80.0f * ps3LeftStickDis() / 128.0f, 0.0f, 80.0f);
-    if (ps3ButtonIsPushing(ButtonDataType::L3))
+    if (ps3ButtonIsPushing(Ps3Button::L3))
     {
         move_power = 95.0f;
     }

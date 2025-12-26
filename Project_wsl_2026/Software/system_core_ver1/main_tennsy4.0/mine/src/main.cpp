@@ -100,7 +100,7 @@ void setup()
     }
     anyrtttl::nonblocking::stop(); // 曲の演奏停止
 
-    tone(BUZZER_PIN, BUZZER_PITCHES::MyC4, 100); // 決定音
+    tone(BUZZER_PIN, BuzzerPitches::MyC4, 100); // 決定音
     // anyrtttl::blocking::play(BUZZER_PIN, startup2); // 起動音2
 
     // 押し続け防止
@@ -235,7 +235,7 @@ void loop()
                 }
                 case 9:
                 {
-                    ButtonDataType btns[] = {UP, DOWN, LEFT, RIGHT, TRIANGLE, CIRCLE, CROSS, SQUARE, L1, L2, L3, R1, R2, R3};
+                    Ps3Button btns[] = {UP, DOWN, LEFT, RIGHT, TRIANGLE, CIRCLE, CROSS, SQUARE, L1, L2, L3, R1, R2, R3};
                     String message = "";
                     for (int i = 0; i < 14; i++)
                     {

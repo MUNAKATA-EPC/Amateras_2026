@@ -130,7 +130,7 @@ int ps3RightStickDeg() { return _stick_right_deg; }
 float ps3LeftStickDis() { return _stick_left_dis; }
 float ps3RightStickDis() { return _stick_right_dis; }
 
-bool ps3ButtonIsPushing(ButtonDataType type)
+bool ps3ButtonIsPushing(Ps3Button btn)
 {
-    return ((1 << (int)type) & _button_bit_mask) > 0; // (int)type分だけシフトした1との論理積が0よりも大きかったらそのbitは1
+    return ((1 << (int)btn) & _button_bit_mask) > 0; // (int)type分だけシフトした1との論理積が0よりも大きかったらそのbitは1
 }
