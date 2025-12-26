@@ -13,6 +13,9 @@ void record();                                                    // 記録
 // replay関連
 void replay();
 
+// asobi関連
+void asobi();
+
 void playRadicon(Radicon::Mode mode)
 {
     fullColorLed1.rgbLightUp(0, 0, 0); // リセット
@@ -21,12 +24,13 @@ void playRadicon(Radicon::Mode mode)
     {
         record();
     }
-    else if (mode == Radicon::COMPLEMENT)
-    {
-    }
     else if (mode == Radicon::Mode::REPLAY)
     {
         replay();
+    }
+    else if (mode == Radicon::Mode::ASOBI)
+    {
+        asobi();
     }
 }
 
@@ -150,23 +154,11 @@ bool old_triangle_button = false; // 昔のps3の▲ボタン記録用
 
 void record()
 {
-    int target_deg = ps3RightStickDetected() ? -ps3RightStickDeg() : 0;
-    motorsPdProcess(&pd_gyro, bnoDeg(), target_deg);
-
-    /*キッカー(記録時には使わない)*/
-    kicker1.kick(
-        ps3ButtonIsPushing(ButtonDataType::L1) ||
-        ps3ButtonIsPushing(ButtonDataType::L2) ||
-        ps3ButtonIsPushing(ButtonDataType::R1) ||
-        ps3ButtonIsPushing(ButtonDataType::R2));
+    motorsPdProcess(&pd_gyro, bnoDeg(), 0);
 
     /*ps3からの読み取り　移動方向の計算*/
-    int move_deg = normalizeDeg(ps3LeftStickDeg() + bnoDeg());
+    int move_deg = ps3LeftStickDeg();
     int move_power = (int)constrain(80.0f * ps3LeftStickDis() / 128.0f, 0.0f, 80.0f);
-    if (ps3ButtonIsPushing(ButtonDataType::L3))
-    {
-        move_power = 95.0f;
-    }
     if (!ps3LeftStickDetected())
     {
         move_deg = 0xFF;
@@ -282,9 +274,13 @@ void record()
 
     /*モータ制御*/
     if (move_deg != 0xFF)
+    {
         motorsMove(move_deg, move_power);
+    }
     else
+    {
         motorsPdMove();
+    }
 
     old_triangle_button = ps3ButtonIsPushing(ButtonDataType::TRIANGLE); // 記録
 }
@@ -315,5 +311,41 @@ void replay()
     else
     {
         motorsStop();
+    }
+}
+
+void asobi()
+{
+    int target_deg = ps3RightStickDetected() ? -ps3RightStickDeg() : 0;
+    motorsPdProcess(&pd_gyro, bnoDeg(), target_deg);
+
+    /*キッカー*/
+    kicker1.kick(
+        ps3ButtonIsPushing(ButtonDataType::L1) ||
+        ps3ButtonIsPushing(ButtonDataType::L2) ||
+        ps3ButtonIsPushing(ButtonDataType::R1) ||
+        ps3ButtonIsPushing(ButtonDataType::R2));
+
+    /*ps3からの読み取り　移動方向の計算*/
+    int move_deg = normalizeDeg(ps3LeftStickDeg() + bnoDeg());
+    int move_power = (int)constrain(80.0f * ps3LeftStickDis() / 128.0f, 0.0f, 80.0f);
+    if (ps3ButtonIsPushing(ButtonDataType::L3))
+    {
+        move_power = 95.0f;
+    }
+    if (!ps3LeftStickDetected())
+    {
+        move_deg = 0xFF;
+        move_power = 0xFF;
+    }
+
+    /*制御*/
+    if (move_deg != 0xFF)
+    {
+        motorsMove(move_deg, move_power);
+    }
+    else
+    {
+        motorsPdMove();
     }
 }

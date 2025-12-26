@@ -337,11 +337,11 @@ void uiDrawMain()
             case Radicon::Mode::RECORD:
                 modeName = "Record";
                 break;
-            case Radicon::Mode::COMPLEMENT:
-                modeName = "Complement";
-                break;
             case Radicon::Mode::REPLAY:
                 modeName = "Replay";
+                break;
+            case Radicon::Mode::ASOBI:
+                modeName = "Asobi";
                 break;
             default:
                 modeName = "Unknown";

@@ -53,8 +53,8 @@ namespace Radicon
     enum Mode
     {
         RECORD,
-        COMPLEMENT,
         REPLAY,
+        ASOBI,
 
         MODE_COUNT
     };
