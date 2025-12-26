@@ -42,12 +42,38 @@ enum Position
     Tate_line,
     Yoko_line,
     Kado_line,
+    Haji_line,
     None_line
 };
 Position linePositionCheck()
 {
     if (lineRingDetected())
     {
+        int up = 0, left = 0, right = 0;
+        for (int i = 0; i < 16; i++)
+        {
+            if (lineSensorDetected(i) == true)
+            {
+                if (i == 0 || i == 1 || i == 2 || i == 15 || i == 14)
+                {
+                    up = 1;
+                }
+                else if (i >= 3 && i <= 8)
+                {
+                    left = 1;
+                }
+                else // if (i >= 9 && i <= 13)
+                {
+                    right = 1;
+                }
+            }
+        }
+
+        if (up + left + right >= 3) // 3点反応していたらライン端
+        {
+            return Haji_line;
+        }
+
         if (lineRingDis() != 0.0f)
         {
             int true_line_ring_deg = normalizeDeg(lineRingDeg() - bnoDeg()); // 機体の傾きも考慮したエンジェルラインの角度
@@ -158,6 +184,8 @@ void playDefenderVer2(Defender::Mode mode)
         irDetected() &&
         abs(diffDeg(now_ir_deg, old_ir_deg)) <= 15 &&
         (defence_goal_detected && ((mode == Defender::Mode::YELLOWGOAL) ? (defence_goal_dis < DEFENCE_BLUE_GOAL_DIS) : (defence_goal_dis < DEFENCE_YELLOW_GOAL_DIS))) &&
+        (defence_goal_deg > ((mode == Defender::Mode::YELLOWGOAL) ? ATTACK_SAKAIME_BLUE_GOAL_DEG_MAX : ATTACK_SAKAIME_YELLOW_GOAL_DEG_MAX) ||
+         defence_goal_deg < ((mode == Defender::Mode::YELLOWGOAL) ? ATTACK_SAKAIME_BLUE_GOAL_DEG_MIN : ATTACK_SAKAIME_YELLOW_GOAL_DEG_MIN)) &&
         !(catchSensor.read() == HIGH);
 
     static bool come_back = false; // 帰還したか？
@@ -171,7 +199,7 @@ void playDefenderVer2(Defender::Mode mode)
         }
         old_ir_keep_deg_flag = true;
 
-        if (ir_keep_deg_flag == true && ir_keep_deg_timer.msTime() >= 3000UL) // 3秒以上もボールが一定の角度にあるなら
+        if (ir_keep_deg_flag == true && ir_keep_deg_timer.msTime() >= 5000UL) // 3秒以上もボールが一定の角度にあるなら
         {
             attacking_timer.reset(); // アタッカータイマー開始
             attack_flag = true;
@@ -191,15 +219,14 @@ void playDefenderVer2(Defender::Mode mode)
 
     if (attack_flag == true && attacking_timer.msTime() <= 3000UL) // 3ms間アタッカーをする
     {
-        if (attacking_timer.msTime() <= 500UL && (irDeg() >= -120 && irDeg() <= 120)) // とりあえずボールの方向へ行く
+        // まだ出ていないからcome_backをfalseにする
+        if (defence_goal_detected &&
+            ((mode == Defender::Mode::YELLOWGOAL) ? (defence_goal_dis < DEFENCE_BLUE_GOAL_DIS) : (defence_goal_dis < DEFENCE_YELLOW_GOAL_DIS)))
         {
-            motorsPdProcess(&pd_gyro, bnoDeg(), 0);
-            motorsMove(irDeg(), ATTACK_IR_FOLLOW_POWER);
+            come_back = false; // ボールを追いかけに行った
         }
-        else
-        {
-            playAttacker((mode == Defender::Mode::YELLOWGOAL) ? Attacker::Mode::YELLOWGOAL : Attacker::Mode::BLUEGOAL);
-        }
+
+        playAttacker((mode == Defender::Mode::YELLOWGOAL) ? Attacker::Mode::YELLOWGOAL : Attacker::Mode::BLUEGOAL);
         return;
     }
     else
@@ -214,81 +241,139 @@ void playDefenderVer2(Defender::Mode mode)
 
     if (defence_goal_detected && ((mode == Defender::Mode::YELLOWGOAL) ? (defence_goal_dis < DEFENCE_BLUE_GOAL_DIS) : (defence_goal_dis < DEFENCE_YELLOW_GOAL_DIS)))
     {
-        if (lineRingDetected() &&
-            (defence_goal_deg > ((mode == Defender::Mode::YELLOWGOAL) ? SAKAIME_BLUE_GOAL_DEG_MAX : SAKAIME_YELLOW_GOAL_DEG_MAX) ||
-             defence_goal_deg < ((mode == Defender::Mode::YELLOWGOAL) ? SAKAIME_BLUE_GOAL_DEG_MIN : SAKAIME_YELLOW_GOAL_DEG_MIN))) // (SAKAIME処理)
+        if (lineRingDetected()) // (SAKAIME処理)
         {
-            come_back = true; // 帰還した
-
-            // ボールの方向を決める
-            int defence_ir_deg;
-            if (abs(defence_goal_deg) >= ((mode == Defender::Mode::YELLOWGOAL) ? DEFENCE_BLUE_GOAL_NORMAL_DEG : DEFENCE_YELLOW_GOAL_NORMAL_DEG))
-            {
-                defence_ir_deg = irDeg();
-            }
-            else
-            {
-                int target_deg = normalizeDeg(defence_goal_deg + 180); // 対角線で守る
-                defence_ir_deg = normalizeDeg(irDeg() - target_deg);
-            }
-
-            // ボールを守りたいベクトル
-            Vector ir_defence_vec;
             Position posi = linePositionCheck();
-            if (posi == Position::Yoko_line)
+            if (posi == Position::Haji_line) // 恥だとこれ以上行かないようにまっすぐ進む
             {
-                if (defence_ir_deg > 0) // 左にある
-                {
-                    ir_defence_vec = Vector(90, DEFENCE_YOKO_IR_FOLLOW_POWER_MAX);
-                }
-                else // 右にある
-                {
-                    ir_defence_vec = Vector(-90, DEFENCE_YOKO_IR_FOLLOW_POWER_MAX);
-                }
+                motorsMove(0, DEFENCE_TATE_IR_FOLLOW_POWER_MAX);
             }
-            else if (posi == Position::Kado_line)
+            else if (irDetected())
             {
-                int ir_near_sessen_deg = nearSeesenDeg(lineRingDeg(), defence_ir_deg);
+                come_back = true; // 帰還した
 
-                ir_defence_vec = Vector(ir_near_sessen_deg, DEFENCE_KADO_IR_FOLLOW_POWER_MAX);
-            }
-            else // if (posi == Position::Tate_line)
-            {
-                if (defence_goal_deg > 0 && irDeg() >= 0 && irDeg() <= 140) // 右のラインにいてボールが左にある | (ゴール) (ボール) | (ロボット)
+                // ボールの方向を決める
+                int defence_ir_deg;
+                if (abs(defence_goal_deg) >= ((mode == Defender::Mode::YELLOWGOAL) ? DEFENCE_BLUE_GOAL_NORMAL_DEG : DEFENCE_YELLOW_GOAL_NORMAL_DEG))
                 {
-                    ir_defence_vec = Vector(0, DEFENCE_TATE_IR_FOLLOW_POWER_MAX);
-                }
-                else if (defence_goal_deg <= 0 && irDeg() < 0 && irDeg() >= -140) // 左のラインにいてボールが右にある (ロボット) | (ボール) (ゴール) |
-                {
-                    ir_defence_vec = Vector(0, DEFENCE_TATE_IR_FOLLOW_POWER_MAX);
+                    defence_ir_deg = irDeg();
                 }
                 else
                 {
-                    if (abs(irDeg()) < 90) // 前にある
+                    int target_deg = normalizeDeg(defence_goal_deg + 180); // 対角線で守る
+                    defence_ir_deg = normalizeDeg(irDeg() - target_deg);
+                }
+
+                // ボールを守りたいベクトル
+                Vector ir_defence_vec;
+                if (posi == Position::Yoko_line)
+                {
+                    if (defence_ir_deg > 0) // 左にある
+                    {
+                        ir_defence_vec = Vector(90, DEFENCE_YOKO_IR_FOLLOW_POWER_MAX);
+                    }
+                    else // 右にある
+                    {
+                        ir_defence_vec = Vector(-90, DEFENCE_YOKO_IR_FOLLOW_POWER_MAX);
+                    }
+                }
+                else if (posi == Position::Kado_line)
+                {
+                    int ir_near_sessen_deg;
+
+                    if (defence_goal_deg > 0 && irDeg() >= 0 && irDeg() <= 140) // 右のラインにいてボールが左にある | (ゴール) (ボール) | (ロボット)
+                    {
+                        ir_near_sessen_deg = nearSeesenDeg(lineRingDeg(), defence_goal_deg - 90); // 接線方向へ行く
+                    }
+                    else if (defence_goal_deg <= 0 && irDeg() < 0 && irDeg() >= -140) // 左のラインにいてボールが右にある (ロボット) | (ボール) (ゴール) |
+                    {
+                        ir_near_sessen_deg = nearSeesenDeg(lineRingDeg(), defence_goal_deg + 90); // 接線方向へ行く
+                    }
+                    else
+                    {
+                        ir_near_sessen_deg = nearSeesenDeg(lineRingDeg(), defence_ir_deg); // 接線方向へ行く
+                    }
+
+                    ir_defence_vec = Vector(ir_near_sessen_deg, DEFENCE_KADO_IR_FOLLOW_POWER_MAX);
+                }
+                else // if (posi == Position::Tate_line)
+                {
+                    if (defence_goal_deg > 0 && irDeg() >= 0 && irDeg() <= 140) // 右のラインにいてボールが左にある | (ゴール) (ボール) | (ロボット)
                     {
                         ir_defence_vec = Vector(0, DEFENCE_TATE_IR_FOLLOW_POWER_MAX);
                     }
-                    else // 後にある
+                    else if (defence_goal_deg <= 0 && irDeg() < 0 && irDeg() >= -140) // 左のラインにいてボールが右にある (ロボット) | (ボール) (ゴール) |
                     {
-                        ir_defence_vec = Vector(-180, DEFENCE_TATE_IR_FOLLOW_POWER_MAX);
+                        ir_defence_vec = Vector(0, DEFENCE_TATE_IR_FOLLOW_POWER_MAX);
+                    }
+                    else
+                    {
+                        if (abs(irDeg()) < 90) // 前にある
+                        {
+                            ir_defence_vec = Vector(0, DEFENCE_TATE_IR_FOLLOW_POWER_MAX);
+                        }
+                        else // 後にある
+                        {
+                            ir_defence_vec = Vector(180, DEFENCE_TATE_IR_FOLLOW_POWER_MAX);
+                        }
                     }
                 }
-            }
 
-            float defence_ir_y = irDis() * sinf(radians(defence_ir_deg)); // y方向成分
-            if (defence_ir_y >= DEFENCE_IR_FRONT_Y_MIN &&
-                defence_ir_y <= DEFENCE_IR_FRONT_Y_MAX) // 一定の値の中に入るとボールを追わなくなる (停止)
+                float defence_ir_y = irDis() * sinf(radians(defence_ir_deg)); // y方向成分
+                if (defence_ir_y >= DEFENCE_IR_FRONT_Y_MIN &&
+                    defence_ir_y <= DEFENCE_IR_FRONT_Y_MAX) // 一定の値の中に入るとボールを追わなくなる (停止)
+                {
+                    ir_defence_vec = Vector(0, 0.0f);
+                }
+
+                // ライントレースするベクトル
+                Vector line_trace_vec = Vector(lineRingDeg(), lineRingDis() * DEFENCE_LINE_TRACE_POWER_MAX / 100.0f);
+
+                // 最終ベクトル
+                Vector final_defence_vec = ir_defence_vec + line_trace_vec;
+
+                motorsVectorMove(&final_defence_vec);
+            }
+            else
             {
-                ir_defence_vec = Vector(0, 0.0f);
+                // ゴールの中心へ行くベクトル
+                Vector go_central_vec;
+                Position posi = linePositionCheck();
+
+                if (posi == Position::Yoko_line)
+                {
+                    if (defence_goal_deg > 0 && defence_goal_deg < 150)
+                    {
+                        go_central_vec = Vector(90, DEFENCE_GO_CENTRAL);
+                    }
+                    else if (defence_goal_deg <= 0 && defence_goal_deg <= -150)
+                    {
+                        go_central_vec = Vector(-90, DEFENCE_GO_CENTRAL);
+                    }
+                    else
+                    {
+                        go_central_vec = Vector(0, 0.0f);
+                    }
+                }
+                else if (posi == Position::Tate_line)
+                {
+                    go_central_vec = Vector(0, DEFENCE_GO_CENTRAL);
+                }
+                else // if(posi == Position::Kado_line)
+                {
+                    int go_central_near_sessen_deg = nearSeesenDeg(lineRingDeg(), (defence_goal_deg > 0) ? defence_goal_deg - 90 : defence_goal_deg + 90);
+
+                    go_central_vec = Vector(go_central_near_sessen_deg, DEFENCE_GO_CENTRAL);
+                }
+
+                // ライントレースするベクトル
+                Vector line_trace_vec = Vector(lineRingDeg(), lineRingDis() * DEFENCE_LINE_TRACE_POWER_MAX / 100.0f);
+
+                // 最終ベクトル
+                Vector final_defence_vec = go_central_vec + line_trace_vec;
+
+                motorsVectorMove(&final_defence_vec);
             }
-
-            // ライントレースするベクトル
-            Vector line_trace_vec = Vector(lineRingDeg(), lineRingDis() * DEFENCE_LINE_TRACE_POWER_MAX / 100.0f);
-
-            // 最終ベクトル
-            Vector final_defence_vec = ir_defence_vec + line_trace_vec;
-
-            motorsVectorMove(&final_defence_vec);
         }
         else
         {
@@ -304,7 +389,7 @@ void playDefenderVer2(Defender::Mode mode)
             }
 
             Vector ir_follow_vec; // ボール追いたいベクトル
-            if (irDetected())
+            if (irDetected() && ((mode == Defender::Mode::YELLOWGOAL) ? (defence_goal_dis < DEFENCE_BLUE_GOAL_DIS) : (defence_goal_dis < DEFENCE_YELLOW_GOAL_DIS)))
             {
                 if (irDeg() > 0) // 左にある
                 {
@@ -316,11 +401,7 @@ void playDefenderVer2(Defender::Mode mode)
                 }
             }
 
-            Vector final_modoru_vec = line_modoru_vec;               // 最終ベクトル
-            if ((line_modoru_vec + ir_follow_vec).length() >= 20.0f) // 力同士が相殺されないのなら足し合わせる
-            {
-                final_modoru_vec = final_modoru_vec + ir_follow_vec;
-            }
+            Vector final_modoru_vec = line_modoru_vec + ir_follow_vec; // 最終ベクトル
 
             motorsVectorMove(&final_modoru_vec);
         }
