@@ -112,7 +112,7 @@ void loop()
         // Serial.print(String(IRball_x) + " " + String(IRball_y) + "\n");
 
         IRball_deg = (int)roundf(degrees(atan2f(IRball_y, IRball_x)));
-        IRball_dis = (int)roundf(((IRsensor[0].value) / 1.0f) * 1.25f); // ※重要：1個の平均をとる
+        IRball_dis = IRsensor[0].value; // ※重要：1個の平均をとる
         // IRball_dis = sqrtf(IRball_x * IRball_x + IRball_y * IRball_y);
     }
 
