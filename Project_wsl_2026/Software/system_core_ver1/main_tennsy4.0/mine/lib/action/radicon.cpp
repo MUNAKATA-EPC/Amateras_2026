@@ -154,6 +154,7 @@ bool old_triangle_button = false; // 昔のps3の▲ボタン記録用
 
 void record()
 {
+    /*PD計算*/
     motorsPdProcess(&pd_gyro, bnoDeg(), 0);
 
     /*ps3からの読み取り　移動方向の計算*/
@@ -316,6 +317,7 @@ void replay()
 
 void asobi()
 {
+    /*PD計算*/
     int target_deg = ps3RightStickDetected() ? -ps3RightStickDeg() : 0;
     motorsPdProcess(&pd_gyro, bnoDeg(), target_deg);
 
