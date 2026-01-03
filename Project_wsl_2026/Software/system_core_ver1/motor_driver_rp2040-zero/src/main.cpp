@@ -34,10 +34,10 @@ void loop()
     Serial.print(receive_data); // デバッグ用
   }
 
-  static char old_rotate[4] = {'B', 'B', 'B', 'B'}; // Bはブレーキ、Fは前進、Rは後退
-
   if (is_read_success)
   {
+    static char old_rotate[4] = {'B', 'B', 'B', 'B'}; // Bはブレーキ、Fは前進、Rは後退
+
     if (receive_data == "1R0002R0003R0004R000")
     {
       // 全モータ停止
