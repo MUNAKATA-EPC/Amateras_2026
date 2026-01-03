@@ -40,7 +40,7 @@ void loop()
   {
     if (receive_data == "1R0002R0003R0004R000")
     {
-      // モータ停止
+      // 全モータ停止
       for (int i = 0; i < 4; i++)
       {
         motors[i].stop();
@@ -80,6 +80,10 @@ void loop()
         else if (rotate[i] == 'R')
         {
           motors[i].move(-power[i]);
+        }
+        else
+        {
+          motors[i].stop();
         }
       }
     }
