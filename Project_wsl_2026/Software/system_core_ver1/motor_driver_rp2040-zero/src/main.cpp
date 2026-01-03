@@ -5,12 +5,12 @@ Motor motors[4];
 
 void setup()
 {
-  motors[0].set_pin(2, 4, 3);
-  motors[1].set_pin(5, 7, 6);
-  motors[2].set_pin(8, 14, 15);
-  motors[3].set_pin(26, 27, 28);
+  motors[0].setPin(2, 4, 3);
+  motors[1].setPin(5, 7, 6);
+  motors[2].setPin(8, 14, 15);
+  motors[3].setPin(26, 27, 28);
 
-  Serial.print(9600); // PC送信用
+  Serial.begin(9600); // PC送信用
 
   Serial1.begin(115200);  // Teensy4.0受信用
   Serial1.setTimeout(10); // 受信タイムアウト10ms
@@ -21,7 +21,7 @@ void loop()
   String receive_data = "";     // 受信データの例："1F1002B1003F0014F043"
   bool is_read_success = false; // 受信に成功したかどうか
 
-  if (Serial1.available() > 0)
+  if (Serial1.available() >= 20)
   {
     receive_data = Serial1.readStringUntil('\n');
     receive_data.trim(); // 改行コード削除
@@ -34,13 +34,18 @@ void loop()
     Serial.print(receive_data); // デバッグ用
   }
 
+  static char old_rotate[4] = {'B', 'B', 'B', 'B'}; // Bはブレーキ、Fは前進、Rは後退
+
   if (is_read_success)
   {
     if (receive_data == "1R0002R0003R0004R000")
     {
+      // モータ停止
       for (int i = 0; i < 4; i++)
       {
         motors[i].stop();
+
+        old_rotate[i] = 'B'; // 記録
       }
     }
     else
@@ -59,10 +64,23 @@ void loop()
 
       for (int i = 0; i < 4; i++)
       {
+        // 方向が変わった時の保護
+        if (rotate[i] != old_rotate[i])
+        {
+          motors[i].stop();
+          delayMicroseconds(50);
+        }
+        old_rotate[i] = rotate[i]; // 記録
+
+        // モーター制御
         if (rotate[i] == 'F')
+        {
           motors[i].move(power[i]);
+        }
         else if (rotate[i] == 'R')
+        {
           motors[i].move(-power[i]);
+        }
       }
     }
   }
