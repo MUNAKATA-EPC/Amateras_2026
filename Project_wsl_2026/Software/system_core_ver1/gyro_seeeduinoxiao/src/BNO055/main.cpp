@@ -1,8 +1,8 @@
 #include <Arduino.h>
+#include <Wire.h>
+#include <SPI.h>
 #include <Adafruit_BNO055.h>
 #include <Adafruit_Sensor.h>
-#include <utility/imumaths.h>
-// #include <SPI.h>
 #include "button.hpp"
 
 Adafruit_BNO055 *_bno = nullptr;
