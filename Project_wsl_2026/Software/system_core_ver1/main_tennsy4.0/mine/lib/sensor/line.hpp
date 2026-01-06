@@ -37,3 +37,17 @@ float lineRingY();
 bool lineRingFirstDetedcted();
 int lineRingFirstDeg();
 unsigned long lineRingDetectingTime();
+
+// 反応の多い部分をチャンクごとに分けて返す(念のため32サイズ)
+int lineChunkCount(int (&chunk_indexes)[32]);
+
+// 白線の位置を検出する
+enum LinePosi
+{
+    Tate_line,
+    Yoko_line,
+    Kado_line,
+    Haji_line,
+    No_line
+};
+LinePosi linePositionCheck();

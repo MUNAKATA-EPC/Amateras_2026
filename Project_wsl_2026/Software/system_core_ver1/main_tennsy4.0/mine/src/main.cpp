@@ -100,7 +100,7 @@ void setup()
     }
     anyrtttl::nonblocking::stop(); // 曲の演奏停止
 
-    tone(BUZZER_PIN, BuzzerPitches::MyC4, 100); // 決定音
+    tone(BUZZER_PIN, BuzzerPitches::MyE7, 100); // 決定音
     // anyrtttl::blocking::play(BUZZER_PIN, startup2); // 起動音2
 
     // 押し続け防止
@@ -122,9 +122,9 @@ void loop()
 {
     // ボタン更新
     enterButton.update();
-    backButton.update();
     rightButton.update();
     leftButton.update();
+    backButton.update();
     resetButton.update();
 
     // センサー類更新

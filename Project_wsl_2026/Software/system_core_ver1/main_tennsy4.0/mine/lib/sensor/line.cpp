@@ -229,3 +229,88 @@ float lineRingY() { return _y; }
 bool lineRingFirstDetedcted() { return _ring_detected == true && _old_ring_detected == false; }
 int lineRingFirstDeg() { return _ring_first_deg; }
 unsigned long lineRingDetectingTime() { return _line_ring_detecting_time; }
+
+// 反応の多い部分をチャンクごとに分けて返す
+int lineChunkCount(int (&chunk_indexes)[32])
+{
+    int chunk_count = 0;
+    for (int i = 0; i < 32; i++)
+        chunk_indexes[i] = -1;
+
+    // 最初の「緑（false）」の位置を探す（ここを起点にすれば跨ぎが起きない）
+    int start_offset = -1;
+    for (int i = 0; i < 16; i++)
+    {
+        if (_sensor[i] == false)
+        {
+            start_offset = i;
+            break;
+        }
+    }
+
+    // すべてtrue（全点灯）の場合の処理
+    if (start_offset == -1)
+    {
+        chunk_indexes[0] = 0;
+        chunk_indexes[1] = 15;
+        return 1;
+    }
+
+    // start_offsetから16個分を順番にチェック
+    bool in_chunk = false;
+    for (int j = 0; j < 16; j++)
+    {
+        int idx = (start_offset + j) % 16;
+
+        if (_sensor[idx] == true)
+        {
+            if (!in_chunk)
+            {
+                // チャンク開始
+                chunk_indexes[chunk_count * 2] = idx;
+                in_chunk = true;
+            }
+            // 常に現在の位置を終了候補として更新
+            chunk_indexes[chunk_count * 2 + 1] = idx;
+        }
+        else
+        {
+            if (in_chunk)
+            {
+                // チャンク終了
+                chunk_count++;
+                in_chunk = false;
+                if (chunk_count >= 16)
+                    break; // 配列溢れ防止
+            }
+        }
+    }
+
+    // 最後にチャンクの中にいたままループが終わった場合のカウントアップ
+    if (in_chunk)
+    {
+        chunk_count++;
+    }
+
+    return chunk_count;
+}
+
+// 白線の位置を検出する
+LinePosi linePositionCheck()
+{
+    int line_chunk_indexes[32], line_chunk_count;
+    line_chunk_count = lineChunkCount(line_chunk_indexes); // ラインチャンク取得
+
+    if (line_chunk_count == 0)
+    {
+        return LinePosi::No_line;
+    }
+    else if (line_chunk_count == 1)
+    {
+    }
+    else if (line_chunk_count == 2)
+    {
+    }
+
+    return LinePosi::Haji_line;
+}
