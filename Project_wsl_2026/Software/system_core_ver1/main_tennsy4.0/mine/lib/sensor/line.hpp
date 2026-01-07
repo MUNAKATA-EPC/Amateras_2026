@@ -48,6 +48,6 @@ enum LinePosi
     Yoko_line,
     Kado_line,
     Haji_line,
-    No_line
+    Nai_line
 };
 LinePosi linePositionCheck();

@@ -303,13 +303,48 @@ LinePosi linePositionCheck()
 
     if (line_chunk_count == 0)
     {
-        return LinePosi::No_line;
+        return LinePosi::Nai_line;
     }
     else if (line_chunk_count == 1)
     {
+        int middle_idx = (line_chunk_indexes[0] + line_chunk_indexes[1]) / 2;
+        int line_chunk_abs_deg = abs(normalizeDeg(22.5f * middle_idx));
+
+        if (line_chunk_abs_deg <= 30 || line_chunk_abs_deg >= 150)
+        {
+            return LinePosi::Yoko_line;
+        }
+        else if (line_chunk_abs_deg >= 60 && line_chunk_abs_deg <= 120)
+        {
+            return LinePosi::Tate_line;
+        }
+        else
+        {
+            return LinePosi::Kado_line;
+        }
     }
     else if (line_chunk_count == 2)
     {
+        int middle_idx1 = ((line_chunk_indexes[0] + line_chunk_indexes[1]) / 2) % 16;
+        int middle_idx2 = ((line_chunk_indexes[2] + line_chunk_indexes[3]) / 2) % 16;
+
+        int deg1 = normalizeDeg(22.5f * middle_idx1);
+        int deg2 = normalizeDeg(22.5f * middle_idx2);
+
+        int line_chunk_abs_deg = abs(normalizeDeg((deg1 + deg2) / 2));
+
+        if (line_chunk_abs_deg <= 30 || line_chunk_abs_deg >= 150)
+        {
+            return LinePosi::Yoko_line;
+        }
+        else if (line_chunk_abs_deg >= 60 && line_chunk_abs_deg <= 120)
+        {
+            return LinePosi::Tate_line;
+        }
+        else
+        {
+            return LinePosi::Kado_line;
+        }
     }
 
     return LinePosi::Haji_line;

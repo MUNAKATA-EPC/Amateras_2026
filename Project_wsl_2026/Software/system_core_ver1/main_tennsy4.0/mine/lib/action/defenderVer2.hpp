@@ -31,30 +31,32 @@ void playDefenderVer2(Defender::Mode mode);
 #define DEFENCE_YELLOW_GOAL_NORMAL_DEG 150 // 普通に守備をする角度(これを超えると対角線で守る)
 #define DEFENCE_BLUE_GOAL_NORMAL_DEG 150
 
-#define DEFENCE_YELLOW_GOAL_DIS 72.0f // ディフェンスの処理に移る距離
-#define DEFENCE_BLUE_GOAL_DIS 72.0f
+#define DEFENCE_YELLOW_GOAL_DIS 73.0f // ディフェンスの処理に移る距離
+#define DEFENCE_BLUE_GOAL_DIS 73.0f
 
 #define DEFENCE_LINE_TRACE_POWER_MAX 20.0f // ライントレースに使う力の上限
 
-#define DEFENCE_TATE_IR_FOLLOW_POWER_MAX 50.0f // ボールの方向に行くときの力の上限
-#define DEFENCE_YOKO_IR_FOLLOW_POWER_MAX 90.0f
-#define DEFENCE_KADO_IR_FOLLOW_POWER_MAX 60.0f
+#define DEFENCE_YOKO_IR_FOLLOW_POWER_MAX 75.0f         // ボールの方向に行くときの力の上限
+#define DEFENCE_TATE_ZENSHIN_IR_FOLLOW_POWER_MAX 75.0f // 縦　前進用
+#define DEFENCE_TATE_KOUTAI_IR_FOLLOW_POWER_MAX 40.0f  // 縦　後退用
+#define DEFENCE_KADO_IR_FOLLOW_POWER_MAX 75.0f         // 角
+#define DEFENCE_HAJI_IR_FOLLOW_POWER_MAX 20.0f         // 端
 
-#define DEFENCE_GO_CENTRAL 65.0f // ゴールの中心に行くパワー
+#define DEFENCE_GO_CENTRAL_POWER 65.0f // ゴールの中心に行くパワー
 
 //// MODORU処理 ////
-#define MODORU_YELLOW_GOAL_DIS 42.0f // ゴール近距離を判断する距離とその時の力 (ゴールから逃げる・近寄る)
-#define MODORU_BLUE_GOAL_DIS 42.0f
+#define MODORU_YELLOW_GOAL_DIS 66.0f // ゴール近距離を判断する距離とその時の力 (ゴールから逃げる・近寄る)
+#define MODORU_BLUE_GOAL_DIS 66.0f
 
 #define MODORU_POWER 60           // この力で戻りながら
-#define MODORU_IR_FOLLOW_POWER 30 // この力でボールを追う
+#define MODORU_IR_FOLLOW_POWER 35 // この力でボールを追う
 
 //// TEIITI処理 ////
-#define TEIITI_LINE_ESCAPE_POWER 65 // ラインが反応したときの力 (ラインから離れる動きの力)
-#define TEIITI_POWER 55             // 定位置に戻るときの力
+#define TEIITI_LINE_ESCAPE_POWER 70 // ラインが反応したときの力 (ラインから離れる動きの力)
+#define TEIITI_POWER 70             // 定位置に戻るときの力
 
 //// ATTACK処理 ////
-#define ATTACK_IR_FOLLOW_POWER 65 // アタッカーのときの一時的にボールに追う動作をするときの力
+#define ATTACK_IR_FOLLOW_POWER 80 // アタッカーのときの一時的にボールに追う動作をするときの力
 // (ディフェンスしていると認識する角度)
 #define ATTACK_SAKAIME_YELLOW_GOAL_DEG_MIN -120 // ゴールの横線の上限の角度
 #define ATTACK_SAKAIME_YELLOW_GOAL_DEG_MAX 120

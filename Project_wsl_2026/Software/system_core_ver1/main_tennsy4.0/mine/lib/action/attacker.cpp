@@ -141,8 +141,8 @@ void attackWithCam(bool attack_goal_detected, int attack_goal_deg, int attack_go
         kicker1.kick(false);
     }
 
-    const int motor_line_max_power = 50;
-    const int motor_ir_max_power = 50;
+    const int motor_line_max_power = 80;
+    const int motor_ir_max_power = 80;
 
     if (line_timer.everReset() && line_timer.msTime() < 50UL)
     {
