@@ -1,4 +1,4 @@
-#include "ps3.hpp"
+#include "uss.hpp"
 
 static HardwareSerial *_serial = nullptr;
 static uint32_t _baudrate = 9600;
@@ -6,7 +6,6 @@ static uint32_t _baudrate = 9600;
 static int _front_dis = 0;
 static int _back_dis = 0;
 
-static bool _
 static int _left_dis = 0;
 static int _right_dis = 0;
 

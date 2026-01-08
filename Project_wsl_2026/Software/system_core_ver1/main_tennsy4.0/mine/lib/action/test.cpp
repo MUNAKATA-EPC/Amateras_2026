@@ -3,6 +3,7 @@
 void testKicker();
 void testGyro();
 void testCam();
+void testLineTrace();
 
 void playTest(Test::Mode mode)
 {
@@ -17,6 +18,10 @@ void playTest(Test::Mode mode)
     else if (mode == Test::Mode::CAM)
     {
         testCam();
+    }
+    else if (mode == Test::Mode::LINE_TRACE)
+    {
+        testLineTrace();
     }
     else
     {
@@ -70,4 +75,29 @@ void testCam()
 
     motorsPdProcess(&pd_cam, pd_deg, 0); // PD成分計算
     motorsPdMove();
+}
+
+void testLineTrace()
+{
+    motorsPdProcess(&pd_gyro, bnoDeg(), 0); // ジャイロで姿勢制御
+
+    const int motor_ir_power = 60;
+    const int motor_line_escape_power = 60;
+    const int motor_line_trace_power = 30;
+
+    if (lineRingDetected())
+    {
+        if ((lineRingDis() > 60) && abs(diffDeg(lineRingDeg(), irDeg())) < 90)
+        {
+            motorsMove(nearSeesenDeg(lineRingDeg(), irDeg()), motor_line_trace_power);
+        }
+        else
+        {
+            motorsMove(lineRingDeg() + 180, motor_line_escape_power);
+        }
+    }
+    else
+    {
+        motorsMove(irDeg(), motor_ir_power);
+    }
 }

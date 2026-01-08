@@ -321,6 +321,9 @@ void uiDrawMain()
             case Test::Mode::CAM:
                 modeName = "Cam";
                 break;
+            case Test::Mode::LINE_TRACE:
+                modeName = "LineTrace";
+                break;
             default:
                 modeName = "Unknown";
                 break;

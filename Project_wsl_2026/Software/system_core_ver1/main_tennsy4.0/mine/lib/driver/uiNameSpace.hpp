@@ -43,6 +43,7 @@ namespace Test
         KICKER,
         GYRO,
         CAM,
+        LINE_TRACE,
 
         MODE_COUNT
     };

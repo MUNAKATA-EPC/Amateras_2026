@@ -31,8 +31,8 @@ void playDefenderVer2(Defender::Mode mode);
 #define DEFENCE_YELLOW_GOAL_NORMAL_DEG 150 // 普通に守備をする角度(これを超えると対角線で守る)
 #define DEFENCE_BLUE_GOAL_NORMAL_DEG 150
 
-#define DEFENCE_YELLOW_GOAL_DIS 73.0f // ディフェンスの処理に移る距離
-#define DEFENCE_BLUE_GOAL_DIS 73.0f
+#define DEFENCE_YELLOW_GOAL_DIS 80.0f // ディフェンスの処理に移る距離
+#define DEFENCE_BLUE_GOAL_DIS 80.0f
 
 #define DEFENCE_LINE_TRACE_POWER_MAX 20.0f // ライントレースに使う力の上限
 
@@ -46,7 +46,7 @@ void playDefenderVer2(Defender::Mode mode);
 
 //// MODORU処理 ////
 #define MODORU_YELLOW_GOAL_DIS 66.0f // ゴール近距離を判断する距離とその時の力 (ゴールから逃げる・近寄る)
-#define MODORU_BLUE_GOAL_DIS 66.0f
+#define MODORU_BLUE_GOAL_DIS 60.0f
 
 #define MODORU_POWER 60           // この力で戻りながら
 #define MODORU_IR_FOLLOW_POWER 35 // この力でボールを追う

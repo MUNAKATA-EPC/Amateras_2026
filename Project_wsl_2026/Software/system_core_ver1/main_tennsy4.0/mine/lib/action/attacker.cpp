@@ -173,7 +173,7 @@ void attackWithCam(bool attack_goal_detected, int attack_goal_deg, int attack_go
         }
         else
         {
-            if (irDis() >= 55.0f)
+            if (irDis() >= 550.0f)
             {
                 motorsMove(irDeg(), motor_ir_max_power);
             }
