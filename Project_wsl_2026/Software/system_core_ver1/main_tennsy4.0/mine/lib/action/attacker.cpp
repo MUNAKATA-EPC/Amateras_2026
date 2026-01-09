@@ -120,6 +120,7 @@ void attackWithGyro() // ジャイロで攻撃
 }
 
 static Timer cam_pd_timer;
+static int line_detected_count = 0;
 
 void attackWithCam(bool attack_goal_detected, int attack_goal_deg, int attack_goal_dis, bool defence_goal_detected, int defence_goal_deg, int defence_goal_dis) // カメラで攻撃
 {
@@ -141,14 +142,57 @@ void attackWithCam(bool attack_goal_detected, int attack_goal_deg, int attack_go
         kicker1.kick(false);
     }
 
-    const int motor_line_max_power = 80;
+    if (line_timer.msTime() >= 1800UL && lineRingDetected() == false)
+    {
+        line_detected_count = 0;
+    }
+    static bool old_line_detected = false;
+    static Timer line_trace_timer;
+
+    Serial.println(line_detected_count);
+
+    const int motor_line_max_power = 50;
+    const int motor_line_trace_power = 40;
     const int motor_ir_max_power = 80;
 
-    if (line_timer.everReset() && line_timer.msTime() < 50UL)
+    if (line_trace_timer.everReset() && line_trace_timer.msTime() < 1000UL)
+    {
+        if (lineRingDetected())
+        {
+            if ((lineRingDis() > 60) && abs(diffDeg(lineRingDeg(), irDeg())) < 90 && abs(diffDeg(lineRingDeg(), fieldDeg())) > 90)
+            {
+                motorsMove(nearSeesenDeg(lineRingDeg(), irDeg()), motor_line_trace_power);
+            }
+            else
+            {
+                motorsMove(fieldDeg(), motor_line_trace_power);
+            }
+        }
+        else
+        {
+            motorsMove(fieldDeg() + 180, motor_line_max_power);
+        }
+    }
+    else if (line_timer.everReset() && (line_timer.msTime() < 50UL || old_line_detected == true))
     {
         if (lineRingDetected()) // エンジェルライン
         {
-            motorsMove(fieldDeg(), motor_line_max_power);
+            if (line_detected_count >= 5)
+            {
+                if ((lineRingDis() > 60) && abs(diffDeg(lineRingDeg(), irDeg())) < 90 && abs(diffDeg(lineRingDeg(), fieldDeg())) > 90)
+                {
+                    motorsMove(nearSeesenDeg(lineRingDeg(), irDeg()), motor_line_trace_power);
+                    line_trace_timer.reset();
+                }
+                else
+                {
+                    motorsMove(fieldDeg(), motor_line_max_power);
+                }
+            }
+            else
+            {
+                motorsMove(fieldDeg(), motor_line_max_power);
+            }
         }
         else
         {
@@ -158,6 +202,7 @@ void attackWithCam(bool attack_goal_detected, int attack_goal_deg, int attack_go
     else if (lineRingDetected()) // エンジェルライン
     {
         motorsMove(fieldDeg(), motor_line_max_power);
+        line_detected_count++;
 
         line_timer.reset();
     }
@@ -218,4 +263,6 @@ void attackWithCam(bool attack_goal_detected, int attack_goal_deg, int attack_go
     {
         motorsPdMove();
     }
+
+    old_line_detected = lineRingDetected();
 }
