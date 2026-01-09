@@ -92,7 +92,7 @@ void playDefenderVer2(Defender::Mode mode)
     bool is_ir_keep =
         // 厳しい条件分岐でアタッカーに移行する
         irDetected() &&
-        abs(diffDeg(now_ir_deg, old_ir_deg)) <= 15 &&
+        abs(diffDeg(now_ir_deg, old_ir_deg)) <= 20 &&
         (defence_goal_detected && ((mode == Defender::Mode::YELLOWGOAL) ? (defence_goal_dis < DEFENCE_BLUE_GOAL_DIS) : (defence_goal_dis < DEFENCE_YELLOW_GOAL_DIS))) &&
         (defence_goal_deg > ((mode == Defender::Mode::YELLOWGOAL) ? ATTACK_SAKAIME_BLUE_GOAL_DEG_MAX : ATTACK_SAKAIME_YELLOW_GOAL_DEG_MAX) ||
          defence_goal_deg < ((mode == Defender::Mode::YELLOWGOAL) ? ATTACK_SAKAIME_BLUE_GOAL_DEG_MIN : ATTACK_SAKAIME_YELLOW_GOAL_DEG_MIN)) &&

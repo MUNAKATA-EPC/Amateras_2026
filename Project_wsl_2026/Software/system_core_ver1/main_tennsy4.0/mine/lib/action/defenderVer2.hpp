@@ -45,7 +45,7 @@ void playDefenderVer2(Defender::Mode mode);
 #define DEFENCE_GO_CENTRAL_POWER 65.0f // ゴールの中心に行くパワー
 
 //// MODORU処理 ////
-#define MODORU_YELLOW_GOAL_DIS 66.0f // ゴール近距離を判断する距離とその時の力 (ゴールから逃げる・近寄る)
+#define MODORU_YELLOW_GOAL_DIS 69.0f // ゴール近距離を判断する距離とその時の力 (ゴールから逃げる・近寄る)
 #define MODORU_BLUE_GOAL_DIS 60.0f
 
 #define MODORU_POWER 60           // この力で戻りながら
@@ -58,8 +58,8 @@ void playDefenderVer2(Defender::Mode mode);
 //// ATTACK処理 ////
 #define ATTACK_IR_FOLLOW_POWER 80 // アタッカーのときの一時的にボールに追う動作をするときの力
 // (ディフェンスしていると認識する角度)
-#define ATTACK_SAKAIME_YELLOW_GOAL_DEG_MIN -120 // ゴールの横線の上限の角度
-#define ATTACK_SAKAIME_YELLOW_GOAL_DEG_MAX 120
+#define ATTACK_SAKAIME_YELLOW_GOAL_DEG_MIN -111 // ゴールの横線の上限の角度
+#define ATTACK_SAKAIME_YELLOW_GOAL_DEG_MAX 111
 
 #define ATTACK_SAKAIME_BLUE_GOAL_DEG_MIN -120
 #define ATTACK_SAKAIME_BLUE_GOAL_DEG_MAX 120
