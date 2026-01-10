@@ -146,14 +146,7 @@ void attackWithCam(bool attack_goal_detected, int attack_goal_deg, int attack_go
     
     if (line_timer.everReset() && line_timer.msTime() < 500UL)
     {
-        if (line_timer.msTime() < 100UL)
-        {
-            motorsStop();
-        }
-        else
-        {
-            motorsMove(fieldDeg(), motor_line_max_power);
-        }
+        motorsMove(fieldDeg(), motor_line_max_power);
     }
     else if (lineRingDetected()) // エンジェルライン
     {
