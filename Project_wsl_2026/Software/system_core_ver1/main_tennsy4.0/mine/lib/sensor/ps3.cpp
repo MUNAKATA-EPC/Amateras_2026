@@ -39,7 +39,6 @@ bool ps3Init(HardwareSerial *serial, uint32_t baudrate)
     while (!success && timer.msTime() < 100)
     {
         success = _serial->available() > 0; // 1個以上データが来たら成功しているとみなす
-        delay(10);                          // ps3の通信開始待ち
     }
 
     return success;

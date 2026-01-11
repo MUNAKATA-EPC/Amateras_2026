@@ -218,5 +218,5 @@ void loop()
   Serial.print(String(analogRead(LINEsensor_side_right_pin)) + " " + String(analogRead(LINEsensor_side_left_pin)) + " ");
   Serial.println(lines_data_bit_mask, BIN); // pcに送る
 
-  delay(10); // 10ms待機
+  // delay(10); // 10ms待機
 }

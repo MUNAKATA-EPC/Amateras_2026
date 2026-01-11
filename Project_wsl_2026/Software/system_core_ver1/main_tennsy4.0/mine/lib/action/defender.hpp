@@ -21,5 +21,6 @@
 #include "line.hpp"
 #include "ps3.hpp"
 #include "openmv.hpp"
+#include "uss.hpp"
 
 void playDefender(Defender::Mode mode);

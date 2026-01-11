@@ -3,11 +3,11 @@
 static HardwareSerial *_serial = nullptr;
 static uint32_t _baudrate = 9600;
 
-static int _front_dis = 0;
-static int _back_dis = 0;
+static int16_t _left_dis = 0;
+static int16_t _right_dis = 0;
 
-static int _left_dis = 0;
-static int _right_dis = 0;
+static float _left_speed = 0.0f;
+static float _right_speed = 0.0f;
 
 static PacketManager packet; // パケットマネージャー
 
@@ -23,10 +23,9 @@ bool ussInit(HardwareSerial *serial, uint32_t baudrate)
     Timer timer;
     timer.reset();
     bool success = false;
-    while (!success && timer.msTime() < 100)
+    while (!success && timer.msTime() < 100UL)
     {
         success = _serial->available() > 0; // 1個以上データが来たら成功しているとみなす
-        delay(10);                          // ussの通信開始待ち
     }
 
     return success;
@@ -51,10 +50,26 @@ void ussUpdate()
             _left_dis = int16_t((uint16_t(high2) << 8) | uint16_t(low2));  // 上位バイトと下位バイトをつなげる
         }
     }
+
+    // Δt計算
+    static unsigned long last_time = micros();
+    unsigned long now_time = micros();
+    float delta_time = float(now_time - last_time);
+    last_time = now_time; // 更新
+
+    // 速度計算
+    _right_speed = (_right_dis * 10.0f - _right_speed) / delta_time * 1000000.0f; // cm/s
+    _left_speed = (_left_dis * 10.0f - _left_speed) / delta_time * 1000000.0f;    // cm/s
 }
 
-int ussFrontDis() { return _front_dis; }
-int ussBackDis() { return _back_dis; }
+// 0xFFFFでないかどうか
+bool ussLeftDetected() { return _left_dis != 0xFFFF; }
+bool ussRightDetected() { return _right_dis != 0xFFFF; }
 
-int ussLeftDis() { return _left_dis; }
-int ussRightDis() { return _right_dis; }
+// cm
+int16_t ussLeftDis() { return _left_dis; }
+int16_t ussRightDis() { return _right_dis; }
+
+// cm/s
+float ussLeftSpeed() { return _left_speed; }
+float ussRightSpeed() { return _right_speed; }

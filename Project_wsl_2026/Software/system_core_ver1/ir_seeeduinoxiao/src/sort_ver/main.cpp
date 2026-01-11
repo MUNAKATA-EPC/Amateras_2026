@@ -131,5 +131,5 @@ void loop()
 
     Serial1.write(end_header); // 通信終了
 
-    delay(10);
+    // delay(10);
 }

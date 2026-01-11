@@ -23,6 +23,7 @@
 #include "line.hpp"
 #include "ps3.hpp"
 #include "openmv.hpp"
+#include "uss.hpp"
 
 void setup()
 {
@@ -38,10 +39,11 @@ void setup()
     debug_message += irInit(&Serial1, 115200) ? "ir     : found\n" : "ir     : not found\n";
     debug_message += lineInit(&Serial5, 115200) ? "line   : found\n" : "line   : not found\n";
     debug_message += openmvInit(&Serial3, 115200) ? "openmv : found\n" : "openmv : not found\n";
+    // debug_message += ussInit(&Serial, 115200) ? "uss    : found\n" : "uss    : not found\n";
     debug_message += ps3Init(&Serial7, 115200) ? "ps3    : found\n" : "ps3    : not found\n";
     ps3StickAdjust(20.0f, 20.0f);
 
-    debug_message += motorsInit(&Serial1, 115200) ? "motors : found\n" : "motors : not found\n";
+    motorsInit(&Serial1, 115200);
     // motorsSetTogglePin(4, INPUT_PULLDOWN);   // モータの起動トグルスイッチのピン設定
     motorsSetMoveSign(1, 1, 1, 1);           // 移動のための符号をセット
     motorsSetPdSign(1, 1, 1, 1);             // PD制御のための符号をセット
@@ -116,8 +118,6 @@ void setup()
 Timer ui_timer; // ui用
 bool old_running_flag = false;
 
-Timer kicker_timer;
-
 void loop()
 {
     // ボタン更新
@@ -126,12 +126,15 @@ void loop()
     leftButton.update();
     backButton.update();
     resetButton.update();
+    // カラーLEDクリア
+    fullColorLed1.rgbLightUp(0, 0, 0);
 
     // センサー類更新
     irUpdate();
     lineUpdate();
     openmvUpdate();
     ps3Update();
+    // ussUpdate();
     bnoUpdate(resetButton.isReleased()); // bno更新
 
     // uiを実行・描画
@@ -243,6 +246,15 @@ void loop()
                     }
                     uiPrint(0, 8, "[ps3_button]\n" + message);
                     break;
+
+                    /*
+                    uiPrint(0, 8,
+                            "[uss]\n r_dis:" + String(ussRightDis()) + "cm" +
+                                "\n l_speed:" + String(ussLeftSpeed()) + "cm/s" +
+                                "\n l_dis:" + String(ussLeftDis()) + "cm" +
+                                "\n l_speed:" + String(ussLeftSpeed()) + "cm/s");
+                    break;
+                    */
                 }
                 }
             }

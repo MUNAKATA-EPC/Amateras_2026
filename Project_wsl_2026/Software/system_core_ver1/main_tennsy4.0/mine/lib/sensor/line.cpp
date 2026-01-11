@@ -56,7 +56,6 @@ bool lineInit(HardwareSerial *serial, uint32_t baudrate)
     while (!success && timer.msTime() < 100UL)
     {
         success = _serial->available() > 0; // 1個以上データが来たら成功しているとみなす
-        delay(10);                          // lineの通信開始待ち
     }
 
     return success;

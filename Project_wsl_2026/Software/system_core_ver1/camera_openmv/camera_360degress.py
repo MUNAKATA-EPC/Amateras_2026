@@ -1,194 +1,119 @@
 import sensor
 import time
-#import image
 from pyb import UART
 import math
 
 #############################################################
 # ゴールの色取り用変数(黄色)
 #goal_yellow = (6, 92, -22, 4, 43, 93) #福岡ﾉｳﾄﾞ
-goal_yellow = (17, 80, -34, 15, 27, 81) #学校
+goal_yellow = (35, 84, -18, -5, 32, 83) #学校
 #############################################################
 # ゴールの色取り用変数(青色)
 #goal_blue = (36, 21, -26, 0, -13, -5) #福岡ﾉｳﾄﾞ
-goal_blue = (14, 26, 6, 4, -13, -13) #学校
+goal_blue = (27, 60, -7, 8, -43, -13) #学校
 #############################################################
 # コートの色（カーペット用）
 #court_green = (44, 75, -55, -29, 9, 40) #福岡ﾉｳﾄﾞ
-court_green = (26, 70, -15, 0, -26, 10) #学校
+court_green = (42, 87, -22, -2, -5, 19) #学校
 #############################################################
 # 画面の中央座標
-screen_center = [159, 97]
-screen_short_r = 33
-screen_long_r = 160
-
-court = [0, 0]
-yellow = [0, 0]
-blue = [0, 0]
-
-frame_count = 0  # フレームカウント
-
-# 青ゴール検出用変数
-count_goal_blue = 0
-blue_num = 0
-deg_goal_blue = [0, 0]
-dis_goal_blue = [0, 0]
-area_goal_blue = [0, 0]
-
-# 黄ゴール検出用変数
-count_goal_yellow = 0
-yellow_num = 0
-deg_goal_yellow = [0, 0]
-dis_goal_yellow = [0, 0]
-area_goal_yellow = [0, 0]
-
-# コート（緑）検出用変数
-count_court_green = 0
-court_green_num = 0
-deg_court_green = [0, 0]
-area_court_green = [0, 0]
-court_pos = None  # 最新のコート座標を保持
+screen_center = [160, 92] # QVGA(320x240)なら160, 120が中央。設定に合わせる
+screen_short_r = 30
+screen_long_r = 164
 
 # -----------------------------------
 # センサー設定
-# 1. 露出時間（マイクロ秒）: 小さくすると暗く・速くなり、大きくすると明るくなる
-MANUAL_EXPOSURE = 10000
-# 2. RGBゲイン（赤, 緑, 青）: 各色の強さを調整する
-MANUAL_RGB_GAIN = (1.5, 1.0, 2.0)
-# 3. センサーゲイン（dB）: 全体的な明るさの増幅させる
+MANUAL_EXPOSURE = 20000
+MANUAL_RGB_GAIN = (1.0, 1.0, 1.0)
 MANUAL_GAIN_DB = 3
 
 sensor.reset()
 sensor.set_pixformat(sensor.RGB565)
 sensor.set_framesize(sensor.QVGA)
-
-# 自動調整をすべて無効化
 sensor.set_auto_whitebal(False, rgb_gain_db=MANUAL_RGB_GAIN)
 sensor.set_auto_exposure(False, exposure_us=MANUAL_EXPOSURE)
 sensor.set_auto_gain(False, gain_db=MANUAL_GAIN_DB)
-sensor.set_brightness(-1)
+sensor.set_brightness(10)
 
 clock = time.clock()
 uart = UART(3, 115200, timeout_char=1000)
 
 # -----------------------------------
+# 角度・距離計算の共通関数
+def calculate_pos(blob, center):
+    # 中心からの相対座標
+    dx = blob.cx() - center[0]
+    dy = blob.cy() - center[1]
+    # 距離計算
+    dist = math.sqrt(dx**2 + dy**2)
+    # 角度計算 (ロボットの前方を0度とするための調整を含む)
+    # atan2(x, y) で、y方向を基準に計算し、反転・180度オフセットを適用
+    deg = int(math.atan2(-dx, -dy) * 180 / math.pi)
+    return deg, int(dist)
+
 # 2バイトのデータ送信関数
 def send_int16(uart, value):
-    if value == 0xFF:       # 0xFFはそのまま
-        value_to_send = 0xFF
-    else:
-        value_to_send = value
-    low = value_to_send & 0xFF
-    high = (value_to_send >> 8) & 0xFF
+    # 0xFFとの重複回避処理は、本来は受信側と合わせたプロトコルが必要
+    low = value & 0xFF
+    high = (value >> 8) & 0xFF
     uart.write(bytearray([low, high]))
+
 # -----------------------------------
 while True:
     clock.tick()
-    frame_count += 1
     img = sensor.snapshot()
+
+    # 画面外周を黒く塗る（計算対象外のノイズを消す）
+    img.draw_circle(screen_center[0], screen_center[1], screen_long_r, [0, 0, 0], 130)
+    img.draw_circle(screen_center[0], screen_center[1], screen_short_r, [0, 0, 0], 1, fill=True)
     img.draw_cross(screen_center[0], screen_center[1])
 
-    # 画面外周を黒く塗る
-    img.draw_circle(screen_center[0], screen_center[1], screen_long_r, [0, 0, 0], 130)
-    img.draw_circle(screen_center[0], screen_center[1], screen_short_r, [0, 0, 0], 1, 1)
-
-    # 各方向と距離の初期化
-    court_deg_temp = 0
+    # 初期値（未検出時は 0xFF などの特定値を送る設定）
     court_deg = 0
-
-    yellow_detected = False
-    yellow_deg = 0xFF
-    yellow_dis = 0xFF
-
-    blue_detected = False
-    blue_deg = 0xFF
-    blue_dis = 0xFF
+    yellow_deg, yellow_dis = 255, 255
+    blue_deg, blue_dis = 255, 255
 
     # -----------------------------------
-    # 青ゴールの検出
+    # 青ゴールの検出 (最大のBlobのみを採用)
+    max_blue_area = 0
     for blob in img.find_blobs([goal_blue], pixels_threshold=10, area_threshold=10, merge=True, margin=25):
-        if count_goal_blue >= 2:
-            count_goal_blue = 0
-        blue[0] = blob.cx()
-        blue[1] = blob.cy()
-        blue_dis = math.sqrt((blue[0] - screen_center[0])**2 + (blue[1] - screen_center[1])**2)
-        blue_deg = math.atan2(blue[0] - screen_center[0], blue[1] - screen_center[1]) * 180 / math.pi
-        deg_goal_blue[count_goal_blue] = blue_deg
-        dis_goal_blue[count_goal_blue] = blue_dis
-        area_goal_blue[count_goal_blue] = blob.area()
-        blue_num = area_goal_blue.index(max(area_goal_blue[:]))
-        blue_deg = deg_goal_blue[blue_num]
-        blue_dis = dis_goal_blue[blue_num]
-        count_goal_blue += 1
+        if blob.area() > max_blue_area:
+            max_blue_area = blob.area()
+            blue_deg, blue_dis = calculate_pos(blob, screen_center)
+            img.draw_rectangle(blob.rect())
+            img.draw_line(screen_center[0], screen_center[1], blob.cx(), blob.cy(), color=(0, 0, 255))
+            blue_deg = -blue_deg #反転
 
-        img.draw_rectangle(blob.rect())
-        img.draw_line(screen_center[0], screen_center[1], blue[0], blue[1], color=(0, 0, 255), thickness=2)
-
-        blue_detected = True
     # -----------------------------------
-    # 黄ゴールの検出
+    # 黄ゴールの検出 (最大のBlobのみを採用)
+    max_yellow_area = 0
     for blob in img.find_blobs([goal_yellow], pixels_threshold=10, area_threshold=10, merge=True, margin=25):
-        if count_goal_yellow >= 2:
-            count_goal_yellow = 0
-        yellow[0] = blob.cx()
-        yellow[1] = blob.cy()
-        yellow_dis = math.sqrt((yellow[0] - screen_center[0])**2 + (yellow[1] - screen_center[1])**2)
-        yellow_deg = math.atan2(yellow[0] - screen_center[0], yellow[1] - screen_center[1]) * 180 / math.pi
-        deg_goal_yellow[count_goal_yellow] = yellow_deg
-        dis_goal_yellow[count_goal_yellow] = yellow_dis
-        area_goal_yellow[count_goal_yellow] = blob.area()
-        yellow_num = area_goal_yellow.index(max(area_goal_yellow[:]))
-        yellow_deg = deg_goal_yellow[yellow_num]
-        yellow_dis = dis_goal_yellow[yellow_num]
-        count_goal_yellow += 1
+        if blob.area() > max_yellow_area:
+            max_yellow_area = blob.area()
+            yellow_deg, yellow_dis = calculate_pos(blob, screen_center)
+            img.draw_rectangle(blob.rect())
+            img.draw_line(screen_center[0], screen_center[1], blob.cx(), blob.cy(), color=(255, 255, 0))
+            yellow_deg = -yellow_deg #反転
 
-        img.draw_rectangle(blob.rect())
-        img.draw_line(screen_center[0], screen_center[1], yellow[0], yellow[1], color=(255, 255, 0), thickness=2)
-
-        yellow_detected = True
     # -----------------------------------
-    # コート検出
-    found_court = False
+    # コート（緑）の検出
+    max_court_area = 0
     for blob in img.find_blobs([court_green], pixels_threshold=50, area_threshold=50, merge=True, margin=25):
-        found_court = True
-        if count_court_green >= 2:
-            count_court_green = 0
-        court[0] = blob.cx()
-        court[1] = blob.cy()
-        court_pos = (court[0], court[1])
-        court_deg_temp = math.atan2(court[0] - screen_center[0], court[1] - screen_center[1]) * 180 / math.pi
-        deg_court_green[count_court_green] = court_deg_temp
-        area_court_green[count_court_green] = blob.area()
-        court_green_num = area_court_green.index(max(area_court_green[:]))
-        court_deg_temp = deg_court_green[court_green_num]
-        court_deg = court_deg_temp
-        count_court_green += 1
+        if blob.area() > max_court_area:
+            max_court_area = blob.area()
+            court_deg, _ = calculate_pos(blob, screen_center)
+            img.draw_line(screen_center[0], screen_center[1], blob.cx(), blob.cy(), color=(0, 255, 0))
+            court_deg = -court_deg #反転
 
-        img.draw_line(screen_center[0], screen_center[1], court[0], court[1], color=(0, 255, 0), thickness=2)
     # -----------------------------------
-
-    # 整数化
-    court_deg = int(-court_deg) + 180 # 反転させてint型に変換
-    if court_deg > 180:
-        court_deg -= 360
-
-    if yellow_detected == True:
-        yellow_deg = int(-yellow_deg) + 180 # 反転させてint型に変換
-        if yellow_deg > 180:
-            yellow_deg -= 360
-        yellow_dis = int(yellow_dis)
-
-    if blue_detected == True:
-        blue_deg = int(-blue_deg) + 180 # 反転させてint型に変換
-        if blue_deg > 180:
-            blue_deg -= 360
-        blue_dis = int(blue_dis)
-
-    # UART送信
-    uart.write(bytearray([0x55]))  # 通信開始
+    # UART送信 (0x55: 開始, 0xAA: 終了)
+    uart.write(bytearray([0x55]))
     send_int16(uart, court_deg)
     send_int16(uart, yellow_deg)
     send_int16(uart, yellow_dis)
     send_int16(uart, blue_deg)
     send_int16(uart, blue_dis)
-    uart.write(bytearray([0xAA]))  # 通信終了
+    uart.write(bytearray([0xAA]))
+
+    # デバッグ出力
+    #print("yellow[deg:%d, dis:%d] blue[deg:%d, dis:%d] court[deg:%d]" % (yellow_deg, yellow_dis, blue_deg, blue_dis, court_deg))

@@ -4,6 +4,7 @@
 /*マルチプレクサのテスト用*/
 
 Multiplexer mux; // 定義
+int min_value[16] = {1023, 1023, 1023, 1023, 1023, 1023, 1023, 1023, 1023, 1023, 1023, 1023, 1023, 1023, 1023, 1023};
 
 void setup()
 {
@@ -15,13 +16,14 @@ void setup()
 
 void loop()
 {
-    for (int i = 0; i < 15; i++)
+    for (int i = 0; i < 16; i++)
     {
-        Serial.print("pin");
-        Serial.print(i);
-        Serial.print(":");
-        Serial.print(mux.read(i));
-        Serial.print(",");
+        int value = mux.read(i); // マルチプレクサから値を読む
+
+        if (value < min_value[i])
+            min_value[i] = value;
+
+        Serial.print("m" + String(i) + ":" + String(min_value[i]) + ",");
     }
     Serial.print("\n");
 

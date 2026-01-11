@@ -21,6 +21,7 @@
 #include "line.hpp"
 #include "ps3.hpp"
 #include "openmv.hpp"
+#include "uss.hpp"
 
 void playDefenderVer2(Defender::Mode mode);
 
@@ -32,14 +33,18 @@ void playDefenderVer2(Defender::Mode mode);
 #define DEFENCE_BLUE_GOAL_NORMAL_DEG 150
 
 // DEFENCE認識条件-------------------------------------------------------------------
-#define DEFENCE_YELLOW_GOAL_DIS 80.0f // ディフェンスの処理に移る距離
-#define DEFENCE_BLUE_GOAL_DIS 77.0f
+// 1段階目
+#define DEFENCE_YELLOW_GOAL_DIS1 80.0f // ディフェンスの処理に移る距離
+#define DEFENCE_BLUE_GOAL_DIS1 77.0f
 
-#define DEFENCE_YELLOW_GOAL_DEG_MIN -120 // ディフェンスの処理に移る角度
-#define DEFENCE_YELLOW_GOAL_DEG_MAX 120
+#define DEFENCE_YELLOW_GOAL_DEG1 120 // ディフェンスの処理に移る角度
+#define DEFENCE_BLUE_GOAL_DEG1 120
+// 2段階目(端に近いときは厳しい条件)
+#define DEFENCE_YELLOW_GOAL_DIS2 73.0f // ディフェンスの処理に移る距離
+#define DEFENCE_BLUE_GOAL_DIS2 73.0f
 
-#define DEFENCE_BLUE_GOAL_DEG_MIN -110
-#define DEFENCE_BLUE_GOAL_DEG_MAX 110
+#define DEFENCE_YELLOW_GOAL_DEG2 110 // ディフェンスの処理に移る角度
+#define DEFENCE_BLUE_GOAL_DEG2 110
 // ---------------------------------------------------------------------------------
 
 #define DEFENCE_LINE_TRACE_POWER_MAX 20.0f // ライントレースに使う力の上限
