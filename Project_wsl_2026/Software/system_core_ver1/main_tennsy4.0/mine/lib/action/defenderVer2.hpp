@@ -34,31 +34,31 @@ void playDefenderVer2(Defender::Mode mode);
 
 // DEFENCE認識条件-------------------------------------------------------------------
 // 1段階目
-#define DEFENCE_YELLOW_GOAL_DIS1 80.0f // ディフェンスの処理に移る距離
+#define DEFENCE_YELLOW_GOAL_DIS1 78.0f // ディフェンスの処理に移る距離
 #define DEFENCE_BLUE_GOAL_DIS1 77.0f
 
 #define DEFENCE_YELLOW_GOAL_DEG1 120 // ディフェンスの処理に移る角度
 #define DEFENCE_BLUE_GOAL_DEG1 120
 // 2段階目(端に近いときは厳しい条件)
-#define DEFENCE_YELLOW_GOAL_DIS2 73.0f // ディフェンスの処理に移る距離
+#define DEFENCE_YELLOW_GOAL_DIS2 75.0f // ディフェンスの処理に移る距離
 #define DEFENCE_BLUE_GOAL_DIS2 73.0f
 
-#define DEFENCE_YELLOW_GOAL_DEG2 110 // ディフェンスの処理に移る角度
+#define DEFENCE_YELLOW_GOAL_DEG2 107 // ディフェンスの処理に移る角度
 #define DEFENCE_BLUE_GOAL_DEG2 110
 // ---------------------------------------------------------------------------------
 
 #define DEFENCE_LINE_TRACE_POWER_MAX 20.0f // ライントレースに使う力の上限
 
-#define DEFENCE_YOKO_IR_FOLLOW_POWER_MAX 75.0f         // ボールの方向に行くときの力の上限
-#define DEFENCE_TATE_ZENSHIN_IR_FOLLOW_POWER_MAX 75.0f // 縦　前進用
+#define DEFENCE_YOKO_IR_FOLLOW_POWER_MAX 70.0f         // ボールの方向に行くときの力の上限
+#define DEFENCE_TATE_ZENSHIN_IR_FOLLOW_POWER_MAX 70.0f // 縦　前進用
 #define DEFENCE_TATE_KOUTAI_IR_FOLLOW_POWER_MAX 40.0f  // 縦　後退用
-#define DEFENCE_KADO_IR_FOLLOW_POWER_MAX 75.0f         // 角
+#define DEFENCE_KADO_IR_FOLLOW_POWER_MAX 60.0f         // 角
 #define DEFENCE_HAJI_IR_FOLLOW_POWER_MAX 20.0f         // 端
 
 #define DEFENCE_GO_CENTRAL_POWER 65.0f // ゴールの中心に行くパワー
 
 //// MODORU処理 ////
-#define MODORU_YELLOW_GOAL_DIS 69.0f // ゴール近距離を判断する距離とその時の力 (ゴールから逃げる・近寄る)
+#define MODORU_YELLOW_GOAL_DIS 60.0f // ゴール近距離を判断する距離とその時の力 (ゴールから逃げる・近寄る)
 #define MODORU_BLUE_GOAL_DIS 59.0f
 
 #define MODORU_POWER 60          // この力で戻りながら

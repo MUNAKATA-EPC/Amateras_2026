@@ -3,8 +3,8 @@
 static HardwareSerial *_serial = nullptr;
 static uint32_t _baudrate = 9600;
 
-static int16_t _left_dis = 0;
-static int16_t _right_dis = 0;
+static uint16_t _left_dis = 0;
+static uint16_t _right_dis = 0;
 
 static float _left_speed = 0.0f;
 static float _right_speed = 0.0f;
@@ -46,8 +46,8 @@ void ussUpdate()
             uint8_t low2 = packet.get(3);  // 左距離の下位バイトを読み取る
             uint8_t high2 = packet.get(4); // 左距離の上位バイトを読み取る
 
-            _right_dis = int16_t((uint16_t(high1) << 8) | uint16_t(low1)); // 上位バイトと下位バイトをつなげる
-            _left_dis = int16_t((uint16_t(high2) << 8) | uint16_t(low2));  // 上位バイトと下位バイトをつなげる
+            _right_dis = uint16_t((uint16_t(high1) << 8) | uint16_t(low1)); // 上位バイトと下位バイトをつなげる
+            _left_dis = uint16_t((uint16_t(high2) << 8) | uint16_t(low2));  // 上位バイトと下位バイトをつなげる
         }
     }
 

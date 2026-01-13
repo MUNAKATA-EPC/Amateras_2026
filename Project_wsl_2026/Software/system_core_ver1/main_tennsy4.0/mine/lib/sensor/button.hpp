@@ -16,6 +16,10 @@ private:
     Timer _pushingTimer; // 押されている時間計測用
     unsigned long _pushing_time = 0UL;
 
+    // チャタリング防止用
+    Timer _debounceTimer;
+    bool _last_raw_state = false;
+
 public:
     // 関数
     bool init(uint8_t pin, uint8_t pinmode);
