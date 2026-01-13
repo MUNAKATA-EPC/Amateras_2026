@@ -9,8 +9,8 @@ const int end_header = 0xAA;   // 同期ヘッダー格納用
 #define RightEchoPin D10 // Echo Pin定義
 
 // 左超音波
-#define LeftTrigPin D7 // Trig Pin定義
-#define LeftEchoPin D8 // Echo Pin定義
+#define LeftTrigPin D3 // Trig Pin定義
+#define LeftEchoPin D4 // Echo Pin定義
 
 unsigned long readUssDis(uint8_t trig_pin, uint8_t echo_pin)
 {

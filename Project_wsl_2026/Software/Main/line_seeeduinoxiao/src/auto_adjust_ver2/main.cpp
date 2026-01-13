@@ -48,7 +48,7 @@ void setup()
   Timer led_timer;
   led_timer.reset();
 
-  while (led_timer.msTime() < 5000UL) // 5秒待機
+  while (led_timer.msTime() < 2500UL) // 2.5秒待機
   {
     button.update();
     if (button.isReleased()) // ボタンが押されたら

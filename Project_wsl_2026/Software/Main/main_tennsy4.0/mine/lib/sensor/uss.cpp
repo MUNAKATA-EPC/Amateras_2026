@@ -67,8 +67,8 @@ bool ussLeftDetected() { return _left_dis != 0xFFFF; }
 bool ussRightDetected() { return _right_dis != 0xFFFF; }
 
 // cm
-int16_t ussLeftDis() { return _left_dis; }
-int16_t ussRightDis() { return _right_dis; }
+uint16_t ussLeftDis() { return _left_dis; }
+uint16_t ussRightDis() { return _right_dis; }
 
 // cm/s
 float ussLeftSpeed() { return _left_speed; }
