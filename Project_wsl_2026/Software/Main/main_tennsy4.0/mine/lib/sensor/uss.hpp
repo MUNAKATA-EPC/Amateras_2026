@@ -12,8 +12,8 @@ bool ussLeftDetected();
 bool ussRightDetected();
 
 // cm
-int16_t ussLeftDis();
-int16_t ussRightDis();
+uint16_t ussLeftDis();
+uint16_t ussRightDis();
 
 // cm/s
 float ussLeftSpeed();

@@ -142,9 +142,17 @@ void attackWithCam(bool attack_goal_detected, int attack_goal_deg, int attack_go
     }
 
     const int motor_line_max_power = 50;
-    const int motor_ir_max_power = 80;
-    
-    if (line_timer.everReset() && line_timer.msTime() < 500UL)
+    const int motor_ir_max_power = 90;
+
+    if (attack_goal_detected && attack_goal_dis < 70)
+    {
+        motorsMove(attack_goal_deg + 180, motor_line_max_power);
+    }
+    else if (defence_goal_detected && defence_goal_dis < 70)
+    {
+        motorsMove(defence_goal_deg + 180, motor_line_max_power);
+    }
+    else if (line_timer.everReset() && line_timer.msTime() < 50UL)
     {
         motorsMove(fieldDeg(), motor_line_max_power);
     }
@@ -153,61 +161,82 @@ void attackWithCam(bool attack_goal_detected, int attack_goal_deg, int attack_go
         motorsMove(fieldDeg(), motor_line_max_power);
         line_timer.reset();
     }
-    else if (irDetected())
+    /*else if (ussRightDetected() && ussLeftDetected() && ussRightDis() < 35 && (ussRightDis() + ussLeftDis()) > 80)
     {
-        if (irDeg() >= -8 && irDeg() <= 8)
+        if (irDetected() && irDeg() <= 0)
         {
-            motorsMove(0, motor_ir_max_power);
-        }
-        else if (irDeg() >= -10 && irDeg() <= 10)
-        {
-            motorsMove(irDeg() * 1.1f, motor_ir_max_power * 0.7f);
-        }
-        else
-        {
-            if (irDis() >= 550.0f)
+            if (irDeg() > -75)
             {
-                motorsMove(irDeg(), motor_ir_max_power);
+                motorsMove(0, motor_ir_max_power);
             }
             else
             {
-                int diff = 50;
-
-                if (irDeg() > 0) // 左にいるとき
-                {
-                    if (irDeg() <= 45)
-                    {
-                        motorsMove(irDeg() + diff, motor_ir_max_power);
-                    }
-                    else if (irDeg() <= 160)
-                    {
-                        motorsMove(irDeg() + diff, motor_ir_max_power);
-                    }
-                    else
-                    {
-                        motorsMove(irDeg() + diff, motor_ir_max_power);
-                    }
-                }
-                else // 右にいるとき
-                {
-                    if (irDeg() >= -45)
-                    {
-                        motorsMove(irDeg() - diff, motor_ir_max_power);
-                    }
-                    else if (irDeg() >= -160)
-                    {
-                        motorsMove(irDeg() - diff, motor_ir_max_power);
-                    }
-                    else
-                    {
-                        motorsMove(irDeg() - diff, motor_ir_max_power);
-                    }
-                }
+                motorsMove(180, motor_ir_max_power);
             }
+        }
+        else
+        {
+            motorsMove(90, motor_ir_max_power);
+        }
+    }
+    else if (ussRightDetected() && ussLeftDetected() && ussLeftDis() < 35 && (ussRightDis() + ussLeftDis()) > 80)
+    {
+        if (irDetected() && irDeg() > 0)
+        {
+            if (irDeg() < 75)
+            {
+                motorsMove(0, motor_ir_max_power);
+            }
+            else
+            {
+                motorsMove(180, motor_ir_max_power);
+            }
+        }
+        else
+        {
+            motorsMove(-90, motor_ir_max_power);
+        }
+    }*/
+    else if (irDetected())
+    {
+        Vector mawarikomi_vec;
+
+        if (irDis() >= 666.0f)
+        {
+            motorsMove(irDeg(), motor_ir_max_power);
+        }
+        else if (irDeg() >= -10 && irDeg() <= 10)
+        {
+            motorsMove(0, motor_ir_max_power);
+        }
+        else if (irDeg() >= -20 && irDeg() <= 20)
+        {
+            int diff = (irDeg() > 0) ? 27 : -27;
+            motorsMove(irDeg() + diff, motor_ir_max_power);
+        }
+        else if (irDeg() >= -30 && irDeg() <= 30)
+        {
+            int diff = (irDeg() > 0) ? 40 : -40;
+            motorsMove(irDeg() + diff, motor_ir_max_power);
+        }
+        else if (irDeg() >= -55 && irDeg() <= 55)
+        {
+            int diff = (irDeg() > 0) ? 45 : -45;
+            motorsMove(irDeg() + diff, motor_ir_max_power);
+        }
+        else if (irDeg() >= -125 && irDeg() <= 125)
+        {
+            int diff = (irDeg() > 0) ? 55 : -55;
+            motorsMove(irDeg() + diff, motor_ir_max_power);
+        }
+        else
+        {
+            int diff = (irDeg() > 0) ? 50 : -50;
+            motorsMove(irDeg() + diff, motor_ir_max_power);
         }
     }
     else
     {
-        motorsPdMove();
+        motorsMove(fieldDeg(), 50);
     }
 }

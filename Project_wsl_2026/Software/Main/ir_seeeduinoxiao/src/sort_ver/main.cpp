@@ -130,6 +130,4 @@ void loop()
     Serial1.write((uint8_t)((dis_to_send >> 8) & 0xFF)); // 上位バイト (high2)
 
     Serial1.write(end_header); // 通信終了
-
-    // delay(10);
 }

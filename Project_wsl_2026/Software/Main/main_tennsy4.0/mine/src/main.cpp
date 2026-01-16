@@ -249,14 +249,9 @@ void loop()
                     break;
                     */
 
-                    
-                    uiPrint(0, 8,
-                            "[uss]\n r_dis:" + String(ussRightDis()) + "cm" +
-                                "\n r_speed:" + String(ussRightSpeed()) + "cm/s" +
-                                "\n l_dis:" + String(ussLeftDis()) + "cm" +
-                                "\n l_speed:" + String(ussLeftSpeed()) + "cm/s");
+                    uiPrint(0, 8, "[uss]\n l_dis:" + String(ussLeftDis()) + "cm" + "\n l_speed:" + String(ussLeftSpeed()) + "cm/s");
+                    uiPrint(0, 32, "[uss]\n r_dis:" + String(ussRightDis()) + "cm" + "\n r_speed:" + String(ussRightSpeed()) + "cm/s");
                     break;
-                    
                 }
                 }
             }

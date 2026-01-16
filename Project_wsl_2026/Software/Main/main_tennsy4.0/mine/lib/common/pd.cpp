@@ -62,5 +62,5 @@ void PD::process(float val, float target, bool angle)
     _output = constrain(power, -100.0f, 100.0f);
 }
 
-PD pd_gyro(0.5f, -4.0f); // 共通で使えるようにしておく
-PD pd_cam(0.50f, -4.0f); // 共通で使えるようにしておく
+PD pd_gyro(0.50f, -3.0f); // 共通で使えるようにしておく
+PD pd_cam(0.50f, -3.0f);  // 共通で使えるようにしておく

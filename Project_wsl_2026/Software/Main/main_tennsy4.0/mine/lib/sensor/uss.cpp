@@ -58,8 +58,27 @@ void ussUpdate()
     last_time = now_time; // 更新
 
     // 速度計算
-    _right_speed = (_right_dis * 10.0f - _right_speed) / delta_time * 1000000.0f; // cm/s
-    _left_speed = (_left_dis * 10.0f - _left_speed) / delta_time * 1000000.0f;    // cm/s
+    static uint16_t old_right_dis = 0;
+    if (old_right_dis == 0xFFFF)
+    {
+        _right_speed = 0.0f;
+    }
+    else
+    {
+        _right_speed = (_right_dis - old_right_dis) / delta_time * 1000000.0f; // cm/s
+    }
+    old_right_dis = _right_dis;
+
+    static uint16_t old_left_dis = 0;
+    if (old_left_dis == 0xFFFF)
+    {
+        _left_speed = 0.0f;
+    }
+    else
+    {
+        _left_speed = (_left_dis - old_left_dis) / delta_time * 1000000.0f; // cm/s
+    }
+    old_left_dis = _left_dis;
 }
 
 // 0xFFFFでないかどうか
