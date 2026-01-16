@@ -22,7 +22,7 @@ int diffDeg(int deg1, int deg2)
 }
 
 // target_degに対する接線方向のうち、enter_Degに近い方を返す
-int nearSeesenDeg(int target_deg, int enter_deg)
+int nearSessenDeg(int target_deg, int enter_deg)
 {
     // targetDegに±90°を加算した角度を正規化する
     int sessen1_deg = normalizeDeg(target_deg + 90);

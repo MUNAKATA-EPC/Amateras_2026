@@ -445,7 +445,7 @@ Vector LineTraceAndTargetVec(PD *pd_line_trace, int deg, int power)
 
     // 接線ベクトル角度の算出（lineRingDeg()の接線方向の内degに近いほう）
     int round_line_ring_deg = areaIndexFromDeg(lineRingDeg(), 8) * 360 / 8;
-    int sessen_deg = nearSeesenDeg(round_line_ring_deg, deg);
+    int sessen_deg = nearSessenDeg(round_line_ring_deg, deg);
     // 接線ベクトル長さの算出
     float sessen_len;
     if (abs(deg) < 10) // 目標角度がほぼ前

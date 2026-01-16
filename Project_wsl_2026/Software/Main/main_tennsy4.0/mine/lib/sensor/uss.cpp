@@ -20,65 +20,41 @@ bool ussInit(HardwareSerial *serial, uint32_t baudrate)
 
     packet.setup(0x55, 4, 0xAA); // フレームヘッダー、データサイズ、エンドヘッダーを設定
 
-    Timer timer;
-    timer.reset();
-    bool success = false;
-    while (!success && timer.msTime() < 100UL)
-    {
-        success = _serial->available() > 0; // 1個以上データが来たら成功しているとみなす
-    }
-
-    return success;
+    return true;
 }
 
 void ussUpdate()
 {
     // データの受け取り
+    static unsigned long last_packet_time = micros();
     int data_count = _serial->available();
     for (int i = 0; i < data_count; i++)
     {
         packet.add(_serial->read());
-
         if (packet.isComplete())
         {
-            uint8_t low1 = packet.get(1);  // 右距離の下位バイトを読み取る
-            uint8_t high1 = packet.get(2); // 右距離の上位バイトを読み取る
-            uint8_t low2 = packet.get(3);  // 左距離の下位バイトを読み取る
-            uint8_t high2 = packet.get(4); // 左距離の上位バイトを読み取る
+            unsigned long now_time = micros();
+            float delta_time = float(now_time - last_packet_time);
+            last_packet_time = now_time;
 
-            _right_dis = uint16_t((uint16_t(high1) << 8) | uint16_t(low1)); // 上位バイトと下位バイトをつなげる
-            _left_dis = uint16_t((uint16_t(high2) << 8) | uint16_t(low2));  // 上位バイトと下位バイトをつなげる
+            if (delta_time > 0)
+            {
+                // データのパース
+                uint16_t new_right = (uint16_t(packet.get(2)) << 8) | packet.get(1);
+                uint16_t new_left = (uint16_t(packet.get(4)) << 8) | packet.get(3);
+
+                // 速度計算（LPF：前回の値を80%残す）
+                float raw_right_speed = (float((int32_t)new_right - (int32_t)_right_dis)) / delta_time * 1e6f;
+                float raw_left_speed = -(float((int32_t)new_left - (int32_t)_left_dis)) / delta_time * 1e6f;
+
+                _right_speed = _right_speed * 0.3f + raw_right_speed * 0.7f;
+                _left_speed = _left_speed * 0.3f + raw_left_speed * 0.7f;
+
+                _right_dis = new_right;
+                _left_dis = new_left;
+            }
         }
     }
-
-    // Δt計算
-    static unsigned long last_time = micros();
-    unsigned long now_time = micros();
-    float delta_time = float(now_time - last_time);
-    last_time = now_time; // 更新
-
-    // 速度計算
-    static uint16_t old_right_dis = 0;
-    if (old_right_dis == 0xFFFF)
-    {
-        _right_speed = 0.0f;
-    }
-    else
-    {
-        _right_speed = (_right_dis - old_right_dis) / delta_time * 1000000.0f; // cm/s
-    }
-    old_right_dis = _right_dis;
-
-    static uint16_t old_left_dis = 0;
-    if (old_left_dis == 0xFFFF)
-    {
-        _left_speed = 0.0f;
-    }
-    else
-    {
-        _left_speed = (_left_dis - old_left_dis) / delta_time * 1000000.0f; // cm/s
-    }
-    old_left_dis = _left_dis;
 }
 
 // 0xFFFFでないかどうか

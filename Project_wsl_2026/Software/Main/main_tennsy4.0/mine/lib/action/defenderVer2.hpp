@@ -8,6 +8,7 @@
 #include "pd.hpp"
 #include "timer.hpp"
 #include "vector.hpp"
+#include "lagrangeShifter.hpp"
 // driver類
 #include "dribbler.hpp"
 #include "kicker.hpp"
@@ -26,13 +27,15 @@
 void playDefenderVer2(Defender::Mode mode);
 
 //// DEFENCE処理 ////
-#define DEFENCE_IR_FRONT_Y_MAX 65.0f  // ボールのy座標がこの値から
-#define DEFENCE_IR_FRONT_Y_MIN -65.0f // この値までであったら停止する
+#define DEFENCE_IR_FRONT_Y_MAX 80.0f  // ボールのy座標がこの値から
+#define DEFENCE_IR_FRONT_Y_MIN -80.0f // この値までであったら停止する
 
 #define DEFENCE_YELLOW_GOAL_NORMAL_DEG 150 // 普通に守備をする角度(これを超えると対角線で守る)
 #define DEFENCE_BLUE_GOAL_NORMAL_DEG 150
 
 // DEFENCE認識条件-------------------------------------------------------------------
+// USS
+#define DEFENCE_USS_DIS_MIN 40 // ディフェンスの処理に移る最低の距離
 // 1段階目
 #define DEFENCE_YELLOW_GOAL_DIS1 78.0f // ディフェンスの処理に移る距離
 #define DEFENCE_BLUE_GOAL_DIS1 77.0f

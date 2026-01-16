@@ -27,20 +27,18 @@
 
 void setup()
 {
-    String debug_message = "> setup <\n";
-
     // I2C
-    debug_message += uiInit(&Wire1, 0x3C, 128, 64) ? "ui     : found\n" : "ui     : not found\n";
-    debug_message += bnoInit(&Wire, 0x28) ? "bno    : found\n" : "bno    : not found\n";
+    bool ssd_success = uiInit(&Wire1, 0x3C, 128, 64);
+    bool bno_success = bnoInit(&Wire, 0x28);
 
     // シリアル
     Serial.begin(9600L); // デバッグ用
 
-    debug_message += irInit(&Serial1, 115200) ? "ir     : found\n" : "ir     : not found\n";
-    debug_message += lineInit(&Serial5, 115200) ? "line   : found\n" : "line   : not found\n";
-    debug_message += openmvInit(&Serial3, 115200) ? "openmv : found\n" : "openmv : not found\n";
-    debug_message += ussInit(&Serial2, 115200) ? "uss    : found\n" : "uss    : not found\n";
-    debug_message += ps3Init(&Serial7, 115200) ? "ps3    : found\n" : "ps3    : not found\n";
+    irInit(&Serial1, 115200);
+    lineInit(&Serial5, 115200);
+    openmvInit(&Serial3, 115200);
+    ussInit(&Serial2, 115200);
+    ps3Init(&Serial7, 115200);
     ps3StickAdjust(20.0f, 20.0f);
 
     motorsInit(&Serial1, 115200);
@@ -61,18 +59,19 @@ void setup()
 
     fullColorLed1.init(36, 35, 34); // デバッグ用
 
-    // デバッグメッセージの出力
-    Serial.println(debug_message);
+    // デバッグメッセージの出力(ui)
+    String message = "> setup <\n";
+    message += "ssd : " + (ssd_success) ? "found" : "not found" + "\n";
+    message += "bno : " + (bno_success) ? "found" : "not found" + "\n";
+    message += "-Presented by onigiri-";
+
     uiClear();
-    uiPrintDebug(debug_message.c_str()); // uiにも表示
+    uiPrintDebug(message.c_str());
     uiShow();
 
     // どれかのボタンを押すまで待機
-    int music_type = 0;
-    // anyrtttl::nonblocking::begin(BUZZER_PIN, zenzenzense); // 前前前世演奏開始（デフォルト）
-
-    bool wait = true;
-    while (wait)
+    int music_type = -1;
+    while (true)
     {
         enterButton.update();
         backButton.update();
@@ -82,9 +81,10 @@ void setup()
 
         if (resetButton.isReleased())
         {
+            anyrtttl::nonblocking::stop(); // 曲の演奏停止
             delay(300);
 
-            music_type = (music_type + 1) % 4;
+            music_type = (music_type + 1) % 4; // 次の曲へ
 
             if (music_type == 0)
                 anyrtttl::nonblocking::begin(BUZZER_PIN, zenzenzense); // 前前前世演奏開始
@@ -98,34 +98,36 @@ void setup()
 
         anyrtttl::nonblocking::play(); // 演奏中
 
-        wait = !(enterButton.isReleased() || backButton.isReleased() || rightButton.isReleased() || leftButton.isReleased());
+        if (enterButton.isReleased() || backButton.isReleased() || rightButton.isReleased() || leftButton.isReleased())
+        {
+            break;
+        }
     }
     anyrtttl::nonblocking::stop(); // 曲の演奏停止
 
     tone(BUZZER_PIN, BuzzerPitches::MyE7, 100); // 決定音
     // anyrtttl::blocking::play(BUZZER_PIN, startup2); // 起動音2
 
-    // 押し続け防止
-    while (enterButton.isPushing() || backButton.isPushing() || rightButton.isPushing() || leftButton.isPushing())
-    {
-        enterButton.update();
-        backButton.update();
-        rightButton.update();
-        leftButton.update();
-    }
+    delay(1000);
 }
 
-Timer ui_timer; // ui用
+Timer btn_timer; // btn用
+Timer ui_timer;  // ui用
 bool old_running_flag = false;
 
 void loop()
 {
-    // ボタン更新
-    enterButton.update();
-    rightButton.update();
-    leftButton.update();
-    backButton.update();
-    resetButton.update();
+    // ボタン類更新
+    if (!btn_timer.everReset() || btn_timer.msTime() > 50UL)
+    {
+        btn_timer.reset();
+
+        enterButton.update();
+        rightButton.update();
+        leftButton.update();
+        backButton.update();
+        resetButton.update();
+    }
     // カラーLEDクリア
     fullColorLed1.rgbLightUp(0, 0, 0);
 
@@ -226,31 +228,20 @@ void loop()
                 }
                 case 7:
                 {
-                    uiPrint(0, 8, "[ps3_left]\n x:" + String(ps3LeftStickX()) + "\n y:" + String(ps3LeftStickY()) + "\n deg:" + String(ps3LeftStickDeg()) + "\n dis:" + String(ps3LeftStickDis()));
-                    uiDrawCircleMeter(92, 32, 20, "deg", ps3LeftStickDeg());
+                    uiPrint(0, 8, "[uss]\n l_dis:" + String(ussLeftDis()) + "cm" + "\n l_speed:" + String(ussLeftSpeed()) + "cm/s");
+                    uiPrint(0, 32, "[uss]\n r_dis:" + String(ussRightDis()) + "cm" + "\n r_speed:" + String(ussRightSpeed()) + "cm/s");
                     break;
                 }
                 case 8:
                 {
-                    uiPrint(0, 8, "[ps3_right]\n x:" + String(ps3RightStickX()) + "\n y:" + String(ps3RightStickY()) + "\n deg:" + String(ps3RightStickDeg()) + "\n dis:" + String(ps3RightStickDis()));
-                    uiDrawCircleMeter(92, 32, 20, "deg", ps3RightStickDeg());
+                    uiPrint(0, 8, "[ps3_left]\n x:" + String(ps3LeftStickX()) + "\n y:" + String(ps3LeftStickY()) + "\n deg:" + String(ps3LeftStickDeg()) + "\n dis:" + String(ps3LeftStickDis()));
+                    uiDrawCircleMeter(92, 32, 20, "deg", ps3LeftStickDeg());
                     break;
                 }
                 case 9:
                 {
-                    /*
-                    Ps3Button btns[] = {UP, DOWN, LEFT, RIGHT, TRIANGLE, CIRCLE, CROSS, SQUARE, L1, L2, L3, R1, R2, R3};
-                    String message = "";
-                    for (int i = 0; i < 14; i++)
-                    {
-                        message += String((ps3ButtonIsPushing(btns[i])) ? "1" : "0");
-                    }
-                    uiPrint(0, 8, "[ps3_button]\n" + message);
-                    break;
-                    */
-
-                    uiPrint(0, 8, "[uss]\n l_dis:" + String(ussLeftDis()) + "cm" + "\n l_speed:" + String(ussLeftSpeed()) + "cm/s");
-                    uiPrint(0, 32, "[uss]\n r_dis:" + String(ussRightDis()) + "cm" + "\n r_speed:" + String(ussRightSpeed()) + "cm/s");
+                    uiPrint(0, 8, "[ps3_right]\n x:" + String(ps3RightStickX()) + "\n y:" + String(ps3RightStickY()) + "\n deg:" + String(ps3RightStickDeg()) + "\n dis:" + String(ps3RightStickDis()));
+                    uiDrawCircleMeter(92, 32, 20, "deg", ps3RightStickDeg());
                     break;
                 }
                 }

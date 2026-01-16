@@ -6,6 +6,7 @@
 #include "timer.hpp"
 #include "vector.hpp"
 #include "movementAverage.hpp"
+#include "lagrangeShifter.hpp"
 // driver類
 #include "dribbler.hpp"
 #include "kicker.hpp"

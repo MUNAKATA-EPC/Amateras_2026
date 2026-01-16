@@ -1,5 +1,45 @@
 #include "attacker.hpp"
 
+Vector mawarikomi(int power)
+{
+    int ir_deg = irDeg();
+    int ir_dis = irDis();
+    Vector vec;
+
+    if (ir_dis < 600) // 近いなら
+    {
+        if (abs(ir_deg) < 60) // 前付近
+        {
+            float pos[4][2] = {{0, 0}, {10, 25}, {30, 40}, {60, 105}};
+            float deg = lagrangeShifter(4, pos, abs(ir_deg));
+            if (ir_deg < 0)
+                deg *= -1;
+            vec = Vector(deg, power);
+        }
+        else if (abs(ir_deg) < 100) // 右・左付近
+        {
+            int diff = (ir_deg > 0) ? 45 : -45; // 注意：posの最後の点に合わせること
+            vec = Vector(ir_deg + diff, power);
+        }
+        else if (abs(ir_deg) < 140) // 右後ろ・左後ろ付近
+        {
+            int diff = (ir_deg > 0) ? 50 : -50;
+            vec = Vector(ir_deg + diff, power);
+        }
+        else // 後ろ付近
+        {
+            int diff = (ir_deg > 0) ? 55 : -55;
+            vec = Vector(ir_deg + diff, power);
+        }
+    }
+    else // 遠いなら
+    {
+        vec = Vector(ir_deg, power);
+    }
+
+    return vec;
+}
+
 void attackWithGyro();
 void attackWithCam(bool attack_goal_detected, int attack_goal_deg, int attack_goal_dis, bool defence_goal_detected, int defence_goal_deg, int defence_goal_dis);
 
@@ -25,21 +65,12 @@ void playAttacker(Attacker::Mode mode)
 static Timer line_timer;
 
 static Timer kick_timer;
-static bool old_catch = false;
 
 void attackWithGyro() // ジャイロで攻撃
 {
     motorsPdProcess(&pd_gyro, bnoDeg(), 0); // ジャイロで姿勢制御
 
-    // キッカー
-    bool now_catch = (catchSensor.read() == HIGH);
-
-    if (now_catch == true && old_catch == false)
-    {
-        kick_timer.reset();
-    }
-
-    if (now_catch && kick_timer.everReset() && kick_timer.msTime() >= 100UL)
+    if (catchSensor.read() == HIGH)
     {
         kicker1.kick(true);
     }
@@ -48,74 +79,62 @@ void attackWithGyro() // ジャイロで攻撃
         kicker1.kick(false);
     }
 
-    old_catch = now_catch;
-    // キッカー
+    const int motor_line_max_power = 50;
+    const int motor_ir_max_power = 90;
 
-    const int motor_line_max_power = 75;
-    const int motor_ir_max_power = 75;
-
-    if (lineRingDetected()) // エンジェルライン
+    if (line_timer.everReset() && line_timer.msTime() < 50UL)
     {
         motorsMove(fieldDeg(), motor_line_max_power);
-
+    }
+    else if (lineRingDetected()) // エンジェルライン
+    {
+        motorsMove(fieldDeg(), motor_line_max_power);
         line_timer.reset();
     }
-    else if (irDetected())
+    /*else if (ussRightDetected() && ussLeftDetected() && ussRightDis() < 35 && (ussRightDis() + ussLeftDis()) > 80)
     {
-        if (irDeg() >= -8 && irDeg() <= 8)
+        if (irDetected() && irDeg() <= 0)
         {
-            motorsMove(0, motor_ir_max_power);
-        }
-        else if (irDeg() >= -10 && irDeg() <= 10)
-        {
-            motorsMove(irDeg() * 1.11f, motor_ir_max_power);
-        }
-        else
-        {
-            if (irDis() >= 53.0f)
+            if (irDeg() > -75)
             {
-                motorsMove(irDeg(), motor_ir_max_power);
+                motorsMove(0, motor_ir_max_power);
             }
             else
             {
-                int diff = 50;
-
-                if (irDeg() > 0) // 左にいるとき
-                {
-                    if (irDeg() <= 45)
-                    {
-                        motorsMove(irDeg() + diff, motor_ir_max_power);
-                    }
-                    else if (irDeg() <= 160)
-                    {
-                        motorsMove(irDeg() + diff, motor_ir_max_power);
-                    }
-                    else
-                    {
-                        motorsMove(irDeg() + diff, motor_ir_max_power);
-                    }
-                }
-                else // 右にいるとき
-                {
-                    if (irDeg() >= -45)
-                    {
-                        motorsMove(irDeg() - diff, motor_ir_max_power);
-                    }
-                    else if (irDeg() >= -160)
-                    {
-                        motorsMove(irDeg() - diff, motor_ir_max_power);
-                    }
-                    else
-                    {
-                        motorsMove(irDeg() - diff, motor_ir_max_power);
-                    }
-                }
+                motorsMove(180, motor_ir_max_power);
             }
         }
+        else
+        {
+            motorsMove(90, motor_ir_max_power);
+        }
+    }
+    else if (ussRightDetected() && ussLeftDetected() && ussLeftDis() < 35 && (ussRightDis() + ussLeftDis()) > 80)
+    {
+        if (irDetected() && irDeg() > 0)
+        {
+            if (irDeg() < 75)
+            {
+                motorsMove(0, motor_ir_max_power);
+            }
+            else
+            {
+                motorsMove(180, motor_ir_max_power);
+            }
+        }
+        else
+        {
+            motorsMove(-90, motor_ir_max_power);
+        }
+    }*/
+    else if (irDetected())
+    {
+        Vector vec = mawarikomi(motor_ir_max_power);
+        motorsVectorMove(&vec);
     }
     else
     {
-        motorsPdMove();
+        motorsMove(fieldDeg(), 50);
     }
 }
 
@@ -199,41 +218,8 @@ void attackWithCam(bool attack_goal_detected, int attack_goal_deg, int attack_go
     }*/
     else if (irDetected())
     {
-        Vector mawarikomi_vec;
-
-        if (irDis() >= 666.0f)
-        {
-            motorsMove(irDeg(), motor_ir_max_power);
-        }
-        else if (irDeg() >= -10 && irDeg() <= 10)
-        {
-            motorsMove(0, motor_ir_max_power);
-        }
-        else if (irDeg() >= -20 && irDeg() <= 20)
-        {
-            int diff = (irDeg() > 0) ? 27 : -27;
-            motorsMove(irDeg() + diff, motor_ir_max_power);
-        }
-        else if (irDeg() >= -30 && irDeg() <= 30)
-        {
-            int diff = (irDeg() > 0) ? 40 : -40;
-            motorsMove(irDeg() + diff, motor_ir_max_power);
-        }
-        else if (irDeg() >= -55 && irDeg() <= 55)
-        {
-            int diff = (irDeg() > 0) ? 45 : -45;
-            motorsMove(irDeg() + diff, motor_ir_max_power);
-        }
-        else if (irDeg() >= -125 && irDeg() <= 125)
-        {
-            int diff = (irDeg() > 0) ? 55 : -55;
-            motorsMove(irDeg() + diff, motor_ir_max_power);
-        }
-        else
-        {
-            int diff = (irDeg() > 0) ? 50 : -50;
-            motorsMove(irDeg() + diff, motor_ir_max_power);
-        }
+        Vector vec = mawarikomi(motor_ir_max_power);
+        motorsVectorMove(&vec);
     }
     else
     {

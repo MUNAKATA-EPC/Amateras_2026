@@ -15,15 +15,20 @@ bool bnoInit(TwoWire *wire, uint8_t address)
     }
     _bno = new Adafruit_BNO055(BNO055_ID, address, wire);
 
-    // Teensy 4.0は高速なため、BNOの起動を確実に待つ
     Timer timer;
     timer.reset();
     bool success = false;
-    while (!success && timer.msTime() < 1000UL)
+    while (timer.msTime() < 1000UL)
     {
         success = _bno->begin(OPERATION_MODE_IMUPLUS);
-        if (!success)
+        if (success)
+        {
+            break;
+        }
+        else
+        {
             delay(50);
+        }
     }
 
     if (success)

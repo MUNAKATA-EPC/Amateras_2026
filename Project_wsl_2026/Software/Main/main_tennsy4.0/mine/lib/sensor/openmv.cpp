@@ -26,15 +26,7 @@ bool openmvInit(HardwareSerial *serial, uint32_t baudrate)
 
     packet.setup(0x55, 10, 0xAA); // フレームヘッダー、データサイズ、エンドヘッダーを設定
 
-    Timer timer;
-    timer.reset();
-    bool success = false;
-    while (!success && timer.msTime() < 100UL)
-    {
-        success = _serial->available() > 0; // 1個以上データが来たら成功しているとみなす
-    }
-
-    return success;
+    return true;
 }
 
 void openmvUpdate()

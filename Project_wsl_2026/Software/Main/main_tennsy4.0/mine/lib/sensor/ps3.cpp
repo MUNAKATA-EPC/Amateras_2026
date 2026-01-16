@@ -33,15 +33,7 @@ bool ps3Init(HardwareSerial *serial, uint32_t baudrate)
 
     packet.setup(0x55, 6, 0xAA); // フレームヘッダー、データサイズ、エンドヘッダーを設定
 
-    Timer timer;
-    timer.reset();
-    bool success = false;
-    while (!success && timer.msTime() < 100)
-    {
-        success = _serial->available() > 0; // 1個以上データが来たら成功しているとみなす
-    }
-
-    return success;
+    return true;
 }
 
 void ps3StickAdjust(float leftAdjust, float rightAdjust)

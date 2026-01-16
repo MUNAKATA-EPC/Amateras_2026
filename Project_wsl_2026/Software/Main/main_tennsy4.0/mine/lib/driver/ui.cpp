@@ -21,15 +21,20 @@ static unsigned int _config_data[CONFIG_DATA_LIMIT] = {0U}; // 0~3個のconfig�
 bool uiInit(TwoWire *wire, uint8_t address, uint8_t width, uint8_t height)
 {
     _ssd = new Adafruit_SSD1306(width, height, wire, -1);
-
     _address = address;
 
-    Timer my_display_timer;
-    my_display_timer.reset();
-    bool success = _ssd->begin(SSD1306_SWITCHCAPVCC, _address);
-    while (!success && my_display_timer.msTime() < 100UL)
+    bool success = false;
+    while (timer.msTime() < 1000UL)
     {
-        delay(10); // SSD1306との通信開始待ち
+        success = _ssd->begin(SSD1306_SWITCHCAPVCC, _address);
+        if (success)
+        {
+            break;
+        }
+        else
+        {
+            delay(50);
+        }
     }
 
     _ssd->clearDisplay(); // 画面初期化

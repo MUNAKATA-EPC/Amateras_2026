@@ -89,7 +89,7 @@ void testLineTrace()
     {
         if ((lineRingDis() > 60) && abs(diffDeg(lineRingDeg(), irDeg())) < 90)
         {
-            motorsMove(nearSeesenDeg(lineRingDeg(), irDeg()), motor_line_trace_power);
+            motorsMove(nearSessenDeg(lineRingDeg(), irDeg()), motor_line_trace_power);
         }
         else
         {
