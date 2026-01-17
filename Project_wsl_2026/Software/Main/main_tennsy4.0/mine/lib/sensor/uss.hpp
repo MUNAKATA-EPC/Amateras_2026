@@ -3,6 +3,7 @@
 #include <Arduino.h>
 #include "timer.hpp"
 #include "packetManager.hpp"
+#include "movementAverage.hpp"
 
 bool ussInit(HardwareSerial *serial, uint32_t baudrate);
 void ussUpdate();

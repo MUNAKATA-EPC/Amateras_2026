@@ -1,6 +1,6 @@
 #include "pd.hpp"
 
-#define D_USE_TIMER // ループが短すぎてうまくいかないです
+// #define D_USE_TIMER // ループが短すぎてうまくいかないです
 
 PD::PD(float kp, float kd)
 {

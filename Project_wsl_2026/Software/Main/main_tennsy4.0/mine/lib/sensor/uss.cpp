@@ -9,6 +9,9 @@ static uint16_t _right_dis = 0;
 static float _left_speed = 0.0f;
 static float _right_speed = 0.0f;
 
+static MovementAverage _left_speed_ave(5);
+static MovementAverage _right_speed_ave(5);
+
 static PacketManager packet; // パケットマネージャー
 
 bool ussInit(HardwareSerial *serial, uint32_t baudrate)
@@ -26,34 +29,49 @@ bool ussInit(HardwareSerial *serial, uint32_t baudrate)
 void ussUpdate()
 {
     // データの受け取り
-    static unsigned long last_packet_time = micros();
-    int data_count = _serial->available();
-    for (int i = 0; i < data_count; i++)
+    bool latest_packet_received = false; // パケット受信フラグ
+    uint16_t temp_right = 0;
+    uint16_t temp_left = 0;
+
+    // バッファにあるデータを全て処理する
+    while (_serial->available() > 0)
     {
         packet.add(_serial->read());
         if (packet.isComplete())
         {
-            unsigned long now_time = micros();
-            float delta_time = float(now_time - last_packet_time);
-            last_packet_time = now_time;
+            // パケットが揃うたびに最新の距離情報を一時保存
+            temp_right = (uint16_t(packet.get(2)) << 8) | packet.get(1);
+            temp_left = (uint16_t(packet.get(4)) << 8) | packet.get(3);
 
-            if (delta_time > 0)
-            {
-                // データのパース
-                uint16_t new_right = (uint16_t(packet.get(2)) << 8) | packet.get(1);
-                uint16_t new_left = (uint16_t(packet.get(4)) << 8) | packet.get(3);
-
-                // 速度計算（LPF：前回の値を80%残す）
-                float raw_right_speed = (float((int32_t)new_right - (int32_t)_right_dis)) / delta_time * 1e6f;
-                float raw_left_speed = -(float((int32_t)new_left - (int32_t)_left_dis)) / delta_time * 1e6f;
-
-                _right_speed = _right_speed * 0.3f + raw_right_speed * 0.7f;
-                _left_speed = _left_speed * 0.3f + raw_left_speed * 0.7f;
-
-                _right_dis = new_right;
-                _left_dis = new_left;
-            }
+            latest_packet_received = true;
+            packet.reset(); // 次のパケットへ
         }
+    }
+
+    // ループ終了後、最新のデータを使って「1回だけ」速度を計算する
+    if (latest_packet_received)
+    {
+        // 速度計算
+        float raw_right_speed = (float((int32_t)temp_right - (int32_t)_right_dis)); // Δtによる除算は削除
+        float raw_left_speed = -(float((int32_t)temp_left - (int32_t)_left_dis));   // Δtによる除算は削除
+
+        // 物理的な上限でガード（異常値対策）
+        raw_right_speed = constrain(raw_right_speed, -500.0f, 500.0f);
+        raw_left_speed = constrain(raw_left_speed, -500.0f, 500.0f);
+
+        // 速度計算（LPF：0.3:0.7に変更して応答性を向上）
+        _right_speed = _right_speed * 0.3f + raw_right_speed * 0.7f;
+        _left_speed = _left_speed * 0.3f + raw_left_speed * 0.7f;
+
+        _right_speed = (int)roundf(_right_speed * 100.0f) / 100.0f;
+        _left_speed = (int)roundf(_left_speed * 100.0f) / 100.0f;
+
+        _right_speed = _right_speed_ave.add(_right_speed);
+        _left_speed = _left_speed_ave.add(_left_speed);
+
+        // 距離情報の更新
+        _right_dis = temp_right;
+        _left_dis = temp_left;
     }
 }
 

@@ -1,43 +1,55 @@
 #include "attacker.hpp"
 
-Vector mawarikomi(int power)
+Vector mawarikomi(int max_power)
 {
     int ir_deg = irDeg();
     int ir_dis = irDis();
-    Vector vec;
+    bool ir_detected = irDetected();
 
-    if (ir_dis < 600) // 近いなら
+    if (ir_detected) // ボールがある
     {
-        if (abs(ir_deg) < 60) // 前付近
+        if (ir_dis < 500) // 近い
         {
-            float pos[4][2] = {{0, 0}, {10, 25}, {30, 40}, {60, 105}};
-            float deg = lagrangeShifter(4, pos, abs(ir_deg));
-            if (ir_deg < 0)
-                deg *= -1;
-            vec = Vector(deg, power);
+            // 角度
+            float deg = 0xFF;
+            if (irDeg() >= -22 && irDeg() <= 22) // -22°～22°
+            {
+                float pos[4][2] = {{0, 0}, {8, 8}, {15, 25}, {22, 40}};
+                deg = ((ir_deg > 0) ? 1 : -1) * lagrangeShifter(4, pos, abs(ir_deg));
+            }
+            else if (irDeg() >= -45 && irDeg() <= 45) //-45°～45°
+            {
+                float pos[4][2] = {{22, 40}, {30, 75}, {35, 85}, {45, 100}};
+                deg = ((ir_deg > 0) ? 1 : -1) * lagrangeShifter(4, pos, abs(ir_deg));
+            }
+            else if (irDeg() >= -90 && irDeg() <= 90) // -90°～90°
+            {
+                float pos[4][2] = {{45, 100}, {50, 140}, {60, 155}, {90, 180}};
+                deg = ((ir_deg > 0) ? 1 : -1) * lagrangeShifter(4, pos, abs(ir_deg));
+            }
+            else if (irDeg() >= -90 && irDeg() <= 90) // -135°～135°
+            {
+                float pos[4][2] = {{90, 180}, {110, 190}, {125, 200}, {135, 210}};
+                deg = ((ir_deg > 0) ? 1 : -1) * lagrangeShifter(4, pos, abs(ir_deg));
+            }
+            else // if (irDeg() >= -180 && irDeg() <= 180) // -180°～180°
+            {
+                float pos[4][2] = {{135, 210}, {140, 220}, {155, 240}, {180, 270}};
+                deg = ((ir_deg > 0) ? 1 : -1) * lagrangeShifter(4, pos, abs(ir_deg));
+            }
+
+            // パワー
+            float power = max_power;
+
+            return Vector(deg, power);
         }
-        else if (abs(ir_deg) < 100) // 右・左付近
+        else // 遠い
         {
-            int diff = (ir_deg > 0) ? 45 : -45; // 注意：posの最後の点に合わせること
-            vec = Vector(ir_deg + diff, power);
-        }
-        else if (abs(ir_deg) < 140) // 右後ろ・左後ろ付近
-        {
-            int diff = (ir_deg > 0) ? 50 : -50;
-            vec = Vector(ir_deg + diff, power);
-        }
-        else // 後ろ付近
-        {
-            int diff = (ir_deg > 0) ? 55 : -55;
-            vec = Vector(ir_deg + diff, power);
+            return Vector(ir_deg, max_power);
         }
     }
-    else // 遠いなら
-    {
-        vec = Vector(ir_deg, power);
-    }
 
-    return vec;
+    return Vector(0, 0.0f);
 }
 
 void attackWithGyro();

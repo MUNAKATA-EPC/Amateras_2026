@@ -214,10 +214,9 @@ void loop()
   Serial1.write((uint8_t)((lines_data_bit_mask >> 8) & 0xFF));  // 3byteのデータなので中位の1byteのみ送信
   Serial1.write((uint8_t)((lines_data_bit_mask >> 16) & 0xFF)); // 3byteのデータなので上位の1byteを送信
   Serial1.write(end_header);                                    // teensyとの通信終了
-  Serial1.flush();
-
   // Serial.print(String(analogRead(LINEsensor_side_right_pin)) + " " + String(analogRead(LINEsensor_side_left_pin)) + " ");
   // Serial.println(lines_data_bit_mask, BIN); // pcに送る
+  Serial1.flush();
 
-  delay(5); // 10ms待機
+  delay(10);
 }

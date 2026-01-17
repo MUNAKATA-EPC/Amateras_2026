@@ -61,9 +61,9 @@ void setup()
 
     // デバッグメッセージの出力(ui)
     String message = "> setup <\n";
-    message += "ssd : " + (ssd_success) ? "found" : "not found" + "\n";
-    message += "bno : " + (bno_success) ? "found" : "not found" + "\n";
-    message += "-Presented by onigiri-";
+    message += "ssd : " + String((ssd_success) ? "found" : "not found") + "\n";
+    message += "bno : " + String((bno_success) ? "found" : "not found") + "\n";
+    // message += "-onigiri.com-";
 
     uiClear();
     uiPrintDebug(message.c_str());
@@ -108,7 +108,7 @@ void setup()
     tone(BUZZER_PIN, BuzzerPitches::MyE7, 100); // 決定音
     // anyrtttl::blocking::play(BUZZER_PIN, startup2); // 起動音2
 
-    delay(1000);
+    delay(250);
 }
 
 Timer btn_timer; // btn用
@@ -127,6 +127,9 @@ void loop()
         leftButton.update();
         backButton.update();
         resetButton.update();
+
+        // uiを実行・描画 // ボタンの更新
+        uiButtonUpdate(enterButton.isReleased(), backButton.isReleased(), rightButton.isReleased(), leftButton.isReleased());
     }
     // カラーLEDクリア
     fullColorLed1.rgbLightUp(0, 0, 0);
@@ -135,12 +138,9 @@ void loop()
     irUpdate();
     lineUpdate();
     openmvUpdate();
-    ps3Update();
+    // ps3Update();
     ussUpdate();
     bnoUpdate(resetButton.isReleased()); // bno更新
-
-    // uiを実行・描画
-    uiButtonUpdate(enterButton.isReleased(), backButton.isReleased(), rightButton.isReleased(), leftButton.isReleased()); // ボタンの更新
 
     // 動作を実行
     if (uiRunning() == false)
@@ -162,7 +162,7 @@ void loop()
                 {
                 case 0:
                 {
-                    uiPrint(0, 8, "[ir]\n deg:" + String(irDeg()) + "\n dis:" + String(irDis()) + "\n val:" + String(irVal()) + "\n irY:" + String(irY()));
+                    uiPrint(0, 8, "[ir]\n deg:" + String(irDeg()) + "\n dis:" + String(irDis()) + "\n y:" + String(irY()) + "\n s_y:" + String(irYSpeed()));
                     uiDrawCircleMeter(92, 32, 20, "deg", irDeg());
                     break;
                 }

@@ -23,6 +23,8 @@ bool uiInit(TwoWire *wire, uint8_t address, uint8_t width, uint8_t height)
     _ssd = new Adafruit_SSD1306(width, height, wire, -1);
     _address = address;
 
+    Timer timer;
+    timer.reset();
     bool success = false;
     while (timer.msTime() < 1000UL)
     {

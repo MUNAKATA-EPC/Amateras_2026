@@ -23,36 +23,27 @@ static bool old_catch = false;
 // ボールの相対速度を組み合わせたボールのy方向出す用
 float getDefenceIrY(int ir_deg)
 {
-    static float old_y = 0;
-    static uint32_t old_time = 0;
-
     float y = irDis() * sinf(radians(ir_deg));
-    uint32_t now_time = micros();
-
-    // 初回実行時の処理
-    if (old_time == 0)
-    {
-        old_y = y;
-        old_time = now_time;
-        return y;
-    }
-
-    float delta_t = (float)(now_time - old_time);
-    float speed_y = (y - old_y) / delta_t;
-
     float result_y = y;
 
+    /*
     if (ussRightDetected() && ussLeftDetected() && (ussRightDis() + ussLeftDis()) > 80) // 超音波が信頼できる場合
     {
-        float speed_robo = (ussRightSpeed + ussLeftSpeed) / 2.0f; // ロボの速度を計算
-        float soutai_speed_y = speed_y - speed_robo;              // なんちゃって相対速度を出す
+        float speed_robo = (ussRightDis() < ussLeftDis()) ? ussRightSpeed() : ussLeftSpeed(); // ロボの速度を計算
+        float speed_y = irYSpeed();
+        float soutai_speed_y = speed_y - speed_robo * 0.1f; // なんちゃって相対速度を出す
 
         // なんちゃって相対速度よりボールの位置を予測する
-        result_y = y + (soutai_speed_y * 0.15f);
-    }
+        result_y = y + (soutai_speed_y);
 
-    old_y = y;
-    old_time = now_time;
+        Serial.println("ir_s:" + String(speed_y) + "\trobo_s:" + String(speed_robo) + "\tsoutai_s:" + String(soutai_speed_y));
+    }
+    else
+    {
+        Serial.println("error");
+    }
+    */
+
     return result_y;
 }
 
@@ -62,23 +53,23 @@ void playDefenderVer2(Defender::Mode mode)
     LinePosi posi = linePositionCheck(); // ラインによる自己位置推定
     /*if (posi == LinePosi::Kado_line)
     {
-        Serial.println("kado");
+        ("kado");
     }
     else if (posi == LinePosi::Tate_line)
     {
-        Serial.println("tate");
+        ("tate");
     }
     else if (posi == LinePosi::Yoko_line)
     {
-        Serial.println("yoko");
+        ("yoko");
     }
     else if (posi == LinePosi::Haji_line)
     {
-        Serial.println("haji");
+        ("haji");
     }
     else
     {
-        Serial.println("nai");
+        ("nai");
     }*/
 
     //// 角度更新 ////
@@ -126,27 +117,24 @@ void playDefenderVer2(Defender::Mode mode)
     bool defence_ok = false;
     if (defence_goal_detected)
     {
-        if (ussRightDetected() && ussLeftDetected() &&
-            (ussRightDis() + ussLeftDis()) > 80 &&
-            ussRightDis() >= DEFENCE_USS_DIS_MIN && ussLeftDis() >= DEFENCE_USS_DIS_MIN)
+        if (abs(defence_goal_deg) >= ((mode == Defender::Mode::YELLOWGOAL) ? DEFENCE_YELLOW_GOAL_DEG1 : DEFENCE_BLUE_GOAL_DEG1))
         {
-            defence_ok = true;
-        }
-        else
-        {
-            if (abs(defence_goal_deg) >= ((mode == Defender::Mode::YELLOWGOAL) ? DEFENCE_YELLOW_GOAL_DEG1 : DEFENCE_BLUE_GOAL_DEG1))
+            if ((defence_goal_dis <= ((mode == Defender::Mode::YELLOWGOAL) ? DEFENCE_YELLOW_GOAL_DIS1 : DEFENCE_BLUE_GOAL_DIS1)))
             {
-                if ((defence_goal_dis <= ((mode == Defender::Mode::YELLOWGOAL) ? DEFENCE_YELLOW_GOAL_DIS1 : DEFENCE_BLUE_GOAL_DIS1)))
-                {
-                    defence_ok = true;
-                }
+                defence_ok = true;
             }
-            if (abs(defence_goal_deg) >= ((mode == Defender::Mode::YELLOWGOAL) ? DEFENCE_YELLOW_GOAL_DEG2 : DEFENCE_BLUE_GOAL_DEG2))
+        }
+        if (abs(defence_goal_deg) >= ((mode == Defender::Mode::YELLOWGOAL) ? DEFENCE_YELLOW_GOAL_DEG2 : DEFENCE_BLUE_GOAL_DEG2))
+        {
+            if ((defence_goal_dis <= ((mode == Defender::Mode::YELLOWGOAL) ? DEFENCE_YELLOW_GOAL_DIS2 : DEFENCE_BLUE_GOAL_DIS2)))
             {
-                if ((defence_goal_dis <= ((mode == Defender::Mode::YELLOWGOAL) ? DEFENCE_YELLOW_GOAL_DIS2 : DEFENCE_BLUE_GOAL_DIS2)))
-                {
-                    defence_ok = true;
-                }
+                defence_ok = true;
+            }
+            else if (ussRightDetected() && ussLeftDetected() &&
+                     (ussRightDis() + ussLeftDis()) > 80 &&
+                     ussRightDis() >= DEFENCE_USS_DIS_MIN && ussLeftDis() >= DEFENCE_USS_DIS_MIN)
+            {
+                defence_ok = true;
             }
         }
     }
@@ -221,7 +209,12 @@ void playDefenderVer2(Defender::Mode mode)
         {
             if (irDetected())
             {
-                come_back = true; // 帰還した
+                if (come_back == false)
+                {
+                    come_back = true; // 帰還した
+                    old_ir_keep_deg_flag = false;
+                    ir_keep_deg_timer.reset(); // 帰還後もう一度測定するようにする
+                }
 
                 // ボールの方向を決める
                 int defence_ir_deg;
@@ -268,11 +261,11 @@ void playDefenderVer2(Defender::Mode mode)
                 {
                     if (defence_ir_deg > 0) // 左にある
                     {
-                        ir_defence_vec = Vector(nearSessenDeg(lineRingDeg(), 90), DEFENCE_YOKO_IR_FOLLOW_POWER_MAX);
+                        ir_defence_vec = Vector(nearSessenDeg(lineRingDeg(), defence_ir_deg), DEFENCE_YOKO_IR_FOLLOW_POWER_MAX);
                     }
                     else // 右にある
                     {
-                        ir_defence_vec = Vector(nearSessenDeg(lineRingDeg(), -90), DEFENCE_YOKO_IR_FOLLOW_POWER_MAX);
+                        ir_defence_vec = Vector(nearSessenDeg(lineRingDeg(), defence_ir_deg), DEFENCE_YOKO_IR_FOLLOW_POWER_MAX);
                     }
                 }
                 else if (posi == LinePosi::Kado_line)
@@ -308,11 +301,11 @@ void playDefenderVer2(Defender::Mode mode)
                     {
                         if (abs(irDeg()) < 90) // 前にある
                         {
-                            ir_defence_vec = Vector(nearSessenDeg(lineRingDeg(), 0), DEFENCE_TATE_ZENSHIN_IR_FOLLOW_POWER_MAX);
+                            ir_defence_vec = Vector(nearSessenDeg(lineRingDeg(), irDeg()), DEFENCE_TATE_ZENSHIN_IR_FOLLOW_POWER_MAX);
                         }
                         else // 後にある
                         {
-                            ir_defence_vec = Vector(nearSessenDeg(lineRingDeg(), 180), DEFENCE_TATE_KOUTAI_IR_FOLLOW_POWER_MAX);
+                            ir_defence_vec = Vector(nearSessenDeg(lineRingDeg(), irDeg()), DEFENCE_TATE_KOUTAI_IR_FOLLOW_POWER_MAX);
                         }
                     }
                 }
@@ -322,19 +315,19 @@ void playDefenderVer2(Defender::Mode mode)
                 float dead_zone = 30.0f; // 停止させる範囲
                 if (defence_ir_y > -dead_zone && defence_ir_y < dead_zone)
                 {
-                    ir_defence_vec *= 0.0f; // 停止させる
+                    ir_defence_vec = ir_defence_vec * 0.0f; // 停止させる
                 }
                 else if (defence_ir_y <= -dead_zone && defence_ir_y >= DEFENCE_IR_FRONT_Y_MIN)
                 {
                     // 負の方向の比例（MINに向かって1.0に近づく）
                     float k = (defence_ir_y + dead_zone) / (DEFENCE_IR_FRONT_Y_MIN + dead_zone);
-                    ir_defence_vec *= fminf(k, 1.0f);
+                    ir_defence_vec = ir_defence_vec * fminf(k, 1.0f);
                 }
                 else if (defence_ir_y >= dead_zone && defence_ir_y <= DEFENCE_IR_FRONT_Y_MAX)
                 {
                     // 正の方向の比例（MAXに向かって1.0に近づく）
-                    float k = (defence_ir_y - dead_zone) / (FULL_POWER_Y - dead_zone);
-                    ir_defence_vec *= fminf(k, 1.0f);
+                    float k = (defence_ir_y - dead_zone) / (DEFENCE_IR_FRONT_Y_MAX - dead_zone);
+                    ir_defence_vec = ir_defence_vec * fminf(k, 1.0f);
                 }
 
                 // ライントレースするベクトル
@@ -347,6 +340,7 @@ void playDefenderVer2(Defender::Mode mode)
             }
             else
             {
+                // GO_CENTRAL処理
                 // ゴールの中心へ行くベクトル
                 Vector go_central_vec;
                 LinePosi posi = linePositionCheck();
@@ -417,38 +411,41 @@ void playDefenderVer2(Defender::Mode mode)
             motorsVectorMove(&final_modoru_vec);
         }
     }
-    // TEIITI処理
-    else if (lineRingDetected())
-    {
-        motorsMove(fieldDeg(), TEIITI_LINE_ESCAPE_POWER);
-    }
-    else if (defence_goal_detected)
-    {
-        motorsMove(defence_goal_deg, TEIITI_POWER);
-    }
     else
     {
-        if (fieldDetected())
+        // TEIITI処理
+        if (lineRingDetected())
         {
-            if (abs(fieldDeg()) >= 90) // コートの後ろにいる
-            {
-                if (fieldDeg() > 0) // コートの右にいる
-                {
-                    motorsMove(145, TEIITI_POWER);
-                }
-                else // コートの左にいる
-                {
-                    motorsMove(-145, TEIITI_POWER);
-                }
-            }
-            else // コートの前にいる
-            {
-                motorsMove(fieldDeg(), TEIITI_POWER);
-            }
+            motorsMove(fieldDeg(), TEIITI_LINE_ESCAPE_POWER);
+        }
+        else if (defence_goal_detected)
+        {
+            motorsMove(defence_goal_deg, TEIITI_POWER);
         }
         else
         {
-            motorsMove(180, TEIITI_POWER);
+            if (fieldDetected())
+            {
+                if (abs(fieldDeg()) >= 90) // コートの後ろにいる
+                {
+                    if (fieldDeg() > 0) // コートの右にいる
+                    {
+                        motorsMove(145, TEIITI_POWER);
+                    }
+                    else // コートの左にいる
+                    {
+                        motorsMove(-145, TEIITI_POWER);
+                    }
+                }
+                else // コートの前にいる
+                {
+                    motorsMove(fieldDeg(), TEIITI_POWER);
+                }
+            }
+            else
+            {
+                motorsMove(180, TEIITI_POWER);
+            }
         }
     }
 }

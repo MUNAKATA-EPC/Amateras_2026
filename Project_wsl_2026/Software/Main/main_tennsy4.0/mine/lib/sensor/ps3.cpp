@@ -45,8 +45,7 @@ void ps3StickAdjust(float leftAdjust, float rightAdjust)
 void ps3Update()
 {
     // データの受け取り
-    int data_count = _serial->available();
-    for (int i = 0; i < data_count; i++)
+    while (_serial->available() > 0)
     {
         packet.add(_serial->read());
 
