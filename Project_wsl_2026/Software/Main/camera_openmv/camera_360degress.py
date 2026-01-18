@@ -6,7 +6,7 @@ import math
 #############################################################
 # ゴールの色取り用変数(黄色)
 #goal_yellow = (6, 92, -22, 4, 43, 93) #福岡ﾉｳﾄﾞ
-goal_yellow = (64, 93, -28, -2, 29, 64) #学校
+goal_yellow = (8, 87, -33, 4, 30, 99) #学校
 #############################################################
 # ゴールの色取り用変数(青色)
 #goal_blue = (36, 21, -26, 0, -13, -5) #福岡ﾉｳﾄﾞ
@@ -14,16 +14,16 @@ goal_blue = (100, 100, 127, 127, 127, 127) #学校
 #############################################################
 # コートの色（カーペット用）
 #court_green = (44, 75, -55, -29, 9, 40) #福岡ﾉｳﾄﾞ
-court_green = (42, 87, -22, 1, -5, 19) #学校
+court_green = (37, 78, -17, 13, -24, 34) #学校
 #############################################################
 # 画面の中央座標
-screen_center = [156, 100] # QVGA(320x240)なら160, 120が中央。設定に合わせる
+screen_center = [165, 96] # QVGA(320x240)なら160, 120が中央。設定に合わせる
 screen_short_r = 30
-screen_long_r = 164
+screen_long_r = 170
 
 # -----------------------------------
 # センサー設定
-MANUAL_EXPOSURE = 20000
+MANUAL_EXPOSURE = 15000
 MANUAL_RGB_GAIN = (1.0, 1.0, 1.0)
 MANUAL_GAIN_DB = 3
 
@@ -33,7 +33,7 @@ sensor.set_framesize(sensor.QVGA)
 sensor.set_auto_whitebal(False, rgb_gain_db=MANUAL_RGB_GAIN)
 sensor.set_auto_exposure(False, exposure_us=MANUAL_EXPOSURE)
 sensor.set_auto_gain(False, gain_db=MANUAL_GAIN_DB)
-sensor.set_brightness(10)
+sensor.set_brightness(5)
 
 clock = time.clock()
 uart = UART(3, 115200, timeout_char=1000)
@@ -116,4 +116,4 @@ while True:
     uart.write(bytearray([0xAA]))
 
     # デバッグ出力
-    #print("yellow[deg:%d, dis:%d] blue[deg:%d, dis:%d] court[deg:%d]" % (yellow_deg, yellow_dis, blue_deg, blue_dis, court_deg))
+    # print("yellow[deg:%d, dis:%d] blue[deg:%d, dis:%d] court[deg:%d]" % (yellow_deg, yellow_dis, blue_deg, blue_dis, court_deg))
