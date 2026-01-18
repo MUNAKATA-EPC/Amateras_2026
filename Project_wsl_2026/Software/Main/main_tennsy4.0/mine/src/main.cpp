@@ -46,6 +46,7 @@ void setup()
     motorsSetMoveSign(1, 1, 1, 1);           // 移動のための符号をセット
     motorsSetPdSign(1, 1, 1, 1);             // PD制御のための符号をセット
     motorsSetDegPosition(315, 45, 225, 135); // モータの位置をセット
+    motorsStop();                            // 停止させておく
 
     // デジタル
     kicker1.init(2, 3, 1500);
@@ -140,7 +141,7 @@ void loop()
     openmvUpdate();
     // ps3Update();
     ussUpdate();
-    bnoUpdate(resetButton.isReleased()); // bno更新
+    bnoUpdate(resetButton.isReleased(), ussRightSpeed(), ussLeftSpeed()); // bno更新
 
     // 動作を実行
     if (uiRunning() == false)
@@ -204,7 +205,7 @@ void loop()
                 }
                 case 3:
                 {
-                    uiPrint(0, 8, "[bno055]\n deg:" + String(bnoDeg()));
+                    uiPrint(0, 8, "[bno055]\n deg:" + String(bnoDeg()) + "\n x_speed:" + String(bnoSpeedX()));
                     uiDrawCircleMeter(92, 32, 20, "deg", bnoDeg());
                     break;
                 }

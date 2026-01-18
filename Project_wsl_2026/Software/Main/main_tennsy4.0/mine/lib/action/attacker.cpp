@@ -8,35 +8,28 @@ Vector mawarikomi(int max_power)
 
     if (ir_detected) // ボールがある
     {
-        if (ir_dis < 500) // 近い
+        if (ir_dis < 560) // 近い
         {
             // 角度
             float deg = 0xFF;
-            if (irDeg() >= -22 && irDeg() <= 22) // -22°～22°
+            if (irDeg() >= -45 && irDeg() <= 45) // -45°～45°
             {
-                float pos[4][2] = {{0, 0}, {8, 8}, {15, 25}, {22, 40}};
-                deg = ((ir_deg > 0) ? 1 : -1) * lagrangeShifter(4, pos, abs(ir_deg));
+                float pos[5][2] = {{0, 0}, {8, 10}, {20, 60}, {35, 95}, {45, 105}};
+                deg = ((ir_deg > 0) ? 1 : -1.1f) * lagrangeShifter(5, pos, abs(ir_deg));
             }
+            /*
             else if (irDeg() >= -45 && irDeg() <= 45) //-45°～45°
             {
-                float pos[4][2] = {{22, 40}, {30, 75}, {35, 85}, {45, 100}};
+                float pos[4][2] = {{22, 60}, {30, 75}, {35, 90}, {45, 100}};
                 deg = ((ir_deg > 0) ? 1 : -1) * lagrangeShifter(4, pos, abs(ir_deg));
-            }
-            else if (irDeg() >= -90 && irDeg() <= 90) // -90°～90°
+            }*/
+            else
             {
-                float pos[4][2] = {{45, 100}, {50, 140}, {60, 155}, {90, 180}};
-                deg = ((ir_deg > 0) ? 1 : -1) * lagrangeShifter(4, pos, abs(ir_deg));
+                float k = (ir_deg > 0) ? 1.0f : -1.0f;
+                deg = ir_deg + k * 60;
             }
-            else if (irDeg() >= -90 && irDeg() <= 90) // -135°～135°
-            {
-                float pos[4][2] = {{90, 180}, {110, 190}, {125, 200}, {135, 210}};
-                deg = ((ir_deg > 0) ? 1 : -1) * lagrangeShifter(4, pos, abs(ir_deg));
-            }
-            else // if (irDeg() >= -180 && irDeg() <= 180) // -180°～180°
-            {
-                float pos[4][2] = {{135, 210}, {140, 220}, {155, 240}, {180, 270}};
-                deg = ((ir_deg > 0) ? 1 : -1) * lagrangeShifter(4, pos, abs(ir_deg));
-            }
+
+            // deg = ir_deg + (deg - ir_deg) * map(ir_dis, 200, 500, 1.4f, 1.0f);
 
             // パワー
             float power = max_power;
@@ -94,13 +87,16 @@ void attackWithGyro() // ジャイロで攻撃
     const int motor_line_max_power = 50;
     const int motor_ir_max_power = 90;
 
+    static int old_line_ring_deg = 0;
+
     if (line_timer.everReset() && line_timer.msTime() < 50UL)
     {
-        motorsMove(fieldDeg(), motor_line_max_power);
+        motorsMove(old_line_ring_deg + 180, motor_line_max_power);
     }
     else if (lineRingDetected()) // エンジェルライン
     {
-        motorsMove(fieldDeg(), motor_line_max_power);
+        motorsMove(lineRingDeg() + 180, motor_line_max_power);
+        old_line_ring_deg = lineRingDeg();
         line_timer.reset();
     }
     /*else if (ussRightDetected() && ussLeftDetected() && ussRightDis() < 35 && (ussRightDis() + ussLeftDis()) > 80)
@@ -146,7 +142,7 @@ void attackWithGyro() // ジャイロで攻撃
     }
     else
     {
-        motorsMove(fieldDeg(), 50);
+        motorsPdMove();
     }
 }
 
@@ -235,6 +231,6 @@ void attackWithCam(bool attack_goal_detected, int attack_goal_deg, int attack_go
     }
     else
     {
-        motorsMove(fieldDeg(), 50);
+        motorsPdMove();
     }
 }

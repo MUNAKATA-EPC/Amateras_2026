@@ -26,12 +26,11 @@ float getDefenceIrY(int ir_deg)
     float y = irDis() * sinf(radians(ir_deg));
     float result_y = y;
 
-    /*
     if (ussRightDetected() && ussLeftDetected() && (ussRightDis() + ussLeftDis()) > 80) // 超音波が信頼できる場合
     {
-        float speed_robo = (ussRightDis() < ussLeftDis()) ? ussRightSpeed() : ussLeftSpeed(); // ロボの速度を計算
+        float speed_robo = bnoSpeedX(); // ロボの速度を計算
         float speed_y = irYSpeed();
-        float soutai_speed_y = speed_y - speed_robo * 0.1f; // なんちゃって相対速度を出す
+        float soutai_speed_y = speed_y - speed_robo * 10.0f; // なんちゃって相対速度を出す
 
         // なんちゃって相対速度よりボールの位置を予測する
         result_y = y + (soutai_speed_y);
@@ -42,7 +41,6 @@ float getDefenceIrY(int ir_deg)
     {
         Serial.println("error");
     }
-    */
 
     return result_y;
 }
@@ -160,7 +158,7 @@ void playDefenderVer2(Defender::Mode mode)
         }
         old_ir_keep_deg_flag = true;
 
-        if (ir_keep_deg_flag == true && ir_keep_deg_timer.msTime() >= 3000UL) // 3秒以上もボールが一定の角度にあるなら
+        if (ir_keep_deg_flag == true && ir_keep_deg_timer.msTime() >= 5000UL) // 5秒以上もボールが一定の角度にあるなら
         {
             attacking_timer.reset(); // アタッカータイマー開始
             attack_flag = true;

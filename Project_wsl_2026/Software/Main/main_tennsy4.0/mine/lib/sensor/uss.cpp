@@ -9,8 +9,8 @@ static uint16_t _right_dis = 0;
 static float _left_speed = 0.0f;
 static float _right_speed = 0.0f;
 
-static MovementAverage _left_speed_ave(5);
-static MovementAverage _right_speed_ave(5);
+static MovementAverage _left_speed_ave(1);
+static MovementAverage _right_speed_ave(1);
 
 static PacketManager packet; // パケットマネージャー
 
@@ -59,9 +59,9 @@ void ussUpdate()
         raw_right_speed = constrain(raw_right_speed, -500.0f, 500.0f);
         raw_left_speed = constrain(raw_left_speed, -500.0f, 500.0f);
 
-        // 速度計算（LPF：0.3:0.7に変更して応答性を向上）
-        _right_speed = _right_speed * 0.3f + raw_right_speed * 0.7f;
-        _left_speed = _left_speed * 0.3f + raw_left_speed * 0.7f;
+        // 速度計算
+        _right_speed = _right_speed * 0.0f + raw_right_speed * 1.0f;
+        _left_speed = _left_speed * 0.0f + raw_left_speed * 1.0f;
 
         _right_speed = (int)roundf(_right_speed * 100.0f) / 100.0f;
         _left_speed = (int)roundf(_left_speed * 100.0f) / 100.0f;
