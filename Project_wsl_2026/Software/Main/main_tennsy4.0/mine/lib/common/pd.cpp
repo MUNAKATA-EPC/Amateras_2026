@@ -13,6 +13,15 @@ PD::PD(float kp, float kd)
     _output = 0.0f;
 }
 
+void PD::useP(bool use)
+{
+    _useP = use;
+}
+void PD::useD(bool use)
+{
+    _useD = use;
+}
+
 void PD::process(float val, float target, bool angle)
 {
     // 現在値を設定
@@ -60,6 +69,19 @@ void PD::process(float val, float target, bool angle)
     power += (_useP) ? _p_power : 0.0f;
     power += (_useD) ? _d_power : 0.0f; // D成分は動きを抑える作用
     _output = constrain(power, -100.0f, 100.0f);
+}
+
+// -100.0f～100.0fの値を返す
+float const PD::output()
+{
+    return _output;
+}
+
+// リセットしD成分の暴走を防ぐ
+void PD::reset(float current_val)
+{
+    _oldvalue = current_val;
+    _output = 0.0f;
 }
 
 PD pd_gyro(0.50f, -3.0f); // 共通で使えるようにしておく

@@ -8,12 +8,6 @@
 bool lineInit(HardwareSerial *serial, uint32_t baudrate);
 void lineUpdate();
 
-enum LineDataType
-{
-    RING,
-    SIDE
-};
-
 bool lineIsAdjusting();
 int lineValueToAdjust(uint8_t index);
 

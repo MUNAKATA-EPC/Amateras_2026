@@ -7,6 +7,7 @@ static int _move_sign[4] = {1};    // 移動ベクトル計算後のパワーに
 static int _pd_sign[4] = {1};      // PD制御の回転トルクに対する符号
 
 static PD *_pd = nullptr;
+static PD *_last_pd = nullptr;
 
 // モーター制御の初期化
 bool motorsInit(HardwareSerial *serial, uint32_t baudrate)
@@ -67,7 +68,14 @@ void motorsSetPdSign(int sign_1ch, int sign_2ch, int sign_3ch, int sign_4ch)
 void motorsPdProcess(PD *pd, int deg, int target)
 {
     _pd = pd;
+
+    if (_pd != _last_pd)
+    {
+        _pd->reset(deg);
+    }
     _pd->process(deg, target, true);
+
+    _last_pd = _pd; // 記録
 }
 
 #define PD_MAX 80.0f

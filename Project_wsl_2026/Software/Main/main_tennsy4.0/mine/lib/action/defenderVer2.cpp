@@ -21,12 +21,12 @@ static Timer kick_timer;
 static bool old_catch = false;
 
 // ボールの相対速度を組み合わせたボールのy方向出す用
-float getDefenceIrY(int ir_deg)
+float getDefenceIrY(int ir_deg, bool yoti_flag)
 {
     float y = irDis() * sinf(radians(ir_deg));
     float result_y = y;
 
-    if (ussRightDetected() && ussLeftDetected() && (ussRightDis() + ussLeftDis()) > 80) // 超音波が信頼できる場合
+    if (yoti_flag) // 超音波が信頼できる場合
     {
         float speed_robo = bnoSpeedX(); // ロボの速度を計算
         float speed_y = irYSpeed();
@@ -145,7 +145,8 @@ void playDefenderVer2(Defender::Mode mode)
         irDetected() &&
         abs(diffDeg(now_ir_deg, old_ir_deg)) <= 20 &&
         defence_ok &&
-        !(catchSensor.read() == HIGH);
+        !(catchSensor.read() == HIGH) &&
+        (posi == LinePosi::Yoko_line || posi == LinePosi::Kado_line);
 
     static bool come_back = true; // 帰還したか？
 
@@ -308,7 +309,8 @@ void playDefenderVer2(Defender::Mode mode)
                     }
                 }
 
-                float defence_ir_y = getDefenceIrY(defence_ir_deg); // y方向成分を計算
+                bool yoti_falg = (posi == LinePosi::Yoko_line);                // 横ラインにいるときのみ予知をする（イキり）
+                float defence_ir_y = getDefenceIrY(defence_ir_deg, yoti_falg); // y方向成分を計算
 
                 float dead_zone = 30.0f; // 停止させる範囲
                 if (defence_ir_y > -dead_zone && defence_ir_y < dead_zone)

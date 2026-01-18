@@ -26,22 +26,16 @@ public:
     // 関数・コンストラクタ
     PD(float kp, float kd);
 
-    void useP(bool use)
-    {
-        _useP = use;
-    }
-    void useD(bool use)
-    {
-        _useD = use;
-    }
+    void useP(bool use);
+    void useD(bool use);
 
     void process(float val, float target, bool angle);
 
-    // [-100.0f~100.0f]の値を返す
-    float const output()
-    {
-        return _output;
-    }
+    // -100.0f～100.0fの値を返す
+    float const output();
+
+    // リセットしD成分の暴走を防ぐ
+    void reset(float current_val);
 };
 
 extern PD pd_gyro; // 共通で使えるようにしておく
