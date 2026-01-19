@@ -16,7 +16,8 @@ namespace JAM
     enum Mode
     {
         MANABU,
-        MIRU,
+        KEISAN,
+        KAKUNIN,
         KAKIKOMU,
         ATTACKER,
 

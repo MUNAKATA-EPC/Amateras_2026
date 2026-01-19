@@ -53,7 +53,7 @@ void setup()
     leftButton.init(12, INPUT_PULLDOWN);  // ui用
     resetButton.init(37, INPUT_PULLDOWN); // bno用
 
-    fullColorLed1.init(36, 35, 34); // デバッグ用
+    fullColorLed1.init(36, 34, 35); // デバッグ用
 
     // デバッグメッセージの出力(ui)
     String message = "JAM-System\n";

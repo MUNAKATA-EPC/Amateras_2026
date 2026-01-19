@@ -1,6 +1,6 @@
 #include "ui.hpp"
 
-// #define CONFIG_PRINT // Configをプリントするかどうか
+#define CONFIG_PRINT // Configをプリントするかどうか
 
 static Adafruit_SSD1306 *_ssd = nullptr;
 
@@ -10,14 +10,13 @@ static bool _action_decided = false;
 static bool _mode_decided = false;
 
 #define METER_COUNT 4
-static bool _meter_flag = false;
 static int _meter_number = 0;
 static int _action_number = 0;
 static int _mode_number = 0;
 
-#define CONFIG_DATA_LIMIT 4
+#define CONFIG_DATA_LIMIT 2
 static int _config_number = 0;
-static unsigned int _config_data[CONFIG_DATA_LIMIT] = {0U}; // 0~3個のconfigがある（Runも含む）
+static int _config_data[CONFIG_DATA_LIMIT] = {0U}; // 2個のconfigがある（Runも含む）
 
 // 初期化
 bool uiInit(TwoWire *wire, uint8_t address, uint8_t width, uint8_t height)
@@ -133,8 +132,6 @@ void uiButtonUpdate(bool enterbtn, bool backbtn, bool rightbtn, bool leftbtn)
         }
         else
         {
-            _meter_flag = (_meter_flag == true) ? false : true;
-
             _meter_number = (_meter_number + 1 + METER_COUNT) % METER_COUNT; // 0~(METER_COUNT-1)を周期するようにする
         }
     }
@@ -178,6 +175,10 @@ void uiButtonUpdate(bool enterbtn, bool backbtn, bool rightbtn, bool leftbtn)
                 if (_mode_number > JAM::Mode::MODE_COUNT - 1)
                     _mode_number = 0;
                 break;
+            case Action::Type::RADICON:
+                if (_mode_number > Radicon::Mode::MODE_COUNT - 1)
+                    _mode_number = 0;
+                break;
             }
         }
         if (leftbtn)
@@ -189,6 +190,10 @@ void uiButtonUpdate(bool enterbtn, bool backbtn, bool rightbtn, bool leftbtn)
             {
             case Action::Type::JAM:
                 if (_mode_number > JAM::Mode::MODE_COUNT - 1)
+                    _mode_number = 0;
+                break;
+            case Action::Type::RADICON:
+                if (_mode_number > Radicon::Mode::MODE_COUNT - 1)
                     _mode_number = 0;
                 break;
             }
@@ -232,7 +237,8 @@ void uiButtonUpdate(bool enterbtn, bool backbtn, bool rightbtn, bool leftbtn)
             }
             else
             {
-                _config_data[_config_number]++; // 加算する
+                _config_data[_config_number]++;                                  // 加算する
+                _config_data[_config_number] = _config_data[_config_number] % 6; // 0~5周期にする
             }
         }
     }
@@ -240,7 +246,7 @@ void uiButtonUpdate(bool enterbtn, bool backbtn, bool rightbtn, bool leftbtn)
 // メインのuiの描画用
 static String actionName = "";
 static String modeName = "";
-static String configName[3] = {""}; // CONFIG_DATA_LIMIT (4) から Run設定分 (1) を引いた3個のConfig名を表示
+static String configName[CONFIG_DATA_LIMIT - 1] = {""}; // CONFIG_DATA_LIMIT (2) から Run設定分 (1) を引いた3個のConfig名を表示
 
 void uiDrawMain()
 {
@@ -248,141 +254,141 @@ void uiDrawMain()
     switch (_action_number)
     {
     case Action::Type::JAM:
-                actionName = "JAM";
-                if (_action_decided)
-                {
-                    switch (_mode_number)
-                    {
-                    case JAM::Mode::MANABU:
-                        modeName = "Manabu";
-                        break;
-                    case JAM::Mode::MIRU:
-                        modeName = "Miru";
-                        break;
-                    case JAM::Mode::KAKIKOMU:
-                        modeName = "Kakikomu";
-                        break;
-                    case JAM::Mode::ATTACKER:
-                        modeName = "Attacker";
-                        break;
-                    default:
-                        modeName = "Unknown";
-                        break;
-                    }
-                    configName[0] = "a";
-                    configName[1] = "b";
-                    configName[2] = "c";
-                }
+        actionName = "JAM";
+        if (_action_decided)
+        {
+            switch (_mode_number)
+            {
+            case JAM::Mode::MANABU:
+                modeName = "Manabu";
                 break;
-
-            case Action::Type::RADICON:
-                actionName = "Radicon";
-                if (_action_decided)
-                {
-                    switch (_mode_number)
-                    {
-                    case Radicon::Mode::ZENRYOKU:
-                        modeName = "Zenryoku";
-                        break;
-                    case Radicon::Mode::DARADARA:
-                        modeName = "Daradara";
-                        break;
-                    default:
-                        modeName = "Unknown";
-                        break;
-                    }
-                    configName[0] = "a";
-                    configName[1] = "b";
-                    configName[2] = "c";
-                }
+            case JAM::Mode::KEISAN:
+                modeName = "Keisan";
                 break;
-
+            case JAM::Mode::KAKUNIN:
+                modeName = "Kakunin";
+                break;
+            case JAM::Mode::KAKIKOMU:
+                modeName = "Kakikomu";
+                break;
+            case JAM::Mode::ATTACKER:
+                modeName = "Attacker";
+                break;
             default:
-                actionName = "Unknown";
                 modeName = "Unknown";
                 break;
             }
+            configName[0] = "idx2";
+        }
+        break;
 
-            // 画面描画
-            _ssd->setTextSize(1);
-            _ssd->setTextColor(SSD1306_WHITE, SSD1306_BLACK);
-            _ssd->setCursor(0, 0);
-
-            // action表示
-            _ssd->print("> ");
-
-            ssdPrint(actionName);
-
-            if (!_action_decided)
+    case Action::Type::RADICON:
+        actionName = "Radicon";
+        if (_action_decided)
+        {
+            switch (_mode_number)
             {
-                _ssd->print(" <");
+            case Radicon::Mode::ZENRYOKU:
+                modeName = "Zenryoku";
+                break;
+            case Radicon::Mode::DARADARA:
+                modeName = "Daradara";
+                break;
+            default:
+                modeName = "Unknown";
+                break;
             }
-            else
-            {
-                _ssd->println("");
+            configName[0] = "p";
+        }
+        break;
 
-                // mode表示
-                _ssd->print(" > ");
-                ssdPrint(modeName);
-                if (!_mode_decided)
-                {
-                    _ssd->println(" <");
-                }
-                else
-                {
-                    _ssd->println("");
+    default:
+        actionName = "Unknown";
+        modeName = "Unknown";
+        break;
+    }
 
-                    // run系のプリント
-                    String run_str = (_config_number == 0) ? "|" : " ";
-                    run_str += "Run:";
-                    run_str += _config_data[0] ? "on" : "off";
+    // 画面描画
+    _ssd->setTextSize(1);
+    _ssd->setTextColor(SSD1306_WHITE, SSD1306_BLACK);
+    _ssd->setCursor(0, 0);
 
-                    _ssd->setTextSize(2);
-                    ssdPrint(run_str);
-                    _ssd->println(""); // Run表示の後に改行を追加
+    // action表示
+    _ssd->print("> ");
+
+    ssdPrint(actionName);
+
+    if (!_action_decided)
+    {
+        _ssd->print(" <");
+    }
+    else
+    {
+        _ssd->println("");
+
+        // mode表示
+        _ssd->print(" > ");
+        ssdPrint(modeName);
+        if (!_mode_decided)
+        {
+            _ssd->println(" <");
+        }
+        else
+        {
+            _ssd->println("");
+
+            // run系のプリント
+            String run_str = (_config_number == 0) ? "|" : " ";
+            run_str += "Run:";
+            run_str += _config_data[0] ? "on" : "off";
+
+            _ssd->setTextSize(2);
+            ssdPrint(run_str);
+            _ssd->println(""); // Run表示の後に改行を追加
 
 #ifdef CONFIG_PRINT
-                    // config系のプリント
-                    int maxLen = 0;
-                    for (int i = 0; i < 3; i++)
-                    {
-                        int len = (int)configName[i].length();
+            // config系のプリント
+            int maxLen = 0;
+            for (int i = 0; i < CONFIG_DATA_LIMIT - 1; i++)
+            {
+                int len = (int)configName[i].length();
 
-                        if (len > maxLen)
-                            maxLen = len;
-                    }
-
-                    // 文字列の末尾にスペースを詰める処理
-                    for (int i = 0; i < 3; i++)
-                    {
-                        // スペースを詰める幅を決定
-                        int behindLen = maxLen - configName[i].length();
-
-                        for (int ii = 0; ii < behindLen; ii++)
-                            configName[i] += " ";
-                    }
-
-                    String config_str = "";
-                    for (int i = 0; i < 3; i++)
-                    {
-                        // 選択されているConfig (i+1) をチェック
-                        config_str = (_config_number == (i + 1)) ? " |" : "  ";
-                        // configName[i] (スペース調整済み) とコロン':'を結合
-                        config_str += configName[i] + ":" + String(_config_data[(i + 1)]) + "\n";
-
-                        _ssd->setTextSize(1);
-                        ssdPrint(config_str);
-                    }
-#endif
-                }
+                if (len > maxLen)
+                    maxLen = len;
             }
-        }
 
-        // 　データ取得
-        int uiMeterNumber() { return _meter_number; }
-        bool uiActionDecided() { return _action_decided; }
-        bool uiModeDecided() { return _mode_decided; }
-        bool uiRunning() { return _mode_decided && _action_decided && _config_data[0]; }
-        int uiActionNumber() { return _action_number; }
-        int uiModeNumber() { return _mode_number; }
-        int uiConfigNumber() { return _config_number; }
+            // 文字列の末尾にスペースを詰める処理
+            for (int i = 0; i < CONFIG_DATA_LIMIT - 1; i++)
+            {
+                // スペースを詰める幅を決定
+                int behindLen = maxLen - configName[i].length();
+
+                for (int ii = 0; ii < behindLen; ii++)
+                    configName[i] += " ";
+            }
+
+            String config_str = "";
+            for (int i = 0; i < CONFIG_DATA_LIMIT - 1; i++)
+            {
+                // 選択されているConfig (i+1) をチェック
+                config_str = (_config_number == (i + 1)) ? " |" : "  ";
+                // configName[i] (スペース調整済み) とコロン':'を結合
+                config_str += configName[i] + ":" + String(_config_data[(i + 1)]) + "\n";
+
+                _ssd->setTextSize(1);
+                ssdPrint(config_str);
+            }
+#endif
+        }
+    }
+}
+
+// 　データ取得
+int uiMeterNumber() { return _meter_number; }
+bool uiActionDecided() { return _action_decided; }
+bool uiModeDecided() { return _mode_decided; }
+bool uiRunning() { return _mode_decided && _action_decided && _config_data[0]; }
+int uiActionNumber() { return _action_number; }
+int uiModeNumber() { return _mode_number; }
+int uiConfigNumber() { return _config_number; }
+int uiConfigData(uint8_t index) { return _config_data[index]; }
