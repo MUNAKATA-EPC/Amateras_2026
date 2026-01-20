@@ -11,7 +11,7 @@ bool Button::init(uint8_t pin, uint8_t pinmode)
 }
 
 // チャタリング防止のための閾値（ミリ秒）
-const unsigned long DEBOUNCE_DELAY = 20;
+const unsigned long DEBOUNCE_DELAY = 5;
 
 void Button::update()
 {

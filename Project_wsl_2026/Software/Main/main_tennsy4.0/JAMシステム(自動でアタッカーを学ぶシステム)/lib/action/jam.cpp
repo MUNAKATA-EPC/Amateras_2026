@@ -316,27 +316,27 @@ void printJAM(JAM::Mode mode)
                     msg += "0";
                 }
             }
-            uiPrint(10, 32, msg);
+            uiPrint(15, 40, msg);
         }
         else
         {
-            uiPrint(10, 32, "error");
+            uiPrint(15, 40, "error");
         }
     }
     else if (mode == JAM::Mode::KEISAN)
     {
-        uiPrint(0, 0, "hello");
+        uiPrint(15, 40, "hello");
     }
     else if (mode == JAM::Mode::KAKUNIN)
     {
-        uiPrint(0, 0, "hello");
+        uiPrint(15, 40, "hello");
     }
     else if (mode == JAM::Mode::KAKIKOMU)
     {
-        uiPrint(0, 0, "hello");
+        uiPrint(15, 40, "hello");
     }
     else if (mode == JAM::Mode::ATTACKER)
     {
-        uiPrint(0, 0, "hello");
+        uiPrint(15, 40, "hello");
     }
 }

@@ -8,7 +8,7 @@ Vector mawarikomi(int max_power)
 
     if (ir_detected) // ボールがある
     {
-        if (ir_dis < 560) // 近い
+        if (ir_dis <= 540) // 近い
         {
             // 角度
             float deg = 0xFF;
@@ -171,11 +171,11 @@ void attackWithCam(bool attack_goal_detected, int attack_goal_deg, int attack_go
     const int motor_line_max_power = 50;
     const int motor_ir_max_power = 90;
 
-    if (attack_goal_detected && attack_goal_dis < 70)
+    if (attack_goal_detected && attack_goal_dis < 60)
     {
         motorsMove(attack_goal_deg + 180, motor_line_max_power);
     }
-    else if (defence_goal_detected && defence_goal_dis < 70)
+    else if (defence_goal_detected && defence_goal_dis < 60)
     {
         motorsMove(defence_goal_deg + 180, motor_line_max_power);
     }
@@ -188,7 +188,7 @@ void attackWithCam(bool attack_goal_detected, int attack_goal_deg, int attack_go
         motorsMove(fieldDeg(), motor_line_max_power);
         line_timer.reset();
     }
-    /*else if (ussRightDetected() && ussLeftDetected() && ussRightDis() < 35 && (ussRightDis() + ussLeftDis()) > 80)
+    /*else if (ussRightDetected() && ussLeftDetected() && ussRightDis() <= 36 && (ussRightDis() + ussLeftDis()) > 80)
     {
         if (irDetected() && irDeg() <= 0)
         {
@@ -206,7 +206,7 @@ void attackWithCam(bool attack_goal_detected, int attack_goal_deg, int attack_go
             motorsMove(90, motor_ir_max_power);
         }
     }
-    else if (ussRightDetected() && ussLeftDetected() && ussLeftDis() < 35 && (ussRightDis() + ussLeftDis()) > 80)
+    else if (ussRightDetected() && ussLeftDetected() && ussLeftDis() <= 36 && (ussRightDis() + ussLeftDis()) > 80)
     {
         if (irDetected() && irDeg() > 0)
         {

@@ -30,10 +30,10 @@ float getDefenceIrY(int ir_deg, bool yoti_flag)
     {
         float speed_robo = bnoSpeedX(); // ロボの速度を計算
         float speed_y = irYSpeed();
-        float soutai_speed_y = speed_y - speed_robo * 10.0f; // なんちゃって相対速度を出す
+        float soutai_speed_y = speed_y - speed_robo * 0.0f; // なんちゃって相対速度を出す
 
         // なんちゃって相対速度よりボールの位置を予測する
-        result_y = y + (soutai_speed_y);
+        result_y = y + (soutai_speed_y * 1.25f);
 
         Serial.println("ir_s:" + String(speed_y) + "\trobo_s:" + String(speed_robo) + "\tsoutai_s:" + String(soutai_speed_y));
     }
@@ -290,11 +290,11 @@ void playDefenderVer2(Defender::Mode mode)
                 {
                     if (defence_goal_deg > 0 && irDeg() >= 0 && irDeg() <= 140) // 右のラインにいてボールが左にある | (ゴール) (ボール) | (ロボット)
                     {
-                        ir_defence_vec = Vector(nearSessenDeg(lineRingDeg(), 0), DEFENCE_TATE_ZENSHIN_IR_FOLLOW_POWER_MAX);
+                        ir_defence_vec = Vector(nearSessenDeg(lineRingDeg(), -30), DEFENCE_TATE_ZENSHIN_IR_FOLLOW_POWER_MAX);
                     }
                     else if (defence_goal_deg <= 0 && irDeg() < 0 && irDeg() >= -140) // 左のラインにいてボールが右にある (ロボット) | (ボール) (ゴール) |
                     {
-                        ir_defence_vec = Vector(nearSessenDeg(lineRingDeg(), 0), DEFENCE_TATE_ZENSHIN_IR_FOLLOW_POWER_MAX);
+                        ir_defence_vec = Vector(nearSessenDeg(lineRingDeg(), 30), DEFENCE_TATE_ZENSHIN_IR_FOLLOW_POWER_MAX);
                     }
                     else
                     {
@@ -309,26 +309,43 @@ void playDefenderVer2(Defender::Mode mode)
                     }
                 }
 
-                bool yoti_falg = (posi == LinePosi::Yoko_line);                // 横ラインにいるときのみ予知をする（イキり）
+                bool yoti_falg = /*(posi == LinePosi::Yoko_line)*/ false;      // 横ラインにいるときのみ予知をする（イキり）
                 float defence_ir_y = getDefenceIrY(defence_ir_deg, yoti_falg); // y方向成分を計算
 
+                bool is_front = false;
                 float dead_zone = 30.0f; // 停止させる範囲
                 if (defence_ir_y > -dead_zone && defence_ir_y < dead_zone)
                 {
+                    is_front = true;
                     ir_defence_vec = ir_defence_vec * 0.0f; // 停止させる
                 }
                 else if (defence_ir_y <= -dead_zone && defence_ir_y >= DEFENCE_IR_FRONT_Y_MIN)
                 {
+                    is_front = true;
                     // 負の方向の比例（MINに向かって1.0に近づく）
                     float k = (defence_ir_y + dead_zone) / (DEFENCE_IR_FRONT_Y_MIN + dead_zone);
                     ir_defence_vec = ir_defence_vec * fminf(k, 1.0f);
                 }
                 else if (defence_ir_y >= dead_zone && defence_ir_y <= DEFENCE_IR_FRONT_Y_MAX)
                 {
+                    is_front = true;
                     // 正の方向の比例（MAXに向かって1.0に近づく）
                     float k = (defence_ir_y - dead_zone) / (DEFENCE_IR_FRONT_Y_MAX - dead_zone);
                     ir_defence_vec = ir_defence_vec * fminf(k, 1.0f);
                 }
+
+                /*ボールが前にあり横ラインにいるならボールは本当に停止しているかを見る（予知ロジック）
+                if (is_front && abs(bnoSpeedX()) <= 0.05 && posi == LinePosi::Yoko_line)
+                {
+                    if (irYSpeed() >= 15)
+                    {
+                        ir_defence_vec = Vector(90, DEFENCE_YOKO_IR_FOLLOW_POWER_MAX);
+                    }
+                    else if (irYSpeed() <= -15)
+                    {
+                        ir_defence_vec = Vector(-90, DEFENCE_YOKO_IR_FOLLOW_POWER_MAX);
+                    }
+                }*/
 
                 // ライントレースするベクトル
                 Vector line_trace_vec = Vector(lineRingDeg(), lineRingDis() * DEFENCE_LINE_TRACE_POWER_MAX / 100.0f);
@@ -347,22 +364,40 @@ void playDefenderVer2(Defender::Mode mode)
 
                 if (posi == LinePosi::Yoko_line)
                 {
-                    if (defence_goal_deg > 0 && defence_goal_deg < 165)
+                    if (ussLeftDetected() && ussRightDetected() && ussRightDis() + ussLeftDis() > 80)
                     {
-                        go_central_vec = Vector(90, DEFENCE_GO_CENTRAL_POWER);
-                    }
-                    else if (defence_goal_deg <= 0 && defence_goal_deg <= -165)
-                    {
-                        go_central_vec = Vector(-90, DEFENCE_GO_CENTRAL_POWER);
+                        if (ussRightDis() >= 74 && ussLeftDis() >= 74)
+                        {
+                            go_central_vec = Vector(0, 0);
+                        }
+                        else if (ussRightDis() < ussLeftDis())
+                        {
+                            go_central_vec = Vector(nearSessenDeg(lineRingDeg(), 90), DEFENCE_GO_CENTRAL_POWER);
+                        }
+                        else
+                        {
+                            go_central_vec = Vector(nearSessenDeg(lineRingDeg(), -90), DEFENCE_GO_CENTRAL_POWER);
+                        }
                     }
                     else
                     {
-                        go_central_vec = Vector(0, 0.0f);
+                        if (defence_goal_deg > 0 && defence_goal_deg < 165)
+                        {
+                            go_central_vec = Vector(nearSessenDeg(lineRingDeg(), 90), DEFENCE_GO_CENTRAL_POWER);
+                        }
+                        else if (defence_goal_deg <= 0 && defence_goal_deg <= -165)
+                        {
+                            go_central_vec = Vector(nearSessenDeg(lineRingDeg(), -90), DEFENCE_GO_CENTRAL_POWER);
+                        }
+                        else
+                        {
+                            go_central_vec = Vector(0, 0.0f);
+                        }
                     }
                 }
                 else if (posi == LinePosi::Tate_line)
                 {
-                    go_central_vec = Vector(0, DEFENCE_GO_CENTRAL_POWER);
+                    go_central_vec = Vector(nearSessenDeg(lineRingDeg(), 0), DEFENCE_GO_CENTRAL_POWER);
                 }
                 else // if(posi == LinePosi::Kado_line)
                 {

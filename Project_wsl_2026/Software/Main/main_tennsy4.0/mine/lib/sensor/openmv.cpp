@@ -10,10 +10,12 @@ static int _field_deg = 0xFF;
 static bool _blue_goal_detected = false;
 static int _blue_goal_deg = 0xFF;
 static float _blue_goal_dis = 0xFF;
+static float _blue_goal_y = 0xFF;
 // 黄ゴール
 static bool _yellow_goal_detected = false;
 static int _yellow_goal_deg = 0xFF;
 static float _yellow_goal_dis = 0xFF;
+static float _yellow_goal_y = 0xFF;
 
 static PacketManager packet; // パケットマネージャー
 
@@ -31,6 +33,8 @@ bool openmvInit(HardwareSerial *serial, uint32_t baudrate)
 
 void openmvUpdate()
 {
+    bool latest_packet_received = false; // 今回のループでパケットが完成したかフラグ
+
     // データの受け取り
     while (_serial->available() > 0)
     {
@@ -50,6 +54,14 @@ void openmvUpdate()
             uint8_t high3 = packet.get(6);                                       // 黄色ゴールの距離の上位バイトを読み取る
             _yellow_goal_dis = float((uint16_t(high3) << 8) | uint16_t(low3));   // 上位バイトと下位バイトをつなげる
             _yellow_goal_detected = (_yellow_goal_deg != 0xFF);
+            if (_yellow_goal_detected)
+            {
+                _yellow_goal_y = sinf(radians(_yellow_goal_deg)) * _yellow_goal_dis;
+            }
+            else
+            {
+                _yellow_goal_y = 0xFF;
+            }
 
             uint8_t low4 = packet.get(7);                                      // 青色ゴールの角度の下位バイトを読み取る
             uint8_t high4 = packet.get(8);                                     // 青色ゴールの角度の上位バイトを読み取る
@@ -58,7 +70,23 @@ void openmvUpdate()
             uint8_t high5 = packet.get(10);                                    // 青色ゴールの距離の上位バイトを読み取る
             _blue_goal_dis = float((uint16_t(high5) << 8) | uint16_t(low5));   // 上位バイトと下位バイトをつなげる
             _blue_goal_detected = (_blue_goal_deg != 0xFF);
+            if (_blue_goal_detected)
+            {
+                _blue_goal_y = sinf(radians(_blue_goal_deg)) * _blue_goal_dis;
+            }
+            else
+            {
+                _blue_goal_y = 0xFF;
+            }
+
+            latest_packet_received = true; // パケットが1つ以上完成したことを記録
+            packet.reset();
         }
+    }
+
+    // // ループ終了後、最新のデータを使って「1回だけ」速度を計算する
+    if (latest_packet_received)
+    {
     }
 }
 
@@ -68,7 +96,9 @@ int fieldDeg() { return _field_deg; }
 bool blueGoalDetected() { return _blue_goal_detected; }
 int blueGoalDeg() { return _blue_goal_deg; }
 float blueGoalDis() { return _blue_goal_dis; }
+float blueGoalY() { return _blue_goal_y; }
 
 bool yellowGoalDetected() { return _yellow_goal_detected; }
 int yellowGoalDeg() { return _yellow_goal_deg; }
 float yellowGoalDis() { return _yellow_goal_dis; }
+float yellowGoalY() { return _yellow_goal_y; }

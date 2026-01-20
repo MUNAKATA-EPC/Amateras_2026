@@ -189,12 +189,12 @@ void uiButtonUpdate(bool enterbtn, bool backbtn, bool rightbtn, bool leftbtn)
             switch (_action_number)
             {
             case Action::Type::JAM:
-                if (_mode_number > JAM::Mode::MODE_COUNT - 1)
-                    _mode_number = 0;
+                if (_mode_number < 0)
+                    _mode_number = JAM::Mode::MODE_COUNT - 1;
                 break;
             case Action::Type::RADICON:
-                if (_mode_number > Radicon::Mode::MODE_COUNT - 1)
-                    _mode_number = 0;
+                if (_mode_number > 0)
+                    _mode_number = Radicon::Mode::MODE_COUNT - 1;
                 break;
             }
         }

@@ -56,8 +56,8 @@ void setup()
     fullColorLed1.init(36, 34, 35); // デバッグ用
 
     // デバッグメッセージの出力(ui)
-    String message = "JAM-System\n";
-    message += "Jidou-de-Attacker-wo-Manabu-System";
+    String message = "> JAM-System <\n";
+    message += "Jidou-de\n Attacker-wo\n  Manabu\n   System";
 
     uiClear();
     uiPrintDebug(message.c_str());

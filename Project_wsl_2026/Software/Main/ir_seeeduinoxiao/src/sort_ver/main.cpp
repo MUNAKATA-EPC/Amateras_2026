@@ -63,7 +63,7 @@ void setup()
     Serial1.begin(115200);
 
     // マルチプレクサのピン設定
-    mux.set_pin(1, 2, 3, 4, 5, -1);
+    mux.set_pin(1, 2, 3, 4, 0, -1);
     // マルチプレクサの初期化
     mux.init(20);
 }

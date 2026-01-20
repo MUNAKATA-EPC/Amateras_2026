@@ -27,8 +27,8 @@
 void playDefenderVer2(Defender::Mode mode);
 
 //// DEFENCE処理 ////
-#define DEFENCE_IR_FRONT_Y_MAX 80.0f  // ボールのy座標がこの値から
-#define DEFENCE_IR_FRONT_Y_MIN -80.0f // この値までであったら停止する
+#define DEFENCE_IR_FRONT_Y_MAX 50.0f  // ボールのy座標がこの値から
+#define DEFENCE_IR_FRONT_Y_MIN -50.0f // この値までであったら停止する
 
 #define DEFENCE_YELLOW_GOAL_NORMAL_DEG 150 // 普通に守備をする角度(これを超えると対角線で守る)
 #define DEFENCE_BLUE_GOAL_NORMAL_DEG 150
@@ -37,7 +37,7 @@ void playDefenderVer2(Defender::Mode mode);
 // USS
 #define DEFENCE_USS_DIS_MIN 40 // ディフェンスの処理に移る最低の距離
 // 1段階目
-#define DEFENCE_YELLOW_GOAL_DIS1 75.0f // ディフェンスの処理に移る距離
+#define DEFENCE_YELLOW_GOAL_DIS1 80.0f // ディフェンスの処理に移る距離
 #define DEFENCE_BLUE_GOAL_DIS1 77.0f
 
 #define DEFENCE_YELLOW_GOAL_DEG1 120 // ディフェンスの処理に移る角度
@@ -61,7 +61,7 @@ void playDefenderVer2(Defender::Mode mode);
 #define DEFENCE_GO_CENTRAL_POWER 65.0f // ゴールの中心に行くパワー
 
 //// MODORU処理 ////
-#define MODORU_YELLOW_GOAL_DIS 57.0f // ゴール近距離を判断する距離とその時の力 (ゴールから逃げる・近寄る)
+#define MODORU_YELLOW_GOAL_DIS 68.0f // ゴール近距離を判断する距離とその時の力 (ゴールから逃げる・近寄る)
 #define MODORU_BLUE_GOAL_DIS 59.0f
 
 #define MODORU_POWER 60          // この力で戻りながら
