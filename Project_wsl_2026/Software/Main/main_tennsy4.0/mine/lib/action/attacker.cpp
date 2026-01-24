@@ -12,17 +12,15 @@ Vector mawarikomi(int max_power)
         {
             // 角度
             float deg = 0xFF;
-            if (irDeg() >= -45 && irDeg() <= 45) // -45°～45°
+            if (abs(irDeg()) < 8)
+            {
+                deg = 0;
+            }
+            else if (irDeg() >= -45 && irDeg() <= 45) // -45°～45°
             {
                 float pos[5][2] = {{0, 0}, {8, 10}, {20, 60}, {35, 95}, {45, 105}};
                 deg = ((ir_deg > 0) ? 1 : -1.1f) * lagrangeShifter(5, pos, abs(ir_deg));
             }
-            /*
-            else if (irDeg() >= -45 && irDeg() <= 45) //-45°～45°
-            {
-                float pos[4][2] = {{22, 60}, {30, 75}, {35, 90}, {45, 100}};
-                deg = ((ir_deg > 0) ? 1 : -1) * lagrangeShifter(4, pos, abs(ir_deg));
-            }*/
             else
             {
                 float k = (ir_deg > 0) ? 1.0f : -1.0f;
@@ -99,7 +97,7 @@ void attackWithGyro() // ジャイロで攻撃
         old_line_ring_deg = lineRingDeg();
         line_timer.reset();
     }
-    /*else if (ussRightDetected() && ussLeftDetected() && ussRightDis() < 35 && (ussRightDis() + ussLeftDis()) > 80)
+    else if (ussRightDetected() && ussLeftDetected() && ussRightDis() < 35 && (ussRightDis() + ussLeftDis()) > 80)
     {
         if (irDetected() && irDeg() <= 0)
         {
@@ -134,7 +132,7 @@ void attackWithGyro() // ジャイロで攻撃
         {
             motorsMove(-90, motor_ir_max_power);
         }
-    }*/
+    }
     else if (irDetected())
     {
         Vector vec = mawarikomi(motor_ir_max_power);
@@ -183,7 +181,7 @@ void attackWithCam(bool attack_goal_detected, int attack_goal_deg, int attack_go
     {
         motorsMove(fieldDeg(), motor_line_max_power);
     }
-    else if (lineRingDetected()) // エンジェルライン
+    else if (lineRingDetected() || lineSideRightDetected() || lineSideLeftDetected()) // エンジェルライン
     {
         motorsMove(fieldDeg(), motor_line_max_power);
         line_timer.reset();

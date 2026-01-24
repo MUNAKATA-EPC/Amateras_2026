@@ -159,7 +159,7 @@ void playDefenderVer2(Defender::Mode mode)
         }
         old_ir_keep_deg_flag = true;
 
-        if (ir_keep_deg_flag == true && ir_keep_deg_timer.msTime() >= 5000UL) // 5秒以上もボールが一定の角度にあるなら
+        if (ir_keep_deg_flag == true && ir_keep_deg_timer.msTime() >= 3000UL) // 3秒以上もボールが一定の角度にあるなら
         {
             attacking_timer.reset(); // アタッカータイマー開始
             attack_flag = true;
@@ -173,10 +173,13 @@ void playDefenderVer2(Defender::Mode mode)
     }
 
     if (attack_flag == true &&
-        (posi == LinePosi::Haji_line ||                              // アタックモードに移行して端ラインにいるなら戻る
-         posi == LinePosi::Tate_line ||                              // アタックモードに移行して角ラインにいるなら戻る
-         !irDetected() ||                                            // アタックモードに移行してボールがなくなったらら戻る
-         (attacking_timer.msTime() > 1000UL && lineRingDetected()))) // アタックモードに移行して1秒経った後ラインが反応したら戻る
+        (posi == LinePosi::Haji_line || // アタックモードに移行して端ラインにいるなら戻る
+         posi == LinePosi::Tate_line || // アタックモードに移行して角ラインにいるなら戻る
+         !irDetected() ||               // アタックモードに移行してボールがなくなったらら戻る
+         (attacking_timer.msTime() > 1000UL &&
+          (lineRingDetected() ||
+           lineSideLeftDetected() ||
+           lineSideRightDetected())))) // アタックモードに移行して1秒経った後ラインが反応したら戻る
     {
         attack_flag = false;
     }
@@ -312,23 +315,23 @@ void playDefenderVer2(Defender::Mode mode)
                 bool yoti_falg = /*(posi == LinePosi::Yoko_line)*/ false;      // 横ラインにいるときのみ予知をする（イキり）
                 float defence_ir_y = getDefenceIrY(defence_ir_deg, yoti_falg); // y方向成分を計算
 
-                bool is_front = false;
-                float dead_zone = 30.0f; // 停止させる範囲
+                // bool is_front = false;
+                float dead_zone = 50.0f; // 停止させる範囲
                 if (defence_ir_y > -dead_zone && defence_ir_y < dead_zone)
                 {
-                    is_front = true;
+                    // is_front = true;
                     ir_defence_vec = ir_defence_vec * 0.0f; // 停止させる
                 }
                 else if (defence_ir_y <= -dead_zone && defence_ir_y >= DEFENCE_IR_FRONT_Y_MIN)
                 {
-                    is_front = true;
+                    // is_front = true;
                     // 負の方向の比例（MINに向かって1.0に近づく）
                     float k = (defence_ir_y + dead_zone) / (DEFENCE_IR_FRONT_Y_MIN + dead_zone);
                     ir_defence_vec = ir_defence_vec * fminf(k, 1.0f);
                 }
                 else if (defence_ir_y >= dead_zone && defence_ir_y <= DEFENCE_IR_FRONT_Y_MAX)
                 {
-                    is_front = true;
+                    // is_front = true;
                     // 正の方向の比例（MAXに向かって1.0に近づく）
                     float k = (defence_ir_y - dead_zone) / (DEFENCE_IR_FRONT_Y_MAX - dead_zone);
                     ir_defence_vec = ir_defence_vec * fminf(k, 1.0f);
