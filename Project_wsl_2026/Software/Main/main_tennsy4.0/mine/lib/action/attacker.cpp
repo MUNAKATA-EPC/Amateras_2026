@@ -97,7 +97,7 @@ void attackWithGyro() // ジャイロで攻撃
         old_line_ring_deg = lineRingDeg();
         line_timer.reset();
     }
-    else if (ussRightDetected() && ussLeftDetected() && ussRightDis() < 35 && (ussRightDis() + ussLeftDis()) > 80)
+    /*else if (ussRightDetected() && ussLeftDetected() && ussRightDis() < 35 && (ussRightDis() + ussLeftDis()) > 80)
     {
         if (irDetected() && irDeg() <= 0)
         {
@@ -132,7 +132,7 @@ void attackWithGyro() // ジャイロで攻撃
         {
             motorsMove(-90, motor_ir_max_power);
         }
-    }
+    }*/
     else if (irDetected())
     {
         Vector vec = mawarikomi(motor_ir_max_power);
@@ -167,7 +167,7 @@ void attackWithCam(bool attack_goal_detected, int attack_goal_deg, int attack_go
     }
 
     const int motor_line_max_power = 50;
-    const int motor_ir_max_power = 90;
+    const int motor_ir_max_power = 80;
 
     if (attack_goal_detected && attack_goal_dis < 60)
     {
@@ -188,39 +188,11 @@ void attackWithCam(bool attack_goal_detected, int attack_goal_deg, int attack_go
     }
     /*else if (ussRightDetected() && ussLeftDetected() && ussRightDis() <= 36 && (ussRightDis() + ussLeftDis()) > 80)
     {
-        if (irDetected() && irDeg() <= 0)
-        {
-            if (irDeg() > -75)
-            {
-                motorsMove(0, motor_ir_max_power);
-            }
-            else
-            {
-                motorsMove(180, motor_ir_max_power);
-            }
-        }
-        else
-        {
-            motorsMove(90, motor_ir_max_power);
-        }
+        motorsMove(90, motor_ir_max_power);
     }
     else if (ussRightDetected() && ussLeftDetected() && ussLeftDis() <= 36 && (ussRightDis() + ussLeftDis()) > 80)
     {
-        if (irDetected() && irDeg() > 0)
-        {
-            if (irDeg() < 75)
-            {
-                motorsMove(0, motor_ir_max_power);
-            }
-            else
-            {
-                motorsMove(180, motor_ir_max_power);
-            }
-        }
-        else
-        {
-            motorsMove(-90, motor_ir_max_power);
-        }
+        motorsMove(-90, motor_ir_max_power);
     }*/
     else if (irDetected())
     {

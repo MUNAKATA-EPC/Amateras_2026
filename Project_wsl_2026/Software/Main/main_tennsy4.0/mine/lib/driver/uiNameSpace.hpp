@@ -44,6 +44,7 @@ namespace Test
         GYRO,
         CAM,
         LINE_TRACE,
+        MOTOR,
 
         MODE_COUNT
     };

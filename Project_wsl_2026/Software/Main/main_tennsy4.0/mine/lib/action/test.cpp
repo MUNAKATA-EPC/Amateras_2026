@@ -4,6 +4,7 @@ void testKicker();
 void testGyro();
 void testCam();
 void testLineTrace();
+void testMotor();
 
 void playTest(Test::Mode mode)
 {
@@ -22,6 +23,10 @@ void playTest(Test::Mode mode)
     else if (mode == Test::Mode::LINE_TRACE)
     {
         testLineTrace();
+    }
+    else if (mode == Test::Mode::MOTOR)
+    {
+        testMotor();
     }
     else
     {
@@ -100,4 +105,9 @@ void testLineTrace()
     {
         motorsMove(irDeg(), motor_ir_power);
     }
+}
+
+void testMotor()
+{
+    motorsDirectMove(-100, 100, -100, 100);
 }

@@ -159,7 +159,7 @@ void playDefenderVer2(Defender::Mode mode)
         }
         old_ir_keep_deg_flag = true;
 
-        if (ir_keep_deg_flag == true && ir_keep_deg_timer.msTime() >= 3000UL) // 3秒以上もボールが一定の角度にあるなら
+        if (ir_keep_deg_flag == true && ir_keep_deg_timer.msTime() >= 2000UL) // 2秒以上もボールが一定の角度にあるなら
         {
             attacking_timer.reset(); // アタッカータイマー開始
             attack_flag = true;
@@ -293,11 +293,11 @@ void playDefenderVer2(Defender::Mode mode)
                 {
                     if (defence_goal_deg > 0 && irDeg() >= 0 && irDeg() <= 140) // 右のラインにいてボールが左にある | (ゴール) (ボール) | (ロボット)
                     {
-                        ir_defence_vec = Vector(nearSessenDeg(lineRingDeg(), -30), DEFENCE_TATE_ZENSHIN_IR_FOLLOW_POWER_MAX);
+                        ir_defence_vec = Vector(nearSessenDeg(lineRingDeg(), -40), DEFENCE_TATE_ZENSHIN_IR_FOLLOW_POWER_MAX);
                     }
                     else if (defence_goal_deg <= 0 && irDeg() < 0 && irDeg() >= -140) // 左のラインにいてボールが右にある (ロボット) | (ボール) (ゴール) |
                     {
-                        ir_defence_vec = Vector(nearSessenDeg(lineRingDeg(), 30), DEFENCE_TATE_ZENSHIN_IR_FOLLOW_POWER_MAX);
+                        ir_defence_vec = Vector(nearSessenDeg(lineRingDeg(), 40), DEFENCE_TATE_ZENSHIN_IR_FOLLOW_POWER_MAX);
                     }
                     else
                     {
@@ -316,7 +316,7 @@ void playDefenderVer2(Defender::Mode mode)
                 float defence_ir_y = getDefenceIrY(defence_ir_deg, yoti_falg); // y方向成分を計算
 
                 // bool is_front = false;
-                float dead_zone = 50.0f; // 停止させる範囲
+                float dead_zone = 88.0f; // 停止させる範囲
                 if (defence_ir_y > -dead_zone && defence_ir_y < dead_zone)
                 {
                     // is_front = true;

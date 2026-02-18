@@ -23,8 +23,8 @@ private:
 public:
     // 関数
     bool init(uint8_t pin, uint8_t pinmode);
-    void update();
 
+    void update();
     bool isPushing();
     bool isReleased();
 

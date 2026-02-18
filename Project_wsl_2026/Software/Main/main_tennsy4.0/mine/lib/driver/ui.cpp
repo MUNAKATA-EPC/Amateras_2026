@@ -331,6 +331,9 @@ void uiDrawMain()
             case Test::Mode::LINE_TRACE:
                 modeName = "LineTrace";
                 break;
+            case Test::Mode::MOTOR:
+                modeName = "Motor";
+                break;
             default:
                 modeName = "Unknown";
                 break;

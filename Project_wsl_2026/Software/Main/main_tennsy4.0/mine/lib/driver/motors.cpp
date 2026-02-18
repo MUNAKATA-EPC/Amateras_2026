@@ -78,6 +78,11 @@ void motorsPdProcess(PD *pd, int deg, int target)
     _last_pd = _pd; // 記録
 }
 
+void motorsDirectMove(int value_1ch, int value_2ch, int value_3ch, int value_4ch)
+{
+    _dsr->move(value_1ch, value_2ch, value_3ch, value_4ch);
+}
+
 #define PD_MAX 80.0f
 #define PD_MOVING_MAX 20.0f
 
