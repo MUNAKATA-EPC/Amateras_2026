@@ -17,11 +17,24 @@ void playJAM(JAM::Mode mode)
     bool once = (mode != last_mode);
 
     // MANABU処理：学習モード
+    // 計測中の一時データを保持する変数（静的変数として定義）
+    static bool is_measuring = false;
+    static long measure_sum_deg = 0;
+    static long measure_sum_pow = 0;
+    static int measure_count = 0;
+    static int target_idx = -1;        // 計測開始時のインデックスを保持
+    static bool last_l1_state = false; // L1の連続押し防止用
+
     if (mode == JAM::Mode::MANABU)
     {
+        // L1ボタンの現在の状態を取得
+        bool current_l1_state = ps3ButtonIsPushing(Ps3Button::L1);
+
+        // ×ボタン：全データの初期化
         if (once || ps3ButtonIsPushing(Ps3Button::CROSS))
         {
-            print_jam_message = "reset data";
+            print_jam_message = "reset all data";
+            is_measuring = false;
             for (int i = 0; i < 91; i++)
             {
                 reliable_subdata_counter[i] = 0;
@@ -31,10 +44,6 @@ void playJAM(JAM::Mode mode)
                     power_subdata[i][j] = 0;
                 }
             }
-        }
-        else
-        {
-            print_jam_message = "collecting data";
         }
 
         // 基本姿勢制御
@@ -49,33 +58,61 @@ void playJAM(JAM::Mode mode)
             int ir_deg = irDeg();
             int idx1 = degToIdex1(ir_deg);
 
-            // 赤外線検知中かつCIRCLEボタン押下で学習
+            // 1. ◎ボタンを押し続ける：一時的な計測（平均を取る準備）
             if (irDetected() && idx1 != -1 && ps3ButtonIsPushing(Ps3Button::CIRCLE))
             {
-                fullColorLed1.rgbLightUp(0, 10, 10);
+                // 計測開始の瞬間にインデックスを固定
+                if (!is_measuring)
+                {
+                    target_idx = idx1;
+                }
+                is_measuring = true;
+                measure_sum_deg += move_deg;
+                measure_sum_pow += move_pow;
+                measure_count++;
+                print_jam_message = "measuring...";
+                fullColorLed1.rgbLightUp(10, 10, 0); // 黄色：計測中
+            }
+            else
+            {
+                // ボタンを離したとき、計測状態を維持（L1/R1待ち）
+                if (is_measuring)
+                {
+                    print_jam_message = "wait L1(save) or R1(cancel)";
+                }
+                else
+                {
+                    print_jam_message = "collecting data";
+                }
+            }
 
-                if (reliable_subdata_counter[idx1] == 5) // 6個目のデータが入った場合
+            // 2. L1ボタン：計測データを確定して subdata に格納
+            if (is_measuring && current_l1_state && !last_l1_state && measure_count > 0 && target_idx != -1)
+            {
+                int avg_move_deg = measure_sum_deg / measure_count;
+                int avg_move_pow = measure_sum_pow / measure_count;
+
+                // 外れ値除去ロジックを用いて保存
+                if (reliable_subdata_counter[target_idx] == 5)
                 {
                     int temp_deg[6], temp_pow[6];
-                    long sum_deg = move_deg;
-                    temp_deg[5] = move_deg;
-                    temp_pow[5] = move_pow;
+                    temp_deg[5] = avg_move_deg;
+                    temp_pow[5] = avg_move_pow;
+                    long sum_deg_for_outlier = avg_move_deg;
 
                     for (int i = 0; i < 5; i++)
                     {
-                        temp_deg[i] = deg_subdata[idx1][i];
-                        temp_pow[i] = power_subdata[idx1][i];
-                        sum_deg += temp_deg[i];
+                        temp_deg[i] = deg_subdata[target_idx][i];
+                        temp_pow[i] = power_subdata[target_idx][i];
+                        sum_deg_for_outlier += temp_deg[i];
                     }
 
-                    int ave_deg = sum_deg / 6;
+                    int ave_deg_tmp = sum_deg_for_outlier / 6;
                     int outlier_idx = 0;
                     int max_diff = -1;
-
-                    // 平均から最も遠い値（外れ値）を特定
                     for (int i = 0; i < 6; i++)
                     {
-                        int diff = abs(temp_deg[i] - ave_deg);
+                        int diff = abs(temp_deg[i] - ave_deg_tmp);
                         if (diff > max_diff)
                         {
                             max_diff = diff;
@@ -83,31 +120,56 @@ void playJAM(JAM::Mode mode)
                         }
                     }
 
-                    // 外れ値を除いた5つを保存
                     int k = 0;
                     for (int i = 0; i < 6; i++)
                     {
                         if (i == outlier_idx)
                             continue;
-                        deg_subdata[idx1][k] = temp_deg[i];
-                        power_subdata[idx1][k] = temp_pow[i];
+                        deg_subdata[target_idx][k] = temp_deg[i];
+                        power_subdata[target_idx][k] = temp_pow[i];
                         k++;
                     }
                 }
                 else
                 {
-                    // カウンターが5未満ならそのまま追加
-                    int current_cnt = reliable_subdata_counter[idx1];
-                    deg_subdata[idx1][current_cnt] = move_deg;
-                    power_subdata[idx1][current_cnt] = move_pow;
-                    reliable_subdata_counter[idx1]++;
+                    int current_cnt = reliable_subdata_counter[target_idx];
+                    deg_subdata[target_idx][current_cnt] = avg_move_deg;
+                    power_subdata[target_idx][current_cnt] = avg_move_pow;
+                    reliable_subdata_counter[target_idx]++;
                 }
+
+                // 計測リセット
+                is_measuring = false;
+                measure_sum_deg = 0;
+                measure_sum_pow = 0;
+                measure_count = 0;
+                target_idx = -1;
+                print_jam_message = "measure saved";
+                fullColorLed1.rgbLightUp(0, 10, 10); // シアン：保存完了
+            }
+
+            // 3. R1ボタン：現在の計測データを破棄
+            if (is_measuring && ps3ButtonIsPushing(Ps3Button::R1))
+            {
+                is_measuring = false;
+                measure_sum_deg = 0;
+                measure_sum_pow = 0;
+                measure_count = 0;
+                target_idx = -1;
+                print_jam_message = "measure canceled";
+                fullColorLed1.rgbLightUp(10, 0, 0); // 赤色：キャンセル
             }
         }
         else
         {
             motorsPdMove();
+            // スティックを離したときも計測中ならメッセージ維持
+            if (is_measuring)
+                print_jam_message = "wait L1/R1";
         }
+
+        // L1の状態を保存（次回ループでの比較用）
+        last_l1_state = current_l1_state;
     }
     // KEISAN処理：データ整理と線形補完
     else if (mode == JAM::Mode::KEISAN)
