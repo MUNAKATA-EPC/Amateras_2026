@@ -84,5 +84,5 @@ void PD::reset(float current_val)
     _output = 0.0f;
 }
 
-PD pd_gyro(0.50f, -3.0f); // 共通で使えるようにしておく
-PD pd_cam(0.50f, -3.0f);  // 共通で使えるようにしておく
+PD pd_gyro(0.65f, -1.0f); // 共通で使えるようにしておく
+PD pd_cam(0.65f, -1.0f);  // 共通で使えるようにしておく

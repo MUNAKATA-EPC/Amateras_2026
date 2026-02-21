@@ -278,7 +278,7 @@ void uiDrawMain()
                 modeName = "Unknown";
                 break;
             }
-            configName[0] = "idx2";
+            configName[0] = "none";
         }
         break;
 
@@ -298,7 +298,7 @@ void uiDrawMain()
                 modeName = "Unknown";
                 break;
             }
-            configName[0] = "p";
+            configName[0] = "none";
         }
         break;
 

@@ -21,6 +21,7 @@ static int _stick_right_deg = 0xFF;
 static float _stick_right_dis = 0xFF;
 // ボタン（14個）
 static uint16_t _button_bit_mask = 0;
+static uint16_t _old_button_bit_mask = 0;
 
 static PacketManager packet; // パケットマネージャー
 
@@ -44,6 +45,9 @@ void ps3StickAdjust(float leftAdjust, float rightAdjust)
 
 void ps3Update()
 {
+    // 前回のボタン状態を退避（このタイミングがPressed判定に重要）
+    _old_button_bit_mask = _button_bit_mask;
+
     // データの受け取り
     while (_serial->available() > 0)
     {
@@ -96,8 +100,9 @@ void ps3Update()
             }
 
             // ボタン
-            uint8_t low = packet.get(5);                    // ボタン下位バイト
-            uint8_t high = packet.get(6);                   // ボタン上位バイト
+            uint8_t low = packet.get(5);  // ボタン下位バイト
+            uint8_t high = packet.get(6); // ボタン上位バイト
+
             _button_bit_mask = (uint16_t(high) << 8) | low; // 16bit にまとめる
 
             packet.reset();
@@ -122,5 +127,11 @@ float ps3RightStickDis() { return _stick_right_dis; }
 
 bool ps3ButtonIsPushing(Ps3Button btn)
 {
-    return ((1 << (int)btn) & _button_bit_mask) > 0; // (int)type分だけシフトした1との論理積が0よりも大きかったらそのbitは1
+    return ((1 << (int)btn) & _button_bit_mask) > 0; // (int)btn分だけシフトした1との論理積が0よりも大きかったらそのbitは1
+}
+
+bool ps3ButtonIsPressed(Ps3Button btn)
+{
+    uint16_t mask = (1 << (int)btn);
+    return ((mask & _button_bit_mask) > 0) && ((mask & _old_button_bit_mask) == 0); // 今回は押されていて、前回は押されていなかったらtrue
 }

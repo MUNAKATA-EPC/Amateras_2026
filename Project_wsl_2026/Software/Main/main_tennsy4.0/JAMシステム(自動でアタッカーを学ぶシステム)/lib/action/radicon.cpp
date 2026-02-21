@@ -8,7 +8,7 @@ void playRadicon(Radicon::Mode mode)
 
     if (mode == Radicon::Mode::ZENRYOKU)
     {
-        radicon(95);
+        radicon(80);
     }
     else if (mode == Radicon::Mode::DARADARA)
     {
@@ -16,7 +16,7 @@ void playRadicon(Radicon::Mode mode)
     }
 }
 
-void radicon(int max_power)
+void radicon(int power)
 {
     // PD計算
     int target_deg = ps3RightStickDetected() ? -ps3RightStickDeg() : 0;
@@ -31,8 +31,8 @@ void radicon(int max_power)
 
     // ps3からの読み取り　移動方向の計算
     int move_deg = normalizeDeg(ps3LeftStickDeg() + bnoDeg());
-    int move_power = (int)constrain(80.0f * ps3LeftStickDis() / 128.0f, 0.0f, (float)max_power);
-    if (ps3ButtonIsPushing(Ps3Button::L3))
+    int move_power = power * ps3LeftStickDis() / 128.0f;
+    if (ps3ButtonIsPushing(Ps3Button::CIRCLE)) // ○ボタンで全力
     {
         move_power = 95.0f;
     }

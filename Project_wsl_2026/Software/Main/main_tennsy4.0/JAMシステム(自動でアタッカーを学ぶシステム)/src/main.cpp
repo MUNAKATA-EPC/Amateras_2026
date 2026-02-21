@@ -1,7 +1,7 @@
 #include <Arduino.h>
 
 // action類
-#include "jam.hpp"
+#include "jamVer2.hpp"
 #include "radicon.hpp"
 // common類
 #include "angleHelper.hpp"
@@ -142,7 +142,7 @@ void loop()
             {
             case Action::JAM:
             {
-                printJAM(JAM::Mode(uiModeNumber()));
+                printJAMVer2(JAM::Mode(uiModeNumber()));
                 break;
             }
             case Action::RADICON:
@@ -194,7 +194,7 @@ void loop()
         {
         case Action::JAM:
         {
-            playJAM(JAM::Mode(uiModeNumber()));
+            playJAMVer2(JAM::Mode(uiModeNumber()));
             break;
         }
         case Action::RADICON:

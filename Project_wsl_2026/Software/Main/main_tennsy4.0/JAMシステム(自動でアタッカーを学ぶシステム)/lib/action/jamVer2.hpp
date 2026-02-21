@@ -20,14 +20,5 @@
 #include "openmv.hpp"
 #include "uss.hpp"
 
-// manabuモードで一時的に格納するデータの配列
-int reliable_subdata_counter[91]; // 角度ごとのカウンターを格納する配列
-int deg_subdata[91][5];           // 角度ごとのデータを格納する配列
-int power_subdata[91][5];         // 角度ごとのデータを格納する配列
-
-// 最終的な回り込みデータの配列
-int deg_data[91][5];   // 角度ごとのデータを格納する配列
-int power_data[91][5]; // 角度ごとのデータを格納する配列
-
 void playJAMVer2(JAM::Mode mode);
 void printJAMVer2(JAM::Mode mode);

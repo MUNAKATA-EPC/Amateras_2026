@@ -42,3 +42,4 @@ enum Ps3Button
     R3
 };
 bool ps3ButtonIsPushing(Ps3Button btn);
+bool ps3ButtonIsPressed(Ps3Button btn);

@@ -5,27 +5,25 @@ import math
 
 #############################################################
 # ゴールの色取り用変数(黄色)
-#goal_yellow = (6, 92, -22, 4, 43, 93) #福岡ﾉｳﾄﾞ
-goal_yellow = (8, 87, -33, 4, 30, 99) #学校
+goal_yellow = (62, 81, -39, -19, 55, 74)
 #############################################################
 # ゴールの色取り用変数(青色)
-#goal_blue = (36, 21, -26, 0, -13, -5) #福岡ﾉｳﾄﾞ
-goal_blue = (100, 100, 127, 127, 127, 127) #学校
+goal_blue = (37, 49, -38, -14, -20, 0)
 #############################################################
 # コートの色（カーペット用）
-#court_green = (44, 75, -55, -29, 9, 40) #福岡ﾉｳﾄﾞ
-court_green = (37, 78, -17, 13, -24, 34) #学校
+court_green = (38, 71, -15, -1, -15, 22) #福岡ﾉｳﾄﾞ
+#court_green = (37, 78, -17, 13, -24, 34) #学校
 #############################################################
 # 画面の中央座標
-screen_center = [165, 96] # QVGA(320x240)なら160, 120が中央。設定に合わせる
-screen_short_r = 30
-screen_long_r = 170
+screen_center = [154, 104] # QVGA(320x240)なら160, 120が中央。設定に合わせる
+screen_short_r = 00
+screen_long_r = 0
 
 # -----------------------------------
 # センサー設定
-MANUAL_EXPOSURE = 15000
-MANUAL_RGB_GAIN = (1.0, 1.0, 1.0)
-MANUAL_GAIN_DB = 3
+MANUAL_EXPOSURE = 20000
+MANUAL_RGB_GAIN = (0.0,0.0,0.0)
+MANUAL_GAIN_DB = 6
 
 sensor.reset()
 sensor.set_pixformat(sensor.RGB565)
@@ -33,7 +31,7 @@ sensor.set_framesize(sensor.QVGA)
 sensor.set_auto_whitebal(False, rgb_gain_db=MANUAL_RGB_GAIN)
 sensor.set_auto_exposure(False, exposure_us=MANUAL_EXPOSURE)
 sensor.set_auto_gain(False, gain_db=MANUAL_GAIN_DB)
-sensor.set_brightness(5)
+sensor.set_brightness(-10)
 
 clock = time.clock()
 uart = UART(3, 115200, timeout_char=1000)
@@ -76,7 +74,7 @@ while True:
     # -----------------------------------
     # 青ゴールの検出 (最大のBlobのみを採用)
     max_blue_area = 0
-    for blob in img.find_blobs([goal_blue], pixels_threshold=10, area_threshold=10, merge=True, margin=25):
+    for blob in img.find_blobs([goal_blue], pixels_threshold=15, area_threshold=15, merge=True, margin=30):
         if blob.area() > max_blue_area:
             max_blue_area = blob.area()
             blue_deg, blue_dis = calculate_pos(blob, screen_center)
