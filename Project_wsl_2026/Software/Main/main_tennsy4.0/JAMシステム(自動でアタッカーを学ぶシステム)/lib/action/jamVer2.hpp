@@ -2,6 +2,7 @@
 
 // common類
 #include "angleHelper.hpp"
+#include "gaussianShifter.hpp"
 #include "pd.hpp"
 #include "timer.hpp"
 #include "vector.hpp"

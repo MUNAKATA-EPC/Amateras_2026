@@ -33,6 +33,7 @@ void setup()
     Serial.begin(9600L); // デバッグ用
 
     irInit(&Serial1, 115200);
+    openmvInit(&Serial3, 115200);
     ps3Init(&Serial7, 115200);
     ps3StickAdjust(20.0f, 20.0f);
 
@@ -127,6 +128,7 @@ void loop()
     // センサー類更新
     irUpdate();
     ps3Update();
+    openmvUpdate();
     bnoUpdate(resetButton.isReleased()); // bno更新
 
     // ui更新
@@ -165,17 +167,23 @@ void loop()
                 }
                 case 1:
                 {
+                    uiPrint(0, 8, "[orange]\n deg:" + String(orangeBallDeg()) + "\n dis:" + String(orangeBallDis()));
+                    uiDrawCircleMeter(92, 32, 20, "deg", orangeBallDeg());
+                    break;
+                }
+                case 2:
+                {
                     uiPrint(0, 8, "[bno055]\n deg:" + String(bnoDeg()) + "\n x_speed:" + String(bnoSpeedX()));
                     uiDrawCircleMeter(92, 32, 20, "deg", bnoDeg());
                     break;
                 }
-                case 2:
+                case 3:
                 {
                     uiPrint(0, 8, "[ps3_left]\n x:" + String(ps3LeftStickX()) + "\n y:" + String(ps3LeftStickY()) + "\n deg:" + String(ps3LeftStickDeg()) + "\n dis:" + String(ps3LeftStickDis()));
                     uiDrawCircleMeter(92, 32, 20, "deg", ps3LeftStickDeg());
                     break;
                 }
-                case 3:
+                case 4:
                 {
                     uiPrint(0, 8, "[ps3_right]\n x:" + String(ps3RightStickX()) + "\n y:" + String(ps3RightStickY()) + "\n deg:" + String(ps3RightStickDeg()) + "\n dis:" + String(ps3RightStickDis()));
                     uiDrawCircleMeter(92, 32, 20, "deg", ps3RightStickDeg());

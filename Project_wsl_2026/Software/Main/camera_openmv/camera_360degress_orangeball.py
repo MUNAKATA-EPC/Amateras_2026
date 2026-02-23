@@ -5,33 +5,36 @@ import math
 
 #############################################################
 # ゴールの色取り用変数(黄色)
-goal_yellow = (62, 81, -39, -19, 55, 74)
+goal_yellow = (59, 84, -24, -7, 30, 81)
 #############################################################
 # ゴールの色取り用変数(青色)
-goal_blue = (37, 49, -38, -14, -20, 0)
+goal_blue = (28, 45, 2, -18, -30, -15)
 #############################################################
 # コートの色（カーペット用）
 court_green = (38, 71, -15, -1, -15, 22) #福岡ﾉｳﾄﾞ
 #court_green = (37, 78, -17, 13, -24, 34) #学校
 #############################################################
+# オレンジボールの色
+orange_ball = (28, 72, 30, 68, 12, 55)
+#############################################################
 # 画面の中央座標
-screen_center = [150, 98] # QVGA(320x240)なら160, 120が中央。設定に合わせる
-screen_short_r = 40
-screen_long_r = 169
+screen_center = [149, 98] # QVGA(320x240)なら160, 120が中央。設定に合わせる
+screen_short_r = 30
+screen_long_r = 162
 
 # -----------------------------------
 # センサー設定
-MANUAL_EXPOSURE = 100
+MANUAL_EXPOSURE = 0
 MANUAL_RGB_GAIN = (0.0,0.0,0.0)
 MANUAL_GAIN_DB = -10
 
 sensor.reset()
 sensor.set_pixformat(sensor.RGB565)
 sensor.set_framesize(sensor.QVGA)
-sensor.set_auto_whitebal(False, rgb_gain_db=MANUAL_RGB_GAIN)
-sensor.set_auto_exposure(False, exposure_us=MANUAL_EXPOSURE)
-sensor.set_auto_gain(False, gain_db=MANUAL_GAIN_DB)
-sensor.set_brightness(-100)
+#sensor.set_auto_whitebal(False, rgb_gain_db=MANUAL_RGB_GAIN)
+#sensor.set_auto_exposure(False, exposure_us=MANUAL_EXPOSURE)
+#sensor.set_auto_gain(False, gain_db=MANUAL_GAIN_DB)
+sensor.set_brightness(0)
 
 clock = time.clock()
 uart = UART(3, 115200, timeout_char=1000)
@@ -62,14 +65,15 @@ while True:
     img = sensor.snapshot()
 
     # 画面外周を黒く塗る（計算対象外のノイズを消す）
-    img.draw_circle(screen_center[0], screen_center[1], screen_long_r, [0, 0, 0], 130)
-    img.draw_circle(screen_center[0], screen_center[1], screen_short_r, [0, 0, 0], 1, fill=True)
     img.draw_cross(screen_center[0], screen_center[1])
+    img.draw_circle(screen_center[0], screen_center[1], screen_long_r, [0, 0, 0], 130)
+    img.draw_circle(screen_center[0], screen_center[1], screen_short_r, [0, 0, 0], 1, 1)
 
     # 初期値（未検出時は 0xFF などの特定値を送る設定）
-    court_deg = 0
     yellow_deg, yellow_dis = 255, 255
     blue_deg, blue_dis = 255, 255
+    court_deg = 0
+    orange_deg,orange_dis = 255, 255
 
     # -----------------------------------
     # 青ゴールの検出 (最大のBlobのみを採用)
@@ -104,6 +108,18 @@ while True:
             court_deg = -court_deg #反転
 
     # -----------------------------------
+    # オレンジボールの検出 (最大のBlobのみを採用)
+    max_orange_area = 0
+    for blob in img.find_blobs([orange_ball], pixels_threshold=3, area_threshold=10, merge=True, margin=25):
+        if blob.area() > max_orange_area:
+            max_orange_area = blob.area()
+            orange_deg, orange_dis = calculate_pos(blob, screen_center)
+            img.draw_rectangle(blob.rect())
+            img.draw_line(screen_center[0], screen_center[1], blob.cx(), blob.cy(), color=(255, 255, 255))
+            orange_deg = -orange_deg #反転
+
+
+    # -----------------------------------
     # UART送信 (0x55: 開始, 0xAA: 終了)
     uart.write(bytearray([0x55]))
     send_int16(uart, court_deg)
@@ -111,7 +127,9 @@ while True:
     send_int16(uart, yellow_dis)
     send_int16(uart, blue_deg)
     send_int16(uart, blue_dis)
+    send_int16(uart, orange_deg)
+    send_int16(uart, orange_dis)
     uart.write(bytearray([0xAA]))
 
     # デバッグ出力
-    # print("yellow[deg:%d, dis:%d] blue[deg:%d, dis:%d] court[deg:%d]" % (yellow_deg, yellow_dis, blue_deg, blue_dis, court_deg))
+    print("yellow[deg:%d, dis:%d] blue[deg:%d, dis:%d] court[deg:%d] orange[deg:%d, dis:%d]" % (yellow_deg, yellow_dis, blue_deg, blue_dis, court_deg, orange_deg, orange_dis))

@@ -17,3 +17,7 @@ float blueGoalDis();
 bool yellowGoalDetected();
 int yellowGoalDeg();
 float yellowGoalDis();
+
+bool orangeBallDetected();
+int orangeBallDeg();
+float orangeBallDis();

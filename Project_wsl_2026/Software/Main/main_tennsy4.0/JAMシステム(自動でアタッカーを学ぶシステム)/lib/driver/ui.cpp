@@ -1,6 +1,6 @@
 #include "ui.hpp"
 
-#define CONFIG_PRINT // Configをプリントするかどうか
+// #define CONFIG_PRINT // Configをプリントするかどうか
 
 static Adafruit_SSD1306 *_ssd = nullptr;
 
@@ -9,7 +9,7 @@ static uint8_t _address;
 static bool _action_decided = false;
 static bool _mode_decided = false;
 
-#define METER_COUNT 4
+#define METER_COUNT 5
 static int _meter_number = 0;
 static int _action_number = 0;
 static int _mode_number = 0;

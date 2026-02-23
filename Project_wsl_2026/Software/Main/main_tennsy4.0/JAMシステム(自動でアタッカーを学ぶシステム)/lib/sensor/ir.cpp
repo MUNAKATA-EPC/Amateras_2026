@@ -104,6 +104,7 @@ void irUpdate()
         }
     }
 }
+
 bool irDetected() { return _detected; }
 int irDeg() { return _deg; }
 int irVal() { return _val; }

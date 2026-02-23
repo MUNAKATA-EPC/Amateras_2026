@@ -14,6 +14,10 @@ static float _blue_goal_dis = 0xFF;
 static bool _yellow_goal_detected = false;
 static int _yellow_goal_deg = 0xFF;
 static float _yellow_goal_dis = 0xFF;
+// オレンジボール
+static bool _orange_ball_detected = false;
+static int _orange_ball_deg = 0xFF;
+static float _orange_ball_dis = 0xFF;
 
 static PacketManager packet; // パケットマネージャー
 
@@ -24,7 +28,7 @@ bool openmvInit(HardwareSerial *serial, uint32_t baudrate)
 
     _serial->begin(_baudrate);
 
-    packet.setup(0x55, 10, 0xAA); // フレームヘッダー、データサイズ、エンドヘッダーを設定
+    packet.setup(0x55, 14, 0xAA); // フレームヘッダー、データサイズ、エンドヘッダーを設定
 
     return true;
 }
@@ -58,6 +62,14 @@ void openmvUpdate()
             uint8_t high5 = packet.get(10);                                    // 青色ゴールの距離の上位バイトを読み取る
             _blue_goal_dis = float((uint16_t(high5) << 8) | uint16_t(low5));   // 上位バイトと下位バイトをつなげる
             _blue_goal_detected = (_blue_goal_deg != 0xFF);
+
+            uint8_t low6 = packet.get(11);                                      // オレンジボールの角度の下位バイトを読み取る
+            uint8_t high6 = packet.get(12);                                     // オレンジボールの角度の上位バイトを読み取る
+            _orange_ball_deg = int16_t((uint16_t(high6) << 8) | uint16_t(low6)); // 上位バイトと下位バイトをつなげる
+            uint8_t low7 = packet.get(13);                                      // オレンジボールの距離の下位バイトを読み取る
+            uint8_t high7 = packet.get(14);                                    // オレンジボールの距離の上位バイトを読み取る
+            _orange_ball_dis = float((uint16_t(high7) << 8) | uint16_t(low7));   // 上位バイトと下位バイトをつなげる
+            _orange_ball_detected = (_orange_ball_deg != 0xFF);
         }
     }
 }
@@ -72,3 +84,8 @@ float blueGoalDis() { return _blue_goal_dis; }
 bool yellowGoalDetected() { return _yellow_goal_detected; }
 int yellowGoalDeg() { return _yellow_goal_deg; }
 float yellowGoalDis() { return _yellow_goal_dis; }
+
+
+bool orangeBallDetected() { return _orange_ball_detected; }
+int orangeBallDeg() { return _orange_ball_deg; }
+float orangeBallDis() { return _orange_ball_dis; }
