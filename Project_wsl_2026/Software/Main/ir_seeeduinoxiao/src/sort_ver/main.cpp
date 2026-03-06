@@ -3,11 +3,25 @@
 #include "multiplexer.hpp"
 #include "movementAverage.hpp"
 
+#define ATTACKER
+// #define DEFENDER
+
+// 角度を -180度から180度の範囲に正規化する関数
+int normalizeDeg(int deg)
+{
+    int norm = (deg % 360 + 360) % 360;
+    if (norm > 180)
+        norm -= 360;
+    return norm;
+}
+
 // センサークラス
 class Sensor
 {
 public:
-    int value;
+    int pin;
+    float value;
+    float weight;
     float deg;
     float get_x() { return cosf(radians(deg)); };
     float get_y() { return sinf(radians(deg)); };
@@ -16,14 +30,14 @@ public:
 // qsort()用の比較関数（降順に並べるようにする）
 int sensorsCompare(const void *a, const void *b)
 {
-    int a_num = ((Sensor *)a)->value;
-    int b_num = ((Sensor *)b)->value;
+    float a_num = ((Sensor *)a)->weight;
+    float b_num = ((Sensor *)b)->weight;
 
-    if (a_num < b_num)
+    if (a_num > b_num)
     {
         return -1;
     }
-    else if (a_num > b_num)
+    else if (a_num < b_num)
     {
         return 1;
     }
@@ -39,21 +53,34 @@ const int end_header = 0xAA;   // 同期ヘッダー格納用
 Sensor IRsensor[16];
 
 // IRセンサーのピン番号。前から反時計回りに指定
+#ifdef ATTACKER
 const int IRsensor_pin[16] = {0, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1};
-const float IRsensor_gain[16] = {1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f};
+const float IRsensor_weight_gain[16] = {1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
+                                        1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f};
+#endif
+#ifdef DEFENDER
+const int IRsensor_pin[16] = {0, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1};
+const float IRsensor_weight_gain[16] = {1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
+                                        1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f};
+#endif
 
 // マルチプレクサ
 Multiplexer mux;
 
 // 移動平均
-MovementAverage mux_ave(3), x_ave(3), y_ave(3);
+MovementAverage mux_ave[16] = {
+    MovementAverage(10), MovementAverage(10), MovementAverage(10), MovementAverage(10),
+    MovementAverage(10), MovementAverage(10), MovementAverage(10), MovementAverage(10),
+    MovementAverage(10), MovementAverage(10), MovementAverage(10), MovementAverage(10),
+    MovementAverage(10), MovementAverage(10), MovementAverage(10), MovementAverage(10)};
+MovementAverage x_ave(3), y_ave(3);
 
 // センサーのデバッグ表示
 void IRsensorDebugPrint()
 {
     for (int i = 0; i < 16; i++)
     {
-        Serial.print(String(IRsensor[i].value) + ",");
+        Serial.print(String(IRsensor[i].pin) + ":" + String(int(IRsensor[i].weight)) + ", ");
     }
 }
 
@@ -70,51 +97,48 @@ void setup()
 
 void loop()
 {
-    bool is_any_detected = false; // いずれかのセンサーが反応したかどうか
+    int detected_count = 0; // いずれかのセンサーが反応したかどうか
 
     for (int i = 0; i < 16; i++)
     {
-        IRsensor[i].value = constrain(mux_ave.add(mux.read(IRsensor_pin[i])), 0, 1023);
+        IRsensor[i].pin = IRsensor_pin[i];
+        IRsensor[i].value = mux_ave[i].add(mux.read(IRsensor[i].pin));
+        IRsensor[i].weight = (5000.0f - IRsensor[i].value) * IRsensor_weight_gain[i];
         IRsensor[i].deg = i * 22.5f;
 
-        if (IRsensor[i].value < 990)
+        if (IRsensor[i].value < 990.0f)
         {
-            is_any_detected = true;
+            detected_count++;
         }
     }
 
     int IRball_deg = 0xFF;
     int IRball_dis = 0xFF;
 
-    if (is_any_detected)
+    if (detected_count > 3)
     {
         qsort(IRsensor,
               sizeof(IRsensor) / sizeof(IRsensor[0]),
               sizeof(Sensor),
               sensorsCompare); // 降順に並べ替え
 
-        // IRsensorDebugPrint();
-        // Serial.print("\n");
-
-        const int use_count = 5; // 値の小さな7個を計算に使う
+        const int use_count = 3; // 値の小さな7個を計算に使う
 
         float IRball_x = 0.0f, IRball_y = 0.0f;
         for (int i = 0; i < use_count; i++)
         {
-            int weight = 1023 - IRsensor[i].value;
-
-            IRball_x += IRsensor[i].get_x() * weight;
-            IRball_y += IRsensor[i].get_y() * weight;
+            IRball_x += IRsensor[i].get_x() * IRsensor[i].weight;
+            IRball_y += IRsensor[i].get_y() * IRsensor[i].weight;
         }
-        IRball_x = x_ave.add(IRball_x / use_count);
-        IRball_y = y_ave.add(IRball_y / use_count);
-
-        // Serial.print(String(IRball_x) + " " + String(IRball_y) + "\n");
+        IRball_x = x_ave.add(IRball_x);
+        IRball_y = y_ave.add(IRball_y);
 
         IRball_deg = (int)roundf(degrees(atan2f(IRball_y, IRball_x)));
-        IRball_dis = IRsensor[0].value; // ※重要：1個の平均をとる
-        // IRball_dis = sqrtf(IRball_x * IRball_x + IRball_y * IRball_y);
+        IRball_dis = (IRsensor[0].value + IRsensor[1].value + IRsensor[2].value) / 3.0f;
     }
+
+    IRsensorDebugPrint();
+    Serial.print("deg:" + String(IRball_deg) + "\n");
 
     int16_t deg_to_send = IRball_deg == 0xFF ? 0xFF : (int16_t)IRball_deg;
     int16_t dis_to_send = IRball_dis == 0xFF ? 0xFF : (int16_t)IRball_dis;
