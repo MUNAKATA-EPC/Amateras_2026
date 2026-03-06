@@ -133,7 +133,7 @@ void loop()
         uiButtonUpdate(enterButton.isReleased(), backButton.isReleased(), rightButton.isReleased(), leftButton.isReleased());
     }
     // カラーLEDクリア
-    fullColorLed1.rgbLightUp(0, 10, 10);
+    fullColorLed1.rgbLightUp(0, 0, 0);
 
     // センサー類更新
     irUpdate();

@@ -1,19 +1,27 @@
 #include <Arduino.h>
+#include <Adafruit_NeoPixel.h>
 #include "motor.hpp"
 
+// モーター設定
 Motor motors[4];
 
+// Core 0
 void setup()
 {
+  // モーターピン設定
   motors[0].setPin(2, 4, 3);
   motors[1].setPin(5, 7, 6);
   motors[2].setPin(8, 14, 15);
   motors[3].setPin(26, 27, 28);
 
-  Serial.begin(9600); // PC送信用
+  Serial.begin(9600);    // PC用
+  Serial1.begin(115200); // Teensy用
+  Serial1.setTimeout(10);
 
-  Serial1.begin(115200);  // Teensy4.0受信用
-  Serial1.setTimeout(10); // 受信タイムアウト10ms
+  Serial1.flush(); // 受信バッファをクリア
+  while (!Serial1.available())
+    ;                     // Teensyからの信号を待つ
+  rp2040.fifo.push(true); // Core1起動
 }
 
 void loop()
@@ -47,6 +55,8 @@ void loop()
 
         old_rotate[i] = 'B'; // 記録
       }
+
+      rp2040.fifo.push(0xFF); // モーター停止信号を送る
     }
     else
     {
@@ -88,4 +98,44 @@ void loop()
       }
     }
   }
+}
+
+// NeoPixel設定
+#define PIN_NEOPIXEL 16
+#define NUM_PIXELS 1
+Adafruit_NeoPixel pixels(NUM_PIXELS, PIN_NEOPIXEL, NEO_GRB + NEO_KHZ800);
+
+// Core 1
+void setup1()
+{
+  pixels.begin();
+  pixels.setBrightness(30);
+
+  pixels.setPixelColor(0, pixels.Color(50, 0, 0)); // 赤で待機
+  pixels.show();
+  while (!rp2040.fifo.available())
+    ;
+  rp2040.fifo.pop(); // 起動信号を消費
+
+  pixels.setPixelColor(0, pixels.Color(0, 0, 0)); // 消灯
+  delay(100);
+
+  for (int i = 0; i < 360; i++) // 起動イルミネーション
+  {
+    uint32_t rgb_color = pixels.ColorHSV(i, 255, 50); // 明度50
+    pixels.setPixelColor(0, rgb_color);
+    delay(5);
+  }
+
+  pixels.setPixelColor(0, pixels.Color(0, 0, 0)); // 消灯
+  delay(100);
+
+  while (rp2040.fifo.available())
+  {
+    rp2040.fifo.pop(); // 余分な信号を消費
+  }
+}
+
+void loop1()
+{
 }
