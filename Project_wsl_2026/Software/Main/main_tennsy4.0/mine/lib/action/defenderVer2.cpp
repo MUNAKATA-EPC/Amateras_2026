@@ -316,7 +316,7 @@ void playDefenderVer2(Defender::Mode mode)
                 float defence_ir_y = getDefenceIrY(defence_ir_deg, yoti_falg); // y方向成分を計算
 
                 // bool is_front = false;
-                float dead_zone = 88.0f; // 停止させる範囲
+                float dead_zone = 60.0f; // 停止させる範囲
                 if (defence_ir_y > -dead_zone && defence_ir_y < dead_zone)
                 {
                     // is_front = true;
@@ -367,40 +367,25 @@ void playDefenderVer2(Defender::Mode mode)
 
                 if (posi == LinePosi::Yoko_line)
                 {
-                    if (ussLeftDetected() && ussRightDetected() && ussRightDis() + ussLeftDis() > 80)
+                    if (abs(defence_goal_deg) >= 170)
                     {
-                        if (ussRightDis() >= 74 && ussLeftDis() >= 74)
-                        {
-                            go_central_vec = Vector(0, 0);
-                        }
-                        else if (ussRightDis() < ussLeftDis())
-                        {
-                            go_central_vec = Vector(nearSessenDeg(lineRingDeg(), 90), DEFENCE_GO_CENTRAL_POWER);
-                        }
-                        else
-                        {
-                            go_central_vec = Vector(nearSessenDeg(lineRingDeg(), -90), DEFENCE_GO_CENTRAL_POWER);
-                        }
+                        go_central_vec = Vector(0, 0); // 停止
                     }
                     else
                     {
-                        if (defence_goal_deg > 0 && defence_goal_deg < 165)
-                        {
-                            go_central_vec = Vector(nearSessenDeg(lineRingDeg(), 90), DEFENCE_GO_CENTRAL_POWER);
-                        }
-                        else if (defence_goal_deg <= 0 && defence_goal_deg <= -165)
+                        if (defence_goal_deg < 0)
                         {
                             go_central_vec = Vector(nearSessenDeg(lineRingDeg(), -90), DEFENCE_GO_CENTRAL_POWER);
                         }
                         else
                         {
-                            go_central_vec = Vector(0, 0.0f);
+                            go_central_vec = Vector(nearSessenDeg(lineRingDeg(), 90), DEFENCE_GO_CENTRAL_POWER);
                         }
                     }
                 }
                 else if (posi == LinePosi::Tate_line)
                 {
-                    go_central_vec = Vector(nearSessenDeg(lineRingDeg(), 0), DEFENCE_GO_CENTRAL_POWER);
+                    go_central_vec = Vector(0, DEFENCE_GO_CENTRAL_POWER);
                 }
                 else // if(posi == LinePosi::Kado_line)
                 {
@@ -431,17 +416,10 @@ void playDefenderVer2(Defender::Mode mode)
                 line_modoru_vec = Vector(defence_goal_deg, MODORU_POWER);
             }
 
-            Vector ir_follow_vec; // ボール追いたいベクトル
+            Vector ir_follow_vec = Vector(0, 0); // ボール追いたいベクトル
             if (irDetected() && defence_ok)
             {
-                if (irDeg() > 0) // 左にある
-                {
-                    ir_follow_vec = Vector(90, MODORU_IR_FOLLOW_POWER);
-                }
-                else // 右にある
-                {
-                    ir_follow_vec = Vector(-90, MODORU_IR_FOLLOW_POWER);
-                }
+                ir_follow_vec = Vector(nearSessenDeg(line_modoru_vec.deg(), irDeg()), MODORU_IR_FOLLOW_POWER);
             }
 
             Vector final_modoru_vec = line_modoru_vec + ir_follow_vec; // 最終ベクトル
@@ -464,7 +442,7 @@ void playDefenderVer2(Defender::Mode mode)
         {
             if (fieldDetected())
             {
-                if (abs(fieldDeg()) >= 90) // コートの後ろにいる
+                if (abs(fieldDeg()) <= 100) // コートの後ろにいる
                 {
                     if (fieldDeg() > 0) // コートの右にいる
                     {

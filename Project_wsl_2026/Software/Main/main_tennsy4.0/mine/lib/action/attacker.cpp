@@ -8,29 +8,46 @@ Vector mawarikomi(int max_power)
 
     if (ir_detected) // ボールがある
     {
-        if (ir_dis <= 540) // 近い
+        if (catchSensor.read() == HIGH) // ボールを持っているときは直進する
+        {
+            return Vector(0, max_power);
+        }
+        if (ir_dis <= 600) // 近い
         {
             // 角度
-            float deg = 0xFF;
-            if (abs(irDeg()) < 8)
+            float deg = 0xFF,power = max_power;
+            if (abs(irDeg()) < 8) // 前にある
             {
                 deg = 0;
+
+                power *= 1.0f;
             }
-            else if (irDeg() >= -45 && irDeg() <= 45) // -45°～45°
+            else if (abs(irDeg()) < 45) // 前付近
             {
-                float pos[5][2] = {{0, 0}, {8, 10}, {20, 60}, {35, 95}, {45, 105}};
+                float k = (ir_deg > 0) ? 1.0f : -1.0f;
+                deg = ir_deg + k * 50.0f;
+
+                power *= 0.8f; // 少し減速する
+            }
+            else
+            {
+                float k = (ir_deg > 0) ? 1.0f : -1.0f;
+                deg = ir_deg + k * 60.0f;
+
+                power *= 1.0f;
+            }
+            /*if (irDeg() >= -30 && irDeg() <= 30) // 前付近
+            {
+                float pos[3][2] = {{0, 0}, {8, 12}, {30, 90}};
                 deg = ((ir_deg > 0) ? 1 : -1.1f) * lagrangeShifter(5, pos, abs(ir_deg));
             }
             else
             {
                 float k = (ir_deg > 0) ? 1.0f : -1.0f;
-                deg = ir_deg + k * 60;
-            }
+                deg = ir_deg + k * 60.0f; // ボールの方向に対して60°回り込む
+            }*/
 
             // deg = ir_deg + (deg - ir_deg) * map(ir_dis, 200, 500, 1.4f, 1.0f);
-
-            // パワー
-            float power = max_power;
 
             return Vector(deg, power);
         }

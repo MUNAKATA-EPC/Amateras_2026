@@ -112,26 +112,20 @@ void setup()
     delay(250);
 }
 
-Timer btn_timer; // btn用
-Timer ui_timer;  // ui用
+Timer ui_timer; // ui用
 bool old_running_flag = false;
 
 void loop()
 {
     // ボタン類更新
-    if (!btn_timer.everReset() || btn_timer.msTime() > 50UL)
-    {
-        btn_timer.reset();
+    enterButton.update();
+    rightButton.update();
+    leftButton.update();
+    backButton.update();
+    resetButton.update();
 
-        enterButton.update();
-        rightButton.update();
-        leftButton.update();
-        backButton.update();
-        resetButton.update();
-
-        // uiを実行・描画 // ボタンの更新
-        uiButtonUpdate(enterButton.isReleased(), backButton.isReleased(), rightButton.isReleased(), leftButton.isReleased());
-    }
+    // uiを実行・描画 // ボタンの更新
+    uiButtonUpdate(enterButton.isReleased(), backButton.isReleased(), rightButton.isReleased(), leftButton.isReleased());
     // カラーLEDクリア
     fullColorLed1.rgbLightUp(0, 0, 0);
 
@@ -286,4 +280,6 @@ void loop()
         }
         }
     }
+
+    delay(10);
 }
