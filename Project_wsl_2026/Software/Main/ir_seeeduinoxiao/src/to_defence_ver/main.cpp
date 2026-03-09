@@ -3,9 +3,6 @@
 #include "multiplexer.hpp"
 #include "movementAverage.hpp"
 
-// #define ATTACKER
-#define DEFENDER
-
 // 角度を -180度から180度の範囲に正規化する関数
 int normalizeDeg(int deg)
 {
@@ -13,6 +10,18 @@ int normalizeDeg(int deg)
     if (norm > 180)
         norm -= 360;
     return norm;
+}
+
+// 角度の差分を -180度から180度の範囲で計算する
+int diffDeg(int deg1, int deg2)
+{
+    int diff = (deg1 - deg2); // 差分
+
+    // 差分が360度を超えないように調整
+    int mod = (diff % 360 + 360) % 360;
+    if (mod > 180)
+        mod -= 360;
+    return mod;
 }
 
 // センサークラス
@@ -53,28 +62,18 @@ const int end_header = 0xAA;   // 同期ヘッダー格納用
 Sensor IRsensor[16];
 
 // IRセンサーのピン番号。前から反時計回りに指定
-#ifdef ATTACKER
-const int IRsensor_pin[16] = {0, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1};
-const float IRsensor_weight_gain[16] = {1.05f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
-                                        1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f};
-#endif
-#ifdef DEFENDER
 const int IRsensor_pin[16] = {0, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1};
 const float IRsensor_weight_gain[16] = {1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
                                         1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f};
-#endif
-
 // マルチプレクサ
 Multiplexer mux;
 
 // 移動平均
-const int ave_count = 5;
 MovementAverage mux_ave[16] = {
-    MovementAverage(ave_count), MovementAverage(ave_count), MovementAverage(ave_count), MovementAverage(ave_count),
-    MovementAverage(ave_count), MovementAverage(ave_count), MovementAverage(ave_count), MovementAverage(ave_count),
-    MovementAverage(ave_count), MovementAverage(ave_count), MovementAverage(ave_count), MovementAverage(ave_count),
-    MovementAverage(ave_count), MovementAverage(ave_count), MovementAverage(ave_count), MovementAverage(ave_count)};
-MovementAverage x_ave(ave_count), y_ave(ave_count);
+    MovementAverage(10), MovementAverage(10), MovementAverage(10), MovementAverage(10),
+    MovementAverage(10), MovementAverage(10), MovementAverage(10), MovementAverage(10),
+    MovementAverage(10), MovementAverage(10), MovementAverage(10), MovementAverage(10),
+    MovementAverage(10), MovementAverage(10), MovementAverage(10), MovementAverage(10)};
 
 // センサーのデバッグ表示
 void IRsensorDebugPrint()
@@ -123,18 +122,10 @@ void loop()
               sizeof(Sensor),
               sensorsCompare); // 降順に並べ替え
 
-        const int use_count = 7; // 値の小さな7個を計算に使う
+        int diff[2] = {-abs(diffDeg(IRsensor[0].deg, IRsensor[1].deg)), abs(diffDeg(IRsensor[0].deg, IRsensor[15].deg))};
+        int add = (diff[0] + diff[1] + 0) / 3 * 0;        // 重心をとる
+        IRball_deg = normalizeDeg(IRsensor[0].deg + add); // 最も重みの大きいセンサーの角度に重心を加算してボールの角度とする
 
-        float IRball_x = 0.0f, IRball_y = 0.0f;
-        for (int i = 0; i < use_count; i++)
-        {
-            IRball_x += IRsensor[i].get_x() * IRsensor[i].weight;
-            IRball_y += IRsensor[i].get_y() * IRsensor[i].weight;
-        }
-        IRball_x = x_ave.add(IRball_x);
-        IRball_y = y_ave.add(IRball_y);
-
-        IRball_deg = (int)roundf(degrees(atan2f(IRball_y, IRball_x)));
         IRball_dis = (IRsensor[0].value + IRsensor[1].value + IRsensor[2].value) / 3.0f;
     }
 

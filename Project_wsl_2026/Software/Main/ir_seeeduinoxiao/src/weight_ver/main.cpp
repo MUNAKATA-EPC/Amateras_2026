@@ -8,7 +8,11 @@ const int end_header = 0xAA;   // 同期ヘッダー格納用
 #define IR_SENSOR_COUNT 16
 
 Multiplexer ir_mux;
-MovementAverage ir_ave[IR_SENSOR_COUNT];
+MovementAverage ir_ave[IR_SENSOR_COUNT] = {
+    MovementAverage(3), MovementAverage(3), MovementAverage(3), MovementAverage(3),
+    MovementAverage(3), MovementAverage(3), MovementAverage(3), MovementAverage(3),
+    MovementAverage(3), MovementAverage(3), MovementAverage(3), MovementAverage(3),
+    MovementAverage(3), MovementAverage(3), MovementAverage(3), MovementAverage(3)};
 MovementAverage x(3);
 MovementAverage y(3);
 MovementAverage dis(3);

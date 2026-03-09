@@ -66,6 +66,11 @@ void loop()
       power[2] = (String(receive_data[12]) + String(receive_data[13]) + String(receive_data[14])).toInt();
       power[3] = (String(receive_data[17]) + String(receive_data[18]) + String(receive_data[19])).toInt();
 
+      int x = power[0] - power[1];                                        // 左右の差分
+      int y = power[2] - power[3];                                        // 前後の差分
+      uint32_t deg = uint32_t(int(atan2(y, x) * 180 / PI) + 360) % 360UL; // 角度計算
+      rp2040.fifo.push(deg);                                              // 角度を送る
+
       char rotate[4];
       rotate[0] = receive_data[1];
       rotate[1] = receive_data[6];
@@ -111,31 +116,50 @@ void setup1()
   pixels.begin();
   pixels.setBrightness(30);
 
-  pixels.setPixelColor(0, pixels.Color(50, 0, 0)); // 赤で待機
+  // 赤で待機（Core 0からの信号待ち）
+  pixels.setPixelColor(0, pixels.Color(50, 0, 0));
   pixels.show();
+
   while (!rp2040.fifo.available())
     ;
   rp2040.fifo.pop(); // 起動信号を消費
 
-  pixels.setPixelColor(0, pixels.Color(0, 0, 0)); // 消灯
-  delay(100);
-
-  for (int i = 0; i < 360; i++) // 起動イルミネーション
+  // 起動イルミネーション（虹色を1周させる）
+  for (uint32_t i = 0; i < 65536; i += 256)
   {
-    uint32_t rgb_color = pixels.ColorHSV(i, 255, 50); // 明度50
+    uint32_t rgb_color = pixels.ColorHSV(i, 255, 50);
     pixels.setPixelColor(0, rgb_color);
-    delay(5);
+    pixels.show();
+    delay(10);
   }
 
-  pixels.setPixelColor(0, pixels.Color(0, 0, 0)); // 消灯
+  // 終了後に一旦消灯
+  pixels.setPixelColor(0, pixels.Color(0, 0, 0));
+  pixels.show();
   delay(100);
-
-  while (rp2040.fifo.available())
-  {
-    rp2040.fifo.pop(); // 余分な信号を消費
-  }
 }
 
 void loop1()
 {
+  static uint32_t current_color = pixels.Color(0, 0, 0);
+
+  if (rp2040.fifo.available())
+  {
+    int deg = (int)rp2040.fifo.pop(); // 角度を受信
+
+    if (deg == 0xFF)
+    {
+      current_color = pixels.Color(17, 17, 17); // 停止時は暗い白
+    }
+    else
+    {
+      // Core 0からの角度(-180~180)を0~65535に変換
+      uint16_t hue = (uint16_t)(deg * 65535 / 360);
+      current_color = pixels.ColorHSV(hue, 255, 50);
+    }
+  }
+
+  pixels.setPixelColor(0, current_color);
+  pixels.show();
+  delay(20);
 }

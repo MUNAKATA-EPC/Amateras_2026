@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include "movement_average.hpp"
+#include "movementAverage.hpp"
 #include "multiplexer.hpp"
 
 const int start_header = 0x55; // 同期ヘッダー格納用
@@ -18,9 +18,13 @@ int IRball_deg;                 // ボール角度
 int IRball_val;                 // IRセンサーの値（距離）
 
 Multiplexer ir_mux;
-Movement_average ir_ave[16];
-Movement_average x;
-Movement_average y;
+MovementAverage ir_ave[16] = {
+    MovementAverage(3), MovementAverage(3), MovementAverage(3), MovementAverage(3),
+    MovementAverage(3), MovementAverage(3), MovementAverage(3), MovementAverage(3),
+    MovementAverage(3), MovementAverage(3), MovementAverage(3), MovementAverage(3),
+    MovementAverage(3), MovementAverage(3), MovementAverage(3), MovementAverage(3)};
+MovementAverage x(5);
+MovementAverage y(5);
 
 void setup()
 {
@@ -31,11 +35,6 @@ void setup()
   ir_mux.set_pin(1, 2, 3, 4, 0, -1);
   // マルチプレクサの初期化
   ir_mux.init(100);
-
-  for (int i = 0; i < 16; i++)
-    ir_ave[i].set(5); // 5個の平均をとる
-  x.set(5);
-  y.set(5);
 }
 
 void loop()
@@ -45,11 +44,7 @@ void loop()
   // データを移動平均を使って滑らかにする
   for (uint8_t i = 0; i < 16; i++)
   {
-    ir_ave[i].add(ir_mux.read(IRsensor_pin[i]));
-    int ave_value = ir_ave[i].output();
-
-    if (ir_ave[i].cant_compute())
-      ave_value = 1023;
+    int ave_value =  ir_ave[i].add(ir_mux.read(IRsensor_pin[i]));
 
     IRsensor_value[i] = constrain((int)round(ave_value), 0, 1023);
 
@@ -89,11 +84,8 @@ void loop()
     }
 
     // ボールの座標にも移動平均を使ってみる（サンクス・トウ・ソエダ・センパイ）
-    x.add((int)roundf(IRball_of_x * 1000.0f));
-    y.add((int)roundf(IRball_of_x * 1000.0f));
-
-    IRball_of_x = x.cant_compute() ? 0.0f : x.output();
-    IRball_of_y = y.cant_compute() ? 0.0f : y.output();
+    IRball_of_x = x.add((int)roundf(IRball_of_x * 1000.0f));
+    IRball_of_y = y.add((int)roundf(IRball_of_y * 1000.0f));
 
     IRball_deg = (int)roundf(degrees(atan2(IRball_of_y, IRball_of_x)));
     IRball_val = IRsensor_value[IRsensor_min_around_index[3]]; // 最小のIRセンサーの値を距離とする

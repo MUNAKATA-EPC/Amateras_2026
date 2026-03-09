@@ -126,9 +126,13 @@ int compare_int(const void *a, const void *b)
     return 0;
 }
 
-Movement_average value_ave[16];
-Movement_average x(3);
-Movement_average y(3);
+MovementAverage value_ave[16] = {
+    MovementAverage(3), MovementAverage(3), MovementAverage(3), MovementAverage(3),
+    MovementAverage(3), MovementAverage(3), MovementAverage(3), MovementAverage(3),
+    MovementAverage(3), MovementAverage(3), MovementAverage(3), MovementAverage(3),
+    MovementAverage(3), MovementAverage(3), MovementAverage(3), MovementAverage(3)};
+MovementAverage x(3);
+MovementAverage y(3);
 void setup()
 {
     Serial.begin(9600);
@@ -152,8 +156,7 @@ void loop()
     {
         sensor_data[i].index = i + 1;
 
-        value_ave[i].add(get_from_multiplexer(i));
-        sensor_data[i].value = value_ave[i].output();
+        sensor_data[i].value = value_ave[i].add(get_from_multiplexer(i));
     }
 
     print_debug_value();
@@ -190,10 +193,7 @@ void loop()
             y_of_ball_deg += sin(radians(index_of_around_max_detected_sensor[i] * -22.5)) * (1023 - sensor_data_temp[index_of_around_max_detected_sensor[i]].value);
         }
 
-        x.add(x_of_ball_deg * 1000000);
-        y.add(y_of_ball_deg * 1000000);
-
-        double deg_of_ball = degrees(atan2(y.output(), x.output()));
+        double deg_of_ball = degrees(atan2(y.add(y_of_ball_deg * 1000000), x.add(x_of_ball_deg * 1000000)));
 
         ball_deg = (int16_t)deg_of_ball;
         ball_distance = (int16_t)(sensor_data[0].value / 1023.0 * 100.0);
