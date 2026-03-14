@@ -20,6 +20,7 @@ class Sensor
 {
 public:
     int pin;
+    bool detected;
     float value;
     float weight;
     float deg;
@@ -60,7 +61,7 @@ const float IRsensor_weight_gain[16] = {1.05f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0
 #endif
 #ifdef DEFENDER
 const int IRsensor_pin[16] = {0, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1};
-const float IRsensor_weight_gain[16] = {1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
+const float IRsensor_weight_gain[16] = {1.001f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
                                         1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f};
 #endif
 
@@ -68,7 +69,7 @@ const float IRsensor_weight_gain[16] = {1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f
 Multiplexer mux;
 
 // 移動平均
-const int ave_count = 4;
+const int ave_count = 10;
 MovementAverage mux_ave[16] = {
     MovementAverage(ave_count), MovementAverage(ave_count), MovementAverage(ave_count), MovementAverage(ave_count),
     MovementAverage(ave_count), MovementAverage(ave_count), MovementAverage(ave_count), MovementAverage(ave_count),
@@ -93,7 +94,7 @@ void setup()
     // マルチプレクサのピン設定
     mux.set_pin(1, 2, 3, 4, 0, -1);
     // マルチプレクサの初期化
-    mux.init(20);
+    mux.init(100);
 }
 
 void loop()
@@ -109,7 +110,12 @@ void loop()
 
         if (IRsensor[i].value < 990.0f)
         {
+            IRsensor[i].detected = true;
             detected_count++;
+        }
+        else
+        {
+            IRsensor[i].detected = false;
         }
     }
 
@@ -141,8 +147,11 @@ void loop()
         for (int i = 0; i < 7; i++)
         {
             int index = around_index[i];
-            IRball_x += IRsensor[index].get_x() * IRsensor[index].weight;
-            IRball_y += IRsensor[index].get_y() * IRsensor[index].weight;
+            if (IRsensor[index].detected)
+            {
+                IRball_x += IRsensor[index].get_x() * IRsensor[index].weight;
+                IRball_y += IRsensor[index].get_y() * IRsensor[index].weight;
+            }
         }
         IRball_x = x_ave.add(IRball_x);
         IRball_y = y_ave.add(IRball_y);
