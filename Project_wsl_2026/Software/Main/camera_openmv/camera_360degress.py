@@ -5,7 +5,7 @@ import math
 
 #############################################################
 # ゴールの色取り用変数(黄色)
-goal_yellow = (71, 86, -26, -20, 41, 127)
+goal_yellow = (65, 89, -35, -13, 31, 90)
 #############################################################
 # ゴールの色取り用変数(青色)
 goal_blue = (7, 48, -15, 16, -41, -19)
@@ -24,7 +24,7 @@ screen_long_r = 168
 sensor.reset()
 sensor.set_pixformat(sensor.RGB565)
 sensor.set_framesize(sensor.QVGA)
-sensor.set_brightness(0)
+sensor.set_brightness(-25)
 
 # まずオートを全部ONにして、センサーを環境に慣れさせる
 sensor.set_auto_whitebal(True)
@@ -35,7 +35,7 @@ sensor.set_auto_gain(True)
 time.sleep_ms(2000)
 
 # 慣れたあとの値を「固定」する（試合中の変動を防ぐ）
-sensor.set_auto_whitebal(True)
+sensor.set_auto_whitebal(False, rgb_gain_db=[0,0,0])
 sensor.set_auto_exposure(False, exposure_us=10000) # 暗いならここを増やす
 sensor.set_auto_gain(False, gain_db=6)
 

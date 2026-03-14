@@ -118,18 +118,31 @@ void loop()
 
     if (detected_count != 0)
     {
-        qsort(IRsensor,
-              sizeof(IRsensor) / sizeof(IRsensor[0]),
-              sizeof(Sensor),
-              sensorsCompare); // 降順に並べ替え
+        int max_index = 0;
+        for (int i = 1; i < 16; i++)
+        {
+            int weight = IRsensor[i].weight;
+            if (weight > IRsensor[max_index].weight)
+            {
+                max_index = i;
+            }
+        }
 
-        const int use_count = 7; // 値の小さな7個を計算に使う
+        int around_index[7] = {
+            (max_index - 3 + 16) % 16,
+            (max_index - 2 + 16) % 16,
+            (max_index - 1 + 16) % 16,
+            max_index,
+            (max_index + 1) % 16,
+            (max_index + 2) % 16,
+            (max_index + 3) % 16};
 
         float IRball_x = 0.0f, IRball_y = 0.0f;
-        for (int i = 0; i < use_count; i++)
+        for (int i = 0; i < 7; i++)
         {
-            IRball_x += IRsensor[i].get_x() * IRsensor[i].weight;
-            IRball_y += IRsensor[i].get_y() * IRsensor[i].weight;
+            int index = around_index[i];
+            IRball_x += IRsensor[index].get_x() * IRsensor[index].weight;
+            IRball_y += IRsensor[index].get_y() * IRsensor[index].weight;
         }
         IRball_x = x_ave.add(IRball_x);
         IRball_y = y_ave.add(IRball_y);
