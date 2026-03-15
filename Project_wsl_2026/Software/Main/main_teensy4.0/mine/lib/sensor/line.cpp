@@ -16,7 +16,7 @@ static bool _sensor[19] = {false, false, false, false, false, false, false, fals
 
 static float _ring_x = 0.0f;
 static float _ring_y = 0.0f;
-static MovementAverage _ave_ring_xy[2] = {MovementAverage(5), MovementAverage(5)};
+static MovementAverage _ave_ring_xy[2] = {MovementAverage(10), MovementAverage(10)};
 
 static Timer _detecting_timer;
 static unsigned long _line_ring_detecting_time = 0UL;

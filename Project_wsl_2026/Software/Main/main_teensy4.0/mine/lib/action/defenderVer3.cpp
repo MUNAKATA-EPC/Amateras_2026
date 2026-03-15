@@ -34,10 +34,12 @@ LinePosition linePositionCheck()
     {
         if (abs(line_chunk[0].deg) > 45 && abs(line_chunk[0].deg) < 135) // 縦線上にいる
         {
+            Serial.println("Tate");
             return Tate;
         }
         else // 横線上にいる
         {
+            Serial.println("Yoko");
             return Yoko;
         }
     }
@@ -45,19 +47,23 @@ LinePosition linePositionCheck()
     {
         if (abs(lineRingDeg()) > 45 && abs(lineRingDeg()) < 135) // 縦線上にいる
         {
+            Serial.println("Tate");
             return Tate;
         }
         else // 横線上にいる
         {
+            Serial.println("Yoko");
             return Yoko;
         }
     }
     else // if (line_chunk_count >= 3) // 端にいる
     {
+        Serial.println("Haji");
         return Haji;
     }
 
     // if (line_chunk_count == 0)
+    Serial.println("None");
     return None;
 }
 
@@ -68,24 +74,6 @@ void lineTraceMove(int move_deg, int move_power, int line_trace_power)
     Vector line_trace_vector = Vector(lineRingDeg(), lineRingDis() * line_trace_power / 100.0f);
     Vector total_vector = move_vector + line_trace_vector;
     motorsVectorMove(&total_vector);
-}
-
-// ボールが正面にあったら止まるライントレース関数
-void lineTraceMoveToDefence(int ir_deg, int move_deg, int move_power, int line_trace_power)
-{
-    if (abs(ir_deg) < 10)
-    {
-        lineTrace(0, 0, line_trace_power);
-    }
-    else if (abs(ir_deg) < 20)
-    {
-        int power = move_power * (abs(ir_deg) - 10) / 10;
-        lineTrace(move_deg, power, line_trace_power);
-    }
-    else
-    {
-        lineTrace(move_deg, move_power, line_trace_power);
-    }
 }
 
 //// ディフエンダーメイン ////
@@ -144,56 +132,71 @@ void playDefenderVer3(Defender::Mode mode)
     {
         if (irDetected())
         {
-            int ir_defence_deg = (irDeg() - (defence_goal_deg + 180) + 360) % 360; // ゴールを基準としたボールの角度
+            int ir_defence_deg = nearSessenDeg(defence_goal_deg, irDeg()); // ゴールの接線方向の角度の内ボールの角に近いほう
+            LinePosition line_position = linePositionCheck();              // Noneは考えられない
 
-            if (lineSideRightDetected() && lineSideLeftDetected())
+            // 減速処理
+            int diff_from_ball_to_goal = abs(diffDeg(defence_goal_deg, irDeg()));
+            float speed_down_gain = 1.0f;
+            if (diff_from_ball_to_goal > 160)
             {
-                // トレースせずに横移動
-                if (irDeg() > 0) // ボールが右側にある
+                if (diff_from_ball_to_goal > 170)
                 {
-                    lineTraceToDefence(irDeg(), 90, 80, 0);
+                    speed_down_gain = 0.0f;
                 }
-                else // ボールが左側にある
+                else
                 {
-                    lineTraceToDefence(irDeg(), -90, 80, 0);
+                    speed_down_gain = map(diff_from_ball_to_goal, 160, 170, 100.0f, 0.0f) / 100.0f;
                 }
             }
-            else
-            {
-                LinePosition line_position = linePositionCheck(); // Noneは考えられない
 
-                if (line_position == LinePosition::Yoko)
+            // ライントレース
+            if (line_position == LinePosition::Yoko)
+            {
+                if (lineSideRightDetected() && lineSideLeftDetected())
+                {
+                    // トレースせずに横移動
+                    if (irDeg() > 0) // ボールが左側にいる
+                    {
+                        lineTraceMove(90, 95 * speed_down_gain, 0);
+                    }
+                    else // ボールが右側にいる
+                    {
+                        lineTraceMove(-90, 95 * speed_down_gain, 0);
+                    }
+                }
+                else
                 {
                     // 横トレース
-                    int move_deg = (irDeg() > 0) ? 90 : -90;
-                    lineTraceMoveToDefence(irDeg(), move_deg, 80, 15);
+                    lineTraceMove(ir_defence_deg, 80 * speed_down_gain, 15);
                 }
-                else if (line_position == LinePosition::Tate)
+            }
+            else if (line_position == LinePosition::Tate)
+            {
+                if (defence_goal_deg > 0 && irDeg() > 0)
                 {
-                    if (abs(diffDeg(defence_goal_deg, irDeg())) < 90) // ロボット|ゴール|ボール　この状況の場合
-                    {
-                        // 前進トレース
-                        lineTraceToDefence(irDeg(), 0, 80, 15);
-                    }
-                    else // ボール ロボット|ゴール|　この状況の場合
-                    {
-                        if (abs(irDeg()) < 90) // 前方にボールがある
-                        {
-                            // 前進トレース
-                            lineTraceToDefence(irDeg(), 0, 80, 15);
-                        }
-                        else // 後方にボールがある
-                        {
-                            // 後退トレース（減速）
-                            lineTraceMoveToDefence(irDeg(), 180, 40, 15);
-                        }
-                    }
+                    lineTraceMove(0, 60, 15);
                 }
-                else // if(line_position == LinePosition::Haji)
+                else if (defence_goal_deg < 0 && irDeg() < 0)
                 {
-                    // 端移動（前進）
-                    lineTraceMoveToDefence(irDeg(), 0, 40, 15);
+                    lineTraceMove(0, 60, 15);
                 }
+                else
+                {
+                    if (abs(irDeg()) < 90) // 前にボールがある
+                    {
+                        lineTraceMove(ir_defence_deg, 60 * speed_down_gain, 15);
+                    }
+                    else // 後ろにボールがある
+                    {
+                        lineTraceMove(ir_defence_deg, 15 * speed_down_gain, 15);
+                    }
+                }
+            }
+            else // if(line_position == LinePosition::Haji)
+            {
+                // 端移動（前進）
+                lineTraceMove(0, 15 * speed_down_gain, 15);
             }
         }
         else
@@ -203,7 +206,7 @@ void playDefenderVer3(Defender::Mode mode)
 
             if (line_position == LinePosition::Yoko)
             {
-                if (abs(defence_goal_deg) > 160)
+                if (abs(defence_goal_deg) > 170)
                 {
                     lineTraceMove(0, 0, 15);
                 }
