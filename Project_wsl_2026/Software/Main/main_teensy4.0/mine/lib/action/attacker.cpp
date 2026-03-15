@@ -12,42 +12,36 @@ Vector mawarikomi(int max_power)
         {
             return Vector(0, max_power);
         }
-        if (ir_dis <= 600) // 近い
+        if (ir_dis <= 300) // 近い
         {
             // 角度
-            float deg = 0xFF,power = max_power;
-            if (abs(irDeg()) <= 10) // 前にある
+            float deg = 0xFF, power = max_power;
+            if (abs(ir_deg) <= 10) // 前
             {
                 deg = 0;
-
                 power *= 1.0f;
             }
-            else if (abs(irDeg()) < 45) // 前付近
+            else if (abs(ir_deg) <= 45) // 前付近
             {
                 float k = (ir_deg > 0) ? 1.0f : -1.0f;
                 deg = ir_deg + k * 50.0f;
 
-                power *= 0.8f; // 少し減速する
+                power *= map(ir_deg, 10, 45, 85, 100) / 100.0f; // 少し減速する
             }
-            else
+            else if (abs(ir_deg) <= 100) // 中央付近
             {
                 float k = (ir_deg > 0) ? 1.0f : -1.0f;
-                deg = ir_deg + k * 60.0f;
+                deg = ir_deg + k * 50.0f;
 
                 power *= 1.0f;
             }
-            /*if (irDeg() >= -30 && irDeg() <= 30) // 前付近
-            {
-                float pos[3][2] = {{0, 0}, {8, 12}, {30, 90}};
-                deg = ((ir_deg > 0) ? 1 : -1.1f) * lagrangeShifter(5, pos, abs(ir_deg));
-            }
             else
             {
                 float k = (ir_deg > 0) ? 1.0f : -1.0f;
-                deg = ir_deg + k * 60.0f; // ボールの方向に対して60°回り込む
-            }*/
+                deg = ir_deg + k * 50.0f;
 
-            // deg = ir_deg + (deg - ir_deg) * map(ir_dis, 200, 500, 1.4f, 1.0f);
+                power *= 1.0f;
+            }
 
             return Vector(deg, power);
         }
@@ -84,8 +78,6 @@ void playAttacker(Attacker::Mode mode)
 
 static Timer line_timer;
 
-static Timer kick_timer;
-
 void attackWithGyro() // ジャイロで攻撃
 {
     motorsPdProcess(&pd_gyro, bnoDeg(), 0); // ジャイロで姿勢制御
@@ -100,7 +92,7 @@ void attackWithGyro() // ジャイロで攻撃
     }
 
     const int motor_line_max_power = 50;
-    const int motor_ir_max_power = 90;
+    const int motor_ir_max_power = 95;
 
     static int old_line_ring_deg = 0;
 
@@ -114,40 +106,15 @@ void attackWithGyro() // ジャイロで攻撃
         old_line_ring_deg = lineRingDeg();
         line_timer.reset();
     }
-    /*else if (ussRightDetected() && ussLeftDetected() && ussRightDis() < 35 && (ussRightDis() + ussLeftDis()) > 80)
+    /*else if (ussRightDetected() && ussLeftDetected() && (ussRightDis() <= 30 || ussLeftDis() <= 30))
     {
-        if (irDetected() && irDeg() <= 0)
+        if (abs(irDeg()) < 90)
         {
-            if (irDeg() > -75)
-            {
-                motorsMove(0, motor_ir_max_power);
-            }
-            else
-            {
-                motorsMove(180, motor_ir_max_power);
-            }
+            motorsMove(0, motor_ir_max_power * 0.8);
         }
         else
         {
-            motorsMove(90, motor_ir_max_power);
-        }
-    }
-    else if (ussRightDetected() && ussLeftDetected() && ussLeftDis() < 35 && (ussRightDis() + ussLeftDis()) > 80)
-    {
-        if (irDetected() && irDeg() > 0)
-        {
-            if (irDeg() < 75)
-            {
-                motorsMove(0, motor_ir_max_power);
-            }
-            else
-            {
-                motorsMove(180, motor_ir_max_power);
-            }
-        }
-        else
-        {
-            motorsMove(-90, motor_ir_max_power);
+            motorsMove(180, motor_ir_max_power * 0.8);
         }
     }*/
     else if (irDetected())
@@ -184,7 +151,7 @@ void attackWithCam(bool attack_goal_detected, int attack_goal_deg, int attack_go
     }
 
     const int motor_line_max_power = 50;
-    const int motor_ir_max_power = 80;
+    const int motor_ir_max_power = 95;
 
     if (attack_goal_detected && attack_goal_dis < 60)
     {
@@ -203,13 +170,16 @@ void attackWithCam(bool attack_goal_detected, int attack_goal_deg, int attack_go
         motorsMove(fieldDeg(), motor_line_max_power);
         line_timer.reset();
     }
-    /*else if (ussRightDetected() && ussLeftDetected() && ussRightDis() <= 36 && (ussRightDis() + ussLeftDis()) > 80)
+    /*else if (ussRightDetected() && ussLeftDetected() && (ussRightDis() <= 30 || ussLeftDis() <= 30) && abs(bnoDeg()) < 15)
     {
-        motorsMove(90, motor_ir_max_power);
-    }
-    else if (ussRightDetected() && ussLeftDetected() && ussLeftDis() <= 36 && (ussRightDis() + ussLeftDis()) > 80)
-    {
-        motorsMove(-90, motor_ir_max_power);
+        if (abs(irDeg()) < 90)
+        {
+            motorsMove(0, motor_ir_max_power * 0.8);
+        }
+        else
+        {
+            motorsMove(180, motor_ir_max_power * 0.8);
+        }
     }*/
     else if (irDetected())
     {

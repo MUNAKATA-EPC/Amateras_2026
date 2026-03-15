@@ -32,8 +32,9 @@ bool lineRingFirstDetedcted();
 int lineRingFirstDeg();
 unsigned long lineRingDetectingTime();
 
-int lineLastRingDeg();   // 一番最後に反応した角度
-float lineLastRingDis(); // 一番最後に反応した距離
+int lineRingLastDeg();                     // 一番最後に反応した角度
+float lineRingLastDis();                   // 一番最後に反応した距離
+unsigned long lineRingLastDetectingTime(); // 一番最後に反応したときからの時間
 
 // チャンクを計算する関数 ( start_index + lengh ) % 16 = end_index が成り立つ
 class LineChunk

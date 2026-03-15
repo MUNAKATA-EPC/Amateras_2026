@@ -19,12 +19,13 @@ static float _ring_y = 0.0f;
 static MovementAverage _ave_ring_xy[2] = {MovementAverage(10), MovementAverage(10)};
 
 static Timer _detecting_timer;
-static unsigned long _line_ring_detecting_time = 0UL;
+static unsigned long _ring_detecting_time = 0UL;
 
 static int _ring_deg = 0xFF, _ring_first_deg = 0xFF;
 static float _ring_dis = 0xFF;
 
-static int _last_ring_deg = 0xFF, _last_ring_dis = 0xFF; // 最後に計測した角度・距離格納用
+static int _ring_last_deg = 0xFF, _ring_last_dis = 0xFF; // 最後に計測した角度・距離格納用
+static Timer _ring_last_timer;
 
 static bool _side_right = false;
 static bool _side_left = false;
@@ -47,7 +48,7 @@ bool lineInit(HardwareSerial *serial, uint32_t baudrate)
     _ring_x = _ring_y = 0.0f;
     _ring_deg = _side_deg = 0xFF;
     _ring_dis = 0xFF;
-    _last_ring_deg = _last_ring_dis = 0xFF;
+    _ring_last_deg = _ring_last_dis = 0xFF;
     _side_right = _side_left = _side_back = false;
 
     for (int i = 0; i < 19; i++)
@@ -160,8 +161,8 @@ void lineUpdate()
                 _ring_deg = (int)roundf(degrees(atan2f(_ring_y, _ring_x)));
             }
 
-            _last_ring_deg = _ring_deg;
-            _last_ring_dis = _ring_dis;
+            _ring_last_deg = _ring_deg;
+            _ring_last_dis = _ring_dis;
         }
         else // ringDetectedCount == 0 の場合 (リングセンサーの反応がない)
         {
@@ -211,7 +212,13 @@ void lineUpdate()
     {
         _ring_first_deg = 0xFF;
     }
-    _line_ring_detecting_time = _detecting_timer.msTime();
+    _ring_detecting_time = _detecting_timer.msTime();
+
+    // エンジェル検出終了後の処理
+    if (_ring_detected == false && _old_ring_detected)
+    {
+        _ring_last_timer.reset();
+    }
 }
 
 bool lineIsAdjusting() { return _is_adjusting; }
@@ -236,10 +243,21 @@ float lineRingY() { return _ring_y; }
 
 bool lineRingFirstDetedcted() { return _ring_detected == true && _old_ring_detected == false; }
 int lineRingFirstDeg() { return _ring_first_deg; }
-unsigned long lineRingDetectingTime() { return _line_ring_detecting_time; }
+unsigned long lineRingDetectingTime() { return _ring_detecting_time; }
 
-int lineLastRingDeg() { return _last_ring_deg; }
-float lineLastRingDis() { return _last_ring_dis; }
+int lineRingLastDeg() { return _ring_last_deg; }
+float lineRingLastDis() { return _ring_last_dis; }
+unsigned long lineRingLastDetectingTime()
+{
+    if (_ring_last_timer.everReset())
+    {
+        return _ring_last_timer.msTime();
+    }
+    else
+    {
+        return 0xFFFFFFFF;
+    }
+}
 
 int lineChunkCount(LineChunk (&chunk)[16])
 {
