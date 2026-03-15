@@ -11,7 +11,7 @@ const int pins[16] =
     {0, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1};
 
 float ema_angle = 0;
-float ema_dist = 0;
+float ema_dis = 0;
 
 const float ANGLE_ALPHA = 0.2;
 const float DIST_ALPHA = 0.25;
@@ -125,11 +125,16 @@ void loop()
     while (final_angle <= -180)
         final_angle += 360;
 
-    float dist = 100000.0 / (max_v + 1.0);
+// #define EMA_DIS
+#ifdef EMA_DIS
+    float dis = 100000.0 / (max_v + 1.0);
 
-    ema_dist = DIST_ALPHA * dist + (1 - DIST_ALPHA) * ema_dist;
+    ema_dis = DIST_ALPHA * dis + (1 - DIST_ALPHA) * ema_dis;
 
-    int dis_out = constrain((int)ema_dist, 0, 1000);
+    int dis_out = constrain((int)ema_dis, 0, 1000);
+#else
+    int dis_out = pow(1023 - max_v, 1.5);
+#endif
 
     sendData(
         (int16_t)round(final_angle),
