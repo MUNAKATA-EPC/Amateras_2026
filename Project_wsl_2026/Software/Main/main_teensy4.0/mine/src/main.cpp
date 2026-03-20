@@ -3,6 +3,7 @@
 // action類
 #include "attacker.hpp"
 #include "defenderVer3.hpp"
+#include "defenderVer4.hpp"
 #include "radicon.hpp"
 #include "test.hpp"
 // common類
@@ -255,7 +256,7 @@ void loop()
         }
         case Action::DEFENDER:
         {
-            playDefenderVer3(Defender::Mode(uiModeNumber()));
+            playDefenderVer4(Defender::Mode(uiModeNumber()));
             break;
         }
         case Action::TEST:
