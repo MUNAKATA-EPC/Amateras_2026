@@ -5,6 +5,7 @@ void testGyro();
 void testCam();
 void testLineTrace();
 void testMotor();
+void testBallDisAdjust();
 
 void playTest(Test::Mode mode)
 {
@@ -27,6 +28,10 @@ void playTest(Test::Mode mode)
     else if (mode == Test::Mode::MOTOR)
     {
         testMotor();
+    }
+    else if (mode == Test::Mode::BALL_DIS_ADJUST)
+    {
+        testBallDisAdjust();
     }
     else
     {
@@ -92,7 +97,7 @@ void testLineTrace()
 
     if (lineRingDetected())
     {
-        if ((lineRingDis() > 60) && abs(diffDeg(lineRingDeg(), irDeg())) < 90)
+        if ((lineRingDis() > 60) && fabsf(diffDeg(lineRingDeg(), irDeg())) < 90)
         {
             motorsMove(nearSessenDeg(lineRingDeg(), irDeg()), motor_line_trace_power);
         }
@@ -110,4 +115,82 @@ void testLineTrace()
 void testMotor()
 {
     motorsDirectMove(-100, 100, -100, 100);
+}
+
+void testBallDisAdjust()
+{
+    static String mode = "reset";
+    static int deg_to_dis[360];
+
+    while (Serial.available())
+    {
+        mode = Serial.readStringUntil('\n');
+    }
+
+    static bool flag = true;
+
+    if (mode == "home")
+    {
+        if (flag)
+        {
+            Serial.print(mode + " : ");
+            Serial.println("home:セレクト,reset:データリセット,show:データ表示,collect:データ採取");
+            flag = false;
+        }
+    }
+    else if (mode == "reset")
+    {
+        for (int i = 0; i < 360; i++)
+        {
+            deg_to_dis[i] = 1023;
+        }
+        Serial.print(mode + " : ");
+        Serial.println("success");
+
+        mode = "home";
+        flag = true;
+    }
+    else if (mode == "show")
+    {
+        Serial.print(mode + " : ");
+        Serial.print("{");
+        for (int i = 0; i < 360; i++)
+        {
+            Serial.print(String(deg_to_dis[i]) + ",");
+        }
+        Serial.println("}");
+
+        mode = "home";
+        flag = true;
+    }
+    else if (mode == "collect")
+    {
+        Serial.print(mode + " : ");
+        if (irDetected())
+        {
+            int index = ((int)irDeg() + 360) % 360;
+            int dis = irDis();
+
+            if (dis < deg_to_dis[index])
+            {
+                deg_to_dis[index] = dis;
+            }
+
+            Serial.println(dis);
+        }
+        else
+        {
+            Serial.println("0xFF");
+        }
+
+        flag = true;
+    }
+    else
+    {
+        Serial.print(mode + " : ");
+        Serial.println("error");
+
+        mode = "home";
+        flag = true;
+    }
 }

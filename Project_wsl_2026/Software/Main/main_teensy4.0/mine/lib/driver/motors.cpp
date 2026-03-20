@@ -4,9 +4,9 @@
 
 static DSR1202 *_dsr = nullptr;
 
-static int _deg_position[4] = {0}; // モータの物理的な配置角度
-static int _move_sign[4] = {1};    // 移動ベクトル計算後のパワーに対する符号
-static int _pd_sign[4] = {1};      // PD制御の回転トルクに対する符号
+static float _deg_position[4] = {0}; // モータの物理的な配置角度
+static int _move_sign[4] = {1};      // 移動ベクトル計算後のパワーに対する符号
+static int _pd_sign[4] = {1};        // PD制御の回転トルクに対する符号
 
 static PD *_pd = nullptr;
 static PD *_last_pd = nullptr;
@@ -42,7 +42,7 @@ void motorsSetTogglePin(uint8_t pin, uint8_t pinmode)
 }
 
 // 各モーターの物理的な配置角度を設定
-void motorsSetDegPosition(int deg_1ch, int deg_2ch, int deg_3ch, int deg_4ch)
+void motorsSetDegPosition(float deg_1ch, float deg_2ch, float deg_3ch, float deg_4ch)
 {
     _deg_position[0] = deg_1ch > 180 ? deg_1ch - 360 : deg_1ch;
     _deg_position[1] = deg_2ch > 180 ? deg_2ch - 360 : deg_2ch;
@@ -69,7 +69,7 @@ void motorsSetPdSign(int sign_1ch, int sign_2ch, int sign_3ch, int sign_4ch)
 }
 
 // PDの計算を実行
-void motorsPdProcess(PD *pd, int deg, int target)
+void motorsPdProcess(PD *pd, float deg, float target)
 {
     _pd = pd;
 
@@ -90,7 +90,7 @@ void motorsDirectMove(int value_1ch, int value_2ch, int value_3ch, int value_4ch
 #define PD_MAX 80.0f
 #define PD_MOVING_MAX 20.0f
 
-void motorsMove(int deg, int power)
+void motorsMove(float deg, float power)
 {
     // 角度による計算
     deg = -normalizeDeg(deg + 180);
@@ -102,9 +102,9 @@ void motorsMove(int deg, int power)
     float strongest_abs_power = 0.0f;
     for (int i = 0; i < 4; i++)
     {
-        if (fabs(powers[i]) > strongest_abs_power)
+        if (fabsf(powers[i]) > strongest_abs_power)
         {
-            strongest_abs_power = fabs(powers[i]);
+            strongest_abs_power = fabsf(powers[i]);
         }
     }
     // 最大出力にするためにスケーリング
@@ -129,17 +129,17 @@ void motorsMove(int deg, int power)
     strongest_abs_power = 0.0f;
     for (int i = 0; i < 4; i++)
     {
-        if (fabs(temp_powers[i]) > strongest_abs_power)
+        if (fabsf(temp_powers[i]) > strongest_abs_power)
         {
-            strongest_abs_power = fabs(temp_powers[i]);
+            strongest_abs_power = fabsf(temp_powers[i]);
         }
     }
 
     // 100を超える用であればPD値のみを削る形で補正
     if (strongest_abs_power > 100.0f)
     {
-        float over_limit_abs_power = strongest_abs_power - 100.0f;        // 100をどれくらい超えたか
-        float pd_value_max_power = fabs(pd_value) - over_limit_abs_power; // それをもとにPD値の限界を計算
+        float over_limit_abs_power = strongest_abs_power - 100.0f;         // 100をどれくらい超えたか
+        float pd_value_max_power = fabsf(pd_value) - over_limit_abs_power; // それをもとにPD値の限界を計算
 
         pd_value = constrain(pd_value, -pd_value_max_power, pd_value_max_power); // 制限
     }
@@ -181,5 +181,5 @@ void motorsStop()
 
 void motorsVectorMove(Vector *vec)
 {
-    motorsMove(vec->deg(), (int)roundf(vec->length()));
+    motorsMove(vec->deg(), vec->length());
 }

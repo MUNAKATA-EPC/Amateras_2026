@@ -2,11 +2,11 @@
 
 // 攻撃ゴールの位置
 static bool attack_goal_detected;
-static int attack_goal_deg;
+static float attack_goal_deg;
 static float attack_goal_dis;
 // 守備ゴールの位置
 static bool defence_goal_detected;
-static int defence_goal_deg;
+static float defence_goal_deg;
 static float defence_goal_dis;
 
 // ディフエンダーのフォーム
@@ -17,6 +17,15 @@ enum DfForm
     DEFENCE_LINE_HOSEI, // DEFENCE_LINE_HOSEIフォーム（自分陣地でラインから離れた場合一時的にラインに戻ろうとする）
     KIKAN               // KIKANフォーム
 };
+
+// ラインの絶対角を出す関数
+float lineAbsoluteRingDeg()
+{
+    if (!lineRingDetected())
+        return 0xFF;
+
+    return normalizeDeg(lineRingDeg() - bnoDeg());
+}
 
 // ライン自己位置推定関数
 enum LinePosition
@@ -33,7 +42,8 @@ LinePosition linePositionCheck()
 
     if (line_chunk_count == 1)
     {
-        if (abs(line_chunk[0].deg) > 45 && abs(line_chunk[0].deg) < 135) // 縦線上にいる
+        float absolute_line_chunk_deg = normalizeDeg(line_chunk[0].deg - bnoDeg());
+        if (fabsf(absolute_line_chunk_deg) > 45 && fabsf(absolute_line_chunk_deg) < 135) // 縦線上にいる
         {
             return Tate;
         }
@@ -44,7 +54,7 @@ LinePosition linePositionCheck()
     }
     else if (line_chunk_count == 2)
     {
-        if (abs(lineRingDeg()) > 45 && abs(lineRingDeg()) < 135) // 縦線上にいる
+        if (fabsf(lineAbsoluteRingDeg()) > 45 && fabsf(lineAbsoluteRingDeg()) < 135) // 縦線上にいる
         {
             return Tate;
         }
@@ -63,7 +73,7 @@ LinePosition linePositionCheck()
 }
 
 // ライントレース関数
-void lineTraceMove(int move_deg, int move_power, int line_trace_power)
+void lineTraceMove(float move_deg, float move_power, float line_trace_power)
 {
     Vector move_vector = Vector(nearSessenDeg(lineRingDeg(), move_deg), move_power);
     Vector line_trace_vector = Vector(lineRingDeg(), lineRingDis() * line_trace_power / 100.0f);
@@ -102,12 +112,10 @@ void playDefenderVer3(Defender::Mode mode)
 
     // 守備エリア条件
     bool my_defence_area =
-        abs(fieldDeg()) < 90 &&
+        fabsf(fieldDeg()) < 90 &&
         defence_goal_detected &&
-        abs(defence_goal_deg) > 90 &&
-        defence_goal_dis < 85 &&
-        ussLeftDis() > 36 &&
-        ussRightDis() > 36;
+        fabsf(defence_goal_deg) > 90 &&
+        defence_goal_dis < 85;
 
     // 攻撃フォーム切り替え条件
     static bool my_defence_point = false; // 守備フォーム かつ ボールとゴールの線分上にいる時true
@@ -193,27 +201,33 @@ void playDefenderVer3(Defender::Mode mode)
 
         if (irDetected())
         {
-            int ir_defence_deg = nearSessenDeg(defence_goal_deg, irDeg()); // ゴールの接線方向の角度の内ボールの角に近いほう
+            float ir_defence_deg = nearSessenDeg(defence_goal_deg, irDeg()); // ゴールの接線方向の角度の内ボールの角に近いほう
 
             // 出力減少処理
-            int diff_from_ball_to_goal = abs(diffDeg(defence_goal_deg, irDeg()));
-            float power_down_gain = 1.0f;
-            if (diff_from_ball_to_goal > 160) // (ゴール) - (ロボット) - (ボール) この位置関係である可能性が高い
-            {
-                my_defence_point = true;
+            float diff_from_ball_to_goal = fabsf(diffDeg(defence_goal_deg, irDeg()));
+            float abs_defence_y = sinf(radians(diff_from_ball_to_goal)) * irDis(); // ゴールの方向を基準とした見たボールのy成分
 
-                if (diff_from_ball_to_goal > 170)
-                {
-                    power_down_gain = 0.0f;
-                }
-                else
-                {
-                    power_down_gain = map(diff_from_ball_to_goal, 160, 170, 100.0f, 0.0f) / 100.0f;
-                }
-            }
-            if (diff_from_ball_to_goal < 15) // (ゴール) - (ボール) - (ロボット) この位置関係である可能性が高い
+            float power_down_gain = 1.0f; // 減速ゲイン
+
+            if (abs_defence_y < 180.0f) // (ゴール) - (ロボット) - (ボール) または (ゴール) - (ボール) - (ロボット)
             {
-                power_down_gain = 0.25f; // 減速させる（オウンゴール対策）
+                if (diff_from_ball_to_goal > 90) // (ゴール) - (ロボット) - (ボール)
+                {
+                    my_defence_point = true;
+
+                    if (abs_defence_y < 80.0f)
+                    {
+                        power_down_gain = 0.0f;
+                    }
+                    else
+                    {
+                        power_down_gain = map(abs_defence_y, 80, 180, 0.0f, 100.0f) / 100.0f;
+                    }
+                }
+                else // (ゴール) - (ボール) - (ロボット)
+                {
+                    power_down_gain = 0.6f; // 減速
+                }
             }
 
             // 守備
@@ -249,7 +263,7 @@ void playDefenderVer3(Defender::Mode mode)
                 }
                 else
                 {
-                    if (abs(irDeg()) < 90) // 前にボールがある
+                    if (fabsf(irDeg()) < 90) // 前にボールがある
                     {
                         lineTraceMove(ir_defence_deg, 60 * power_down_gain, line_trace_power);
                     }
@@ -270,7 +284,7 @@ void playDefenderVer3(Defender::Mode mode)
             // 定位置移動
             if (line_position == LinePosition::Yoko)
             {
-                if (abs(defence_goal_deg) > 170)
+                if (fabsf(defence_goal_deg) > 170)
                 {
                     lineTraceMove(0, 0, line_trace_power);
                 }
@@ -305,7 +319,8 @@ void playDefenderVer3(Defender::Mode mode)
         if (lineRingDetected())
         {
             // ラインから逃れる動き
-            if (abs(lineRingDeg()) > 135 && abs(fieldDeg()) < 90) // |__(ロボット)__(ゴール)___________| この状況である可能性が高い
+            if (fabsf(lineAbsoluteRingDeg()) > 135 &&
+                fabsf(fieldDeg()) < 90) // |__(ロボット)__(ゴール)___________| この状況である可能性が高い
             {
                 if (fieldDeg() > 0) // コート上で右にいる
                 {

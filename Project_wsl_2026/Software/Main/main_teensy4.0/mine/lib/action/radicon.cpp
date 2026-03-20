@@ -171,7 +171,7 @@ void record()
         /*データの記録*/
         if (move_deg != 0xFF && irDetected())
         {
-            int deg_index = (irDeg() + 360) % 360; // 角度を0~359の配列用に変換
+            int deg_index = ((int)irDeg() + 360) % 360; // 角度を0~359の配列用に変換
             int dis_index = disToIndex(irDis());   // 距離を0~4の配列用に変換
 
             temp_record_data[deg_index][dis_index] = getVec(move_deg, move_power); // 記録
@@ -200,7 +200,7 @@ void record()
 
         for (int j = 0; j < 5; j++)
         {
-            int middle_deg = (middle_vec[j].deg() + 360) % 360;
+            int middle_deg = ((int)middle_vec[j].deg() + 360) % 360;
             bool find_data_flag[2] = {false, false}; // emptyならfalseにしていく
             int count = 0;
             while (find_data_flag[0] != true || find_data_flag[1] != true) // どちらも見つけるまで探索を続ける
@@ -293,7 +293,7 @@ void replay()
 
     if (irDetected())
     {
-        int deg_index = (irDeg() + 360) % 360; // 角度を0~359の配列用に変換
+        int deg_index = ((int)irDeg() + 360) % 360; // 角度を0~359の配列用に変換
         int dis_index = disToIndex(irDis());   // 距離を0~4の配列用に変換
 
         Vector move_vec = record_data[deg_index][dis_index];
@@ -318,7 +318,7 @@ void replay()
 void asobi()
 {
     /*PD計算*/
-    int target_deg = ps3RightStickDetected() ? -ps3RightStickDeg() : 0;
+    float target_deg = ps3RightStickDetected() ? -ps3RightStickDeg() : 0;
     motorsPdProcess(&pd_gyro, bnoDeg(), target_deg);
 
     /*キッカー*/
@@ -329,8 +329,8 @@ void asobi()
         ps3ButtonIsPushing(Ps3Button::R2));
 
     /*ps3からの読み取り　移動方向の計算*/
-    int move_deg = normalizeDeg(ps3LeftStickDeg() + bnoDeg());
-    int move_power = (int)constrain(80.0f * ps3LeftStickDis() / 128.0f, 0.0f, 80.0f);
+    float move_deg = normalizeDeg(ps3LeftStickDeg() + bnoDeg());
+    float move_power = constrain(80.0f * ps3LeftStickDis() / 128.0f, 0.0f, 80.0f);
     if (ps3ButtonIsPushing(Ps3Button::L3))
     {
         move_power = 95.0f;

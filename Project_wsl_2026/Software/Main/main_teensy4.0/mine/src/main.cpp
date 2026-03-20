@@ -157,7 +157,7 @@ void loop()
                 {
                 case 0:
                 {
-                    uiPrint(0, 8, "[ir]\n deg:" + String(irDeg()) + "\n dis:" + String(irDis()) + "\n y:" + String(irY()) + "\n s_y:" + String(irYSpeed()));
+                    uiPrint(0, 8, "[ir]\n deg:" + String(irDeg()) + "\n dis:" + String(irDis()) + "\n x:" + String(irX()) + "\n y:" + String(irY()));
                     uiDrawCircleMeter(92, 32, 20, "deg", irDeg());
                     break;
                 }

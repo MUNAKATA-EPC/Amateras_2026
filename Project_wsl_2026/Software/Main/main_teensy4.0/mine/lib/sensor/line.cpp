@@ -21,17 +21,17 @@ static MovementAverage _ave_ring_xy[2] = {MovementAverage(10), MovementAverage(1
 static Timer _detecting_timer;
 static unsigned long _ring_detecting_time = 0UL;
 
-static int _ring_deg = 0xFF, _ring_first_deg = 0xFF;
+static float _ring_deg = 0xFF, _ring_first_deg = 0xFF;
 static float _ring_dis = 0xFF;
 
-static int _ring_last_deg = 0xFF, _ring_last_dis = 0xFF; // 最後に計測した角度・距離格納用
+static float _ring_last_deg = 0xFF, _ring_last_dis = 0xFF; // 最後に計測した角度・距離格納用
 static Timer _ring_last_timer;
 
 static bool _side_right = false;
 static bool _side_left = false;
 static bool _side_back = false;
 
-static int _side_deg = 0xFF;
+static float _side_deg = 0xFF;
 
 static PacketManager packet_to_adjust; // 調整用パケットマネージャー
 static PacketManager packet;           // パケットマネージャー
@@ -158,7 +158,7 @@ void lineUpdate()
             }
             else
             {
-                _ring_deg = (int)roundf(degrees(atan2f(_ring_y, _ring_x)));
+                _ring_deg = degrees(atan2f(_ring_y, _ring_x));
             }
 
             _ring_last_deg = _ring_deg;
@@ -195,7 +195,7 @@ void lineUpdate()
         side_ring_y += (_side_left == true) ? sinf(radians(90.0f)) : 0.0f;   // 前が0度としているのでx,yが反転する
         side_ring_y += (_side_back == true) ? sinf(radians(180.0f)) : 0.0f;  // 前が0度としているのでx,yが反転する
 
-        _side_deg = (int)roundf(degrees(atan2f(side_ring_y, side_ring_x)));
+        _side_deg = degrees(atan2f(side_ring_y, side_ring_x));
     }
     else
     {
@@ -233,8 +233,8 @@ bool lineSideRightDetected() { return _side_right; }
 bool lineSideLeftDetected() { return _side_left; }
 bool lineSideBackDetected() { return _side_back; }
 
-int lineRingDeg() { return _ring_deg; }
-int lineSideDeg() { return _side_deg; }
+float lineRingDeg() { return _ring_deg; }
+float lineSideDeg() { return _side_deg; }
 
 float lineRingDis() { return _ring_dis; }
 
@@ -242,10 +242,10 @@ float lineRingX() { return _ring_x; }
 float lineRingY() { return _ring_y; }
 
 bool lineRingFirstDetedcted() { return _ring_detected == true && _old_ring_detected == false; }
-int lineRingFirstDeg() { return _ring_first_deg; }
+float lineRingFirstDeg() { return _ring_first_deg; }
 unsigned long lineRingDetectingTime() { return _ring_detecting_time; }
 
-int lineRingLastDeg() { return _ring_last_deg; }
+float lineRingLastDeg() { return _ring_last_deg; }
 float lineRingLastDis() { return _ring_last_dis; }
 unsigned long lineRingLastDetectingTime()
 {
@@ -322,7 +322,7 @@ int lineChunkCount(LineChunk (&chunk)[16])
     for (int i = 0; i < chunk_count; i++) // チャンクの角度を計算
     {
         float middle_index = fmodf(chunk[i].start_index + 0.5f * chunk[i].length, 16.0f); // 中間のインデックスを求める
-        chunk[i].deg = normalizeDeg((int)roundf(middle_index * 22.5f));
+        chunk[i].deg = normalizeDeg(middle_index * 22.5f);
     }
 
     return chunk_count; // 見つかったチャンク数を返す

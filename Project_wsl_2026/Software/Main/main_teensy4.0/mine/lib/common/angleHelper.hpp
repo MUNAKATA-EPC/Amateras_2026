@@ -3,14 +3,14 @@
 #include <Arduino.h>
 
 // 関数
-int normalizeDeg(int deg); // 角度を -180度から180度の範囲に正規化する関数
+float normalizeDeg(float deg); // 角度を -180度から180度の範囲に正規化する関数
 
-int diffDeg(int deg1, int deg2); // 角度の差分を -180度から180度の範囲で計算する
+float diffDeg(float deg1, float deg2); // 角度の差分を -180度から180度の範囲で計算する
 
-int nearSessenDeg(int target_deg, int enter_deg); // targetDegの接線の角度を出しその2つ角度の内enterDegに近いほうを返す
+float nearSessenDeg(float target_deg, float enter_deg); // targetDegの接線の角度を出しその2つ角度の内enterDegに近いほうを返す
 
-int areaIndexFromDeg(int n, int deg);   // 角度からエリアインデックスを計算
-int degFromAreaIndex(int n, int index); // エリアインデックスからエリアの中心角度を計算
+float areaIndexFromDeg(int n, float deg); // 角度からエリアインデックスを計算
+float degFromAreaIndex(int n, int index); // エリアインデックスからエリアの中心角度を計算
 
 enum Map
 {

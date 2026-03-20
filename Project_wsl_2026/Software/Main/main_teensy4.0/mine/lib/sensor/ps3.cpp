@@ -13,13 +13,13 @@ static float _stick_right_adjust = 0.0f;
 static int _stick_lx = 0;
 static int _stick_ly = 0;
 static bool _stick_left_detected = false;
-static int _stick_left_deg = 0xFF;
+static float _stick_left_deg = 0xFF;
 static float _stick_left_dis = 0xFF;
 // 右ステック
 static int _stick_rx = 0;
 static int _stick_ry = 0;
 static bool _stick_right_detected = false;
-static int _stick_right_deg = 0xFF;
+static float _stick_right_deg = 0xFF;
 static float _stick_right_dis = 0xFF;
 // ボタン（14個）
 static uint16_t _button_bit_mask = 0;
@@ -77,7 +77,7 @@ void ps3Update()
             {
                 _stick_left_detected = true;
 
-                _stick_left_deg = (int)roundf(degrees(atan2f(-_stick_lx, _stick_ly)));
+                _stick_left_deg = degrees(atan2f(-_stick_lx, _stick_ly));
             }
 
             // 右ステックの角度・距離
@@ -96,7 +96,7 @@ void ps3Update()
             {
                 _stick_right_detected = true;
 
-                _stick_right_deg = (int)roundf(degrees(atan2f(-_stick_rx, _stick_ry)));
+                _stick_right_deg = degrees(atan2f(-_stick_rx, _stick_ry));
             }
 
             // ボタン
@@ -118,8 +118,8 @@ int ps3LeftStickY() { return _stick_ly; }
 int ps3RightStickX() { return _stick_rx; }
 int ps3RightStickY() { return _stick_ry; }
 
-int ps3LeftStickDeg() { return _stick_left_deg; }
-int ps3RightStickDeg() { return _stick_right_deg; }
+float ps3LeftStickDeg() { return _stick_left_deg; }
+float ps3RightStickDeg() { return _stick_right_deg; }
 
 float ps3LeftStickDis() { return _stick_left_dis; }
 float ps3RightStickDis() { return _stick_right_dis; }

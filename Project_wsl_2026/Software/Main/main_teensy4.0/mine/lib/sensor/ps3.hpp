@@ -18,8 +18,8 @@ int ps3LeftStickY();
 int ps3RightStickX();
 int ps3RightStickY();
 
-int ps3LeftStickDeg();
-int ps3RightStickDeg();
+float ps3LeftStickDeg();
+float ps3RightStickDeg();
 
 float ps3LeftStickDis();
 float ps3RightStickDis();

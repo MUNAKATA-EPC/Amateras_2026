@@ -338,6 +338,9 @@ void uiDrawMain()
             case Test::Mode::MOTOR:
                 modeName = "Motor";
                 break;
+            case Test::Mode::BALL_DIS_ADJUST:
+                modeName = "BallDisAdjust";
+                break;
             default:
                 modeName = "Unknown";
                 break;

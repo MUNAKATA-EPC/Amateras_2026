@@ -7,15 +7,15 @@ static uint32_t _baudrate = 9600U;
 
 // コート
 static bool _field_detected = false;
-static int _field_deg = 0xFF;
+static float _field_deg = 0xFF;
 // 青ゴール
 static bool _blue_goal_detected = false;
-static int _blue_goal_deg = 0xFF;
+static float _blue_goal_deg = 0xFF;
 static float _blue_goal_dis = 0xFF;
 static float _blue_goal_y = 0xFF;
 // 黄ゴール
 static bool _yellow_goal_detected = false;
-static int _yellow_goal_deg = 0xFF;
+static float _yellow_goal_deg = 0xFF;
 static float _yellow_goal_dis = 0xFF;
 static float _yellow_goal_y = 0xFF;
 
@@ -95,14 +95,14 @@ void openmvUpdate()
 }
 
 bool fieldDetected() { return _field_detected; }
-int fieldDeg() { return _field_deg; }
+float fieldDeg() { return _field_deg; }
 
 bool blueGoalDetected() { return _blue_goal_detected; }
-int blueGoalDeg() { return _blue_goal_deg; }
+float blueGoalDeg() { return _blue_goal_deg; }
 float blueGoalDis() { return _blue_goal_dis; }
 float blueGoalY() { return _blue_goal_y; }
 
 bool yellowGoalDetected() { return _yellow_goal_detected; }
-int yellowGoalDeg() { return _yellow_goal_deg; }
+float yellowGoalDeg() { return _yellow_goal_deg; }
 float yellowGoalDis() { return _yellow_goal_dis; }
 float yellowGoalY() { return _yellow_goal_y; }

@@ -21,18 +21,18 @@ bool lineSideRightDetected();
 bool lineSideLeftDetected();
 bool lineSideBackDetected();
 
-int lineRingDeg();
-int lineSideDeg();
+float lineRingDeg();
+float lineSideDeg();
 
 float lineRingDis();
 float lineRingX();
 float lineRingY();
 
 bool lineRingFirstDetedcted();
-int lineRingFirstDeg();
+float lineRingFirstDeg();
 unsigned long lineRingDetectingTime();
 
-int lineRingLastDeg();                     // 一番最後に反応した角度
+float lineRingLastDeg();                   // 一番最後に反応した角度
 float lineRingLastDis();                   // 一番最後に反応した距離
 unsigned long lineRingLastDetectingTime(); // 一番最後に反応したときからの時間
 
@@ -42,7 +42,7 @@ class LineChunk
 public:
     int start_index = -1;
     int end_index = -1;
-    int length = 0;
-    int deg = 0xFF;
+    float length = 0;
+    float deg = 0xFF;
 };
 int lineChunkCount(LineChunk (&chunk)[16]);

@@ -11,7 +11,7 @@ public:
     // コンストラクタ
     Vector();
     Vector(float x0, float y0, float x1, float y1); // ベクトル生成 方法1
-    Vector(int deg, float length);                  // ベクトル生成 方法2
+    Vector(float deg, float length);                  // ベクトル生成 方法2
 
     // 演算
     Vector operator+(const Vector &other) const; // ベクトル同士の足し算
@@ -26,13 +26,13 @@ public:
     float y() const { return _vector_y; }                                                 // y
     float length() const { return sqrtf(_vector_x * _vector_x + _vector_y * _vector_y); } // 大きさ
 
-    int deg() const // 度数法[0~180]
+    float deg() const // 度数法
     {
-        int deg = (int)round(degrees(atan2f(_vector_y, _vector_x)));
+        float deg = degrees(atan2f(_vector_y, _vector_x));
         return deg;
     }
 
-    float rad() const // ラジアン[0~2π]
+    float rad() const // ラジアン
     {
         float rad = atan2f(_vector_y, _vector_x);
         if (rad < 0.0f)
@@ -42,7 +42,7 @@ public:
 };
 
 // ベクター自動生成用
-Vector getVec(int deg, float length);
+Vector getVec(float deg, float length);
 
 // ベクターマッピング
 Vector mapVec(Vector vec, float in_scale, float out_scale);

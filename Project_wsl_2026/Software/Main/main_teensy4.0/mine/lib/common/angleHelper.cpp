@@ -3,32 +3,32 @@
 //// パブリック関数 ////
 
 // 角度を -180度から180度の範囲に正規化する関数
-int normalizeDeg(int deg)
+float normalizeDeg(float deg)
 {
-    int norm = (deg % 360 + 360) % 360;
+    float norm = fmodf(deg + 360.0f, 360);
     if (norm > 180)
         norm -= 360;
     return norm;
 }
 
 // 角度の差分を -180度から180度の範囲で計算する
-int diffDeg(int deg1, int deg2)
+float diffDeg(float deg1, float deg2)
 {
-    int diff = (deg1 - deg2); // 差分
+    float diff = (deg1 - deg2); // 差分
 
     // 差分が360度を超えないように調整
-    int mod = (diff % 360 + 360) % 360;
+    float mod = fmodf(diff + 360.0f, 360);
     if (mod > 180)
         mod -= 360;
     return mod;
 }
 
 // target_degに対する接線方向のうち、enter_Degに近い方を返す
-int nearSessenDeg(int target_deg, int enter_deg)
+float nearSessenDeg(float target_deg, float enter_deg)
 {
     // targetDegに±90°を加算した角度を正規化する
-    int sessen1_deg = normalizeDeg(target_deg + 90);
-    int sessen2_deg = normalizeDeg(target_deg - 90); // target_deg + 270 は target_deg - 90 と同じ
+    float sessen1_deg = normalizeDeg(target_deg + 90);
+    float sessen2_deg = normalizeDeg(target_deg - 90); // target_deg + 270 は target_deg - 90 と同じ
 
     // 差分を -180〜180 の範囲で計算
     bool is_sessen1_deg_near = abs(diffDeg(sessen1_deg, enter_deg)) < abs(diffDeg(sessen2_deg, enter_deg));
@@ -37,24 +37,24 @@ int nearSessenDeg(int target_deg, int enter_deg)
 }
 
 // 角度からエリアインデックスを計算
-int areaIndexFromDeg(int n, int deg)
+float areaIndexFromDeg(int n, float deg)
 {
     float area_size = 360.0f / n;
 
     // degを0〜359に変換（-180は180, 180は180として扱う）
-    int positiveDeg = (deg + 360) % 360;
+    float positiveDeg = fmodf(deg + 360, 360);
 
-    int index = int((positiveDeg + area_size / 2.0f) / area_size) % n;
+    int index = (int)fmodf((positiveDeg + area_size / 2.0f) / area_size, n);
     return index;
 }
 
 // エリアインデックスからエリアの中心角度を計算
-int degFromAreaIndex(int n, int index)
+float degFromAreaIndex(int n, int index)
 {
     float area_size = 360.0f / n;
 
     // 0〜359度の中心角を計算
-    int positiveDeg = int(index * area_size + area_size / 2.0f) % 360;
+    float positiveDeg = fmodf(index * area_size + area_size / 2.0f, 360);
 
     // 0〜359 の角度を -180〜179 に正規化して返す
     return normalizeDeg(positiveDeg);

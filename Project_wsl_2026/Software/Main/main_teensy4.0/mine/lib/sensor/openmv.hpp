@@ -8,12 +8,12 @@ bool openmvInit(HardwareSerial *serial, uint32_t baudrate);
 void openmvUpdate();
 
 bool fieldDetected();
-int fieldDeg();
+float fieldDeg();
 
 bool blueGoalDetected();
-int blueGoalDeg();
+float blueGoalDeg();
 float blueGoalDis();
 
 bool yellowGoalDetected();
-int yellowGoalDeg();
+float yellowGoalDeg();
 float yellowGoalDis();

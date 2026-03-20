@@ -9,12 +9,14 @@ Multiplexer mux;
 
 const int pins[16] =
     {0, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1};
+const float gain[16] =
+    {1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f};
 
 float ema_angle = 0;
 float ema_dis = 0;
 
-const float ANGLE_ALPHA = 0.2;
-const float DIST_ALPHA = 0.25;
+const float ANGLE_ALPHA = 0.3f;
+const float DIST_ALPHA = 0.3f;
 
 float cos_table[16];
 float sin_table[16];
@@ -69,15 +71,22 @@ void loop()
     int val[16];
     int max_v = 0;
 
-    for (int i = 0; i < 16; i++)
+    for (int step = 0; step < 16; step++)
     {
-        val[i] = 1023 - readMedian(pins[i]);
-        if (val[i] < 0)
-            val[i] = 0;
+        int i = (step + 8) % 16; // i=8から始まり、16で0に戻る
 
-        if (val[i] > max_v)
+        if (i != 13)
         {
-            max_v = val[i];
+            val[i] = 1023 - readMedian(pins[i]);
+            if (val[i] < 0)
+                val[i] = 0;
+
+            if (val[i] > max_v)
+            {
+                max_v = val[i];
+            }
+
+            Serial.print(String(i) + ":" + String(val[i]) + ",\t");
         }
     }
 
@@ -89,52 +98,49 @@ void loop()
 
     float sum_x = 0;
     float sum_y = 0;
+    float sum_x_to_dis = 0;
+    float sum_y_to_dis = 0;
 
     int threshold = max_v / 4;
 
+    int cnt = 0;
     for (int i = 0; i < 16; i++)
     {
         if (val[i] > threshold)
         {
-            float weight = (float)val[i] * val[i];
+            float weight = (float)((int)(val[i] * val[i]) / 100 * 100);
             sum_x += weight * cos_table[i];
             sum_y += weight * sin_table[i];
+
+            sum_x_to_dis += (1023 - val[i]) * cos_table[i];
+            sum_y_to_dis += (1023 - val[i]) * sin_table[i];
+            cnt++;
         }
+    }
+
+    if (cnt > 0)
+    {
+        sum_x_to_dis /= cnt;
+        sum_y_to_dis /= cnt;
     }
 
     float current_angle = atan2(sum_y, sum_x) * 180.0 / M_PI;
 
-    // 0〜360度に正規化
-    if (current_angle < 0)
-        current_angle += 360.0;
-
     // EMAによる角度の平滑化
     float diff = current_angle - ema_angle;
 
-    if (diff > 180)
-        diff -= 360;
-    if (diff < -180)
-        diff += 360;
-
     ema_angle += ANGLE_ALPHA * diff;
+
+    while (ema_angle > 180)
+        ema_angle -= 360;
+    while (ema_angle <= -180)
+        ema_angle += 360;
 
     float final_angle = ema_angle;
 
-    while (final_angle > 180)
-        final_angle -= 360;
-    while (final_angle <= -180)
-        final_angle += 360;
-
-// #define EMA_DIS
-#ifdef EMA_DIS
-    float dis = 100000.0 / (max_v + 1.0);
-
+    float dis = sqrt(sum_x_to_dis * sum_x_to_dis + sum_y_to_dis * sum_y_to_dis);
     ema_dis = DIST_ALPHA * dis + (1 - DIST_ALPHA) * ema_dis;
-
-    int dis_out = constrain((int)ema_dis, 0, 1000);
-#else
-    int dis_out = pow(1023 - max_v, 1.5);
-#endif
+    int dis_out = ema_dis;
 
     sendData(
         (int16_t)round(final_angle),

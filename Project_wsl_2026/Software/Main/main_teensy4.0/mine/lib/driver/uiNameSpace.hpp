@@ -45,6 +45,7 @@ namespace Test
         CAM,
         LINE_TRACE,
         MOTOR,
+        BALL_DIS_ADJUST,
 
         MODE_COUNT
     };

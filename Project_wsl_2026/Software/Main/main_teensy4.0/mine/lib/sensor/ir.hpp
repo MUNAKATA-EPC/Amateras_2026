@@ -4,14 +4,15 @@
 #include "timer.hpp"
 #include "packetManager.hpp"
 #include "movementAverage.hpp"
+#include "angleHelper.hpp"
 
 bool irInit(HardwareSerial *serial, uint32_t baudrate);
 void irUpdate();
 
 bool irDetected();
-int irDeg();
-int irVal();
-int irDis();
+float irDeg();
+float irVal();
+float irDis();
 
 float irX();
 float irY();
