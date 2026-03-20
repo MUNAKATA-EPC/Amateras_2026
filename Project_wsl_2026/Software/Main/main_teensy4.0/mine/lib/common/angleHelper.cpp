@@ -14,6 +14,8 @@ float normalizeDeg(float deg)
 // 角度の差分を -180度から180度の範囲で計算する
 float diffDeg(float deg1, float deg2)
 {
+    deg1 = normalizeDeg(deg1);
+    deg2 = normalizeDeg(deg2);
     float diff = (deg1 - deg2); // 差分
 
     // 差分が360度を超えないように調整
