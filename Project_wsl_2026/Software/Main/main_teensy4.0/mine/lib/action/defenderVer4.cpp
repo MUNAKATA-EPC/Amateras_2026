@@ -274,12 +274,14 @@ void playDefenderVer4(Defender::Mode mode)
         {
             float defence_ir_deg = nearSessenDeg(defence_goal_deg, irDeg()); // 守備ゴールの±90度の方向のうち、ボールの方向に近い角度
 
-            float defence_ir_y = irDis() * sinf(radians(diffDeg(defence_goal_deg + 180, irDeg()))); // y方向の偏差
-            float defence_ir_x = irDis() * cosf(radians(diffDeg(defence_goal_deg + 180, irDeg()))); // x方向の偏差
+            float defence_ir_y = irDis() * sinf(radians(diffDeg(defence_goal_deg + 180, irDeg()))); // y成分
+            float defence_ir_x = irDis() * cosf(radians(diffDeg(defence_goal_deg + 180, irDeg()))); // x成分
 
             Vector vec;
             if (defence_ir_x > 0 && fabsf(defence_ir_y) < 30.0f)
             {
+                my_defence_point = true;
+                
                 vec = lineTrace(0, 0, 50);
             }
             else
