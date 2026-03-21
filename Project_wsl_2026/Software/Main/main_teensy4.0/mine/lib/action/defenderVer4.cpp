@@ -252,7 +252,7 @@ void playDefenderVer4(Defender::Mode mode)
             float defence_ir_y = irDis() * sinf(radians(diffDeg(defenceGoalDeg() + 180, irDeg()))); // y成分
             float defence_ir_x = irDis() * cosf(radians(diffDeg(defenceGoalDeg() + 180, irDeg()))); // x成分
 
-            MovementAverage y_ave(10);
+            static MovementAverage y_ave(10);
             float smooth_defence_ir_y = y_ave.add(defence_ir_y);
 
             Vector vec;
