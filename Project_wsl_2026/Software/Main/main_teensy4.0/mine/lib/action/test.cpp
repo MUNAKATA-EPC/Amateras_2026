@@ -44,18 +44,17 @@ void testKicker()
     if (resetButton.isReleased())
     {
         Serial.print("kick");
-        kicker1.kick(true);
+        kicker1.kick();
         fullColorLed1.rgbLightUp(0, 50, 0);
     }
     else if (catchSensor.read() == HIGH)
     {
         Serial.print("kick");
-        kicker1.kick(true);
+        kicker1.kick();
         fullColorLed1.rgbLightUp(0, 50, 0);
     }
     else
     {
-        kicker1.kick(false);
         fullColorLed1.rgbLightUp(0, 0, 0);
     }
 }

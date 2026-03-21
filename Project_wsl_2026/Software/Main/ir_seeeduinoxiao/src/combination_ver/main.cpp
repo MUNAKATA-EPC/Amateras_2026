@@ -10,10 +10,10 @@ const double weight_gain[16] =
     {1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f};
 
 double ema_angle = 0;
-const double ema_angle_plus_alpha_gain = 0.3;
+const double ema_angle_plus_alpha_gain = 1.0;
 
 double ema_dis = 0;
-const double ema_dis_plus_alpha_gain = 0.5;
+const double ema_dis_plus_alpha_gain = 1.0;
 
 double cos_table[16];
 double sin_table[16];
@@ -37,7 +37,7 @@ double diffDeg(double deg1, double deg2)
 
 int readMedian(int pin)
 {
-    const int sample_count = 6;
+    const int sample_count = 1;
     int v[sample_count];
 
     for (int i = 0; i < sample_count; i++)

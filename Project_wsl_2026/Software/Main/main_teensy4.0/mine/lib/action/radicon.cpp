@@ -322,11 +322,14 @@ void asobi()
     motorsPdProcess(&pd_gyro, bnoDeg(), target_deg);
 
     /*キッカー*/
-    kicker1.kick(
-        ps3ButtonIsPushing(Ps3Button::L1) ||
+
+    if (ps3ButtonIsPushing(Ps3Button::L1) ||
         ps3ButtonIsPushing(Ps3Button::L2) ||
         ps3ButtonIsPushing(Ps3Button::R1) ||
-        ps3ButtonIsPushing(Ps3Button::R2));
+        ps3ButtonIsPushing(Ps3Button::R2))
+    {
+        kicker1.kick();
+    }
 
     /*ps3からの読み取り　移動方向の計算*/
     float move_deg = normalizeDeg(ps3LeftStickDeg() + bnoDeg());
