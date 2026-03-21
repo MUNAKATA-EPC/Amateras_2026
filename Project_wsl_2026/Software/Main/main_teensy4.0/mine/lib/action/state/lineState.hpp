@@ -1,14 +1,12 @@
 #pragma once
 
-// action類
-#include "attacker.hpp"
-
 // common類
 #include "angleHelper.hpp"
 #include "pd.hpp"
 #include "timer.hpp"
 #include "vector.hpp"
-#include "lagrangeShifter.hpp"
+#include "movementAverage.hpp"
+#include "smoothHelper.hpp"
 // driver類
 #include "dribbler.hpp"
 #include "kicker.hpp"
@@ -24,4 +22,18 @@
 #include "openmv.hpp"
 #include "uss.hpp"
 
-void playDefenderVer3(Defender::Mode mode);
+// ラインの絶対角を出す関数
+float lineAbsoluteRingDeg();
+
+// ライン自己位置推定関数
+enum LinePosition
+{
+    Yoko,
+    Tate,
+    Haji,
+    None
+};
+LinePosition linePositionCheck();
+
+// ライントレース関数
+Vector lineTrace(float move_deg, float move_power, float line_trace_power);

@@ -2,7 +2,6 @@
 
 // action類
 #include "attacker.hpp"
-#include "defenderVer3.hpp"
 #include "defenderVer4.hpp"
 #include "radicon.hpp"
 #include "test.hpp"
@@ -134,7 +133,7 @@ void loop()
     irUpdate();
     lineUpdate();
     openmvUpdate();
-    // ps3Update();
+    ps3Update();
     ussUpdate();
     bnoUpdate(resetButton.isReleased(), ussRightSpeed(), ussLeftSpeed()); // bno更新
 

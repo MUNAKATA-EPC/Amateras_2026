@@ -172,7 +172,7 @@ void record()
         if (move_deg != 0xFF && irDetected())
         {
             int deg_index = ((int)irDeg() + 360) % 360; // 角度を0~359の配列用に変換
-            int dis_index = disToIndex(irDis());   // 距離を0~4の配列用に変換
+            int dis_index = disToIndex(irDis());        // 距離を0~4の配列用に変換
 
             temp_record_data[deg_index][dis_index] = getVec(move_deg, move_power); // 記録
 
@@ -294,7 +294,7 @@ void replay()
     if (irDetected())
     {
         int deg_index = ((int)irDeg() + 360) % 360; // 角度を0~359の配列用に変換
-        int dis_index = disToIndex(irDis());   // 距離を0~4の配列用に変換
+        int dis_index = disToIndex(irDis());        // 距離を0~4の配列用に変換
 
         Vector move_vec = record_data[deg_index][dis_index];
 

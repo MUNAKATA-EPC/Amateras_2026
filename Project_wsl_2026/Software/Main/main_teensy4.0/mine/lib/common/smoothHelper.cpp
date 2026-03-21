@@ -1,4 +1,4 @@
-#include "lagrangeShifter.hpp"
+#include "smoothHelper.hpp"
 
 //// パブリック関数 ////
 
@@ -34,4 +34,26 @@ float lagrangeShifter(int n, float pos[][2], float x)
     }
 
     return y;
+}
+
+float smoothShifter(float x1, float x2, float y1, float y2, float input_x)
+{
+    float x = fabsf(input_x);
+    if (0 <= x && x <= x1)
+    {
+        return y1;
+    }
+    else if (x1 < x && x < x2)
+    {
+
+        float p = x2 - x1;
+        float q = y2 - y1;
+
+        return pow(x - x1, 3) * (-2 * q / (p * p * p)) + pow(x - x1, 2) * (3 * q / (p * p)) + y1; // 3次関数
+        // return pow(x - x1, 4) * (-q / (p * p * p * p)) + pow(x - x1, 2) * (2 * q / (p * p)) + y1; // 4次関数
+    }
+    else
+    {
+        return y2;
+    }
 }

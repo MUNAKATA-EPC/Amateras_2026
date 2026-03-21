@@ -1,27 +1,29 @@
 #include "attacker.hpp"
 
-float smoothFunc(float x1, float x2, float y1, float y2, float input_x)
+// アタッカーのフォーム
+namespace AtForm
 {
-    float x = fabsf(input_x);
-    if (0 <= x && x <= x1)
+    enum CamMode
     {
-        return y1;
-    }
-    else if (x1 < x && x < x2)
-    {
+        LINE_ESCAPE,          // ラインから逃れるフォーム
+        LINE_CONTINUE_ESCAPE, // ラインから逃れる動きを継続するフォーム
+        LINE_TRACE,           // ライントレースするフォーム
+        MAWARIKOMI,           // 回り込むフォーム
+        HOLD,                 // ボール捕獲時のゴールに向かうフォーム
+        LOSE_BALL             // ボールが見えず停滞するフォーム
+    };
 
-        float p = x2 - x1;
-        float q = y2 - y1;
-
-        return pow(x - x1, 3) * (-2 * q / (p * p * p)) + pow(x - x1, 2) * (3 * q / (p * p)) + y1; // 3次関数
-        // return pow(x - x1, 4) * (-q / (p * p * p * p)) + pow(x - x1, 2) * (2 * q / (p * p)) + y1; // 4次関数
-    }
-    else
+    enum GyroMode
     {
-        return y2;
-    }
+        LINE_ESCAPE,          // ラインから逃れるフォーム
+        LINE_CONTINUE_ESCAPE, // ラインから逃れる動きを継続するフォーム
+        MAWARIKOMI,           // 回り込むフォーム
+        HOLD,                 // ボール捕獲時の直進するフォーム
+        LOSE_BALL             // ボールが見えず停滞するフォーム
+    };
 }
 
+// 回り込みをする関数
 Vector mawarikomi()
 {
     if (!irDetected())
@@ -38,7 +40,7 @@ Vector mawarikomi()
     {
         vec = Vector(degrees(ir_rad), 95.0f);
     }
-    else if (ir_x > 0.0f && fabsf(ir_y) < 150.0f)
+    else if (ir_x > 0.0f && fabsf(ir_y) < 95.0f)
     {
         if (catchSensor.read() == HIGH)
         {
@@ -47,16 +49,16 @@ Vector mawarikomi()
         else
         {
             // rad計算
-            float dis_x = smoothFunc(35.0f, 100.0f, 60.0f, 300.0f, ir_y);
+            float dis_x = smoothShifter(45.0f, 100.0f, 60.0f, 280.0f, ir_y);
             // length計算
             float length_temp;
-            if (fabsf(ir_y) < 35.0f)
+            if (fabsf(ir_y) < 45.0f)
             {
                 length_temp = 95.0f;
             }
             else
             {
-                length_temp = smoothFunc(35.0f, 140.0f, 60.0f, 95.0f, ir_y);
+                length_temp = smoothShifter(45.0f, 140.0f, 60.0f, 95.0f, ir_y);
             }
 
             Vector vec_temp = Vector(dis_x, 0, ir_x, ir_y);
@@ -101,134 +103,200 @@ Vector mawarikomi()
         vec = Vector(degrees(rad_temp), length_temp);
     }
 
-    static float smooth_length = 60.0f;
+    // static float smooth_length = 60.0f;
 
-    if (vec.length() >= smooth_length)
-    {
-        smooth_length += 1.5f;
-    }
-    else
-    {
-        smooth_length -= 1.5f;
-    }
+    // if (vec.length() >= smooth_length)
+    // {
+    //     smooth_length += 1.5f;
+    // }
+    // else
+    // {
+    //     smooth_length -= 1.5f;
+    // }
 
-    smooth_length = constrain(smooth_length, 0.0f, 100.0f);
+    // smooth_length = constrain(smooth_length, 0.0f, 95.0f);
 
-    Vector final_vec = Vector(vec.deg(), smooth_length);
-    return final_vec;
+    // Vector final_vec = Vector(vec.deg(), smooth_length);
+    // return final_vec;
+
+    return vec;
 }
 
-void attackWithGyro();
-void attackWithCam(bool attack_goal_detected, int attack_goal_deg, int attack_goal_dis, bool defence_goal_detected, int defence_goal_deg, int defence_goal_dis);
+// ジャイロで攻撃
+void attackWithGyro(AtForm::GyroMode at_form)
+{
+    if (at_form == AtForm::GyroMode::LINE_ESCAPE)
+    {
+        motorsMove(lineRingFirstDeg() + 180, 60);
+    }
+    else if (at_form == AtForm::GyroMode::LINE_CONTINUE_ESCAPE)
+    {
+        motorsMove(lineRingLastDeg() + 180, 60);
+    }
+    else if (at_form == AtForm::GyroMode::MAWARIKOMI)
+    {
+        Vector vec = mawarikomi();
+        motorsVectorMove(&vec);
+    }
+    else if (at_form == AtForm::GyroMode::HOLD)
+    {
+        motorsMove(0, 95);
+    }
+    else // if (at_form == AtForm::GyroMode::LOSE_BALL)
+    {
+        motorsPdMove();
+    }
+}
 
+// カメラで攻撃
+void attackWithCam(AtForm::CamMode at_form)
+{
+    if (at_form == AtForm::CamMode::LINE_ESCAPE || at_form == AtForm::CamMode::LINE_CONTINUE_ESCAPE)
+    {
+        motorsMove(fieldDeg(), 60);
+    }
+    else if (at_form == AtForm::CamMode::LINE_TRACE)
+    {
+    }
+    else if (at_form == AtForm::CamMode::MAWARIKOMI)
+    {
+        Vector vec = mawarikomi();
+        motorsVectorMove(&vec);
+    }
+    else if (at_form == AtForm::CamMode::HOLD)
+    {
+        motorsMove(0, 95);
+    }
+    else // if (at_form == AtForm::CamMode::LOSE_BALL)
+    {
+        motorsPdMove();
+    }
+}
+
+//// アタッカーメイン ////
 void playAttacker(Attacker::Mode mode)
 {
+    static Timer line_timer;
+
     if (mode == Attacker::Mode::GYRO)
     {
-        attackWithGyro();
-    }
-    else
-    {
-        if (mode == Attacker::Mode::YELLOWGOAL)
+        AtForm::GyroMode current_at_form;
+        static AtForm::GyroMode old_at_form;
+
+        //// フォーム決定
+        if (lineRingDetected() || lineSideDetected())
         {
-            attackWithCam(yellowGoalDetected(), yellowGoalDeg(), yellowGoalDis(), blueGoalDetected(), blueGoalDeg(), blueGoalDis());
+            current_at_form = AtForm::LINE_ESCAPE;
+        }
+        else if (old_at_form == AtForm::LINE_ESCAPE)
+        {
+            line_timer.reset();
+            current_at_form = AtForm::LINE_CONTINUE_ESCAPE;
+        }
+        else if (line_timer.everReset() && line_timer.msTime() < 50UL)
+        {
+            current_at_form = AtForm::LINE_CONTINUE_ESCAPE;
         }
         else
         {
-            attackWithCam(blueGoalDetected(), blueGoalDeg(), blueGoalDis(), yellowGoalDetected(), yellowGoalDeg(), yellowGoalDis());
+            if (catchSensor.read() == HIGH)
+            {
+                current_at_form = AtForm::HOLD;
+            }
+            else
+            {
+                if (irDetected())
+                {
+                    current_at_form = AtForm::MAWARIKOMI;
+                }
+                else
+                {
+                    current_at_form = AtForm::LOSE_BALL;
+                }
+            }
         }
-    }
-}
 
-static Timer line_timer;
+        //// 攻撃制御
+        // pd・キッカー
+        motorsPdProcess(&pd_gyro, bnoDeg(), 0);
 
-void attackWithGyro() // ジャイロで攻撃
-{
-    motorsPdProcess(&pd_gyro, bnoDeg(), 0); // ジャイロで姿勢制御
+        if (current_at_form == AtForm::HOLD)
+        {
+            kicker1.kick();
+        }
 
-    if (catchSensor.read() == HIGH)
-    {
-        kicker1.kick(true);
+        // 移動
+        attackWithGyro(current_at_form);
+
+        old_at_form = current_at_form; // 記録
     }
     else
     {
-        kicker1.kick(false);
-    }
+        AtForm::CamMode current_at_form;
+        static AtForm::CamMode old_at_form;
 
-    const int motor_line_max_power = 50;
-    const int motor_ir_max_power = 95;
+        //// 自分ゴールと相手ゴールの確認
+        goalPositionCheck(mode);
 
-    static int old_line_ring_deg = 0;
+        //// フォーム決定
+        if (lineRingDetected() || lineSideDetected())
+        {
+            current_at_form = AtForm::LINE_ESCAPE;
+        }
+        else if (old_at_form == AtForm::LINE_ESCAPE)
+        {
+            line_timer.reset();
+            current_at_form = AtForm::LINE_CONTINUE_ESCAPE;
+        }
+        else if (line_timer.everReset() && line_timer.msTime() < 50UL)
+        {
+            current_at_form = AtForm::LINE_CONTINUE_ESCAPE;
+        }
+        else
+        {
+            if (catchSensor.read() == HIGH)
+            {
+                current_at_form = AtForm::HOLD;
+            }
+            else
+            {
+                if (irDetected())
+                {
+                    current_at_form = AtForm::MAWARIKOMI;
+                }
+                else
+                {
+                    current_at_form = AtForm::LOSE_BALL;
+                }
+            }
+        }
 
-    if (line_timer.everReset() && line_timer.msTime() < 50UL)
-    {
-        motorsMove(old_line_ring_deg + 180, motor_line_max_power);
-    }
-    else if (lineRingDetected()) // エンジェルライン
-    {
-        motorsMove(lineRingDeg() + 180, motor_line_max_power);
-        old_line_ring_deg = lineRingDeg();
-        line_timer.reset();
-    }
-    else if (irDetected())
-    {
-        Vector vec = mawarikomi();
-        motorsVectorMove(&vec);
-    }
-    else
-    {
-        motorsPdMove();
-    }
-}
+        //// 攻撃制御
+        // pd・キッカー
+        if (current_at_form == AtForm::HOLD)
+        {
+            if (attackGoalDetected())
+            {
+                motorsPdProcess(&pd_cam, attackGoalDeg(), 0);
 
-static Timer cam_pd_timer;
+                if (fabsf(attackGoalDeg()) < 20)
+                {
+                    kicker1.kick();
+                }
+            }
+            else
+            {
+                motorsPdProcess(&pd_gyro, bnoDeg(), 0);
+            }
+        }
+        else
+        {
+            motorsPdProcess(&pd_gyro, bnoDeg(), 0);
+        }
 
-void attackWithCam(bool attack_goal_detected, int attack_goal_deg, int attack_goal_dis, bool defence_goal_detected, int defence_goal_deg, int defence_goal_dis) // カメラで攻撃
-{
-    if (attack_goal_detected && catchSensor.read() == HIGH)
-    {
-        motorsPdProcess(&pd_cam, attack_goal_deg, 0); // カメラで姿勢制御
-    }
-    else
-    {
-        motorsPdProcess(&pd_gyro, bnoDeg(), 0); // ジャイロで姿勢制御
-    }
+        // 移動
+        attackWithCam(current_at_form);
 
-    if (catchSensor.read() == HIGH && attack_goal_detected && fabsf(attack_goal_deg) <= 70)
-    {
-        kicker1.kick(true);
-    }
-    else
-    {
-        kicker1.kick(false);
-    }
-
-    const int motor_line_max_power = 50;
-
-    if (attack_goal_detected && attack_goal_dis < 60 && fabsf(fieldDeg()) > 90)
-    {
-        motorsMove(attack_goal_deg + 180, motor_line_max_power);
-    }
-    else if (defence_goal_detected && defence_goal_dis < 60 && fabsf(fieldDeg()) < 90)
-    {
-        motorsMove(defence_goal_deg + 180, motor_line_max_power);
-    }
-    else if (line_timer.everReset() && line_timer.msTime() < 50UL)
-    {
-        motorsMove(fieldDeg(), motor_line_max_power);
-    }
-    else if (lineRingDetected() || lineSideRightDetected() || lineSideLeftDetected()) // エンジェルライン
-    {
-        motorsMove(fieldDeg(), motor_line_max_power);
-        line_timer.reset();
-    }
-    else if (irDetected())
-    {
-        Vector vec = mawarikomi();
-        motorsVectorMove(&vec);
-    }
-    else
-    {
-        motorsPdMove();
+        old_at_form = current_at_form; // 記録
     }
 }
