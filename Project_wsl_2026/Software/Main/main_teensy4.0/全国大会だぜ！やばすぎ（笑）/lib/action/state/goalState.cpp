@@ -73,7 +73,10 @@ bool isMyDefenceArea()
            defence_goal_dis < 86;
 }
 
-bool isMyAttackArea() { return fabsf(fieldDeg()) > 90 &&
-                               attack_goal_detected &&
-                               fabsf(attack_goal_deg) < 90 &&
-                               attack_goal_dis < 86; }
+bool isMyAttackArea()
+{
+    return fabsf(fieldDeg()) > 90 &&
+           attack_goal_detected &&
+           fabsf(attack_goal_deg) < 90 &&
+           attack_goal_dis < 86;
+}
