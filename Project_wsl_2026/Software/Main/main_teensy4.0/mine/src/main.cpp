@@ -42,11 +42,11 @@ void setup()
     ps3StickAdjust(20.0f, 20.0f);
 
     motorsInit(&Serial1, 115200);
-    // motorsSetTogglePin(4, INPUT_PULLDOWN);   // モータの起動トグルスイッチのピン設定
+    motorsSetTogglePin(4, INPUT_PULLDOWN);   // モータの起動トグルスイッチのピン設定
     motorsSetMoveSign(1, 1, 1, 1);           // 移動のための符号をセット
     motorsSetPdSign(1, 1, 1, 1);             // PD制御のための符号をセット
     motorsSetDegPosition(315, 45, 225, 135); // モータの位置をセット
-    motorsStop();                            // 停止させておく
+    // motorsStop();                            // 停止させておく
 
     // デジタル
     kicker1.init(2, 3, 1500);
@@ -58,7 +58,7 @@ void setup()
     leftButton.init(12, INPUT_PULLDOWN);  // ui用
     resetButton.init(37, INPUT_PULLDOWN); // bno用
 
-    fullColorLed1.init(36, 35, 34); // デバッグ用
+    // fullColorLed1.init(36, 35, 34); // デバッグ用
 
     // デバッグメッセージの出力(ui)
     String message = "> setup <\n";
@@ -271,5 +271,5 @@ void loop()
         }
     }
 
-    delay(10);
+    delay(1);
 }

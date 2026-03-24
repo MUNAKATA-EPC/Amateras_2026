@@ -19,7 +19,7 @@ const int LINEsensor_side_right_pin = A9; // 右サイドのピン
 const int LINEsensor_side_left_pin = A8;  // 左サイドのピン
 
 unsigned int LINEsensor_adjust_value[LINE_SENSOR_COUNT] =
-    {200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200}; // センサー調整用値格納用
+    {300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300}; // センサー調整用値格納用
 
 unsigned int LINEsensor_side_right_adjust_value = 600U; // 右サイドの調整値
 unsigned int LINEsensor_side_left_adjust_value = 600U;  // 左サイドの調整値

@@ -37,7 +37,7 @@ double diffDeg(double deg1, double deg2)
 
 int readMedian(int pin)
 {
-    const int sample_count = 1;
+    const int sample_count = 6;
     int v[sample_count];
 
     for (int i = 0; i < sample_count; i++)
