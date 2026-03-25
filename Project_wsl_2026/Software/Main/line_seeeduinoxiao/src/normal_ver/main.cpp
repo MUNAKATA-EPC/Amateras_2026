@@ -16,13 +16,33 @@ const int LINEsensor_side_right_pin = A9; // 右サイドのピン
 const int LINEsensor_side_left_pin = A8;  // 左サイドのピン
 
 unsigned int LINEsensor_adjust_value[LINE_SENSOR_COUNT] =
-    {300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300}; // センサー調整用値格納用
+    {310, 340, 260, 290, 190, 590, 260, 260, 225, 220, 230, 300, 230, 320, 250, 350}; // センサー調整用値格納用
 
 unsigned int LINEsensor_side_right_adjust_value = 600U; // 右サイドの調整値
 unsigned int LINEsensor_side_left_adjust_value = 600U;  // 左サイドの調整値
 
 const int button_pin = 0; // ボタンのピン番号
 const int led_pin = 7;    // LEDのピン番号
+
+int readMedian(int pin)
+{
+  const int sample_count = 6;
+  int v[sample_count];
+
+  for (int i = 0; i < sample_count; i++)
+    v[i] = line_mux.read(pin);
+
+  for (int i = 0; i < sample_count - 1; i++)
+    for (int j = i + 1; j < sample_count; j++)
+      if (v[i] > v[j])
+      {
+        int t = v[i];
+        v[i] = v[j];
+        v[j] = t;
+      }
+
+  return v[sample_count / 2];
+}
 
 Button button;
 void setup()
@@ -48,9 +68,13 @@ void loop()
 
   for (uint8_t i = 0; i < 16; i++)
   {
-    if (line_mux.read(LINEsensor_pin[i]) > LINEsensor_adjust_value[i]) // ラインが見えたら
+    unsigned int line_val = readMedian(LINEsensor_pin[i]);
+    if (line_val > LINEsensor_adjust_value[i]) // ラインが見えたら
       lines_data_bit_mask |= (1UL << i);
+
+    Serial.print(String(i) + " : " + String(line_val) + " , ");
   }
+  Serial.println();
 
   // サイドライン
   if (analogRead(LINEsensor_side_right_pin) >= LINEsensor_side_right_adjust_value)

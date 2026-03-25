@@ -6,12 +6,15 @@ static PD pd_cam(1.2, -0.7);  // カメラ用のPD調節値
 static Timer my_timer;
 static Timer kicker_timer;
 
-const int line_escape_power = 55; // ライン反応時のモーターの強さ
-const int line_trace_power = 75;  // ライントレース時モーターの強さ
-const int ir_max_power = 95;      // モーターの強さ
+const float line_escape_power = 55.0f;   // ライン反応時のモーターの強さ
+const float line_trace_power = 75.0f; // ライントレース時モーターの強さ
+const float ir_max_power = 95.0f;        // モーターの強さ
+
+const float yellow_goal_kyori = 91.0f; // キッカー判定用の黄色ゴール距離
+const float blue_goal_kyori = 85.0f;   // キッカー判定用の青色ゴール距離
 
 // 回り込み関数
-Vector mawarikomi(int max_power, int ball_deg, int ball_dis)
+Vector mawarikomi(float max_power, float ball_deg, float ball_dis)
 {
     if (!irDetected())
         return Vector(0, 0.0f);
@@ -23,21 +26,22 @@ Vector mawarikomi(int max_power, int ball_deg, int ball_dis)
 
     if (catchSensor.read() == HIGH)
     {
-        vec = Vector(0.0f, (float)max_power);
+        vec = Vector(0.0f, max_power);
     }
-    else if (ir_x > 0.0f && fabsf(ir_y) < 200.0f)
+    else if (ir_x > 0.0f && fabsf(ir_y) < 140.0f)
     {
         // rad計算
-        float dis_x = smoothShifter(50.0f, 150.0f, 50.0f, 300.0f, ir_y);
+        float dis_x = smoothShifter(60.0f, 140.0f, 65.0f, 280.0f, ir_y);
         // length計算
         float length_temp;
-        if (fabsf(ir_y) < 50.0f)
+        if (fabsf(ir_y) < 60.0f)
         {
-            length_temp = 95.0f;
+            length_temp = max_power;
         }
         else
         {
-            length_temp = smoothShifter(50.0f, 150.0f, 50.0f, 95.0f, ir_y);
+            // length_temp = smoothShifter(60.0f, 150.0f, 50.0f, 95.0f, ir_y);
+            length_temp = max_power;
         }
 
         Vector vec_temp = Vector(dis_x, 0, ir_x, ir_y);
@@ -47,7 +51,7 @@ Vector mawarikomi(int max_power, int ball_deg, int ball_dis)
     }
     else
     {
-        const float r = 390.0f;
+        const float r = 360.0f;
         const float pi = (float)PI;
 
         float ir_rad = (float)radians(ball_deg);
@@ -107,6 +111,15 @@ void playAttacker(Attacker::Mode mode)
     goalPositionCheckAtMode(mode);
 
     //// PD制御目標方向確定
+    static Timer last_catch_timer;
+    bool a = catchSensor.read() == HIGH;
+    static bool b = false;
+    if (!a && b)
+    {
+        last_catch_timer.reset();
+    }
+    b = a;
+
     if (mode == Attacker::Mode::GYRO)
     {
         motorsPdProcess(&pd_gyro, bnoDeg(), 0);
@@ -118,7 +131,7 @@ void playAttacker(Attacker::Mode mode)
         if (attackGoalDetected())
         {
             // if (catchSensor.read() == HIGH || fabsf(iry) <= 130)
-            if (catchSensor.read() == HIGH)
+            if (catchSensor.read() == HIGH || last_catch_timer.msTime() < 200)
             {
                 if (!irDetected())
                 {
@@ -126,12 +139,12 @@ void playAttacker(Attacker::Mode mode)
                 }
                 else
                 {
-                    if (diff > 40)
+                    if (diff > 50)
                     {
                         if (yellowGoalDeg() < 0)
-                            motorsPdProcess(&pd_gyro, bnoDeg(), 40);
+                            motorsPdProcess(&pd_gyro, bnoDeg(), 50);
                         else
-                            motorsPdProcess(&pd_gyro, bnoDeg(), -40);
+                            motorsPdProcess(&pd_cam, bnoDeg(), -50);
                     }
                     else
                     {
@@ -234,7 +247,7 @@ void playAttacker(Attacker::Mode mode)
 
     old_line_detected = line_detected; // 記録
 
-    // 3回以上反応でライントレースモードに移行する
+    // 2回以上反応でライントレースモードに移行する
     static bool old_line_trace_flag = false;
     if (line_switching_count > 1 && (memory_last_line_position == LinePosition::Tate || memory_last_line_position == LinePosition::Yoko))
     {
@@ -254,13 +267,7 @@ void playAttacker(Attacker::Mode mode)
         {
             int line_ring_deg = (fabsf(fieldDeg()) > 90) ? 0 : 180;
 
-            if (fabsf(diffDeg(line_ring_deg, irDeg())) > 110) // ライン方向とボール方向の差を見て解除
-            {
-                line_trace_flag = false;
-                line_switching_count = 0;
-            }
-
-            if (line_trace_timer.msTime() > 2500) // ライントレースを2500ms以上すると解除
+            if (fabsf(diffDeg(line_ring_deg, irDeg())) > 90) // ライン方向とボール方向の差を見て解除
             {
                 line_trace_flag = false;
                 line_switching_count = 0;
@@ -274,8 +281,8 @@ void playAttacker(Attacker::Mode mode)
 
             // if (current_line_position == LinePosition::Tate || current_line_position == LinePosition::Haji) // ラインポジションが変わったら解除
             // {
-            //     line_trace_flag = false;
-            //     line_switching_count = 0;
+            //      line_trace_flag = false;
+            //      line_switching_count = 0;
             // }
         }
         else // (memory_last_line_position == LinePosition::Tate)
@@ -283,12 +290,6 @@ void playAttacker(Attacker::Mode mode)
             int line_ring_deg = (fieldDeg() > 0) ? -90 : 90;
 
             if (fabsf(diffDeg(line_ring_deg, irDeg())) > 110) // ライン方向とボール方向の差を見て解除
-            {
-                line_trace_flag = false;
-                line_switching_count = 0;
-            }
-
-            if (line_trace_timer.msTime() > 2500) // ライントレースを2500ms以上すると解除
             {
                 line_trace_flag = false;
                 line_switching_count = 0;
@@ -302,8 +303,8 @@ void playAttacker(Attacker::Mode mode)
 
             // if (current_line_position == LinePosition::Yoko || current_line_position == LinePosition::Haji) // ラインポジションが変わったら解除
             // {
-            //     line_trace_flag = false;
-            //     line_switching_count = 0;
+            //      line_trace_flag = false;
+            //      line_switching_count = 0;
             // }
         }
     }
@@ -342,7 +343,7 @@ void playAttacker(Attacker::Mode mode)
     Serial.println(", linetrace_flag:" + String(line_trace_flag));
 
     //// 制御
-    bool line_trace_kick_signal = false; // ライントレース時にキックしたいture
+    bool kick_signal = false; // キックしたいture
 
     if (line_form == LineForm::LineEscape)
     {
@@ -350,35 +351,12 @@ void playAttacker(Attacker::Mode mode)
     }
     else if (line_form == LineForm::LineTraceYoko)
     {
-        if (lineRingDetected())
-        {
-            if (lineRingDis() > 60 && fabsf(diffDeg(lineRingDeg(), fieldDeg())) > 90)
-            {
-                if (catchSensor.read() == HIGH)
-                {
-                    line_trace_kick_signal = true;
-                }
+        Vector line_escape_vec = Vector(fieldDeg(), 10);
+        Vector ir_follow_vec = (irDeg() > 0) ? Vector(90, 8) : Vector(-90, 8);
+        Vector final_vec = line_escape_vec + ir_follow_vec;
+        final_vec = final_vec * line_trace_power / final_vec.length();
 
-                motorsMove(nearSessenDeg(lineRingDeg(), irDeg()), line_trace_power);
-            }
-            else
-            {
-                motorsMove(fieldDeg(), line_trace_power);
-            }
-        }
-        else
-        {
-            if (catchSensor.read() == HIGH)
-            {
-                line_trace_kick_signal = true;
-                motorsMove(irDeg(), line_trace_power);
-            }
-            else
-            {
-                Vector vec = mawarikomi(line_trace_power, irDeg(), irDis());
-                motorsVectorMove(&vec);
-            }
-        }
+        motorsVectorMove(&final_vec);
     }
     else if (line_form == LineForm::LineTraceTate)
     {
@@ -388,7 +366,7 @@ void playAttacker(Attacker::Mode mode)
             {
                 if (catchSensor.read() == HIGH)
                 {
-                    line_trace_kick_signal = true;
+                    kick_signal = true;
                 }
 
                 motorsMove(nearSessenDeg(lineRingDeg(), irDeg()), line_trace_power);
@@ -402,7 +380,7 @@ void playAttacker(Attacker::Mode mode)
         {
             if (catchSensor.read() == HIGH)
             {
-                line_trace_kick_signal = true;
+                kick_signal = true;
                 motorsMove(irDeg(), line_trace_power);
             }
             else
@@ -457,15 +435,13 @@ void playAttacker(Attacker::Mode mode)
         }
         else // (mode == Attacker::Mode::YELLOWGOAL) || (mode == Attacker::Mode::BLUEGOAL)
         {
-            if (line_trace_kick_signal) // ライントレース時のキック指示は問答無用でキック
+            if (kick_signal) // ライントレース時のキック指示は問答無用でキック
             {
                 kicker1.kick();
             }
             else
             {
-                const int yellow_goal_kick_dis = 86; // キッカー判定用の黄色ゴール距離
-                const int blue_goal__kick_dis = 86;  // キッカー判定用の青色ゴール距離
-                const int kick_at_goal_dis = (mode == Attacker::Mode::YELLOWGOAL) ? yellow_goal_kick_dis : blue_goal__kick_dis;
+                const int kick_at_goal_dis = (mode == Attacker::Mode::YELLOWGOAL) ? yellow_goal_kyori : blue_goal_kyori;
 
                 if (attackGoalDis() <= kick_at_goal_dis)
                 {
@@ -473,7 +449,7 @@ void playAttacker(Attacker::Mode mode)
                 }
                 else // if (attackGoalDis() > kick_at_goal_dis)
                 {
-                    if (catching_timer.msTime() > 600)
+                    if (catching_timer.msTime() > 400)
                     {
                         kicker1.kick();
                     }
@@ -484,18 +460,18 @@ void playAttacker(Attacker::Mode mode)
     old_catch = current_catch; // 記録
 }
 
-/*　bno関係の関数　*/
+// bno関係の関数
 // bnoDeg();    bnoからの角度を取得　⚠リセットボタンが押されると自動的に0になるようになっている
 
-/*　PD関係のコンストラクタ　*/
+// PD関係のコンストラクタ
 // PD pd_gyro(P成分の係数, D成分の係数);     Pの係数を大きくすると戻る力が大きく、Dの係数を大きくすると戻る力が弱まる
 
-/*　Motor関係の関数　*/
+// Motor関係の関数
 // motorsPdProcess(&pd_gyro, bnoDeg(), 0);   絶対毎回呼び出すこと、PDの計算を行う
-// motorsMove(deg,power);                   degの方向にpowerの力で動かす　⚠前:0、左:90、右:-90、後:180
-// motorsPdMove();                          PD制御のみ行う
+// motorsMove(deg,power);                    degの方向にpowerの力で動かす　⚠前:0、左:90、右:-90、後:180
+// motorsPdMove();                           PD制御のみ行う
 
-/*　IR関係の関数　*/
+// IR関係の関数
 // irDetected();    IRボールがあるかどうか取得      1か0
 // irDeg();         IRボールの角度取得             -180~180       ⚠前:0、左:90、右:-90、後:180 ⚠ボールがないときは0xFF=255を返す
 // irDis();         IRボールの距離取得             0.0 ~ 1023.0
@@ -503,15 +479,15 @@ void playAttacker(Attacker::Mode mode)
 // irX();           IRボールのX座標取得            0.0 ~ 1023.0   ⚠前がx軸、正方向
 // irY();           IRボールのY座標取得            0.0 ~ 1023.0   ⚠左がy軸、正方向
 
-/*　LINE関係の関数　*/
+// LINE関係の関数
 // lineRingDetected();    LINEがあるかどうか取得      1か0
 // lineRingDeg();         LINEの角度取得             -180~180       ⚠前:0、左:90、右:-90、後:180 ⚠ボールがないときは0xFF=255を返す
 // lineRingDis();         LINEの距離取得             0.0 ~ 100.0
 // lineRingX();           ILINEのX座標取得           0.0 ~ 1023.0   ⚠前がx軸、正方向
 // lineRingY();           LINEのY座標取得            0.0 ~ 1023.0   ⚠左がy軸、正方向
 
-/*　キャッチセンサーの関数　*/
+// キャッチセンサーの関数
 // catchSensor.read()  == HIGH or LOW
 
-/*　キッカーの関数　*/
-// kicker1.kick(true or false);
+// キッカーの関数
+// kicker1.kick();
