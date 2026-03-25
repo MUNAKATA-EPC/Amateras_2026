@@ -6,9 +6,9 @@ static PD pd_cam(1.2, -0.7);  // カメラ用のPD調節値
 static Timer my_timer;
 static Timer kicker_timer;
 
-const float line_escape_power = 55.0f;   // ライン反応時のモーターの強さ
-const float line_trace_power = 75.0f; // ライントレース時モーターの強さ
-const float ir_max_power = 95.0f;        // モーターの強さ
+const float line_escape_power = 55.0f; // ライン反応時のモーターの強さ
+const float line_trace_power = 75.0f;  // ライントレース時モーターの強さ
+const float ir_max_power = 95.0f;      // モーターの強さ
 
 const float yellow_goal_kyori = 91.0f; // キッカー判定用の黄色ゴール距離
 const float blue_goal_kyori = 85.0f;   // キッカー判定用の青色ゴール距離
@@ -126,10 +126,10 @@ void playAttacker(Attacker::Mode mode)
     }
     else // (mode == Attacker::Mode::YELLOWGOAL) || (mode == Attacker::Mode::BLUEGOAL)
     {
-        int diff = fabsf(normalizeDeg(bnoDeg() - attackGoalDeg()));
-
         if (attackGoalDetected())
         {
+            int diff = fabsf(normalizeDeg(diffDeg(bnoDeg(), attackGoalDeg())));
+
             // if (catchSensor.read() == HIGH || fabsf(iry) <= 130)
             if (catchSensor.read() == HIGH || last_catch_timer.msTime() < 200)
             {
@@ -139,12 +139,12 @@ void playAttacker(Attacker::Mode mode)
                 }
                 else
                 {
-                    if (diff > 50)
+                    if (diff > 40)
                     {
-                        if (yellowGoalDeg() < 0)
-                            motorsPdProcess(&pd_gyro, bnoDeg(), 50);
+                        if (attackGoalDeg() < 0)
+                            motorsPdProcess(&pd_gyro, bnoDeg(), 40);
                         else
-                            motorsPdProcess(&pd_cam, bnoDeg(), -50);
+                            motorsPdProcess(&pd_cam, bnoDeg(), -40);
                     }
                     else
                     {
@@ -229,9 +229,10 @@ void playAttacker(Attacker::Mode mode)
 
             if (!old_line_detected)
             {
-                const int line_switching_time = 2000; // ライントレースのカウントの時間
+                const int line_switching_min_time = 300;  // ライントレースのカウントの時間(min)
+                const int line_switching_max_time = 2000; // ライントレースのカウントの時間(max)
 
-                if (line_timer.msTime() < line_switching_time)
+                if (line_timer.msTime() > line_switching_min_time && line_timer.msTime() < line_switching_max_time)
                 {
                     line_switching_count++;
                 }
@@ -265,15 +266,13 @@ void playAttacker(Attacker::Mode mode)
     {
         if (memory_last_line_position == LinePosition::Yoko)
         {
-            int line_ring_deg = (fabsf(fieldDeg()) > 90) ? 0 : 180;
-
-            if (fabsf(diffDeg(line_ring_deg, irDeg())) > 90) // ライン方向とボール方向の差を見て解除
+            if (isMyAttackArea()) // 攻撃エリアでの誤反応を無くす
             {
                 line_trace_flag = false;
                 line_switching_count = 0;
             }
 
-            if (isMyAttackArea()) // 攻撃エリアでの誤反応を無くす
+            if (!isMyDefenceArea()) // 守備エリアでの誤反応を無くす
             {
                 line_trace_flag = false;
                 line_switching_count = 0;
@@ -284,6 +283,14 @@ void playAttacker(Attacker::Mode mode)
             //      line_trace_flag = false;
             //      line_switching_count = 0;
             // }
+
+            float line_ring_deg = defenceGoalDeg();
+
+            if (fabsf(diffDeg(line_ring_deg, irDeg())) > 90) // ライン方向とボール方向の差を見て解除
+            {
+                line_trace_flag = false;
+                line_switching_count = 0;
+            }
         }
         else // (memory_last_line_position == LinePosition::Tate)
         {
@@ -347,11 +354,26 @@ void playAttacker(Attacker::Mode mode)
 
     if (line_form == LineForm::LineEscape)
     {
-        motorsMove(fieldDeg(), line_escape_power);
+        if (irDetected())
+        {
+            Vector vec = mawarikomi(ir_max_power, irDeg(), irDis());
+            if (fabsf(diffDeg(vec.deg(), fieldDeg())) < 90)
+            {
+                motorsMove(vec.deg(), line_escape_power);
+            }
+            else
+            {
+                motorsMove(fieldDeg(), line_escape_power);
+            }
+        }
+        else
+        {
+            motorsMove(fieldDeg(), line_escape_power);
+        }
     }
     else if (line_form == LineForm::LineTraceYoko)
     {
-        Vector line_escape_vec = Vector(fieldDeg(), 10);
+        Vector line_escape_vec = Vector(fieldDeg(), 0);
         Vector ir_follow_vec = (irDeg() > 0) ? Vector(90, 8) : Vector(-90, 8);
         Vector final_vec = line_escape_vec + ir_follow_vec;
         final_vec = final_vec * line_trace_power / final_vec.length();

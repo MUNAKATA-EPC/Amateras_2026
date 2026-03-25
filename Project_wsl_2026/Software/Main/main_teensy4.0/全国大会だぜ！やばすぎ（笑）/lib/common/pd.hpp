@@ -1,39 +1,41 @@
 #pragma once
-
 #include <Arduino.h>
-#include "timer.hpp"
-#include "angleHelper.hpp"
 
 class PD
 {
-private:
-    float _kp = 0.0f; // 比例ゲイン
-    float _kd = 0.0f; // 微分ゲイン
-
-    bool _useP = true;
-    bool _useD = true;
-
-    uint32_t old_micro_time = 0xFFFFFFFF; // 昔に時間記録用で最初は最大値を格納しておく（ミクロセカンド）
-
-    float _value = 0.0f;        // 現在の値
-    float _oldvalue = 0.0f;     // 昔の値
-    float _gap_of_value = 0.0f; // 値の変化量
-
-    float _p_power = 0.0f; // P制御の出力
-    float _d_power = 0.0f; // D制御の出力
-    float _output = 0.0f;  // 出力
 public:
-    // 関数・コンストラクタ
-    PD(float kp, float kd);
+    PD(float kp, float kd, float lpf_alpha = 0.2f);
+
+    // 設定変更用
+    void setGains(float kp, float kd);
+    void setLPF(float alpha);
+    void setDeadband(float band); // 誤差がこの値以下なら出力を0にする
 
     void useP(bool use);
     void useD(bool use);
 
-    void process(float val, float target, bool angle);
+    void process(float val, float target, bool angle = false);
 
-    // -100.0f～100.0fの値を返す
-    float const output();
-
-    // リセットしD成分の暴走を防ぐ
+    float output() const;
     void reset(float current_val);
+
+private:
+    float _kp, _kd;
+    float _lpf_alpha;
+    float _deadband = 0.0f;
+
+    float _value = 0.0f;
+    float _old_value = 0.0f;
+    float _p_power = 0.0f;
+    float _d_power = 0.0f;
+    float _d_filtered = 0.0f;
+    float _output = 0.0f;
+
+    bool _useP = true;
+    bool _useD = true;
+
+    uint32_t _last_time = 0;
+
+    // 角度の差分計算
+    float getDiffDeg(float a, float b);
 };

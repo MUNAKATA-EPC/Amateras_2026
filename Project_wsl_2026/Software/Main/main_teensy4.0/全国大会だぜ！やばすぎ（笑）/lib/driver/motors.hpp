@@ -3,6 +3,7 @@
 #include <Arduino.h>
 #include "motorsDSR1202.hpp"
 #include "pd.hpp"
+#include "angleHelper.hpp"
 #include "vector.hpp"
 
 bool motorsInit(HardwareSerial *serial, uint32_t baudrate);

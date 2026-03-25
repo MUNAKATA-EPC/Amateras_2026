@@ -1,87 +1,84 @@
 #include "pd.hpp"
 
-//// パブリッククラス ////
-
-// #define D_USE_TIMER // ループが短すぎてうまくいかないです
-
-PD::PD(float kp, float kd)
+PD::PD(float kp, float kd, float lpf_alpha)
+    : _kp(kp), _kd(kd), _lpf_alpha(lpf_alpha)
 {
-    // PゲインとDゲインを初期化
+    _last_time = micros();
+}
+
+void PD::setGains(float kp, float kd)
+{
     _kp = kp;
     _kd = kd;
-
-    // 過去の値とタイマー関連の初期化
-    _oldvalue = 0.0f;
-    _output = 0.0f;
 }
 
-void PD::useP(bool use)
+void PD::setLPF(float alpha)
 {
-    _useP = use;
+    _lpf_alpha = constrain(alpha, 0.01f, 1.0f);
 }
-void PD::useD(bool use)
+
+void PD::setDeadband(float band)
 {
-    _useD = use;
+    _deadband = fabsf(band);
 }
+
+void PD::useP(bool use) { _useP = use; }
+void PD::useD(bool use) { _useD = use; }
 
 void PD::process(float val, float target, bool angle)
 {
-    // 現在値を設定
-    _value = val;
-    // P制御（比例項）の計算
-    // 誤差を計算 (目標 - 現在値)
-    float error = angle ? (float)diffDeg(target, _value) : float(target - _value);
+    uint32_t now = micros();
+    float dt = (float)(now - _last_time) / 1000000.0f; // 秒単位に変換
+    if (dt <= 0)
+        dt = 0.001f; // ゼロ除算防止
+    _last_time = now;
 
-    // P制御の計算
+    _value = val;
+
+    float error = angle ? getDiffDeg(target, _value) : (target - _value);
+
+    if (fabsf(error) < _deadband)
+        error = 0.0f;
     _p_power = error * _kp;
 
-    // D制御（微分項）の計算
-    // 角度の変化量 (_gap_of_value) を計算
-    _gap_of_value = angle ? (float)diffDeg(_value, _oldvalue) : float(_value - _oldvalue);
+    float diff = angle ? getDiffDeg(_value, _old_value) : (_value - _old_value);
 
-#ifdef D_USE_TIMER
-    if (old_micro_time != 0xFFFFFFFF) // 最初old_micro_timeには0xFFFFFFFFが格納されているから最初の呼び出しかどうか判定できる
-    {
-        uint32_t now_micro_time = micros();
-        uint32_t delta_t = now_micro_time - old_micro_time; // Δt算出
-        old_micro_time = now_micro_time;                    // 更新
+    float raw_d_speed = diff / dt;
+    float raw_d_power = raw_d_speed * _kd;
 
-        // ゼロ除算を避ける
-        if (delta_t > 0)
-            _d_power = _kd * _gap_of_value / float(delta_t); // D = Kd * (変化量 / 時間)
-        else
-            _d_power = 0.0f;
-    }
-    else
-    {
-        _d_power = 0.0f;
-    }
-#endif
+    _d_filtered = (_lpf_alpha * raw_d_power) + ((1.0f - _lpf_alpha) * _d_filtered);
+    _d_power = _d_filtered;
 
-#ifndef D_USE_TIMER
-    // D項の計算（通常は変化量にKdをかける）
-    _d_power = _kd * _gap_of_value;
-#endif
+    _old_value = _value;
 
-    // 過去の値を更新
-    _oldvalue = _value;
+    float total_power = 0.0f;
+    if (_useP)
+        total_power += _p_power;
+    if (_useD)
+        total_power += _d_power; // Kdを負の値で渡している場合は加算、正なら減算
 
-    // P項とD項を合計し、出力を -100.0 から 100.0 の範囲に制限
-    float power = 0.0f;
-    power += (_useP) ? _p_power : 0.0f;
-    power += (_useD) ? _d_power : 0.0f; // D成分は動きを抑える作用
-    _output = constrain(power, -100.0f, 100.0f);
+    _output = constrain(total_power, -100.0f, 100.0f);
 }
 
-// -100.0f～100.0fの値を返す
-float const PD::output()
+float PD::output() const
 {
     return _output;
 }
 
-// リセットしD成分の暴走を防ぐ
 void PD::reset(float current_val)
 {
-    _oldvalue = current_val;
+    _old_value = current_val;
+    _d_filtered = 0.0f;
     _output = 0.0f;
+    _last_time = micros();
+}
+
+float PD::getDiffDeg(float target, float current)
+{
+    float diff = target - current;
+    while (diff > 180.0f)
+        diff -= 360.0f;
+    while (diff < -180.0f)
+        diff += 360.0f;
+    return diff;
 }
