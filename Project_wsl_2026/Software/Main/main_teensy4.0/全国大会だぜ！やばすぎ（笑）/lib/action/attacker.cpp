@@ -1,412 +1,517 @@
 #include "attacker.hpp"
 
-// アタッカーのフォーム
-enum AtForm
+static PD pd_gyro(1.2, -0.7); // ジャイロ用のPD調節値
+static PD pd_cam(1.2, -0.7);  // カメラ用のPD調節値
+
+static Timer my_timer;
+static Timer kicker_timer;
+
+const int line_escape_power = 55; // ライン反応時のモーターの強さ
+const int line_trace_power = 75;  // ライントレース時モーターの強さ
+const int ir_max_power = 95;      // モーターの強さ
+
+// 回り込み関数
+Vector mawarikomi(int max_power, int ball_deg, int ball_dis)
 {
-    LINE_ESCAPE,          // ラインから逃れるフォーム
-    LINE_CONTINUE_ESCAPE, // ラインから逃れる動きを継続するフォーム
-    LINE_TRACE_TATE,      // ライントレースするフォーム（コートの縦白線上でトレース）
-    FOLLOW_BALL,          // 回り込むフォーム
-    HOLD,                 // ボール捕獲時のゴールに向かうフォーム（LINE_TRACE_TURNフォームでない場合）
-    LOSE_BALL             // ボールが見えず停滞するフォーム
-};
-
-// 接線
-Vector sessen(float rad, float dis, float r, float length)
-{
-    const float pi = (float)PI;
-
-    float rad_temp;
-    float length_temp = length;
-
-    if (r <= dis)
-    {
-        float alpha = asinf(r / dis);
-
-        if (rad >= 0)
-        {
-            rad_temp = rad + alpha;
-        }
-        else // (ir_rad < 0)
-        {
-            rad_temp = rad - alpha;
-        }
-    }
-    else // (r > ir_dis)
-    {
-        if (rad >= 0)
-        {
-            rad_temp = rad + pi / 2;
-        }
-        else // (ir_rad < 0)
-        {
-            rad_temp = rad - pi / 2;
-        }
-    }
-
-    return Vector(degrees(rad_temp), length_temp);
-}
-
-// 回り込む関数
-Vector mawarikomi(float ball_detected, float ball_deg, float ball_dis)
-{
-    if (!ball_detected)
+    if (!irDetected())
         return Vector(0, 0.0f);
 
-    float rad = (float)radians(ball_deg);
-    float dis = ball_dis;
-    float x = dis * cosf(radians(ball_deg));
-    float y = dis * sinf(radians(ball_deg));
+    float ir_x = cosf(radians(ball_deg)) * ball_dis;
+    float ir_y = sinf(radians(ball_deg)) * ball_dis;
 
     Vector vec;
 
-    if (dis > 580)
+    if (catchSensor.read() == HIGH)
     {
-        vec = Vector(degrees(rad), 95.0f);
+        vec = Vector(0.0f, (float)max_power);
     }
-    else if (x > 0.0f && fabsf(y) < 120.0f)
+    else if (ir_x > 0.0f && fabsf(ir_y) < 200.0f)
     {
-        if (catchSensor.read() == HIGH)
+        // rad計算
+        float dis_x = smoothShifter(50.0f, 150.0f, 50.0f, 300.0f, ir_y);
+        // length計算
+        float length_temp;
+        if (fabsf(ir_y) < 50.0f)
         {
-            vec = Vector(0.0f, 95.0f);
+            length_temp = 95.0f;
         }
         else
         {
-            // rad計算
-            float dis_x = smoothShifter(60.0f, 90.0f, 50.0f, 300.0f, y);
-            // length計算
-            float length_temp;
-            if (fabsf(y) < 55.0f)
-            {
-                length_temp = 95.0f;
-            }
-            else
-            {
-                length_temp = smoothShifter(60.0f, 90.0f, 50.0f, 95.0f, y);
-            }
-
-            Vector vec_temp = Vector(dis_x, 0, x, y);
-            vec_temp = vec_temp * length_temp / vec_temp.length();
-
-            vec = vec_temp;
+            length_temp = smoothShifter(50.0f, 150.0f, 50.0f, 95.0f, ir_y);
         }
+
+        Vector vec_temp = Vector(dis_x, 0, ir_x, ir_y);
+        vec_temp = vec_temp * length_temp / vec_temp.length();
+
+        vec = vec_temp;
     }
     else
     {
-        vec = sessen(rad, dis, 300, 95.0f);
+        const float r = 390.0f;
+        const float pi = (float)PI;
+
+        float ir_rad = (float)radians(ball_deg);
+        float ir_dis = ball_dis;
+
+        float rad_temp;
+        float length_temp = 85.0f;
+
+        if (r <= ir_dis)
+        {
+            float alpha = asinf(r / ir_dis);
+
+            if (ir_rad >= 0)
+            {
+                rad_temp = ir_rad + alpha;
+            }
+            else // (ir_rad < 0)
+            {
+                rad_temp = ir_rad - alpha;
+            }
+        }
+        else // (r > ir_dis)
+        {
+            if (ir_rad >= 0)
+            {
+                rad_temp = ir_rad + pi / 2;
+            }
+            else // (ir_rad < 0)
+            {
+                rad_temp = ir_rad - pi / 2;
+            }
+        }
+        vec = Vector(degrees(rad_temp), length_temp);
     }
 
-    // static float smooth_length = 60.0f;
-
-    // if (vec.length() >= smooth_length)
-    // {
-    //     smooth_length += 1.5f;
-    // }
-    // else
-    // {
-    //     smooth_length -= 1.5f;
-    // }
-
-    // smooth_length = constrain(smooth_length, 0.0f, 95.0f);
+    static float smooth_length = 60.0f;
+    if (vec.length() >= smooth_length) // ゆっくり加速
+    {
+        smooth_length += 1.5f;
+    }
+    else
+    {
+        smooth_length -= 1.5f;
+    }
+    smooth_length = constrain(smooth_length, 0.0f, 95.0f);
 
     // Vector final_vec = Vector(vec.deg(), smooth_length);
-    // return final_vec;
+    Vector final_vec = vec;
 
-    return vec;
+    return final_vec;
 }
 
 //// アタッカーメイン ////
 void playAttacker(Attacker::Mode mode)
 {
-    //// 自分ゴールと相手ゴールの確認
+    //// ゴールの位置更新
     goalPositionCheckAtMode(mode);
 
-    //// フォーム決定
-    static AtForm current_at_form = AtForm::LOSE_BALL;
-    static AtForm old_at_form;
-
-    LinePosition line_position = linePositionCheck(); // ラインによる自己位置推定
-
-    // ライン反応終了後LINE_CONTINUE_ESCAPEフォームに移行するためのタイマー 兼 どのくらいに周期でラインが反応しているのか確認するためのタイマー
-    static Timer line_timer;
-
-    // 600ms周期で同じポジションを示し続ければcountをアップさせる（LINETRACE用）
-    const int switching_line_position_time = 2000;
-    static int switching_line_position_count = 0;
-    static LinePosition switching_line_position_memory;
-
-    // LINETRACEをすべきか決定
-    static bool line_trace_flag = false; // これが一度trueになるとfalseにするまでずっとライントレースをし続ける
-    if (irDetected() && !line_trace_flag && switching_line_position_count >= 2)
+    //// PD制御目標方向確定
+    if (mode == Attacker::Mode::GYRO)
     {
-        if (switching_line_position_memory == LinePosition::Tate)
-        {
-            line_trace_flag = true;
-
-            current_at_form = AtForm::LINE_TRACE_TATE;
-        }
+        motorsPdProcess(&pd_gyro, bnoDeg(), 0);
     }
-
-    // LINETRACEを取り消すべきか決定
-    static bool old_line_trace_flag = false;
-    static Timer line_tracing_timer;
-
-    if (line_trace_flag)
+    else // (mode == Attacker::Mode::YELLOWGOAL) || (mode == Attacker::Mode::BLUEGOAL)
     {
-        if (!old_line_trace_flag && line_trace_flag)
-        {
-            line_tracing_timer.reset();
-        }
+        int diff = fabsf(normalizeDeg(bnoDeg() - attackGoalDeg()));
 
-        if (lineRingDetected() && switching_line_position_memory != line_position) // 今のラインの状況と異なるならトレースをやめる
+        if (attackGoalDetected())
         {
-            line_trace_flag = false;
-            switching_line_position_count = 0; // カウントリセット
-        }
-        else
-        {
-            Vector vec_temp = mawarikomi(irDetected(), irDeg(), irDis());
-            if (current_at_form == AtForm::LINE_TRACE_TATE)
-            {
-                if (line_tracing_timer.msTime() > 5000) // 5秒トレースしたらトレースをやめる
-                {
-                    line_trace_flag = false;
-                    switching_line_position_count = 0; // カウントリセット
-                }
-
-                // コートの右にいて回り込む方向が左 または コートの左にいて回り込む方向が右のときトレースをやめる
-                if ((fieldDeg() > 0 && (vec_temp.deg() > 20 && vec_temp.deg() < 160)) ||
-                    (fieldDeg() < 0 && (vec_temp.deg() < -20 && vec_temp.deg() > -160)))
-                {
-                    line_trace_flag = false;
-                    switching_line_position_count = 0; // カウントリセット
-                }
-            }
-        }
-    }
-    // ライントレースフラグが立っていないときのフォーム
-    else // if (!line_trace_flag)
-    {
-        static LinePosition last_line_position;
-
-        if (lineRingDetected())
-        {
-            current_at_form = AtForm::LINE_ESCAPE;
-            last_line_position = line_position;
-        }
-        else if (lineSideLeftDetected())
-        {
-            if (lineSideRightDetected())
-            {
-                last_line_position = LinePosition::Yoko;
-            }
-            else
-            {
-                last_line_position = LinePosition::Tate;
-            }
-
-            current_at_form = AtForm::LINE_ESCAPE;
-        }
-        else if (lineSideRightDetected())
-        {
-            last_line_position = LinePosition::Tate;
-
-            current_at_form = AtForm::LINE_ESCAPE;
-        }
-        else if ((attackGoalDetected() && attackGoalDis() < 60) || (defenceGoalDetected() && defenceGoalDis() < 60))
-        {
-            last_line_position = LinePosition::Yoko;
-
-            current_at_form = AtForm::LINE_ESCAPE;
-        }
-        else if (old_at_form == AtForm::LINE_ESCAPE)
-        {
-            if (line_timer.everReset() && line_timer.msTime() < switching_line_position_time)
-            {
-                if (last_line_position == switching_line_position_memory)
-                {
-                    switching_line_position_count++;
-                }
-                else
-                {
-                    switching_line_position_memory = last_line_position; // 新たなポジションとして更新
-                    switching_line_position_count = 0;
-                }
-            }
-            else
-            {
-                switching_line_position_memory = last_line_position; // 新たなポジションとして更新
-                switching_line_position_count = 0;
-            }
-
-            line_timer.reset();
-            current_at_form = AtForm::LINE_CONTINUE_ESCAPE;
-        }
-        else if (line_timer.everReset() && line_timer.msTime() < 100UL)
-        {
-            current_at_form = AtForm::LINE_CONTINUE_ESCAPE;
-        }
-        else
-        {
+            // if (catchSensor.read() == HIGH || fabsf(iry) <= 130)
             if (catchSensor.read() == HIGH)
             {
-                current_at_form = AtForm::HOLD;
-            }
-            else
-            {
-                if (irDetected())
+                if (!irDetected())
                 {
-                    current_at_form = AtForm::FOLLOW_BALL;
+                    motorsPdProcess(&pd_gyro, bnoDeg(), 0);
                 }
                 else
                 {
-                    current_at_form = AtForm::LOSE_BALL;
-                }
-            }
-        }
-    }
-
-    old_line_trace_flag = line_trace_flag; // 記録
-
-    //// 攻撃制御
-    // 移動方向決定
-    int pd_target_deg = 0; // 基本0度（LINE_TRACE_YOKO_AND_TURNフォーム時にtarget_degをずらすことで機体を回転させる）
-
-    Vector move_vec;
-    if (current_at_form == AtForm::LINE_ESCAPE)
-    {
-        move_vec = Vector(fieldDeg(), 60);
-    }
-    else if (current_at_form == AtForm::LINE_CONTINUE_ESCAPE)
-    {
-        move_vec = Vector(fieldDeg(), 60);
-    }
-    else if (current_at_form == AtForm::LINE_TRACE_TATE)
-    {
-        if (lineRingDetected())
-        {
-            move_vec = lineTrace(irDeg(), 60, 10);
-        }
-        else
-        {
-            move_vec = mawarikomi(irDetected(), irDeg(), irDis());
-        }
-    }
-    else if (current_at_form == AtForm::FOLLOW_BALL)
-    {
-        if (false) // (attackGoalDetected() && attackGoalDis() < 95)
-        {
-            float k = smoothShifter(30, 40, 0, 1, fabsf(yellowGoalDeg()));
-            if (fabsf(yellowGoalDeg()) > 40)
-            {
-                k = smoothShifter(40, 50, 1, 0, fabsf(yellowGoalDeg()));
-            }
-            float goal_to_ir_deg = -diffDeg(attackGoalDeg() * k, irDeg());
-            Vector vec = mawarikomi(irDetected(), goal_to_ir_deg, irDis());
-            move_vec = Vector(vec.deg() + attackGoalDeg(), vec.length());
-        }
-        else
-        {
-            move_vec = mawarikomi(irDetected(), irDeg(), irDis());
-        }
-    }
-    else if (current_at_form == AtForm::HOLD)
-    {
-        move_vec = Vector(0, 95);
-    }
-    else // if (current_at_form == AtForm::LOSE_BALL)
-    {
-        move_vec = Vector(0, 0);
-    }
-
-    // pd・キッカー
-    static PD pd_gyro(0.50f, -3.0f);
-    static PD pd_cam(0.5f, -3.0f);
-    static PD pd_zure_gyro(1.5f, -3.0f);
-
-    if (current_at_form == AtForm::HOLD)
-    {
-        static Timer hold_timer;
-        if (old_at_form != AtForm::HOLD)
-        {
-            hold_timer.reset();
-        }
-
-        if (mode == Attacker::Mode::GYRO)
-        {
-            if (hold_timer.msTime() > 500) // 500msホールドし続けると機体をずらす
-            {
-                if (fieldDeg() > 0) // コート右にいる
-                {
-                    motorsPdProcess(&pd_zure_gyro, bnoDeg(), -45);
-                }
-                else
-                {
-                    motorsPdProcess(&pd_zure_gyro, bnoDeg(), 45);
+                    if (diff > 40)
+                    {
+                        if (yellowGoalDeg() < 0)
+                            motorsPdProcess(&pd_gyro, bnoDeg(), 40);
+                        else
+                            motorsPdProcess(&pd_gyro, bnoDeg(), -40);
+                    }
+                    else
+                    {
+                        motorsPdProcess(&pd_cam, attackGoalDeg(), 0);
+                    }
                 }
             }
             else
             {
                 motorsPdProcess(&pd_gyro, bnoDeg(), 0);
             }
-
-            kicker1.kick();
         }
         else
         {
-            if (pd_target_deg != 0)
-            {
-                // LINE_TRACE_YOKO_AND_TURNフォーム時のみpd_target_degの方向に向く（回転）
-                motorsPdProcess(&pd_cam, bnoDeg(), pd_target_deg);
-            }
-            else
-            {
-                // 基本正面を向く
-                if (attackGoalDetected())
-                {
-                    motorsPdProcess(&pd_cam, attackGoalDeg(), 0);
-                }
-                else
-                {
-                    if (hold_timer.msTime() > 500) // 500msホールドし続けると機体をずらす
-                    {
-                        if (fieldDeg() > 0) // コート右にいる
-                        {
-                            motorsPdProcess(&pd_zure_gyro, bnoDeg(), -45);
-                        }
-                        else
-                        {
-                            motorsPdProcess(&pd_zure_gyro, bnoDeg(), 45);
-                        }
-                    }
-                    else
-                    {
-                        motorsPdProcess(&pd_gyro, bnoDeg(), 0);
-                    }
-                }
-            }
-
-            if (fabsf(attackGoalDeg()) < 80)
-            {
-                kicker1.kick();
-            }
-        }
-    }
-    else
-    {
-        if (pd_target_deg != 0)
-        {
-            // LINE_TRACE_YOKO_AND_TURNフォーム時のみpd_target_degの方向に向く（回転）
-            motorsPdProcess(&pd_cam, bnoDeg(), pd_target_deg);
-        }
-        else
-        {
-            // 基本正面を向く
             motorsPdProcess(&pd_gyro, bnoDeg(), 0);
         }
     }
 
-    motorsVectorMove(&move_vec);
+    //// ライン・ライントレース動作決定
+    LinePosition current_line_position = linePositionCheck();
+    if (current_line_position == LinePosition::None)
+    {
+        if (lineSideRightDetected())
+        {
+            if (lineSideLeftDetected())
+            {
+                current_line_position = LinePosition::Yoko;
+            }
+            else
+            {
+                current_line_position = LinePosition::Tate;
+            }
+        }
+        else if (lineSideLeftDetected())
+        {
+            current_line_position = LinePosition::Tate;
+        }
+    }
 
-    old_at_form = current_at_form; // 記録
+    static bool line_trace_flag = false;
+    static Timer line_trace_timer;
+
+    enum LineForm
+    {
+        LineEscape,    // 普通の回避動作
+        LineTraceYoko, // 横線上のトレース
+        LineTraceTate, // 縦線上のトレース
+        None
+    };
+    LineForm line_form = LineForm::None;
+
+    static Timer line_timer;
+
+    bool line_detected = (current_line_position != LinePosition::None);
+    static bool old_line_detected = false;
+
+    static int line_switching_count = 0;
+    static LinePosition memory_last_line_position;
+
+    // ラインフォームをとりあえず決定
+    if (!line_trace_flag)
+    {
+        if (!line_detected)
+        {
+            if (old_line_detected)
+            {
+                line_timer.reset();
+            }
+
+            if (line_timer.msTime() < 80UL) // ラインから逃げる時間(普通の回避動作)
+            {
+                line_form = LineForm::LineEscape;
+            }
+            else
+            {
+                line_form = LineForm::None;
+            }
+        }
+        else
+        {
+            line_form = LineForm::LineEscape;
+
+            if (!old_line_detected)
+            {
+                const int line_switching_time = 2000; // ライントレースのカウントの時間
+
+                if (line_timer.msTime() < line_switching_time)
+                {
+                    line_switching_count++;
+                }
+                else
+                {
+                    line_switching_count = 1;
+                }
+
+                memory_last_line_position = current_line_position; // Tate or Yoko
+            }
+        }
+    }
+
+    old_line_detected = line_detected; // 記録
+
+    // 3回以上反応でライントレースモードに移行する
+    static bool old_line_trace_flag = false;
+    if (line_switching_count > 1 && (memory_last_line_position == LinePosition::Tate || memory_last_line_position == LinePosition::Yoko))
+    {
+        line_trace_flag = true;
+
+        if (!old_line_trace_flag)
+        {
+            line_trace_timer.reset();
+        }
+    }
+    old_line_trace_flag = line_trace_flag;
+
+    // ライントレースモード解除条件
+    if (line_trace_flag)
+    {
+        if (memory_last_line_position == LinePosition::Yoko)
+        {
+            int line_ring_deg = (fabsf(fieldDeg()) > 90) ? 0 : 180;
+
+            if (fabsf(diffDeg(line_ring_deg, irDeg())) > 110) // ライン方向とボール方向の差を見て解除
+            {
+                line_trace_flag = false;
+                line_switching_count = 0;
+            }
+
+            if (line_trace_timer.msTime() > 2500) // ライントレースを2500ms以上すると解除
+            {
+                line_trace_flag = false;
+                line_switching_count = 0;
+            }
+
+            if (isMyAttackArea()) // 攻撃エリアでの誤反応を無くす
+            {
+                line_trace_flag = false;
+                line_switching_count = 0;
+            }
+
+            // if (current_line_position == LinePosition::Tate || current_line_position == LinePosition::Haji) // ラインポジションが変わったら解除
+            // {
+            //     line_trace_flag = false;
+            //     line_switching_count = 0;
+            // }
+        }
+        else // (memory_last_line_position == LinePosition::Tate)
+        {
+            int line_ring_deg = (fieldDeg() > 0) ? -90 : 90;
+
+            if (fabsf(diffDeg(line_ring_deg, irDeg())) > 110) // ライン方向とボール方向の差を見て解除
+            {
+                line_trace_flag = false;
+                line_switching_count = 0;
+            }
+
+            if (line_trace_timer.msTime() > 2500) // ライントレースを2500ms以上すると解除
+            {
+                line_trace_flag = false;
+                line_switching_count = 0;
+            }
+
+            if (isMyAttackArea()) // 攻撃エリアでの誤反応を無くす
+            {
+                line_trace_flag = false;
+                line_switching_count = 0;
+            }
+
+            // if (current_line_position == LinePosition::Yoko || current_line_position == LinePosition::Haji) // ラインポジションが変わったら解除
+            // {
+            //     line_trace_flag = false;
+            //     line_switching_count = 0;
+            // }
+        }
+    }
+
+    // ラインフォームをライントレースモードとして書き換え
+    if (line_trace_flag)
+    {
+        if (memory_last_line_position == LinePosition::Yoko)
+        {
+            line_form = LineForm::LineTraceYoko;
+        }
+        else
+        {
+            line_form = LineForm::LineTraceTate;
+        }
+    }
+
+    Serial.print("posi:");
+    Serial.print((current_line_position == LinePosition::Yoko) ? "Yoko" : (current_line_position == LinePosition::Tate) ? "Tate"
+                                                                                                                        : "None");
+
+    Serial.print(", sw_cnt:");
+    Serial.print(line_switching_count);
+
+    Serial.print(", last_posi:");
+    Serial.print((memory_last_line_position == LinePosition::Yoko) ? "Yoko" : (memory_last_line_position == LinePosition::Tate) ? "Tate"
+                                                                                                                                : "None");
+
+    Serial.print(", line_form:");
+    Serial.print((line_form == LineForm::LineEscape) ? "Escape" : (line_form == LineForm::LineTraceTate) ? "Tate"
+                                                              : (line_form == LineForm::LineTraceYoko)   ? "Yoko"
+                                                                                                         : "None");
+
+    Serial.print(", line_timer:" + String(line_timer.msTime()));
+
+    Serial.println(", linetrace_flag:" + String(line_trace_flag));
+
+    //// 制御
+    bool line_trace_kick_signal = false; // ライントレース時にキックしたいture
+
+    if (line_form == LineForm::LineEscape)
+    {
+        motorsMove(fieldDeg(), line_escape_power);
+    }
+    else if (line_form == LineForm::LineTraceYoko)
+    {
+        if (lineRingDetected())
+        {
+            if (lineRingDis() > 60 && fabsf(diffDeg(lineRingDeg(), fieldDeg())) > 90)
+            {
+                if (catchSensor.read() == HIGH)
+                {
+                    line_trace_kick_signal = true;
+                }
+
+                motorsMove(nearSessenDeg(lineRingDeg(), irDeg()), line_trace_power);
+            }
+            else
+            {
+                motorsMove(fieldDeg(), line_trace_power);
+            }
+        }
+        else
+        {
+            if (catchSensor.read() == HIGH)
+            {
+                line_trace_kick_signal = true;
+                motorsMove(irDeg(), line_trace_power);
+            }
+            else
+            {
+                Vector vec = mawarikomi(line_trace_power, irDeg(), irDis());
+                motorsVectorMove(&vec);
+            }
+        }
+    }
+    else if (line_form == LineForm::LineTraceTate)
+    {
+        if (lineRingDetected())
+        {
+            if (lineRingDis() > 60 && fabsf(diffDeg(lineRingDeg(), fieldDeg())) > 90)
+            {
+                if (catchSensor.read() == HIGH)
+                {
+                    line_trace_kick_signal = true;
+                }
+
+                motorsMove(nearSessenDeg(lineRingDeg(), irDeg()), line_trace_power);
+            }
+            else
+            {
+                motorsMove(fieldDeg(), line_trace_power);
+            }
+        }
+        else
+        {
+            if (catchSensor.read() == HIGH)
+            {
+                line_trace_kick_signal = true;
+                motorsMove(irDeg(), line_trace_power);
+            }
+            else
+            {
+                Vector vec = mawarikomi(line_trace_power, irDeg(), irDis());
+                motorsVectorMove(&vec);
+            }
+        }
+    }
+    //// ボール回り込み
+    else if (irDetected())
+    {
+        // if (goaldetected && goaldis < 80)
+        // {
+        //     int goal_to_ball_deg = -diffDeg(goaldeg, irDeg());
+        //     Vector vec = mawarikomi(ir_max_power, goaldis, goal_to_ball_deg, irDis());
+        //     vec = Vector(vec.deg() + goaldeg, vec.length());
+        //     motorsVectorMove(&vec);
+        // }
+        // else
+        // {
+        //     Vector vec = mawarikomi(ir_max_power, goaldis, irDeg(), irDis());
+        //     motorsVectorMove(&vec);
+        // }
+
+        // motorsMove(0,0);
+        Vector vec = mawarikomi(ir_max_power, irDeg(), irDis());
+        motorsVectorMove(&vec);
+    }
+    else
+    {
+        motorsPdMove();
+    }
+
+    //// キッカー制御
+    static Timer catching_timer;
+    static bool old_catch = false;
+    bool current_catch = (catchSensor.read() == HIGH);
+    if (current_catch)
+    {
+        if (!old_catch)
+        {
+            catching_timer.reset();
+        }
+
+        if (mode == Attacker::Mode::GYRO)
+        {
+            if (catching_timer.msTime() > 80)
+            {
+                kicker1.kick();
+            }
+        }
+        else // (mode == Attacker::Mode::YELLOWGOAL) || (mode == Attacker::Mode::BLUEGOAL)
+        {
+            if (line_trace_kick_signal) // ライントレース時のキック指示は問答無用でキック
+            {
+                kicker1.kick();
+            }
+            else
+            {
+                const int yellow_goal_kick_dis = 86; // キッカー判定用の黄色ゴール距離
+                const int blue_goal__kick_dis = 86;  // キッカー判定用の青色ゴール距離
+                const int kick_at_goal_dis = (mode == Attacker::Mode::YELLOWGOAL) ? yellow_goal_kick_dis : blue_goal__kick_dis;
+
+                if (attackGoalDis() <= kick_at_goal_dis)
+                {
+                    kicker1.kick();
+                }
+                else // if (attackGoalDis() > kick_at_goal_dis)
+                {
+                    if (catching_timer.msTime() > 600)
+                    {
+                        kicker1.kick();
+                    }
+                }
+            }
+        }
+    }
+    old_catch = current_catch; // 記録
 }
+
+/*　bno関係の関数　*/
+// bnoDeg();    bnoからの角度を取得　⚠リセットボタンが押されると自動的に0になるようになっている
+
+/*　PD関係のコンストラクタ　*/
+// PD pd_gyro(P成分の係数, D成分の係数);     Pの係数を大きくすると戻る力が大きく、Dの係数を大きくすると戻る力が弱まる
+
+/*　Motor関係の関数　*/
+// motorsPdProcess(&pd_gyro, bnoDeg(), 0);   絶対毎回呼び出すこと、PDの計算を行う
+// motorsMove(deg,power);                   degの方向にpowerの力で動かす　⚠前:0、左:90、右:-90、後:180
+// motorsPdMove();                          PD制御のみ行う
+
+/*　IR関係の関数　*/
+// irDetected();    IRボールがあるかどうか取得      1か0
+// irDeg();         IRボールの角度取得             -180~180       ⚠前:0、左:90、右:-90、後:180 ⚠ボールがないときは0xFF=255を返す
+// irDis();         IRボールの距離取得             0.0 ~ 1023.0
+// irVal();         IRボールの(1023.0-距離)取得    1023.0 ~ 0.0
+// irX();           IRボールのX座標取得            0.0 ~ 1023.0   ⚠前がx軸、正方向
+// irY();           IRボールのY座標取得            0.0 ~ 1023.0   ⚠左がy軸、正方向
+
+/*　LINE関係の関数　*/
+// lineRingDetected();    LINEがあるかどうか取得      1か0
+// lineRingDeg();         LINEの角度取得             -180~180       ⚠前:0、左:90、右:-90、後:180 ⚠ボールがないときは0xFF=255を返す
+// lineRingDis();         LINEの距離取得             0.0 ~ 100.0
+// lineRingX();           ILINEのX座標取得           0.0 ~ 1023.0   ⚠前がx軸、正方向
+// lineRingY();           LINEのY座標取得            0.0 ~ 1023.0   ⚠左がy軸、正方向
+
+/*　キャッチセンサーの関数　*/
+// catchSensor.read()  == HIGH or LOW
+
+/*　キッカーの関数　*/
+// kicker1.kick(true or false);
