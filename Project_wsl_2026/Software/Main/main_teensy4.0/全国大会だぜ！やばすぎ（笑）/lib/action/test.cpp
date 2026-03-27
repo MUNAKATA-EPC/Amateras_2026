@@ -1,7 +1,7 @@
 #include "test.hpp"
 
-static PD pd_gyro(0.50f, -3.0f);
-static PD pd_cam(0.50f, -3.0f);
+static PD pd_gyro(0.75f, -0.04f);
+static PD pd_cam(0.75f, -0.04f);
 
 void testKicker();
 void testGyro();

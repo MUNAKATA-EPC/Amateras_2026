@@ -9,6 +9,8 @@ private:
     uint32_t _baudrate;
     uint8_t _toggle_pin = 0xFF;
 
+    bool _is_toggle_on = false;
+
 public:
     // 関数・コンストラクタ
     DSR1202(HardwareSerial *serial, uint32_t baudrate);
@@ -16,4 +18,6 @@ public:
     void setTogglePin(uint8_t pin, uint8_t pinmode);
     void stop();
     void move(int value_1ch, int value_2ch, int value_3ch, int value_4ch);
+
+    bool isToggleOn();
 };

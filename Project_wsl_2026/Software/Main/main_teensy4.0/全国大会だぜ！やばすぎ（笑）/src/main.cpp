@@ -59,11 +59,15 @@ void setup()
     leftButton.init(12, INPUT_PULLDOWN);  // ui用
     resetButton.init(37, INPUT_PULLDOWN); // bno用
 
-    delay(3000);
+    for (int i = 0; i < 20; i++)
+    {
+        motorsStop();
+        delay(100);
+    }
 }
 
 Timer ui_timer; // ui用
-bool old_running_flag = false;
+bool old_ui_running = false;
 
 void loop()
 {
@@ -90,7 +94,7 @@ void loop()
     // 動作を実行
     if (uiRunning() == false)
     {
-        old_running_flag = false;
+        old_ui_running = false;
 
         motorsStop(); // 動作選択中はモータを止める
 
@@ -187,14 +191,29 @@ void loop()
     }
     else
     {
-        if (old_running_flag == false)
+        if (!old_ui_running)
+        {
+            old_ui_running = true;
+
+            uiClear();
+            uiDrawMain();
+            uiShow();
+        }
+
+        bool a = motorsIsToggleOn();
+        static bool b = false;
+        if (a && !b)
+        {
+            uiClear();
+            uiShow();
+        }
+        if (!a && b)
         {
             uiClear();
             uiDrawMain();
             uiShow();
-
-            old_running_flag = true;
         }
+        b = a;
 
         switch (uiActionNumber())
         {

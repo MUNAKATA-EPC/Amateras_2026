@@ -1,7 +1,5 @@
 #include "motorsDSR1202.hpp"
 
-//// パブリッククラス ////
-
 DSR1202::DSR1202(HardwareSerial *serial, uint32_t baudrate)
 {
     _serial = serial;
@@ -14,12 +12,17 @@ void DSR1202::begin()
     _serial->setTimeout(50);   // 50msでタイムアウトとする
 }
 
+// void DSR1202::setTogglePin(uint8_t pin, uint8_t pinmode)
+// {
+//     pinMode(pin, pinmode);
+//     _toggle_pin = pin;
+// }
+
 void DSR1202::setTogglePin(uint8_t pin, uint8_t pinmode)
 {
     pinMode(pin, pinmode);
     _toggle_pin = pin;
 }
-
 void DSR1202::stop()
 {
     _serial->println("1R0002R0003R0004R000"); // モータを停止させる
@@ -29,12 +32,29 @@ void DSR1202::move(int value_1ch, int value_2ch, int value_3ch, int value_4ch)
 {
     if (_toggle_pin != 0xFF)
     {
+        // if (digitalRead(_toggle_pin) == LOW)
+        // {
+        //     stop();
+        //     return;
+        // }
+
+        static uint32_t last_ok_time = 0;
+
         if (digitalRead(_toggle_pin) == LOW)
         {
-            stop();
-            return;
+            if (millis() - last_ok_time > 50) // 50ms続いたら止める
+            {
+                _is_toggle_on = false;
+                stop();
+                return;
+            }
         }
+        else
+        {
+            last_ok_time = millis();
+        } // 追加
     }
+    _is_toggle_on = true;
 
     // 1chについて
     value_1ch = constrain(value_1ch, -100, 100);       // -100~100の範囲に収める
@@ -93,4 +113,14 @@ void DSR1202::move(int value_1ch, int value_2ch, int value_3ch, int value_4ch)
         data_value_4ch = "4R" + str_abs_value_4ch; // 4chで逆回転なので4R
 
     _serial->println(data_value_1ch + data_value_2ch + data_value_3ch + data_value_4ch); // 最終的に\0付きで送信
+}
+
+bool DSR1202::isToggleOn()
+{
+    if (_toggle_pin == 0xFF)
+    {
+        return true;
+    }
+
+    return _is_toggle_on;
 }

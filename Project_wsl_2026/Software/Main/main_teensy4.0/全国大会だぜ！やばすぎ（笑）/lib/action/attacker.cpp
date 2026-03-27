@@ -1,7 +1,7 @@
 #include "attacker.hpp"
 
-static PD pd_gyro(0.75, -0.04); // ジャイロ用のPD調節値
-static PD pd_cam(0.75, -0.04);  // カメラ用のPD調節値
+static PD pd_gyro(0.75f, -0.04f); // ジャイロ用のPD調節値
+static PD pd_cam(0.75f, -0.04f);  // カメラ用のPD調節値
 
 const float line_escape_power = 55.0f; // ライン反応時のモーターの強さ
 const float line_trace_power = 75.0f;  // ライントレース時モーターの強さ
@@ -20,7 +20,7 @@ Vector mawarikomi(float max_power, float ball_deg, float ball_dis)
 
     Vector vec;
 
-    if (catchSensor.read() == HIGH)
+    if (catchSensor.read() == HIGH && fabsf(ball_deg) < 20)
     {
         vec = Vector(0.0f, max_power);
     }
@@ -295,9 +295,9 @@ void playAttacker(Attacker::Mode mode)
             //      line_switching_count = 0;
             // }
 
-            float line_ring_deg = defenceGoalDeg();
+            float line_ring_deg = (fabsf(fieldDeg()) > 90) ? 0 : 180;
 
-            if (fabsf(diffDeg(line_ring_deg, irDeg())) > 90) // ライン方向とボール方向の差を見て解除
+            if (fabsf(diffDeg(line_ring_deg, irDeg())) > 25) // ライン方向とボール方向の差を見て解除
             {
                 line_trace_flag = false;
                 line_switching_count = 0;
@@ -497,7 +497,7 @@ void playAttacker(Attacker::Mode mode)
                 const float b = 90.0f; // キッカー判定用の青色ゴール距離
                 int kick_at_goal_dis = (mode == Attacker::Mode::YELLOWGOAL) ? y : b;
 
-                if (attackGoalDis() <= kick_at_goal_dis)
+                if (attackGoalDetected() && attackGoalDis() <= kick_at_goal_dis)
                 {
                     kicker1.kick();
                 }
@@ -513,35 +513,3 @@ void playAttacker(Attacker::Mode mode)
     }
     old_catch = current_catch; // 記録
 }
-
-// bno関係の関数
-// bnoDeg();    bnoからの角度を取得　⚠リセットボタンが押されると自動的に0になるようになっている
-
-// PD関係のコンストラクタ
-// PD pd_gyro(P成分の係数, D成分の係数);     Pの係数を大きくすると戻る力が大きく、Dの係数を大きくすると戻る力が弱まる
-
-// Motor関係の関数
-// motorsPdProcess(&pd_gyro, bnoDeg(), 0);   絶対毎回呼び出すこと、PDの計算を行う
-// motorsMove(deg,power);                    degの方向にpowerの力で動かす　⚠前:0、左:90、右:-90、後:180
-// motorsPdMove();                           PD制御のみ行う
-
-// IR関係の関数
-// irDetected();    IRボールがあるかどうか取得      1か0
-// irDeg();         IRボールの角度取得             -180~180       ⚠前:0、左:90、右:-90、後:180 ⚠ボールがないときは0xFF=255を返す
-// irDis();         IRボールの距離取得             0.0 ~ 1023.0
-// irVal();         IRボールの(1023.0-距離)取得    1023.0 ~ 0.0
-// irX();           IRボールのX座標取得            0.0 ~ 1023.0   ⚠前がx軸、正方向
-// irY();           IRボールのY座標取得            0.0 ~ 1023.0   ⚠左がy軸、正方向
-
-// LINE関係の関数
-// lineRingDetected();    LINEがあるかどうか取得      1か0
-// lineRingDeg();         LINEの角度取得             -180~180       ⚠前:0、左:90、右:-90、後:180 ⚠ボールがないときは0xFF=255を返す
-// lineRingDis();         LINEの距離取得             0.0 ~ 100.0
-// lineRingX();           ILINEのX座標取得           0.0 ~ 1023.0   ⚠前がx軸、正方向
-// lineRingY();           LINEのY座標取得            0.0 ~ 1023.0   ⚠左がy軸、正方向
-
-// キャッチセンサーの関数
-// catchSensor.read()  == HIGH or LOW
-
-// キッカーの関数
-// kicker1.kick();

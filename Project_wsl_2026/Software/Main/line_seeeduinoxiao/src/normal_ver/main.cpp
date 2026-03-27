@@ -1,4 +1,7 @@
 #include <Arduino.h>
+#include "multiplexer.hpp"
+
+#include <Arduino.h>
 #include "movement_average.hpp"
 #include "multiplexer.hpp"
 #include "button.hpp"
@@ -10,25 +13,25 @@ const int end_header = 0xAA;   // 同期ヘッダー格納用
 Multiplexer line_mux;
 
 #define LINE_SENSOR_COUNT 16
-const int LINEsensor_pin[LINE_SENSOR_COUNT] = {8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7}; // 前から左回りにピン番号を指定
+const int LINEsensor_pin[LINE_SENSOR_COUNT] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15}; // 前から左回りにピン番号を指定
 
 const int LINEsensor_side_right_pin = A9; // 右サイドのピン
 const int LINEsensor_side_left_pin = A8;  // 左サイドのピン
 const int LINEsensor_side_back_pin = A10; // 後ろサイドのピン
 
 const uint32_t LINEsensor_adjust_value[LINE_SENSOR_COUNT] =
-    {400, 400, 300, 400, 300, 700, 300, 300, 300, 300, 300, 400, 300, 400, 300, 400}; // センサー調整用値格納用
+    {170, 192, 301, 455, 282, 235, 293, 524, 234, 246, 217, 257, 146, 377, 198, 184}; // センサー調整用値格納用
 
-const uint32_t LINEsensor_side_right_adjust_value = 600UL; // 右サイドの調整値
-const uint32_t LINEsensor_side_left_adjust_value = 600UL;  // 左サイドの調整値
-const uint32_t LINEsensor_side_back_adjust_value = 600UL;  // 後ろサイドの調整値
+const uint32_t LINEsensor_side_right_adjust_value = 650UL; // 右サイドの調整値
+const uint32_t LINEsensor_side_left_adjust_value = 650UL;  // 左サイドの調整値
+const uint32_t LINEsensor_side_back_adjust_value = 650UL;  // 後ろサイドの調整値
 
 const int button_pin = 0; // ボタンのピン番号
 const int led_pin = 7;    // LEDのピン番号
 
 uint32_t readMuxMedian(int pin)
 {
-  const int sample_count = 10;
+  const int sample_count = 6;
   uint32_t v[sample_count];
 
   for (int i = 0; i < sample_count; i++)
@@ -48,7 +51,7 @@ uint32_t readMuxMedian(int pin)
 
 uint32_t readAnalogMedian(int pin)
 {
-  const int sample_count = 10;
+  const int sample_count = 6;
   uint32_t v[sample_count];
 
   for (int i = 0; i < sample_count; i++)
@@ -86,31 +89,49 @@ void setup()
 
 void loop()
 {
+  static uint32_t max_line_value[19] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
   // エンジェルライン
   uint32_t lines_data_bit_mask = 0UL; // 初期化
 
   for (uint8_t i = 0; i < 16; i++)
   {
-    uint32_t line_val = readMuxMedian(LINEsensor_pin[i]);
-    if (line_val > LINEsensor_adjust_value[i]) // ラインが見えたら
-      lines_data_bit_mask |= (1UL << i);
+    uint32_t line_ring_val = readMuxMedian(LINEsensor_pin[i]);
+    if (line_ring_val > max_line_value[i])
+    {
+      max_line_value[i] = line_ring_val;
+    }
 
-    // Serial.print(String(i) + " : " + String(line_val) + " , ");
+    if (line_ring_val > LINEsensor_adjust_value[i]) // ラインが見えたら
+      lines_data_bit_mask |= (1UL << i);
   }
-  // Serial.println();
 
   // サイドライン
-  if (readAnalogMedian(LINEsensor_side_right_pin) >= LINEsensor_side_right_adjust_value)
+  uint32_t line_side_val[3] = {readAnalogMedian(LINEsensor_side_right_pin), readAnalogMedian(LINEsensor_side_left_pin), readAnalogMedian(LINEsensor_side_back_pin)};
+  if (line_side_val[0] >= LINEsensor_side_right_adjust_value)
   {
     lines_data_bit_mask |= (1UL << 16);
   }
-  if (readAnalogMedian(LINEsensor_side_left_pin) >= LINEsensor_side_left_adjust_value)
+  if (line_side_val[1] >= LINEsensor_side_left_adjust_value)
   {
     lines_data_bit_mask |= (1UL << 17);
   }
-  if (readAnalogMedian(LINEsensor_side_back_pin) >= LINEsensor_side_back_adjust_value)
+  if (line_side_val[2] >= LINEsensor_side_back_adjust_value)
   {
-    lines_data_bit_mask |= (1UL << 17);
+    lines_data_bit_mask |= (1UL << 18);
+  }
+
+  if (line_side_val[0] > max_line_value[16])
+  {
+    max_line_value[16] = line_side_val[0];
+  }
+  if (line_side_val[1] > max_line_value[17])
+  {
+    max_line_value[17] = line_side_val[1];
+  }
+  if (line_side_val[2] > max_line_value[18])
+  {
+    max_line_value[18] = line_side_val[2];
   }
 
   // 送信
@@ -119,9 +140,32 @@ void loop()
   Serial1.write((uint8_t)((lines_data_bit_mask >> 8) & 0xFF));  // 3byteのデータなので中位の1byteのみ送信
   Serial1.write((uint8_t)((lines_data_bit_mask >> 16) & 0xFF)); // 3byteのデータなので上位の1byteを送信
   Serial1.write(end_header);                                    // teensyとの通信終了
-  // Serial.print(String(analogRead(LINEsensor_side_right_pin)) + " " + String(analogRead(LINEsensor_side_left_pin)) + " ");
-  // Serial.println(lines_data_bit_mask, BIN); // pcに送る
   Serial1.flush();
+
+  // 閾値調整
+#define ADJUST
+#ifdef ADJUST
+  const uint32_t ring_add = 50;
+  const uint32_t side_add = 50;
+
+  // エンジェルライン
+  Serial.print("{");
+  for (int i = 0; i < 16; i++)
+  {
+    uint32_t a = max_line_value[i] + ring_add;
+    Serial.print(String(a) + ", ");
+  }
+  Serial.print("} ");
+
+  // サイドライン
+  Serial.print("{");
+  for (int i = 16; i < 19; i++)
+  {
+    uint32_t a = max_line_value[i] + side_add;
+    Serial.print(String(a) + ", ");
+  }
+  Serial.println("}");
+#endif
 
   delay(1);
 }

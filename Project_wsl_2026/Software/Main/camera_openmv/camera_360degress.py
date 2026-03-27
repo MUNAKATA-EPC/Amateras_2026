@@ -5,18 +5,18 @@ import math
 
 #############################################################
 # ゴールの色取り用変数(黄色)
-goal_yellow = (45, 98, -37, -9, 36, 91)
+goal_yellow = (69, 90, -27, 12, 57, 103)
 #############################################################
 # ゴールの色取り用変数(青色)
-goal_blue = (18, 43, -14, 26, -42, -18)
+goal_blue = (100, 100, 127, 127, 127, 127)
 #############################################################
 # コートの色（カーペット用）
 court_green = (49, 88, -17, 35, -20, 29)
 #############################################################
 # 画面の中央座標
 screen_center = [150, 97] # QVGA(320x240)なら160, 120が中央。設定に合わせる
-screen_short_r = 36
-screen_long_r = 168
+screen_short_r = 35
+screen_long_r = 165
 
 #############################################################
 # センサー設定
@@ -24,14 +24,14 @@ screen_long_r = 168
 sensor.reset()
 sensor.set_pixformat(sensor.RGB565)
 sensor.set_framesize(sensor.QVGA)
-sensor.set_brightness(-15)
+sensor.set_brightness(-20)
 
 # センサーが光に慣れるまで2秒待つ
 time.sleep_ms(2000)
 
 # 慣れたあとの値を「固定」する（試合中の変動を防ぐ）
-sensor.set_auto_whitebal(False, rgb_gain_db=[0,0,0])
-sensor.set_auto_exposure(False, exposure_us=10000) # 暗いならここを増やす
+sensor.set_auto_whitebal(True)
+sensor.set_auto_exposure(False, exposure_us=1000) # 暗いならここを増やす
 sensor.set_auto_gain(False, gain_db=6)
 
 clock = time.clock()

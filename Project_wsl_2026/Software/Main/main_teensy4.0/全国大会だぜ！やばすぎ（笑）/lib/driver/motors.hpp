@@ -18,3 +18,5 @@ void motorsPdProcess(PD *pd, float deg, float target); // PD出力範囲は-100~
 void motorsMove(float deg, float power);               // PD出力範囲は-100~100
 void motorsVectorMove(Vector *vec);                    // PD出力範囲は-100~100
 void motorsPdMove();                                   // PD出力範囲は-100~100
+
+bool motorsIsToggleOn();

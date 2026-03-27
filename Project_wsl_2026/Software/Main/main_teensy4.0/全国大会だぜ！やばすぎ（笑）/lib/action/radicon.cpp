@@ -1,5 +1,8 @@
 #include "radicon.hpp"
 
+static PD pd_gyro(0.75f, -0.04f);
+static PD pd_cam(0.75f, -0.04f);
+
 static Vector record_data[360][5];      // パワーと角度を5段階360分割で格納
 static Vector temp_record_data[360][5]; // 一時的なデータ保管庫
 
@@ -155,7 +158,6 @@ bool old_triangle_button = false; // 昔のps3の▲ボタン記録用
 void record()
 {
     /*PD計算*/
-    static PD pd_gyro(0.50f, -3.0f);
     motorsPdProcess(&pd_gyro, bnoDeg(), 0);
 
     /*ps3からの読み取り　移動方向の計算*/

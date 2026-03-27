@@ -205,3 +205,5 @@ void motorsVectorMove(Vector *vec)
 {
     motorsMove(vec->deg(), vec->length());
 }
+
+bool motorsIsToggleOn() { return _dsr->isToggleOn(); }
