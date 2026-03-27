@@ -135,13 +135,35 @@ void motorsMove(float deg, float power)
         }
     }
 
-    // 100を超える用であればPD値のみを削る形で補正
+    // 100を超える用であれば移動成分（powers）のみを削る形で補正
     if (strongest_abs_power > 100.0f)
     {
-        float over_limit_abs_power = strongest_abs_power - 100.0f;         // 100をどれくらい超えたか
-        float pd_value_max_power = fabsf(pd_value) - over_limit_abs_power; // それをもとにPD値の限界を計算
+        // PD値を優先し、入り切らない分を移動成分から引くための係数を計算
+        // 各モーターにおいて |powers[i] * move_scale + pd_component| <= 100 を満たす必要がある
+        float move_scale = 1.0f;
+        for (int i = 0; i < 4; i++)
+        {
+            float pd_component = pd_value * float(_pd_sign[i]);
+            // 移動成分がある場合のみ計算
+            if (fabsf(powers[i]) > 0.001f)
+            {
+                // (100 - |pd成分|) / |移動成分| で、そのモーターが許容できる最大のスケーリング比を出す
+                float limit_scale = (100.0f - fabsf(pd_component)) / fabsf(powers[i]);
+                if (limit_scale < move_scale)
+                {
+                    move_scale = limit_scale;
+                }
+            }
+        }
+        // move_scaleが負にならないよう制限（PD値だけで100を超えているケース対策）
+        if (move_scale < 0.0f)
+            move_scale = 0.0f;
 
-        pd_value = constrain(pd_value, -pd_value_max_power, pd_value_max_power); // 制限
+        // 移動成分を一律でスケーリング
+        for (int i = 0; i < 4; i++)
+        {
+            powers[i] *= move_scale;
+        }
     }
 
     // 補正済みPD値をpowersに加算

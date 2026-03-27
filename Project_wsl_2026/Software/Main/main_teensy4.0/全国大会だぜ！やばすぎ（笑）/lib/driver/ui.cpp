@@ -53,7 +53,7 @@ bool uiInit(TwoWire *wire, uint8_t address, uint8_t width, uint8_t height)
 
     _action_number = 1;                              // Action::Type::DEFENDER
     _mode_number = (digitalRead(5) == HIGH ? 1 : 0); // Defender::Mode::YELLOWGOAL or Defender::Mode::BLUEGOAL
-    _config_data[0] = 1;
+    _config_data[0] = 0;
 
     return success;
 }

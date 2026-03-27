@@ -50,8 +50,8 @@ void setup()
 
     // デジタル
     kicker1.init(2, 3, 1500);
-    catchSensor.init(6);            // キッカー用
-    fullColorLed1.init(36, 35, 34); // デバッグ用
+    catchSensor.init(6); // キッカー用
+    // fullColorLed1.init(36, 35, 34); // デバッグ用
 
     enterButton.init(10, INPUT_PULLDOWN); // ui用
     backButton.init(11, INPUT_PULLDOWN);  // ui用
@@ -77,7 +77,7 @@ void loop()
     // uiを実行・描画 // ボタンの更新
     uiButtonUpdate(enterButton.isReleased(), backButton.isReleased(), rightButton.isReleased(), leftButton.isReleased());
     // カラーLEDクリア
-    fullColorLed1.rgbLightUp(0, 0, 0);
+    // fullColorLed1.rgbLightUp(0, 0, 0);
 
     // センサー類更新
     irUpdate();

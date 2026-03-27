@@ -1,5 +1,8 @@
 #include "defenderVer4.hpp"
 
+static PD pd_gyro(1.2, -0.1); // ジャイロ用のPD調節値
+static PD pd_cam(1.2, -0.1);  // カメラ用のPD調節値
+
 // ディフエンダーのフォーム
 enum DfForm
 {
@@ -314,7 +317,7 @@ void playDefenderVer4(Defender::Mode mode)
     }
     else if (df_form == DfForm::DEFENCE_LINE_HOSEI)
     {
-        if (defenceGoalDis() < 60)
+        if (defenceGoalDis() < 65)
         {
             move_vec = Vector(defenceGoalDeg() + 180, 80);
         }
@@ -355,7 +358,7 @@ void playDefenderVer4(Defender::Mode mode)
             else
             {
                 // ゴールから離れる
-                if (defenceGoalDis() < 60)
+                if (defenceGoalDis() < 65)
                 {
                     move_vec = Vector(defenceGoalDeg() + 180, 80);
                 }
@@ -368,14 +371,20 @@ void playDefenderVer4(Defender::Mode mode)
         }
         else
         {
-            move_vec = Vector(180, 90); // 後ろに移動する
+            if (fieldDeg() > 0)
+            {
+                move_vec = Vector(165, 90); // 後ろに移動する
+            }
+            else
+            {
+                move_vec = Vector(-165, 90); // 後ろに移動する
+            }
         }
     }
 
     old_df_form = df_form; // 記録
 
     // pd
-    static PD pd_gyro(0.50f, -3.0f);
     motorsPdProcess(&pd_gyro, bnoDeg(), 0);
 
     motorsVectorMove(&move_vec);

@@ -18,7 +18,7 @@ void asobi();
 
 void playRadicon(Radicon::Mode mode)
 {
-    fullColorLed1.rgbLightUp(0, 0, 0); // リセット
+    // fullColorLed1.rgbLightUp(0, 0, 0); // リセット
 
     if (mode == Radicon::Mode::RECORD)
     {
@@ -302,12 +302,12 @@ void replay()
 
         if (move_vec.is_empty()) // ベクターが空なら
         {
-            fullColorLed1.rgbLightUp(10, 0, 0); // 異常なら赤色
+            // fullColorLed1.rgbLightUp(10, 0, 0); // 異常なら赤色
             motorsStop();
         }
         else
         {
-            fullColorLed1.rgbLightUp(0, 10, 10); // 正常なら青色
+            // fullColorLed1.rgbLightUp(0, 10, 10); // 正常なら青色
             motorsVectorMove(&move_vec);
         }
     }

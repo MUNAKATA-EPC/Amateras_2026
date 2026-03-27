@@ -1,17 +1,13 @@
 #include "attacker.hpp"
 
-static PD pd_gyro(1.2, -0.7); // ジャイロ用のPD調節値
-static PD pd_cam(1.2, -0.7);  // カメラ用のPD調節値
-
-static Timer my_timer;
-static Timer kicker_timer;
+static PD pd_gyro(0.75, -0.04); // ジャイロ用のPD調節値
+static PD pd_cam(0.75, -0.04);  // カメラ用のPD調節値
 
 const float line_escape_power = 55.0f; // ライン反応時のモーターの強さ
 const float line_trace_power = 75.0f;  // ライントレース時モーターの強さ
 const float ir_max_power = 95.0f;      // モーターの強さ
 
-const float yellow_goal_kyori = 91.0f; // キッカー判定用の黄色ゴール距離
-const float blue_goal_kyori = 85.0f;   // キッカー判定用の青色ゴール距離
+const float goal_escape_dis = 65.0f; // ゴールから逃れる距離
 
 // 回り込み関数
 Vector mawarikomi(float max_power, float ball_deg, float ball_dis)
@@ -51,7 +47,7 @@ Vector mawarikomi(float max_power, float ball_deg, float ball_dis)
     }
     else
     {
-        const float r = 360.0f;
+        const float r = 250.0f;
         const float pi = (float)PI;
 
         float ir_rad = (float)radians(ball_deg);
@@ -128,10 +124,9 @@ void playAttacker(Attacker::Mode mode)
     {
         if (attackGoalDetected())
         {
-            int diff = fabsf(normalizeDeg(diffDeg(bnoDeg(), attackGoalDeg())));
+            int diff = fabsf(normalizeDeg(diffDeg(0, attackGoalDeg())));
 
-            // if (catchSensor.read() == HIGH || fabsf(iry) <= 130)
-            if (catchSensor.read() == HIGH || last_catch_timer.msTime() < 200)
+            if (catchSensor.read() == HIGH || last_catch_timer.msTime() < 500) // キャッチする時間
             {
                 if (!irDetected())
                 {
@@ -142,9 +137,13 @@ void playAttacker(Attacker::Mode mode)
                     if (diff > 40)
                     {
                         if (attackGoalDeg() < 0)
-                            motorsPdProcess(&pd_gyro, bnoDeg(), 40);
-                        else
+                        {
                             motorsPdProcess(&pd_cam, bnoDeg(), -40);
+                        }
+                        else
+                        {
+                            motorsPdProcess(&pd_cam, bnoDeg(), 40);
+                        }
                     }
                     else
                     {
@@ -196,7 +195,7 @@ void playAttacker(Attacker::Mode mode)
     };
     LineForm line_form = LineForm::None;
 
-    static Timer line_timer;
+    static Timer line_timer; // 前回の「検出」からの経過時間を測る
 
     bool line_detected = (current_line_position != LinePosition::None);
     static bool old_line_detected = false;
@@ -204,23 +203,25 @@ void playAttacker(Attacker::Mode mode)
     static int line_switching_count = 0;
     static LinePosition memory_last_line_position;
 
-    // ラインフォームをとりあえず決定
+    const unsigned long line_switching_min_time = 10UL;
+    const unsigned long line_switching_max_time = 2000UL;
+
     if (!line_trace_flag)
     {
-        if (!line_detected)
+        if (!line_detected) // ラインを踏んでいない
         {
-            if (old_line_detected)
-            {
-                line_timer.reset();
-            }
-
-            if (line_timer.msTime() < 80UL) // ラインから逃げる時間(普通の回避動作)
+            if (line_timer.msTime() < 80UL) // ラインを離れてすぐは回避動作を維持
             {
                 line_form = LineForm::LineEscape;
             }
             else
             {
                 line_form = LineForm::None;
+                // ラインに長い時間触れなければカウントをリセット
+                if (line_timer.msTime() > line_switching_max_time)
+                {
+                    line_switching_count = 0;
+                }
             }
         }
         else
@@ -229,19 +230,21 @@ void playAttacker(Attacker::Mode mode)
 
             if (!old_line_detected)
             {
-                const int line_switching_min_time = 300;  // ライントレースのカウントの時間(min)
-                const int line_switching_max_time = 2000; // ライントレースのカウントの時間(max)
+                unsigned long interval = line_timer.msTime();
 
-                if (line_timer.msTime() > line_switching_min_time && line_timer.msTime() < line_switching_max_time)
+                // 前回の踏んだ瞬間からの経過時間で判定
+                if (interval > line_switching_min_time && interval < line_switching_max_time)
                 {
                     line_switching_count++;
                 }
                 else
                 {
+                    // 間隔が短すぎるか、長すぎる場合は1に戻す
                     line_switching_count = 1;
                 }
 
-                memory_last_line_position = current_line_position; // Tate or Yoko
+                line_timer.reset();
+                memory_last_line_position = current_line_position;
             }
         }
     }
@@ -264,6 +267,14 @@ void playAttacker(Attacker::Mode mode)
     // ライントレースモード解除条件
     if (line_trace_flag)
     {
+        if (!irDetected())
+        {
+            line_trace_flag = false;
+            line_switching_count = 0;
+        }
+
+        memory_last_line_position = current_line_position;
+
         if (memory_last_line_position == LinePosition::Yoko)
         {
             if (isMyAttackArea()) // 攻撃エリアでの誤反応を無くす
@@ -373,12 +384,22 @@ void playAttacker(Attacker::Mode mode)
     }
     else if (line_form == LineForm::LineTraceYoko)
     {
-        Vector line_escape_vec = Vector(fieldDeg(), 0);
-        Vector ir_follow_vec = (irDeg() > 0) ? Vector(90, 8) : Vector(-90, 8);
-        Vector final_vec = line_escape_vec + ir_follow_vec;
-        final_vec = final_vec * line_trace_power / final_vec.length();
-
-        motorsVectorMove(&final_vec);
+        if (defenceGoalDis() < goal_escape_dis)
+        {
+            motorsMove(defenceGoalDeg() + 180, line_trace_power);
+        }
+        else if (lineRingDetected())
+        {
+            float trace_deg = nearSessenDeg(defenceGoalDeg(), irDeg());
+            Vector vec = lineTrace(trace_deg, line_trace_power - 10.0f, 10.0f);
+            motorsVectorMove(&vec);
+        }
+        else
+        {
+            Vector vec = mawarikomi(ir_max_power, irDeg(), irDis());
+            vec = vec * line_trace_power / vec.length();
+            motorsVectorMove(&vec);
+        }
     }
     else if (line_form == LineForm::LineTraceTate)
     {
@@ -411,6 +432,15 @@ void playAttacker(Attacker::Mode mode)
                 motorsVectorMove(&vec);
             }
         }
+    }
+    //// カメラによるゴール判定
+    else if (attackGoalDetected() && attackGoalDis() < goal_escape_dis) // ゴール内部に侵入してアウトオブバウンズするようだったら60をどっちもあげてください
+    {
+        motorsMove(attackGoalDeg() + 180, line_escape_power);
+    }
+    else if (defenceGoalDetected() && defenceGoalDis() < goal_escape_dis)
+    {
+        motorsMove(defenceGoalDeg() + 180, line_escape_power);
     }
     //// ボール回り込み
     else if (irDetected())
@@ -450,7 +480,7 @@ void playAttacker(Attacker::Mode mode)
 
         if (mode == Attacker::Mode::GYRO)
         {
-            if (catching_timer.msTime() > 80)
+            if (catching_timer.msTime() > 80) // キックする時間
             {
                 kicker1.kick();
             }
@@ -463,7 +493,9 @@ void playAttacker(Attacker::Mode mode)
             }
             else
             {
-                const int kick_at_goal_dis = (mode == Attacker::Mode::YELLOWGOAL) ? yellow_goal_kyori : blue_goal_kyori;
+                const float y = 90.0f; // キッカー判定用の黄色ゴール距離
+                const float b = 90.0f; // キッカー判定用の青色ゴール距離
+                int kick_at_goal_dis = (mode == Attacker::Mode::YELLOWGOAL) ? y : b;
 
                 if (attackGoalDis() <= kick_at_goal_dis)
                 {

@@ -17,7 +17,7 @@ const int LINEsensor_side_left_pin = A8;  // 左サイドのピン
 const int LINEsensor_side_back_pin = A10; // 後ろサイドのピン
 
 const uint32_t LINEsensor_adjust_value[LINE_SENSOR_COUNT] =
-    {330, 360, 280, 310, 210, 610, 280, 280, 245, 240, 250, 320, 250, 340, 270, 370}; // センサー調整用値格納用
+    {400, 400, 300, 400, 300, 700, 300, 300, 300, 300, 300, 400, 300, 400, 300, 400}; // センサー調整用値格納用
 
 const uint32_t LINEsensor_side_right_adjust_value = 600UL; // 右サイドの調整値
 const uint32_t LINEsensor_side_left_adjust_value = 600UL;  // 左サイドの調整値
@@ -28,7 +28,7 @@ const int led_pin = 7;    // LEDのピン番号
 
 uint32_t readMuxMedian(int pin)
 {
-  const int sample_count = 6;
+  const int sample_count = 10;
   uint32_t v[sample_count];
 
   for (int i = 0; i < sample_count; i++)
@@ -48,7 +48,7 @@ uint32_t readMuxMedian(int pin)
 
 uint32_t readAnalogMedian(int pin)
 {
-  const int sample_count = 6;
+  const int sample_count = 10;
   uint32_t v[sample_count];
 
   for (int i = 0; i < sample_count; i++)
