@@ -317,30 +317,7 @@ void playDefenderVer4(Defender::Mode mode)
     }
     else if (df_form == DfForm::DEFENCE_LINE_HOSEI)
     {
-        if (defenceGoalDis() <= 56)
-        {
-            float defence_goal_escape_deg = normalizeDeg(defenceGoalDeg() + 180);
-
-            if (irDetected())
-            {
-                if (fabsf(diffDeg(defence_goal_escape_deg, irDeg())) < 90)
-                {
-                    move_vec = Vector(irDeg(), 80);
-                }
-                else
-                {
-                    move_vec = Vector(defence_goal_escape_deg, 80);
-                }
-            }
-            else
-            {
-                move_vec = Vector(defence_goal_escape_deg, 80);
-            }
-        }
-        else
-        {
-            move_vec = Vector(defenceGoalDeg(), 80);
-        }
+        move_vec = Vector(lineRingLastDeg(), 40);
     }
     else // if (df_form == DfForm::KIKAN)
     {
@@ -352,37 +329,36 @@ void playDefenderVer4(Defender::Mode mode)
             {
                 if (fieldDeg() > 0) // コート上で右にいる
                 {
-                    move_vec = lineTrace(90, 60, 10); // ライントレースする
+                    move_vec = lineTrace(90, 50, 10); // ライントレースする
                 }
                 else
                 {
-                    move_vec = lineTrace(-90, 60, 10); // ライントレースする
+                    move_vec = lineTrace(-90, 50, 10); // ライントレースする
                 }
             }
             else
             {
-                move_vec = Vector(fieldDeg(), 80);
+                move_vec = Vector(fieldDeg(), 70);
             }
         }
         else if (is_my_defence_area)
         {
-            if (defenceGoalDis() > 88)
+            if (defenceGoalDis() >= 88)
             {
                 // ゴールに向かう動き
-                float limit_defence_goal_deg = constrain(defenceGoalDeg(), -90, 90);
-                move_vec = Vector(limit_defence_goal_deg + (limit_defence_goal_deg > 0 ? -20 : 20), 80);
+                move_vec = Vector(defenceGoalDeg(), 70);
             }
             else
             {
                 // ゴールから離れる
                 if (defenceGoalDis() < 65)
                 {
-                    move_vec = Vector(defenceGoalDeg() + 180, 80);
+                    move_vec = Vector(defenceGoalDeg() + 180, 70);
                 }
                 else
                 // ゴールに向かう
                 {
-                    move_vec = Vector(defenceGoalDeg(), 80);
+                    move_vec = Vector(defenceGoalDeg(), 70);
                 }
             }
         }
@@ -390,11 +366,11 @@ void playDefenderVer4(Defender::Mode mode)
         {
             if (fieldDeg() > 0)
             {
-                move_vec = Vector(165, 90); // 後ろに移動する
+                move_vec = Vector(165, 70); // 後ろに移動する
             }
             else
             {
-                move_vec = Vector(-165, 90); // 後ろに移動する
+                move_vec = Vector(-165, 70); // 後ろに移動する
             }
         }
     }
