@@ -317,7 +317,7 @@ void playDefenderVer4(Defender::Mode mode)
     }
     else if (df_form == DfForm::DEFENCE_LINE_HOSEI)
     {
-        if (defenceGoalDis() <= 68)
+        if (defenceGoalDis() <= 56)
         {
             float defence_goal_escape_deg = normalizeDeg(defenceGoalDeg() + 180);
 

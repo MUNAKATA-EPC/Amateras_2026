@@ -48,12 +48,14 @@ bool uiInit(TwoWire *wire, uint8_t address, uint8_t width, uint8_t height)
 
     pinMode(5, INPUT_PULLDOWN);
 
+    delay(500);
+
     _action_decided = true;
     _mode_decided = true;
 
     _action_number = 1;                              // Action::Type::DEFENDER
-    _mode_number = (digitalRead(5) == HIGH ? 1 : 0); // Defender::Mode::YELLOWGOAL or Defender::Mode::BLUEGOAL
-    _config_data[0] = 0;
+    _mode_number = (digitalRead(5) == HIGH ? 0 : 1); // Defender::Mode::YELLOWGOAL or Defender::Mode::BLUEGOAL
+    _config_data[0] = 1;
 
     return success;
 }
