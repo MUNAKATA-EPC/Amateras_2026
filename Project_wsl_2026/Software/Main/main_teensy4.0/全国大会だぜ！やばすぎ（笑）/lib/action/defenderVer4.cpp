@@ -159,6 +159,11 @@ void playDefenderVer4(Defender::Mode mode)
                 is_my_defence_area = false;
             }
         }
+
+        if (fabsf(defenceGoalDeg()) < 98)
+        {
+            is_my_defence_area = false;
+        }
     }
 
     // 攻撃フォーム切り替え条件
@@ -290,6 +295,17 @@ void playDefenderVer4(Defender::Mode mode)
                     move_vec = dfLineTrace(line_position, defence_ir_deg, length, 10);
                 }
             }
+            else if (line_position == LinePosition::Yoko && (lineSideRightDetected() || lineSideLeftDetected()) && irDetected())
+            {
+                if (irDeg() > 0)
+                {
+                    move_vec = Vector(90, 80);
+                }
+                else
+                {
+                    move_vec = Vector(-90, 80);
+                }
+            }
             else
             {
                 move_vec = dfLineTrace(line_position, defence_ir_deg, 90, 10);
@@ -317,7 +333,22 @@ void playDefenderVer4(Defender::Mode mode)
     }
     else if (df_form == DfForm::DEFENCE_LINE_HOSEI)
     {
-        move_vec = Vector(lineRingLastDeg(), 40);
+        if (lineRingLastDetectingTime() < 1000)
+        {
+            move_vec = Vector(lineRingLastDeg(), 60);
+        }
+        else
+        {
+            if (defenceGoalDis() <= 58)
+            {
+                move_vec = Vector(defenceGoalDeg() + 180, 60);
+            }
+            else
+            {
+                move_vec = Vector(defenceGoalDeg(), 60);
+            }
+            // move_vec = Vector(lineRingLastDeg(), 40);
+        }
     }
     else // if (df_form == DfForm::KIKAN)
     {
@@ -351,7 +382,7 @@ void playDefenderVer4(Defender::Mode mode)
             else
             {
                 // ゴールから離れる
-                if (defenceGoalDis() < 65)
+                if (defenceGoalDis() < 60)
                 {
                     move_vec = Vector(defenceGoalDeg() + 180, 70);
                 }

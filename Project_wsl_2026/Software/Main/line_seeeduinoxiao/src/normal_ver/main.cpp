@@ -20,11 +20,11 @@ const int LINEsensor_side_left_pin = A8;  // 左サイドのピン
 const int LINEsensor_side_back_pin = A10; // 後ろサイドのピン
 
 const uint32_t LINEsensor_adjust_value[LINE_SENSOR_COUNT] =
-    {170, 192, 301, 455, 282, 235, 293, 524, 234, 246, 217, 257, 146, 377, 198, 184}; // センサー調整用値格納用
+    {168, 190, 231, 352, 216, 452, 186, 294, 227, 232, 206, 211, 158, 362, 184, 182}; // センサー調整用値格納用
 
-const uint32_t LINEsensor_side_right_adjust_value = 650UL; // 右サイドの調整値
-const uint32_t LINEsensor_side_left_adjust_value = 650UL;  // 左サイドの調整値
-const uint32_t LINEsensor_side_back_adjust_value = 650UL;  // 後ろサイドの調整値
+const uint32_t LINEsensor_side_right_adjust_value = 308UL; // 右サイドの調整値
+const uint32_t LINEsensor_side_left_adjust_value = 433UL;  // 左サイドの調整値
+const uint32_t LINEsensor_side_back_adjust_value = 472UL;  // 後ろサイドの調整値
 
 const int button_pin = 0; // ボタンのピン番号
 const int led_pin = 7;    // LEDのピン番号

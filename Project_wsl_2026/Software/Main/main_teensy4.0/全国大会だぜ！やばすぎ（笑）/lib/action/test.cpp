@@ -116,7 +116,16 @@ void testLineTrace()
 
 void testMotor()
 {
-    motorsDirectMove(-100, 100, -100, 100);
+    static int pow = 100;
+    static Timer timer;
+    if (!timer.everReset() || timer.msTime() >= 100)
+    {
+        pow++;
+        timer.reset();
+    }
+    pow = constrain(pow, 100, 1000);
+
+    motorsDirectMove(-pow, pow, -pow, pow);
 }
 
 void testBallDisAdjust()

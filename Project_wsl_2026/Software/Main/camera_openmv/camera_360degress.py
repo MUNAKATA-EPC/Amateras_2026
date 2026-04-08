@@ -1,43 +1,39 @@
 import sensor
 import time
+#import image
 from pyb import UART
 import math
 
 #############################################################
 # ゴールの色取り用変数(黄色)
-goal_yellow = (64, 86, -18, 17, 42, 104)
+goal_yellow = (71, 91, -25, 34, 25, 95)
 #############################################################
 # ゴールの色取り用変数(青色)
-goal_blue = (4, 42, -22, 19, -50, -18)
+goal_blue = (25, 58, -16, 15, -46, -20)
 #############################################################
 # コートの色（カーペット用）
-court_green = (15, 65, -34, 25, -11, 6)
+court_green = (38, 78, -38, 23, -28, 16)
 #############################################################
 # 画面の中央座標
-screen_center = [153, 90]
+screen_center = [156, 96]
 screen_short_r = 35
-screen_long_r = 163
-
+screen_long_r = 166
 #############################################################
 # センサー設定
-#############################################################
-sensor.reset()
-sensor.set_pixformat(sensor.RGB565)
-sensor.set_framesize(sensor.QVGA)
-sensor.set_brightness(-3)
+sensor.reset()                     # センサーをリセットして初期化
+sensor.set_pixformat(sensor.RGB565)# ピクセルフォーマットをRGB565に設定
+sensor.set_framesize(sensor.QVGA)  # フレームサイズをQVGA (320x240)に設定
+sensor.skip_frames(time=2000)      # 設定が有効になるまで待機
 
-# センサーが光に慣れるまで2秒待つ
-time.sleep_ms(2000)
-
-# 慣れたあとの値を「固定」する（試合中の変動を防ぐ）
-sensor.set_auto_whitebal(False)
-sensor.set_auto_exposure(False, exposure_us=80) # 暗いならここを増やす
-sensor.set_auto_gain(False, gain_db=3)
+# 明るさ関連の設定
+sensor.set_auto_gain(False, gain_db=0)             # 自動ゲインオフ、ゲインを低めに
+sensor.set_auto_whitebal(False)                    # ホワイトバランス固定
+# sensor.set_auto_exposure(False, exposure_us=10000)  # 露出を短くして暗めに
+sensor.set_brightness(0)                            # さらに暗く（-3 〜 +3）
 
 clock = time.clock()
 uart = UART(3, 115200, timeout_char=1000)
-
-# -----------------------------------
+#############################################################
 # 角度・距離計算の共通関数
 def calculate_pos(blob, center):
     # 中心からの相対座標
@@ -56,8 +52,8 @@ def send_int16(uart, value):
     low = value & 0xFF
     high = (value >> 8) & 0xFF
     uart.write(bytearray([low, high]))
-
-# -----------------------------------
+#############################################################
+# メインループ
 while True:
     clock.tick()
     img = sensor.snapshot()
@@ -72,7 +68,6 @@ while True:
     yellow_deg, yellow_dis = 255, 255
     blue_deg, blue_dis = 255, 255
 
-    # -----------------------------------
     # 青ゴールの検出 (最大のBlobのみを採用)
     max_blue_area = 0
     for blob in img.find_blobs([goal_blue], pixels_threshold=15, area_threshold=15, merge=True, margin=30):
@@ -83,7 +78,6 @@ while True:
             img.draw_line(screen_center[0], screen_center[1], blob.cx(), blob.cy(), color=(0, 0, 255))
             blue_deg = -blue_deg #反転
 
-    # -----------------------------------
     # 黄ゴールの検出 (最大のBlobのみを採用)
     max_yellow_area = 0
     for blob in img.find_blobs([goal_yellow], pixels_threshold=10, area_threshold=10, merge=True, margin=25):
@@ -94,7 +88,6 @@ while True:
             img.draw_line(screen_center[0], screen_center[1], blob.cx(), blob.cy(), color=(255, 255, 0))
             yellow_deg = -yellow_deg #反転
 
-    # -----------------------------------
     # コート（緑）の検出
     max_court_area = 0
     for blob in img.find_blobs([court_green], pixels_threshold=50, area_threshold=50, merge=True, margin=25):
@@ -104,7 +97,6 @@ while True:
             img.draw_line(screen_center[0], screen_center[1], blob.cx(), blob.cy(), color=(0, 255, 0))
             court_deg = -court_deg #反転
 
-    # -----------------------------------
     # UART送信 (0x55: 開始, 0xAA: 終了)
     uart.write(bytearray([0x55]))
     send_int16(uart, court_deg)
@@ -116,3 +108,4 @@ while True:
 
     # デバッグ出力
     # print("yellow[deg:%d, dis:%d] blue[deg:%d, dis:%d] court[deg:%d]" % (yellow_deg, yellow_dis, blue_deg, blue_dis, court_deg))
+#############################################################

@@ -104,8 +104,9 @@ void lineUpdate()
 
             for (int i = 0; i < 19; i++)
             {
-                _sensor[i] = (bit_mask & (1UL << i));
-                if (_sensor[i] == true && i < 16)
+                int index = (i < 16) ? (i + 8) % 16 : i;
+                _sensor[index] = (bit_mask & (1UL << i));
+                if (_sensor[index] == true && i < 16)
                     _ring_detected = true;
             }
 

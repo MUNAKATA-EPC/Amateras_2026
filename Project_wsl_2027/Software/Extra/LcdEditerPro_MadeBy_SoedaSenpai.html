@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>LcdEditerPro_MadeBy_SoedaSenpai</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #121212; color: #e0e0e0; margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        .tab-bar { background: #1e1e1e; display: flex; align-items: flex-end; padding: 5px 10px 0; gap: 4px; border-bottom: 1px solid #333; height: 35px; }
+        .tab { background: #333; color: #aaa; padding: 4px 12px; border-radius: 4px 4px 0 0; font-size: 11px; cursor: pointer; display: flex; align-items: center; gap: 8px; border: 1px solid transparent; border-bottom: none; min-width: 60px; transition: 0.2s; user-select: none; position: relative; }
+        .tab.active { background: #252526; color: #0fb; border-color: #444; border-bottom: 1px solid #252526; margin-bottom: -1px; font-weight: bold; }
+        .tab-close { font-size: 12px; color: #777; width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; border-radius: 2px; }
+        .tab-close:hover { background: #f44; color: white; }
+        .add-tab { background: #444; color: white; border: none; border-radius: 4px; padding: 2px 12px; cursor: pointer; margin-bottom: 5px; font-weight: bold; }
+        .header { background: #252526; height: 50px; padding: 0 10px; border-bottom: 1px solid #444; display: flex; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+        .top-row { display: flex; align-items: center; width: 100%; gap: 10px; justify-content: space-between; }
+        .controls-inline { display: flex; align-items: center; gap: 6px; background: #333; padding: 4px 10px; border-radius: 6px; flex: 1; margin: 0 10px; overflow-x: auto; white-space: nowrap; }
+        .mode-btn { border: 1px solid #555; background: none; color: #888; padding: 4px 10px; cursor: pointer; border-radius: 3px; font-size: 10px; font-weight: bold; transition: 0.2s; }
+        .mode-btn.active { background: #007acc; color: white; border-color: #007acc; }
+        .divider { width: 1px; height: 20px; background: #555; margin: 0 4px; flex-shrink: 0; }
+        #smartBarOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; display: none; align-items: center; justify-content: center; }
+        .smart-bar { background: #252526; padding: 20px; border-radius: 8px; border: 2px solid #0fb; box-shadow: 0 0 20px rgba(0,255,187,0.2); display: flex; flex-direction: column; gap: 15px; min-width: 300px; }
+        .smart-bar-title { font-size: 12px; color: #0fb; font-weight: bold; text-transform: uppercase; }
+        .smart-input-field { background: #1e1e1e; color: #fff; border: 1px solid #666; font-size: 14px; border-radius: 3px; padding: 5px; width: 100%; text-align: center; }
+        .main-container { display: flex; flex: 1; position: relative; overflow: hidden; background: #000; }
+        .viewport { flex: 1; position: relative; overflow: hidden; background: #1a1a1a; display: flex; align-items: center; justify-content: center; }
+        #preview-layer { position: absolute; pointer-events: none; z-index: 10; }
+        .viewport.mode-pan { cursor: grab; }
+        .canvas-group { position: absolute; display: none; pointer-events: none; }
+        .canvas-group.active { display: flex; }
+        .canvas-container { position: relative; background: #000; border: 1px solid #444; pointer-events: auto; }
+        canvas { position: absolute; top: 0; left: 0; image-rendering: pixelated; }
+        #sidePanel { width: 260px; background: #252526; border-left: 2px solid #444; display: none; flex-direction: column; z-index: 150; }
+        #sidePanel.open { display: flex; }
+        #saveList { flex: 1; overflow-y: auto; background: #111; font-size: 11px; font-family: monospace; color: #0fb; padding: 10px; }
+        .log-item { padding: 4px 0; border-bottom: 1px solid #222; word-break: break-all; }
+        .log-time { color: #555; font-size: 9px; margin-right: 5px; }
+        .log-input-area { padding: 10px; background: #1e1e1e; border-top: 1px solid #444; display: flex; gap: 5px; }
+        .bottom-drawer { background: #1e1e1e; border-top: 2px solid #0fb; height: 0; transition: 0.3s; overflow: hidden; position: absolute; bottom: 0; width: 100%; z-index: 200; }
+        .bottom-drawer.open { height: 280px; padding: 15px; }
+        textarea { width: calc(100% - 30px); height: 160px; background: #000; color: #b5cea8; border: 1px solid #444; font-size: 12px; font-family: 'Consolas', monospace; padding: 10px; outline: none; resize: none; }
+        button { cursor: pointer; border: none; border-radius: 4px; font-weight: bold; color: white; transition: 0.2s; }
+        .btn-purple { background: #d400ff; } .btn-green { background: #28a745; } .btn-blue { background: #007acc; } .btn-red { background: #a11; } .btn-gray { background: #555; } .btn-pink { background: rgb(111, 0, 255); }
+    </style>
+</head>
+<body>
+
+    <div id="smartBarOverlay">
+        <div class="smart-bar">
+            <div id="sbTitle" class="smart-bar-title">Input</div>
+            <div class="smart-bar-inputs" style="display:flex; gap:10px;">
+                <input type="text" id="sbInput1" class="smart-input-field">
+                <input type="text" id="sbInput2" class="smart-input-field">
+            </div>
+            <div class="smart-bar-actions" style="display:flex; justify-content:flex-end; gap:10px;">
+                <button class="btn-gray" onclick="closeSmartBar()" style="padding: 5px 15px;">CANCEL</button>
+                <button class="btn-blue" id="sbConfirmBtn" style="padding: 5px 20px;">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-bar" id="tabBar"><button class="add-tab" onclick="promptAddTab()">+</button></div>
+
+    <div class="header">
+        <div class="top-row">
+            <div class="status-group" style="display:flex; gap:12px; background:#1a1a1a; padding:5px 10px; border-radius:4px; border:1px solid #333;">
+                <div style="display:flex; flex-direction:column; cursor:pointer;" onclick="triggerResizeUI()">
+                    <span style="font-size:8px; color:#888;">RESOLUTION</span>
+                    <b id="resDisplay" style="font-family:monospace; color:#0fb; font-size:12px;">---</b>
+                </div>
+                <div style="width:1px; background:#333;"></div>
+                <div style="display:flex; flex-direction:column; cursor:pointer;" onclick="triggerCursorUI()">
+                    <span style="font-size:8px; color:#888;">CURSOR</span>
+                    <span style="font-family:monospace; color:#0fb; font-size:12px;">X:<b id="posX">--</b> Y:<b id="posY">--</b></span>
+                </div>
+                <div style="width:1px; background:#333;"></div>
+                <div style="display:flex; flex-direction:column; cursor:pointer;" onclick="triggerZoomUI()">
+                    <span style="font-size:8px; color:#888;">ZOOM</span>
+                    <b id="zoomDisplay" style="font-family:monospace; color:#0fb; font-size:12px;">15.0</b>
+                </div>
+            </div>
+
+            <div class="controls-inline">
+                <button id="btn-pan" class="mode-btn" onclick="setMode('pan')">PAN</button>
+                <div class="divider"></div>
+                <button id="btn-inv" class="mode-btn" onclick="invertCurrentCanvas()">INV</button>
+                <div class="divider"></div>
+                <button id="btn-pen" class="mode-btn active" onclick="setMode('pen')">PEN</button>
+                <button id="btn-line" class="mode-btn" onclick="setMode('line')">LINE</button>
+                <button id="btn-rect" class="mode-btn" onclick="setMode('rect')">RECT</button>
+                <button id="btn-circle" class="mode-btn" onclick="setMode('circle')">CIRC</button>
+                <button id="btn-fill" class="mode-btn" onclick="setMode('fill')">FILL</button>
+                <div class="divider"></div>
+                <button id="btn-eraser" class="mode-btn" onclick="setMode('eraser')">ERA</button>
+                <button id="btn-era_rect" class="mode-btn" onclick="setMode('era_rect')">RECT(ERA)</button>
+                <button id="btn-clear" class="mode-btn" onclick="handleClearCanvas()">CLR</button>
+                <div class="divider"></div>
+                <button id="btn-stamp" class="mode-btn" onclick="setMode('stamp')">STAMP</button>
+                <button id="btn-record" class="mode-btn" onclick="registerObject()">RECORD</button>
+                <select id="objSelect" onchange="setObjectMode()" style="background:#1e1e1e; color:#0fb; font-size:11px; border:1px solid #555; height:22px; width:100px;">
+                    <option value="">None</option>
+                </select>
+                <button class="btn-gray" onclick="renameStamp()" style="font-size:9px; padding:3px 6px;">RENAME</button>
+                <button class="btn-red" onclick="deleteStamp()" style="font-size:9px; padding:3px 6px;">DELETE</button>
+            </div>
+
+            <div style="display:flex; gap:4px; align-items:center;">
+                <button class="btn-gray" onclick="renameCurrentTab()" style="padding: 6px 8px; font-size:14px;">NAME</button>
+                <button class="btn-purple" onclick="togglePanel()" style="padding: 6px 8px; font-size:14px;">LOG</button>
+                <button class="btn-pink" onclick="toggleDrawer('import')" style="padding: 6px 8px; font-size:14px;">IMPORT</button>
+                <button class="btn-pink" onclick="toggleDrawer('gen')" style="padding: 6px 12px; font-size:14px;">GENERATE</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="viewport mode-pen" id="viewport">
+            <div id="preview-layer"><canvas id="previewCanvas"></canvas></div>
+        </div>
+        <div id="sidePanel">
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:10px; background:#1e1e1e;">
+                <span style="font-size:11px; color:#0fb; font-weight:bold;">LOG</span>
+                <button onclick="togglePanel()" style="background:transparent; color:#888;">✕</button>
+            </div>
+            <div id="saveList"></div>
+            <div class="log-input-area">
+                <input type="text" id="logInput" placeholder="Message" style="flex:1; background:#000; border:1px solid #444; color:#fff; font-size:11px; padding:5px; border-radius:3px;">
+                <button class="btn-blue" onclick="sendMemolog()" style="font-size:10px; padding:0 10px;">SEND</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="codeDrawer" class="bottom-drawer">
+        <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+            <span id="drawerTitle" style="font-size:12px; color:#0fb; font-weight:bold;">CODE PANEL</span>
+            <div id="drawerActions" style="display:flex; gap:10px;"></div>
+        </div>
+        <textarea id="output" placeholder="Paste code here..."></textarea>
+    </div>
+
+    <script>
+        const viewport = document.getElementById('viewport');
+        const pCanvas = document.getElementById('previewCanvas');
+        const pCtx = pCanvas.getContext('2d');
+        pCtx.imageSmoothingEnabled = false;
+
+        let state = {
+            mode: 'pen',
+            zoom: 15.0,
+            panX: window.innerWidth / 2,
+            panY: window.innerHeight / 2,
+            curX: -1,
+            curY: -1,
+            lastMouseX: 0,
+            lastMouseY: 0,
+            isPanning: false,
+            isDrawing: false,
+            lastDrawX: null,
+            lastDrawY: null,
+            objects: [],
+            selectedObj: null,
+            tabs: [],
+            activeTabId: null,
+            lineStart: null,
+            rectStart: null,
+            circleStart: null
+        };
+
+        window.addEventListener('contextmenu', e => e.preventDefault());
+
+        function getMousePos(e) {
+            const tab = getActiveTab();
+            if (!tab) return { x: -1, y: -1 };
+
+            const rect = tab.mCanvas.getBoundingClientRect();
+            const x = Math.floor((e.clientX - rect.left) / state.zoom);
+            const y = Math.floor((e.clientY - rect.top) / state.zoom);
+
+            return { x, y };
+        }
+
+        function openSmartBar(t, v1, v2, cb) {
+            document.getElementById('sbTitle').innerText = t;
+            document.getElementById('sbInput1').value = v1 || "";
+            document.getElementById('sbInput2').value = v2 || "";
+            document.getElementById('sbInput2').style.display = (v2 !== undefined) ? "block" : "none";
+            document.getElementById('smartBarOverlay').style.display = "flex";
+            document.getElementById('sbInput1').focus();
+            document.getElementById('sbConfirmBtn').onclick = () => {
+                cb(document.getElementById('sbInput1').value, document.getElementById('sbInput2').value);
+                closeSmartBar();
+            };
+        }
+
+        function closeSmartBar() {
+            document.getElementById('smartBarOverlay').style.display = "none";
+        }
+
+        function addTab(w, h, name) {
+            const id = Date.now();
+            const group = document.createElement('div');
+            group.className = 'canvas-group';
+            group.id = `group-${id}`;
+            group.innerHTML = `<div class="canvas-container"><canvas id="main-${id}"></canvas><canvas id="grid-${id}"></canvas></div>`;
+            viewport.appendChild(group);
+
+            const mCanvas = document.getElementById(`main-${id}`);
+            mCanvas.width = w;
+            mCanvas.height = h;
+
+            const mCtx = mCanvas.getContext('2d', { willReadFrequently: true });
+            mCtx.imageSmoothingEnabled = false;
+            mCtx.fillStyle = "black";
+            mCtx.fillRect(0, 0, w, h);
+
+            const gCanvas = document.getElementById(`grid-${id}`);
+            const gCtx = gCanvas.getContext('2d');
+            gCtx.imageSmoothingEnabled = false;
+
+            state.tabs.push({
+                id,
+                name,
+                width: w,
+                height: h,
+                mCanvas,
+                mCtx,
+                gCanvas,
+                gCtx
+            });
+
+            switchTab(id);
+        }
+
+        function switchTab(id) {
+            state.activeTabId = id;
+            document.querySelectorAll('.canvas-group').forEach(g => g.classList.remove('active'));
+            document.getElementById(`group-${id}`).classList.add('active');
+            renderTabs();
+            updateView();
+        }
+
+        function renderTabs() {
+            const bar = document.getElementById('tabBar');
+            bar.querySelectorAll('.tab').forEach(t => t.remove());
+
+            state.tabs.forEach(tab => {
+                const div = document.createElement('div');
+                div.className = `tab ${tab.id === state.activeTabId ? 'active' : ''}`;
+                div.innerHTML = `<span>${tab.name}</span><div class="tab-close" onclick="removeTab(${tab.id}, event)">×</div>`;
+                div.onclick = () => switchTab(tab.id);
+                bar.insertBefore(div, bar.querySelector('.add-tab'));
+            });
+        }
+
+        function getActiveTab() {
+            return state.tabs.find(t => t.id === state.activeTabId);
+        }
+
+        function promptAddTab() {
+            openSmartBar("ADD NEW CANVAS (X,Y)", "128", "64", (w, h) => addTab(parseInt(w), parseInt(h), `Canvas_${state.tabs.length + 1}`));
+        }
+
+        function removeTab(id, e) {
+            e.stopPropagation();
+            if (state.tabs.length <= 1) return;
+            const idx = state.tabs.findIndex(t => t.id === id);
+            state.tabs.splice(idx, 1);
+            document.getElementById(`group-${id}`).remove();
+            switchTab(state.tabs[0].id);
+        }
+
+        function resizeCanvasPreserve(tab, newW, newH) {
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = tab.width;
+            tempCanvas.height = tab.height;
+            const tempCtx = tempCanvas.getContext('2d');
+            tempCtx.imageSmoothingEnabled = false;
+            tempCtx.drawImage(tab.mCanvas, 0, 0);
+
+            tab.width = newW;
+            tab.height = newH;
+            tab.mCanvas.width = newW;
+            tab.mCanvas.height = newH;
+
+            tab.mCtx = tab.mCanvas.getContext('2d', { willReadFrequently: true });
+            tab.mCtx.imageSmoothingEnabled = false;
+            tab.mCtx.fillStyle = "black";
+            tab.mCtx.fillRect(0, 0, newW, newH);
+
+            tab.mCtx.drawImage(tempCanvas, 0, 0);
+        }
+
+        function triggerResizeUI() {
+            const t = getActiveTab();
+            openSmartBar("SET RESOLUTION (X,Y)", t.width, t.height, (w, h) => {
+                const newW = parseInt(w);
+                const newH = parseInt(h);
+
+                if (isNaN(newW) || isNaN(newH) || newW <= 0 || newH <= 0) return;
+
+                resizeCanvasPreserve(t, newW, newH);
+                updateView();
+            });
+        }
+
+        function triggerCursorUI() {
+            openSmartBar("SET CURSOR (X, Y)", state.curX, state.curY, (x, y) => {
+                state.curX = parseInt(x);
+                state.curY = parseInt(y);
+            });
+        }
+
+        function triggerZoomUI() {
+            openSmartBar("SET ZOOM LEVEL", state.zoom, undefined, (z) => {
+                if (!isNaN(parseFloat(z))) {
+                    state.zoom = parseFloat(z);
+                    updateView();
+                }
+            });
+        }
+
+        function renameCurrentTab() {
+            const t = getActiveTab();
+            openSmartBar("CANVAS NAME", t.name, undefined, (n) => {
+                if (n) {
+                    t.name = n;
+                    renderTabs();
+                }
+            });
+        }
+
+        function setMode(m) {
+            state.mode = m;
+            document.querySelectorAll('.mode-btn').forEach(b => {
+                b.classList.remove('active');
+                if (b.id === `btn-${m}`) {
+                    b.classList.add('active');
+                }
+            });
+            viewport.className = `viewport mode-${m}`;
+        }
+
+        function updateView() {
+            const tab = getActiveTab();
+            if (!tab) return;
+
+            const scale = state.zoom;
+            document.getElementById('resDisplay').innerText = `${tab.width}x${tab.height}`;
+            document.getElementById('zoomDisplay').innerText = scale.toFixed(1);
+
+            const w = tab.width * scale;
+            const h = tab.height * scale;
+            const group = document.getElementById(`group-${tab.id}`);
+
+            [tab.mCanvas, tab.gCanvas, pCanvas].forEach(c => {
+                c.style.width = w + "px";
+                c.style.height = h + "px";
+            });
+
+            tab.gCanvas.width = w;
+            tab.gCanvas.height = h;
+            pCanvas.width = tab.width;
+            pCanvas.height = tab.height;
+            pCtx.imageSmoothingEnabled = false;
+
+            const groupLeft = state.panX - w / 2;
+            const groupTop = state.panY - h / 2;
+
+            group.style.left = `${groupLeft}px`;
+            group.style.top = `${groupTop}px`;
+
+            const previewBorderOffset = 1;
+            document.getElementById('preview-layer').style.left = `${groupLeft + previewBorderOffset}px`;
+            document.getElementById('preview-layer').style.top = `${groupTop + previewBorderOffset}px`;
+
+            drawGrid(tab);
+        }
+
+        function drawGrid(tab) {
+            tab.gCtx.clearRect(0, 0, tab.gCanvas.width, tab.gCanvas.height);
+            if (state.zoom < 4) return;
+
+            tab.gCtx.strokeStyle = "#444";
+            tab.gCtx.lineWidth = 1;
+            tab.gCtx.beginPath();
+
+            for (let x = 0.5; x <= tab.gCanvas.width; x += state.zoom) {
+                tab.gCtx.moveTo(x, 0);
+                tab.gCtx.lineTo(x, tab.gCanvas.height);
+            }
+            for (let y = 0.5; y <= tab.gCanvas.height; y += state.zoom) {
+                tab.gCtx.moveTo(0, y);
+                tab.gCtx.lineTo(tab.gCanvas.width, y);
+            }
+
+            tab.gCtx.stroke();
+        }
+
+        function setPixel(tab, x, y, white) {
+            if (x >= 0 && x < tab.width && y >= 0 && y < tab.height) {
+                tab.mCtx.fillStyle = white ? "white" : "black";
+                tab.mCtx.fillRect(x, y, 1, 1);
+            }
+        }
+
+        function drawContinuousPixels(tab, x0, y0, x1, y1, white, ctx = null) {
+            const target = ctx || tab.mCtx;
+            target.fillStyle = white ? "white" : "black";
+
+            let dx = Math.abs(x1 - x0);
+            let sx = x0 < x1 ? 1 : -1;
+            let dy = -Math.abs(y1 - y0);
+            let sy = y0 < y1 ? 1 : -1;
+            let err = dx + dy;
+
+            while (true) {
+                if (x0 >= 0 && x0 < tab.width && y0 >= 0 && y0 < tab.height) {
+                    target.fillRect(x0, y0, 1, 1);
+                }
+                if (x0 === x1 && y0 === y1) break;
+                const e2 = 2 * err;
+                if (e2 >= dy) { err += dy; x0 += sx; }
+                if (e2 <= dx) { err += dx; y0 += sy; }
+            }
+        }
+
+        function beginFreeDraw(tab, x, y, white) {
+            state.isDrawing = true;
+            state.lastDrawX = x;
+            state.lastDrawY = y;
+            setPixel(tab, x, y, white);
+        }
+
+        function continueFreeDraw(tab, x, y, white) {
+            if (state.lastDrawX === null || state.lastDrawY === null) {
+                beginFreeDraw(tab, x, y, white);
+                return;
+            }
+
+            drawContinuousPixels(tab, state.lastDrawX, state.lastDrawY, x, y, white);
+            state.lastDrawX = x;
+            state.lastDrawY = y;
+        }
+
+        function endFreeDraw() {
+            state.isDrawing = false;
+            state.lastDrawX = null;
+            state.lastDrawY = null;
+        }
+
+        function floodFill(tab, startX, startY, white) {
+            if (startX < 0 || startX >= tab.width || startY < 0 || startY >= tab.height) return;
+
+            const img = tab.mCtx.getImageData(0, 0, tab.width, tab.height);
+            const data = img.data;
+            const startIdx = (startY * tab.width + startX) * 4;
+            const targetWhite = data[startIdx] > 128;
+            const replacementWhite = white;
+
+            if (targetWhite === replacementWhite) return;
+
+            const stack = [[startX, startY]];
+            const fillColor = replacementWhite ? 255 : 0;
+
+            while (stack.length) {
+                const [x, y] = stack.pop();
+                if (x < 0 || x >= tab.width || x < 0 || x >= tab.width || y < 0 || y >= tab.height) continue;
+
+                const idx = (y * tab.width + x) * 4;
+                const currentWhite = data[idx] > 128;
+                if (currentWhite !== targetWhite) continue;
+
+                data[idx] = fillColor;
+                data[idx + 1] = fillColor;
+                data[idx + 2] = fillColor;
+                data[idx + 3] = 255;
+
+                stack.push([x + 1, y]);
+                stack.push([x - 1, y]);
+                stack.push([x, y + 1]);
+                stack.push([x, y - 1]);
+            }
+
+            tab.mCtx.putImageData(img, 0, 0);
+        }
+
+        function invertCurrentCanvas() {
+            // INVボタンを即座にアクティブにする
+            setMode('inv');
+
+            // ブラウザの描画更新（UIの青色反映）を待ってから実際の処理を実行する
+            requestAnimationFrame(() => {
+                setTimeout(() => {
+                    const tab = getActiveTab();
+                    if (tab) {
+                        const img = tab.mCtx.getImageData(0, 0, tab.width, tab.height);
+                        const data = img.data;
+
+                        for (let i = 0; i < data.length; i += 4) {
+                            const isWhite = data[i] > 128;
+                            const v = isWhite ? 0 : 255;
+                            data[i] = v;
+                            data[i + 1] = v;
+                            data[i + 2] = v;
+                            data[i + 3] = 255;
+                        }
+
+                        tab.mCtx.putImageData(img, 0, 0);
+                    }
+                    // 処理終了後はPANに強制的に戻す
+                    setMode('pan');
+                }, 50);
+            });
+        }
+
+        function handleClearCanvas() {
+            // アニメーション(transition)による中途半端な色の描画を一時的に無効化し、色を即時反映させる
+            document.querySelectorAll('.mode-btn').forEach(b => b.style.transition = 'none');
+            
+            // CLRボタンを即座にアクティブ表示にする
+            setMode('clear');
+
+            // ブラウザの描画更新を待ってから実際の処理を実行する
+            requestAnimationFrame(() => {
+                setTimeout(() => {
+                    const ok = confirm("全削除しますか？この操作は元に戻せません。");
+                    if (ok) {
+                        const tab = getActiveTab();
+                        if (tab) {
+                            tab.mCtx.fillStyle = "black";
+                            tab.mCtx.fillRect(0, 0, tab.width, tab.height);
+                            pCtx.clearRect(0, 0, tab.width, tab.height);
+                        }
+                    }
+                    // 処理終了後はPANに戻す
+                    setMode('pan');
+                    
+                    // アニメーション(transition)を元に戻す
+                    document.querySelectorAll('.mode-btn').forEach(b => b.style.transition = '');
+                }, 50);
+            });
+        }
+
+        viewport.addEventListener('wheel', e => {
+            e.preventDefault();
+            const delta = e.deltaY > 0 ? 0.9 : 1.1;
+            const oldZoom = state.zoom;
+            state.zoom = Math.min(Math.max(0.1, state.zoom * delta), 100);
+
+            const rect = viewport.getBoundingClientRect();
+            const mx = e.clientX - rect.left;
+            const my = e.clientY - rect.top;
+
+            state.panX = mx - (mx - state.panX) * (state.zoom / oldZoom);
+            state.panY = my - (my - state.panY) * (state.zoom / oldZoom);
+            updateView();
+        }, { passive: false });
+
+        window.addEventListener('mousemove', e => {
+            const tab = getActiveTab();
+            if (!tab) return;
+
+            const pos = getMousePos(e);
+            const cx = pos.x;
+            const cy = pos.y;
+
+            state.curX = cx;
+            state.curY = cy;
+
+            document.getElementById('posX').innerText = (cx >= 0 && cx < tab.width) ? cx : "--";
+            document.getElementById('posY').innerText = (cy >= 0 && cy < tab.height) ? cy : "--";
+
+            if (state.isPanning) {
+                state.panX += e.clientX - state.lastMouseX;
+                state.panY += e.clientY - state.lastMouseY;
+                updateView();
+            } else if (state.isDrawing) {
+                if (state.mode === 'pen') continueFreeDraw(tab, cx, cy, true);
+                else if (state.mode === 'eraser') continueFreeDraw(tab, cx, cy, false);
+            }
+
+            pCtx.clearRect(0, 0, tab.width, tab.height);
+            pCtx.fillStyle = "#0fb";
+
+            if (state.mode === 'line' && state.lineStart) {
+                drawLine(tab, state.lineStart.x, state.lineStart.y, cx, cy, true, pCtx);
+            } else if (state.mode === 'rect' && state.rectStart) {
+                drawRect(tab, state.rectStart.x, state.rectStart.y, cx, cy, true, pCtx, false);
+            } else if (state.mode === 'circle' && state.circleStart) {
+                drawCircle(tab, state.circleStart.x, state.circleStart.y, cx, cy, true, pCtx);
+            } else if (state.mode === 'era_rect' && state.rectStart) {
+                const sx = Math.min(state.rectStart.x, cx);
+                const sy = Math.min(state.rectStart.y, cy);
+                const w = Math.abs(cx - state.rectStart.x) + 1;
+                const h = Math.abs(cy - state.rectStart.y) + 1;
+
+                pCtx.fillStyle = "rgba(255, 0, 0, 0.4)";
+                pCtx.fillRect(sx, sy, w, h);
+            } else if (state.mode === 'stamp' && state.selectedObj) {
+                const ox = Math.floor(state.selectedObj.w / 2);
+                const oy = Math.floor(state.selectedObj.h / 2);
+                state.selectedObj.pixels.forEach(p => pCtx.fillRect(cx + p.x - ox, cy + p.y - oy, 1, 1));
+            } else if (['pen', 'eraser', 'fill'].includes(state.mode)) {
+                pCtx.fillStyle = state.mode === 'eraser' ? "rgba(255,0,0,0.5)" : "rgba(0,255,187,0.5)";
+                if (cx >= 0 && cx < tab.width && cy >= 0 && cy < tab.height) pCtx.fillRect(cx, cy, 1, 1);
+            }
+
+            state.lastMouseX = e.clientX;
+            state.lastMouseY = e.clientY;
+        });
+
+        window.addEventListener('mousedown', e => {
+            if (e.target.tagName === 'BUTTON' || e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+
+            const pos = getMousePos(e);
+
+            if (e.button === 2 || state.mode === 'pan') {
+                state.isPanning = true;
+            } else {
+                const tab = getActiveTab();
+
+                if (state.mode === 'line') {
+                    state.lineStart = { x: pos.x, y: pos.y };
+                } else if (state.mode === 'rect' || state.mode === 'era_rect') {
+                    state.rectStart = { x: pos.x, y: pos.y };
+                } else if (state.mode === 'circle') {
+                    state.circleStart = { x: pos.x, y: pos.y };
+                } else if (state.mode === 'fill') {
+                    floodFill(tab, pos.x, pos.y, true);
+                } else if (state.mode === 'stamp' && state.selectedObj) {
+                    const ox = Math.floor(state.selectedObj.w / 2);
+                    const oy = Math.floor(state.selectedObj.h / 2);
+                    state.selectedObj.pixels.forEach(p => setPixel(tab, pos.x + p.x - ox, pos.y + p.y - oy, true));
+                } else if (state.mode === 'pen') {
+                    beginFreeDraw(tab, pos.x, pos.y, true);
+                } else if (state.mode === 'eraser') {
+                    beginFreeDraw(tab, pos.x, pos.y, false);
+                }
+            }
+
+            state.lastMouseX = e.clientX;
+            state.lastMouseY = e.clientY;
+        });
+
+        window.addEventListener('mouseup', () => {
+            const tab = getActiveTab();
+            if (!tab) return;
+
+            if (state.mode === 'line' && state.lineStart) {
+                drawLine(tab, state.lineStart.x, state.lineStart.y, state.curX, state.curY, true);
+            } else if (state.mode === 'rect' && state.rectStart) {
+                drawRect(tab, state.rectStart.x, state.rectStart.y, state.curX, state.curY, true, null, false);
+            } else if (state.mode === 'circle' && state.circleStart) {
+                drawCircle(tab, state.circleStart.x, state.circleStart.y, state.curX, state.curY, true);
+            } else if (state.mode === 'era_rect' && state.rectStart) {
+                drawRect(tab, state.rectStart.x, state.rectStart.y, state.curX, state.curY, false, null, true);
+            }
+
+            state.isPanning = false;
+            endFreeDraw();
+            state.lineStart = null;
+            state.rectStart = null;
+            state.circleStart = null;
+            pCtx.clearRect(0, 0, tab.width, tab.height);
+        });
+
+        function drawLine(tab, x0, y0, x1, y1, white, ctx = null) {
+            const target = ctx || tab.mCtx;
+            target.fillStyle = white ? "white" : "black";
+            let dx = Math.abs(x1 - x0), sx = x0 < x1 ? 1 : -1, dy = Math.abs(y1 - y0), sy = y0 < y1 ? 1 : -1, err = (dx > dy ? dx : -dy) / 2;
+            while (true) {
+                target.fillRect(x0, y0, 1, 1);
+                if (x0 === x1 && y0 === y1) break;
+                let e2 = err;
+                if (e2 > -dx) { err -= dy; x0 += sx; }
+                if (e2 < dy) { err += dx; y0 += sy; }
+            }
+        }
+
+        function drawRect(tab, x1, y1, x2, y2, white, ctx = null, fill = false) {
+            const target = ctx || tab.mCtx;
+            target.fillStyle = white ? "white" : "black";
+            const sx = Math.min(x1, x2), sy = Math.min(y1, y2), w = Math.abs(x2 - x1) + 1, h = Math.abs(y2 - y1) + 1;
+            if (fill) {
+                target.fillRect(sx, sy, w, h);
+            } else {
+                for (let x = sx; x < sx + w; x++) {
+                    target.fillRect(x, sy, 1, 1);
+                    target.fillRect(x, sy + h - 1, 1, 1);
+                }
+                for (let y = sy; y < sy + h; y++) {
+                    target.fillRect(sx, y, 1, 1);
+                    target.fillRect(sx + w - 1, y, 1, 1);
+                }
+            }
+        }
+
+        function drawCircle(tab, x1, y1, x2, y2, white, ctx = null) {
+            const target = ctx || tab.mCtx;
+            target.fillStyle = white ? "white" : "black";
+
+            const cx = (x1 + x2) / 2;
+            const cy = (y1 + y2) / 2;
+            const rx = Math.abs(x2 - x1) / 2;
+            const ry = Math.abs(y2 - y1) / 2;
+
+            if (rx === 0 && ry === 0) {
+                target.fillRect(Math.round(cx), Math.round(cy), 1, 1);
+                return;
+            }
+
+            const steps = Math.max(32, Math.ceil(2 * Math.PI * Math.max(rx, ry) * 2));
+            let prev = null;
+
+            for (let i = 0; i <= steps; i++) {
+                const t = (i / steps) * Math.PI * 2;
+                const px = Math.round(cx + rx * Math.cos(t));
+                const py = Math.round(cy + ry * Math.sin(t));
+
+                if (prev) drawLine(tab, prev.x, prev.y, px, py, white, target);
+                else target.fillRect(px, py, 1, 1);
+
+                prev = { x: px, y: py };
+            }
+        }
+
+        function toggleDrawer(mode) {
+            const d = document.getElementById('codeDrawer');
+            const acts = document.getElementById('drawerActions');
+
+            if (!mode) {
+                d.classList.remove('open');
+                return;
+            }
+
+            d.classList.add('open');
+            acts.innerHTML = '';
+
+            if (mode === 'import') {
+                document.getElementById('drawerTitle').innerText = "IMPORT";
+                acts.innerHTML = `<button class="btn-green" onclick="processImport()">LOAD TO CANVAS</button><button class="btn-gray" onclick="toggleDrawer()">CLOSE</button>`;
+            } else {
+                document.getElementById('drawerTitle').innerText = "GENERATE";
+                processGenerate();
+                acts.innerHTML = `<button class="btn-green" onclick="copyToClipboard()">COPY</button><button class="btn-gray" onclick="toggleDrawer()">CLOSE</button>`;
+            }
+        }
+
+        function processGenerate() {
+            const tab = getActiveTab();
+            const data = tab.mCtx.getImageData(0, 0, tab.width, tab.height).data;
+            let res = `const uint8_t bitmap_${tab.name}[${tab.width}][${tab.height}] = {\n`;
+
+            for (let x = 0; x < tab.width; x++) {
+                res += "  {";
+                for (let y = 0; y < tab.height; y++) {
+                    res += (data[(y * tab.width + x) * 4] > 128 ? "1" : "0") + (y === tab.height - 1 ? "" : ",");
+                }
+                res += "}" + (x === tab.width - 1 ? "" : ",") + "\n";
+            }
+
+            document.getElementById('output').value = res + "};";
+        }
+
+        function processImport() {
+            const code = document.getElementById('output').value;
+            const dims = code.match(/\[(\d+)\]\[(\d+)\]/);
+            if (!dims) return alert("無効なコードです。");
+
+            const w = parseInt(dims[1]);
+            const h = parseInt(dims[2]);
+            const tab = getActiveTab();
+
+            resizeCanvasPreserve(tab, w, h);
+
+            tab.mCtx.fillStyle = "black";
+            tab.mCtx.fillRect(0, 0, w, h);
+
+            const bits = code.match(/[01]/g);
+            if (bits && bits.length >= w * h) {
+                let idx = 0;
+                for (let x = 0; x < w; x++) {
+                    for (let y = 0; y < h; y++) {
+                        if (bits[idx++] === "1") setPixel(tab, x, y, true);
+                    }
+                }
+            }
+
+            updateView();
+        }
+
+        function copyToClipboard() {
+            navigator.clipboard.writeText(document.getElementById('output').value).then(() => alert("コードがコピーされました！"), () => alert("コピーに失敗しました。"));
+        }
+
+        function registerObject() {
+            const tab = getActiveTab();
+            const imgData = tab.mCtx.getImageData(0, 0, tab.width, tab.height);
+
+            let minX = tab.width, minY = tab.height, maxX = -1, maxY = -1, pixels = [];
+
+            for (let y = 0; y < tab.height; y++) {
+                for (let x = 0; x < tab.width; x++) {
+                    if (imgData.data[(y * tab.width + x) * 4] > 128) {
+                        minX = Math.min(minX, x);
+                        minY = Math.min(minY, y);
+                        maxX = Math.max(maxX, x);
+                        maxY = Math.max(maxY, y);
+                        pixels.push({ x, y });
+                    }
+                }
+            }
+
+            if (pixels.length === 0) {
+                alert("キャンバス内が空です。");
+                return;
+            }
+
+            setMode('record');
+
+            openSmartBar("STAMP NAME", "Stamp_" + (state.objects.length + 1), undefined, (name) => {
+                if (!name || name.trim() === "") {
+                    alert("名前を入力してください。登録をキャンセルしました。");
+                    setMode('pan');
+                    return;
+                }
+                state.objects.push({
+                    name: name.trim(),
+                    w: maxX - minX + 1,
+                    h: maxY - minY + 1,
+                    pixels: pixels.map(p => ({ x: p.x - minX, y: p.y - minY }))
+                });
+                updateStampList(true);
+            });
+        }
+
+        function updateStampList(shouldSelectNewest = false) {
+            const sel = document.getElementById('objSelect');
+            sel.innerHTML = state.objects.length === 0 ? '<option value="">None</option>' : '';
+
+            state.objects.forEach((obj, i) => {
+                const opt = document.createElement("option");
+                opt.value = i;
+                opt.text = obj.name;
+                sel.appendChild(opt);
+            });
+
+            if (shouldSelectNewest && state.objects.length > 0) {
+                sel.value = state.objects.length - 1;
+                setObjectMode();
+            } else if (state.objects.length === 0) {
+                state.selectedObj = null;
+                setMode('pan');
+            }
+        }
+
+        function renameStamp() {
+            const idx = document.getElementById('objSelect').value;
+            if (idx === "") {
+                alert("リネームするスタンプがありません。");
+                return;
+            }
+            openSmartBar("RENAME", state.objects[idx].name, undefined, (n) => {
+                if (n && n.trim() !== "") {
+                    state.objects[idx].name = n.trim();
+                    updateStampList(false);
+                } else if (n !== null) {
+                    alert("有効な名前を入力してください。");
+                }
+            });
+        }
+
+        function deleteStamp() {
+            const sel = document.getElementById('objSelect');
+            const idx = sel.value;
+            if (idx === "") {
+                alert("削除するスタンプがありません。");
+                return;
+            }
+            if (!confirm("スタンプ「" + state.objects[idx].name + "」を削除していいですか")) return;
+            
+            state.objects.splice(idx, 1);
+            state.selectedObj = null;
+            updateStampList(false);
+            setMode('pan');
+        }
+
+        function setObjectMode() {
+            const idx = document.getElementById('objSelect').value;
+            if (idx !== "") {
+                state.selectedObj = state.objects[idx];
+                setMode('stamp');
+            } else {
+                state.selectedObj = null;
+                setMode('pan');
+            }
+        }
+
+        function togglePanel() {
+            document.getElementById('sidePanel').classList.toggle('open');
+        }
+
+        function sendMemolog() {
+            const input = document.getElementById('logInput');
+            if (!input.value) return;
+
+            const now = new Date();
+            const timeStr = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
+
+            const item = document.createElement('div');
+            item.className = 'log-item';
+            item.innerHTML = `<span class="log-time">[${timeStr}]</span> <span>${input.value}</span>`;
+
+            document.getElementById('saveList').prepend(item);
+            input.value = '';
+        }
+
+        document.getElementById('logInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMemolog();
+        });
+
+        addTab(128, 64, "MainCanvas");
+    </script>
+</body>
+</html>

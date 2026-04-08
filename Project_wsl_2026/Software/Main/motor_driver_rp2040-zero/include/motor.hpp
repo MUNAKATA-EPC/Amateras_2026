@@ -43,8 +43,6 @@ public:
 
     void move(int power)
     {
-        power = constrain(power, -100, 100);
-        // 0-100の入力を0-1023に変換
         uint16_t output = abs(power) * 1023 / 100;
 
         if (power >= 0)

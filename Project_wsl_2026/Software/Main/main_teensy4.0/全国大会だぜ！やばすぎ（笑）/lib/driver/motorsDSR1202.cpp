@@ -23,6 +23,8 @@ void DSR1202::setTogglePin(uint8_t pin, uint8_t pinmode)
     pinMode(pin, pinmode);
     _toggle_pin = pin;
 }
+
+#ifdef LIMITS
 void DSR1202::stop()
 {
     _serial->println("1R0002R0003R0004R000"); // モータを停止させる
@@ -114,6 +116,69 @@ void DSR1202::move(int value_1ch, int value_2ch, int value_3ch, int value_4ch)
 
     _serial->println(data_value_1ch + data_value_2ch + data_value_3ch + data_value_4ch); // 最終的に\0付きで送信
 }
+
+#else
+
+void DSR1202::sendData(int16_t v1, int16_t v2, int16_t v3, int16_t v4)
+{
+    _serial->write(start_header);
+
+    _serial->write((uint8_t)(v1 & 0xFF));
+    _serial->write((uint8_t)(v1 >> 8 & 0xFF));
+
+    _serial->write((uint8_t)(v2 & 0xFF));
+    _serial->write((uint8_t)(v2 >> 8 & 0xFF));
+
+    _serial->write((uint8_t)(v3 & 0xFF));
+    _serial->write((uint8_t)(v3 >> 8 & 0xFF));
+
+    _serial->write((uint8_t)(v4 & 0xFF));
+    _serial->write((uint8_t)(v4 >> 8 & 0xFF));
+
+    _serial->write(end_header);
+}
+
+void DSR1202::stop()
+{
+    sendData(stop_v, stop_v, stop_v, stop_v);
+}
+
+void DSR1202::move(int value_1ch, int value_2ch, int value_3ch, int value_4ch)
+{
+    if (_toggle_pin != 0xFF)
+    {
+        // if (digitalRead(_toggle_pin) == LOW)
+        // {
+        //     stop();
+        //     return;
+        // }
+
+        static uint32_t last_ok_time = 0;
+
+        if (digitalRead(_toggle_pin) == LOW)
+        {
+            if (millis() - last_ok_time > 50) // 50ms続いたら止める
+            {
+                _is_toggle_on = false;
+                stop();
+                return;
+            }
+        }
+        else
+        {
+            last_ok_time = millis();
+        } // 追加
+    }
+    _is_toggle_on = true;
+
+    int16_t v1 = (int16_t)constrain(value_1ch, -32767, 32767);
+    int16_t v2 = (int16_t)constrain(value_2ch, -32767, 32767);
+    int16_t v3 = (int16_t)constrain(value_3ch, -32767, 32767);
+    int16_t v4 = (int16_t)constrain(value_4ch, -32767, 32767);
+
+    sendData(v1, v2, v3, v4);
+}
+#endif
 
 bool DSR1202::isToggleOn()
 {

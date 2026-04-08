@@ -1,0 +1,149 @@
+#pragma once
+#include <Arduino.h>
+
+class PacketManager
+{
+private:
+    uint8_t *_data = nullptr; // ヒープメモリへのポインタ
+    int _data_capacity = 0;   // _dataが確保している最大サイズ (byte_size + 2)
+    int _byte_size = 0;       // 受け取るデータのバイト数
+    int _next_index = 0;      // 次に書き込む配列のインデックス
+
+    uint8_t _start_header = 0x55;
+    uint8_t _end_header = 0xAA;
+
+public:
+    // デフォルトコンストラクタ
+    PacketManager() = default;
+    // デストラクタ：確保したメモリを解放
+    ~PacketManager()
+    {
+        if (_data != nullptr)
+        {
+            delete[] _data;
+            _data = nullptr;
+        }
+    }
+
+    // コピー禁止 (安全のため)
+    PacketManager(const PacketManager &) = delete;
+    PacketManager &operator=(const PacketManager &) = delete;
+
+    // データ量設定
+    void setup(uint8_t start_header, int byte_size, uint8_t end_header)
+    {
+        // 既にメモリが確保されていたら一度解放する (再セットアップへの対応)
+        if (_data != nullptr)
+        {
+            delete[] _data;
+            _data = nullptr;
+        }
+
+        _start_header = start_header;
+        _byte_size = byte_size;
+        _end_header = end_header;
+
+        // スタートヘッダー1バイト + データ(byte_size)バイト + エンドヘッダー1バイト
+        _data_capacity = _byte_size + 2;
+
+        // byte_sizeが無効値でないかチェック
+        if (_byte_size <= 0 || _data_capacity > 255)
+        {
+            _data_capacity = 0; // 無効な状態
+            return;
+        }
+
+        // メモリを動的に確保
+        _data = new uint8_t[_data_capacity];
+
+        // 確保失敗時のチェック
+        if (_data == nullptr)
+        {
+            _data_capacity = 0;
+            _byte_size = 0;
+        }
+
+        // 初期化
+        for (int i = 0; i < _data_capacity; i++)
+        {
+            _data[i] = 0;
+        }
+
+        reset();
+    }
+
+    // パケットリセット
+    void reset()
+    {
+        _next_index = 0;
+    }
+
+    // 1バイト追加する
+    void add(uint8_t byte)
+    {
+        // メモリが確保されていない、または無効なサイズの場合は処理しない
+        if (_data == nullptr || _data_capacity == 0)
+            return;
+
+        // 既にパケットが完成している場合はリセットしてから追加を開始
+        if (isComplete())
+        {
+            reset();
+            _next_index = 0;
+        }
+
+        // スタートヘッダーを待機中
+        if (_next_index == 0)
+        {
+            if (byte == _start_header)
+            {
+                _data[_next_index] = byte;
+                _next_index++;
+            }
+            // スタートヘッダーでない場合は、リセット状態を維持し、次のバイトを待つ
+        }
+        // データ部分を受信中
+        else if (_next_index >= 1 && _next_index <= _byte_size)
+        {
+            _data[_next_index] = byte;
+            _next_index++;
+        }
+        // エンドヘッダーを受信中
+        else if (_next_index == _data_capacity - 1) // _data_capacity - 1 は _byte_size + 1 と等しい
+        {
+            if (byte == _end_header)
+            {
+                _data[_next_index] = byte;
+                _next_index++;
+            }
+            else
+            {
+                reset();
+            }
+        }
+        else
+        {
+            reset();
+        }
+    }
+
+    // パケットが完成しているかどうか
+    bool isComplete()
+    {
+        // _next_index がパケット全体のサイズ (_data_capacity) と等しいとき、全バイト受信済み
+        if (_data_capacity > 0 && _next_index == _data_capacity)
+            return true;
+
+        return false;
+    }
+
+    // index番目のデータを取得する
+    uint8_t get(int index)
+    {
+        // メモリが確保されていない、または無効なインデックスの場合はエラー
+        if (_data == nullptr || index < 0 || index >= _data_capacity)
+            return 0x00;
+
+        return _data[index];
+    }
+};

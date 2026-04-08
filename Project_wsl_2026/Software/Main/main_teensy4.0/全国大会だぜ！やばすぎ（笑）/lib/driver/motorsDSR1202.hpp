@@ -2,6 +2,8 @@
 
 #include <Arduino.h>
 
+// #define LIMITS
+
 class DSR1202
 {
 private:
@@ -10,6 +12,14 @@ private:
     uint8_t _toggle_pin = 0xFF;
 
     bool _is_toggle_on = false;
+
+#ifndef LIMITS
+    const uint8_t start_header = 0x55; // 同期ヘッダー格納用
+    const uint8_t end_header = 0xAA;   // 同期ヘッダー格納用
+    const int16_t stop_v = -32768;     // モーター停止数値
+
+    void sendData(int16_t v1, int16_t v2, int16_t v3, int16_t v4);
+#endif
 
 public:
     // 関数・コンストラクタ
