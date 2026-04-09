@@ -100,12 +100,19 @@ void loop()
 {
     int detected_count = 0; // いずれかのセンサーが反応したかどうか
 
+    int deg = 0;
+    float x = cos(deg);
+
+
     for (int i = 0; i < 16; i++)
     {
         IRsensor[i].pin = IRsensor_pin[i];
         IRsensor[i].value = mux_ave[i].add(mux.read(IRsensor[i].pin));
         IRsensor[i].weight = (5000.0f - IRsensor[i].value) * IRsensor_weight_gain[i];
         IRsensor[i].deg = i * 22.5f;
+
+        float x = IRsensor[i].get_x();
+        float y = IRsensor[i].get_y();
 
         if (IRsensor[i].value < 990.0f)
         {
