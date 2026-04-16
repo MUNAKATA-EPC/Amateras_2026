@@ -1,23 +1,29 @@
 #include "button.hpp"
 
-//// パブリッククラス ////
-
 bool Button::init(uint8_t pin, uint8_t pinmode)
 {
     _pin = pin;
     _pinmode = pinmode;
-
     pinMode(_pin, _pinmode);
+
+    // 初期の生の状態を取得しておく
+    if (_pinmode == INPUT_PULLDOWN)
+    {
+        _last_raw_state = (digitalRead(_pin) == HIGH);
+    }
+    else
+    {
+        _last_raw_state = (digitalRead(_pin) == LOW);
+    }
+    _pressed = _last_raw_state;
+    _oldpressed = _pressed;
 
     return true;
 }
 
-// チャタリング防止のための閾値（ミリ秒）
-const unsigned long DEBOUNCE_DELAY = 5;
-
 void Button::update()
 {
-    // 現在の生のピン状態を取得
+    // 現在の生のピン状態を取得 (アクティブ時に true)
     bool current_state = false;
     if (_pinmode == INPUT_PULLDOWN)
     {
@@ -29,13 +35,11 @@ void Button::update()
     }
 
     // チャタリング防止処理
-    // 前回の生の状態と異なる場合、タイマーをリセット
     if (current_state != _last_raw_state)
     {
         _debounceTimer.reset();
     }
 
-    // タイマーが閾値を超えたら、安定したとみなして値を更新
     if (_debounceTimer.msTime() > DEBOUNCE_DELAY)
     {
         if (current_state != _pressed)
@@ -45,12 +49,17 @@ void Button::update()
     }
     _last_raw_state = current_state;
 
+    // 瞬間移動の検出
+    _pressed_moment = (_pressed && !_oldpressed);
+    _released_moment = (!_pressed && _oldpressed);
+
     // 押し続け時間の計測
     if (_pressed)
     {
-        if (!_oldpressed)
-            _pushingTimer.reset();
-
+        if (_pressed_moment)
+        {
+            _pushingTimer.reset(); // 押された瞬間に計測開始
+        }
         _pushing_time = _pushingTimer.msTime();
     }
     else
@@ -58,21 +67,32 @@ void Button::update()
         _pushing_time = 0;
     }
 
-    // 離された瞬間の検出
-    _released = (!_pressed && _oldpressed);
-
-    // 過去の確定状態を保存
+    // 次回判定用に現在の確定状態を保存
     _oldpressed = _pressed;
 }
 
-bool Button::isPushing() { return _pressed; }
+bool Button::isPushing()
+{
+    return _pressed;
+}
 
-bool Button::isReleased() { return _released; }
+bool Button::isPressedMoment()
+{
+    return _pressed_moment;
+}
 
-unsigned long Button::pushingTime() { return _pushing_time; } // 押されている時間を貸す
+bool Button::isReleasedMoment()
+{
+    return _released_moment;
+}
+
+unsigned long Button::pushingTime()
+{
+    return _pushing_time;
+}
 
 void Button::pushingTimeReset()
 {
-    _pushing_time = 0;     // 押されている時間をリセット
-    _pushingTimer.reset(); // タイマーもリセット
+    _pushing_time = 0;
+    _pushingTimer.reset();
 }

@@ -1,40 +1,31 @@
 #include <Arduino.h>
-
-// SPIFFS (内蔵ファイルシステム) を使うためのインクルード
-#include <SPIFFS.h>
-
-// LovyanGFX設定
-#define LGFX_AUTODETECT
-#include <LovyanGFX.hpp>
-static LGFX tft;
-
+// UI
+#include "ui.hpp"
 // Button
 #include "button.hpp"
 Button btnA;
 Button btnB;
 Button btnC;
+// AnalogController(12bit ADC)
+const uint8_t analog_controller_x_pin = 36;
+const uint8_t analog_controller_y_pin = 35;
 
 void setup()
 {
-    btnA.init(39, INPUT_PULLUP); // ボタンAはGPIO39に接続
-    btnB.init(38, INPUT_PULLUP); // ボタンBはGPIO38に接続
-    btnC.init(37, INPUT_PULLUP); // ボタンCはGPIO37に接続
+    Serial.begin(9600);
 
-    tft.init();
-    tft.setRotation(1);
-    tft.setBrightness(128);
+    pinMode(analog_controller_x_pin, INPUT);
+    pinMode(analog_controller_y_pin, INPUT);
 
-    if (!SPIFFS.begin(true))
-    {
-        tft.println("SPIFFS Mount Failed!");
-        return;
-    }
+    btnA.init(39, INPUT_PULLUP); // ボタンA
+    btnB.init(38, INPUT_PULLUP); // ボタンB
+    btnC.init(37, INPUT_PULLUP); // ボタンC
 
-    tft.fillScreen(TFT_BLACK);
-    tft.drawJpgFile(SPIFFS, "/kitagawa1.jpg", 0, 0);
+    uiInit();
 }
 
-int count = 0, old_count = 0;
+Timer analog_controller_update_timer;
+mouse_t mouse = {{uiWidth() / 2, uiHeight() / 2}, false};
 
 void loop()
 {
@@ -42,32 +33,28 @@ void loop()
     btnB.update();
     btnC.update();
 
-    if (btnA.isReleased())
+    if (analog_controller_update_timer.everReset() || analog_controller_update_timer.msTime() >= 100)
     {
-        count = (count + 1) % 5;
-    }
-    if (btnB.isReleased())
-    {
-        count = (count - 1 + 5) % 5;
+        int xx = - analogRead(analog_controller_x_pin) + 0xFFF / 2;
+        if (abs(xx) > 100)
+        {
+            mouse.posi.x += (xx > 0) ? 10 : -10;
+            mouse.posi.x = constrain(mouse.posi.x, 0, uiWidth() - 1);
+        }
+
+        int yy = analogRead(analog_controller_y_pin) - 0xFFF / 2;
+        if (abs(yy) > 100)
+        {
+            mouse.posi.y += (yy > 0) ? 10 : -10;
+            mouse.posi.y = constrain(mouse.posi.y, 0, uiHeight() - 1);
+        }
+
+        analog_controller_update_timer.reset();
     }
 
-    if (count != old_count)
-    {
-        String filename = "/kitagawa" + String(count) + ".jpg";
-        if (SPIFFS.exists(filename))
-        {
-            tft.drawJpgFile(SPIFFS, filename.c_str(), 0, 0);
-        }
-        else
-        {
-            tft.fillScreen(TFT_BLACK);
-            tft.setCursor(0, 0);
-            tft.setTextColor(TFT_WHITE);
-            tft.println("File not found:");
-            tft.println(filename);
-        }
-    }
+    mouse.pushing = btnA.isPushing();
 
-    old_count = count;
+    uiUpdate(mouse);
+
     delay(1);
 }
