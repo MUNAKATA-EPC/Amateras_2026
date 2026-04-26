@@ -1,7 +1,6 @@
 #include <Arduino.h>
-// UI
+
 #include "ui.hpp"
-// Button
 #include "button.hpp"
 Button btnA;
 Button btnB;

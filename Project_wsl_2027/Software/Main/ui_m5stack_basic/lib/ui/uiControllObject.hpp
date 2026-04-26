@@ -6,8 +6,6 @@
 #include <cstdint>
 #include "uiMouse.hpp"
 
-static constexpr int UI_CYCLE_MAX = 8;
-
 //// Buttonオブジェクト ////
 
 class uiButton
@@ -122,6 +120,8 @@ private:
 
 //// CycleButtonオブジェクト ////
 
+static constexpr int ui_num_states_max = 8;
+
 enum class uiCycleSplitMode
 {
     None,
@@ -150,9 +150,9 @@ private:
 
     uiCycleSplitMode _split_mode;
 
-    uint32_t _bg_colors[UI_CYCLE_MAX];
-    const char *_texts[UI_CYCLE_MAX];
-    uint32_t _text_colors[UI_CYCLE_MAX];
+    uint32_t _bg_colors[ui_num_states_max];
+    const char *_texts[ui_num_states_max];
+    uint32_t _text_colors[ui_num_states_max];
 
     bool _hitTest(const posi_t &posi) const;
 };
@@ -182,7 +182,7 @@ private:
 
     uiCycleSplitMode _split_mode;
 
-    const char *_paths[UI_CYCLE_MAX];
+    const char *_paths[ui_num_states_max];
     LGFX_Sprite *_sprites = nullptr;
     int _index = 0;
     bool _pushing = false;
@@ -207,8 +207,6 @@ public:
 
     void update(const mouse_t &mouse);
     void draw(LGFX_Sprite &canvas);
-
-    void setState(bool state);
 
     bool isOn() const { return _is_on; }
     bool isPushing() const { return _pushing; }

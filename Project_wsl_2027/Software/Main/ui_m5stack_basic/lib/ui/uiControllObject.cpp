@@ -258,8 +258,8 @@ uiCycleButton::uiCycleButton(int x, int y, int w, int h, int num_states,
                              uiCycleSplitMode split_mode)
     : _x(x), _y(y), _w(w), _h(h), _num_states(num_states), _split_mode(split_mode)
 {
-    if (_num_states > UI_CYCLE_MAX)
-        _num_states = UI_CYCLE_MAX;
+    if (_num_states > ui_num_states_max)
+        _num_states = ui_num_states_max;
     for (int i = 0; i < _num_states; i++)
     {
         _bg_colors[i] = bg_colors[i];
@@ -312,7 +312,7 @@ uiImageCycleButton::uiImageCycleButton(int x, int y, int w, int h,
                                        const char *const png_paths[],
                                        uiCycleSplitMode split_mode)
     : _x(x), _y(y), _w(w), _h(h), _img_w(img_w), _img_h(img_h),
-      _cycle_count(cycle_count < UI_CYCLE_MAX ? cycle_count : UI_CYCLE_MAX),
+      _cycle_count(cycle_count < ui_num_states_max ? cycle_count : ui_num_states_max),
       _split_mode(split_mode)
 {
     for (int i = 0; i < _cycle_count; i++)
@@ -463,11 +463,6 @@ void uiToggle::draw(LGFX_Sprite &canvas)
 
     if (_pushing)
         _drawCheckerOverlay(canvas, _x, _y, _w, _h);
-}
-
-void uiToggle::setState(bool state)
-{
-    _is_on = state;
 }
 
 void uiToggle::_drawTextCentered(LGFX_Sprite &canvas, const char *text, int cx, int cy, uint32_t textColor)
