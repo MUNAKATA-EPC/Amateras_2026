@@ -274,11 +274,13 @@ void uiCycleButton::update(const mouse_t &mouse)
     if (_prev_pushing && !_pushing && _hitTest(mouse.posi))
     {
         int step = 1;
-        
-        if (_split_mode == uiCycleSplitMode::Horizontal) {
+
+        if (_split_mode == uiCycleSplitMode::Horizontal)
+        {
             step = (mouse.posi.x < _x + _w / 2) ? -1 : 1;
-        } 
-        else if (_split_mode == uiCycleSplitMode::Vertical) {
+        }
+        else if (_split_mode == uiCycleSplitMode::Vertical)
+        {
             step = (mouse.posi.y < _y + _h / 2) ? 1 : -1;
         }
 
@@ -365,11 +367,13 @@ void uiImageCycleButton::update(const mouse_t &mouse)
     if (_pressed_moment)
     {
         int step = 1;
-        
-        if (_split_mode == uiCycleSplitMode::Horizontal) {
+
+        if (_split_mode == uiCycleSplitMode::Horizontal)
+        {
             step = (mouse.posi.x < _x + _w / 2) ? -1 : 1;
-        } 
-        else if (_split_mode == uiCycleSplitMode::Vertical) {
+        }
+        else if (_split_mode == uiCycleSplitMode::Vertical)
+        {
             step = (mouse.posi.y < _y + _h / 2) ? 1 : -1;
         }
 
@@ -459,6 +463,11 @@ void uiToggle::draw(LGFX_Sprite &canvas)
 
     if (_pushing)
         _drawCheckerOverlay(canvas, _x, _y, _w, _h);
+}
+
+void uiToggle::setState(bool state)
+{
+    _is_on = state;
 }
 
 void uiToggle::_drawTextCentered(LGFX_Sprite &canvas, const char *text, int cx, int cy, uint32_t textColor)

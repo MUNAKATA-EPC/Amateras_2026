@@ -32,21 +32,21 @@ namespace _homescreen
     static uiToggle runToggle(5, 5, 60, 95, _gray_color, _black_color, _red_color, "ON", _white_color, _blue_color, "OFF", _white_color, false, 5);
 
     const uint32_t goalBtnBgColors[] = {_yellow_color, _blue_color, _gray_color};
-    const char *goalBtnText[] = {"YELLOW", "BLUE", "GYRO"};
+    const char *goalBtnTexts[] = {"YELLOW", "BLUE", "GYRO"};
     const uint32_t goalBtnTextColors[] = {_white_color, _white_color, _white_color};
-    static uiCycleButton goalCycleBtn(5, 105, 60, 80, 3, goalBtnBgColors, goalBtnText, goalBtnTextColors);
+    static uiCycleButton goalCycleBtn(5, 105, 60, 80, 3, goalBtnBgColors, goalBtnTexts, goalBtnTextColors);
 
-    static uiToggle showToggle(255, 5, 60, 95, _gray_color, _black_color, _red_color, "SHOW", _white_color, _blue_color, "HIDE", _white_color, false, 5);
+    static uiToggle showToggle(255, 5, 60, 95, _gray_color, _black_color, _red_color, "SHOW", _white_color, _blue_color, "HIDE", _white_color, true, 5);
 
     const uint32_t posBtnBgColors[] = {_green_color, _gray_color};
-    const char *posBtnText[] = {"POS", "ODA"};
+    const char *posBtnTexts[] = {"POS", "ODA"};
     const uint32_t posBtnTextColors[] = {_white_color, _white_color};
-    static uiCycleButton posCycleBtn(255, 105, 60, 80, 2, posBtnBgColors, posBtnText, posBtnTextColors);
+    static uiCycleButton posCycleBtn(255, 105, 60, 80, 2, posBtnBgColors, posBtnTexts, posBtnTextColors);
 
     const uint32_t actionmodeBtnBgColors[] = {_pink_color, _pink_color, _pink_color};
-    const char *actionmodeBtnText[] = {"ATK", "DEF", "RADICON"};
+    const char *actionmodeBtnTexts[] = {"ATK", "DEF", "RADICON"};
     const uint32_t actionmodeBtnTextColors[] = {_white_color, _white_color, _white_color};
-    static uiCycleButton actionmodeBtn(70, 5, 180, 180, 3, actionmodeBtnBgColors, actionmodeBtnText, actionmodeBtnTextColors);
+    static uiCycleButton actionmodeBtn(70, 5, 180, 180, 3, actionmodeBtnBgColors, actionmodeBtnTexts, actionmodeBtnTextColors);
 
     static uiFlexibleImageButton monitorBtn(5, 195, 5, 195, 120, 40, _gray_color, 20, 0, "MONITOR", _white_color, 40, 40, "/ui_monitor_icon.png");
     static uiButton logBtn(130, 195, 120, 40, _gray_color, "LOG", _white_color);
@@ -103,9 +103,9 @@ namespace _monitorscreen
 {
     static uiImageButton appBtn(5, 5, 40, 40, 40, 40, "/ui_monitor_icon.png");
     const uint32_t sensorBtnBgColors[] = {_gray_color, _yellow_color, _blue_color, _gray_color};
-    const char *sensorBtnText[] = {"GYRO", "YELLOW_CAM", "BLUE_CAM", "LIDAR"};
+    const char *sensorBtnTexts[] = {"GYRO", "YELLOW_CAM", "BLUE_CAM", "LIDAR"};
     const uint32_t sensorBtnTextColors[] = {_white_color, _white_color, _white_color, _white_color};
-    static uiCycleButton sensorBtn(50, 5, 220, 40, 4, sensorBtnBgColors, sensorBtnText, sensorBtnTextColors, uiCycleSplitMode::Horizontal);
+    static uiCycleButton sensorBtn(50, 5, 220, 40, 4, sensorBtnBgColors, sensorBtnTexts, sensorBtnTextColors, uiCycleSplitMode::Horizontal);
     static uiButton closeBtn(275, 5, 40, 40, _red_color, "CLOSE", _white_color);
 
     void init()
@@ -143,16 +143,15 @@ namespace _monitorscreen
 // ログスクリーン
 namespace _logscreen
 {
-    static uiImageButton appBtn(5, 5, 40, 40, 40, 40, "/ui_monitor_icon.png");
-    const uint32_t sensorCycleBgColors[] = {_gray_color, _yellow_color, _blue_color, _gray_color};
-    const char *sensorCycleText[] = {"GYRO", "YELLOW_CAM", "BLUE_CAM", "LIDAR"};
-    const uint32_t sensorCycleTxtColors[] = {_white_color, _white_color, _white_color, _white_color};
-    static uiCycleButton sensorBtn(50, 5, 220, 40, 4, sensorCycleBgColors, sensorCycleText, sensorCycleTxtColors);
+    static uiButton appBtn(5, 5, 40, 40, _gray_color, "LOG", _white_color);
+    const uint32_t logBtnBgColors[] = {_gray_color, _gray_color, _gray_color, _gray_color};
+    const char *logBtnTexts[] = {"I", "HAVE", "NO", "IDEA"};
+    const uint32_t logBtnTextColors[] = {_white_color, _white_color, _white_color, _white_color};
+    static uiCycleButton logBtn(50, 5, 220, 40, 4, logBtnBgColors, logBtnTexts, logBtnTextColors);
     static uiButton closeBtn(275, 5, 40, 40, _red_color, "CLOSE", _white_color);
 
     void init()
     {
-        appBtn.init();
     }
 
     void main()
@@ -162,12 +161,12 @@ namespace _logscreen
 
         // コントロールオブジェクト更新
         appBtn.update(_current_mouse);
-        sensorBtn.update(_current_mouse);
+        logBtn.update(_current_mouse);
         closeBtn.update(_current_mouse);
 
         // コントロールオブジェクト描画
         appBtn.draw(_canvas);
-        sensorBtn.draw(_canvas);
+        logBtn.draw(_canvas);
         closeBtn.draw(_canvas);
 
         if (appBtn.isReleasedMoment())

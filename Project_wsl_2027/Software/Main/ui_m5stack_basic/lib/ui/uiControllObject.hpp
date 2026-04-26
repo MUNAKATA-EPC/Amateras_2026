@@ -208,6 +208,8 @@ public:
     void update(const mouse_t &mouse);
     void draw(LGFX_Sprite &canvas);
 
+    void setState(bool state);
+
     bool isOn() const { return _is_on; }
     bool isPushing() const { return _pushing; }
     bool isPressedMoment() const { return _pressed_moment; }
