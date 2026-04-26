@@ -1,88 +1,238 @@
 #include "ui.hpp"
 
-static LGFX tft;
-static LGFX_Sprite canvas(&tft);
+static LGFX _tft;
+static LGFX_Sprite _canvas(&_tft);
 
-const uint32_t black_color = 0x000000;
-const uint32_t white_color = 0xFFFFFF;
-const uint32_t gray_color = 0x7F7F7F;
-const uint32_t red_color = 0xFF0000;
-const uint32_t pink_color = 0xE74D4D;
-const uint32_t blue_color = 0x4472C4;
-const uint32_t yellow_color = 0xFFD966;
-const uint32_t green_color = 0x70AD47;
+// 色定数
+const uint32_t _black_color = 0x000000;
+const uint32_t _white_color = 0xFFFFFF;
+const uint32_t _gray_color = 0x555555;
+const uint32_t _red_color = 0xFF0000;
+const uint32_t _pink_color = 0xE74D4D;
+const uint32_t _blue_color = 0x4472C4;
+const uint32_t _light_blue_color = 0xADC1FF;
+const uint32_t _yellow_color = 0xFFD966;
+const uint32_t _green_color = 0x70AD47;
 
-static uiToggle runToggle(5, 5, 60, 95, gray_color, black_color, red_color, "on", white_color, blue_color, "off", white_color, false, 5);
+// 画面状態
+enum class ui_screen_t
+{
+    HOMESCREEN,
+    MONITORSCREEN,
+    LOGSCREEN
+};
+static ui_screen_t _current_screen = ui_screen_t::HOMESCREEN;
 
-const uint32_t goal_cycle_bg_colors[] = {yellow_color, blue_color, gray_color};
-const char *goal_cycle_labels[] = {"YELLOW", "BLUE", "GYRO"};
-const uint32_t goal_cycle_txt_colors[] = {white_color, white_color, white_color};
-static uiCycleButton goalCycleBtn(5, 105, 60, 80, 3, goal_cycle_bg_colors, goal_cycle_labels, goal_cycle_txt_colors);
+// マウス状態
+static mouse_t _current_mouse;
 
-static uiToggle showToggle(255, 5, 60, 95, gray_color, black_color, red_color, "show", white_color, blue_color, "hide", white_color, false, 5);
+// ホームスクリーン
+namespace _homescreen
+{
+    static uiToggle runToggle(5, 5, 60, 95, _gray_color, _black_color, _red_color, "ON", _white_color, _blue_color, "OFF", _white_color, false, 5);
 
-const uint32_t pos_cycle_bg_colors[] = {green_color, gray_color};
-const char *pos_cycle_labels[] = {"POS", "ODA"};
-const uint32_t pos_cycle_txt_colors[] = {white_color, white_color};
-static uiCycleButton posCycleBtn(255, 105, 60, 80, 2, pos_cycle_bg_colors, pos_cycle_labels, pos_cycle_txt_colors);
+    const uint32_t goalBtnBgColors[] = {_yellow_color, _blue_color, _gray_color};
+    const char *goalBtnText[] = {"YELLOW", "BLUE", "GYRO"};
+    const uint32_t goalBtnTextColors[] = {_white_color, _white_color, _white_color};
+    static uiCycleButton goalCycleBtn(5, 105, 60, 80, 3, goalBtnBgColors, goalBtnText, goalBtnTextColors);
 
-static uiButton atkBtn(70, 5, 180, 180, pink_color, "atk", 0xFFFFFF);
+    static uiToggle showToggle(255, 5, 60, 95, _gray_color, _black_color, _red_color, "SHOW", _white_color, _blue_color, "HIDE", _white_color, false, 5);
 
-static uiButton monitorBtn(70, 190, 180, 45, gray_color, "monitor", 0xFFFFFF);
-static uiButton leftArrowBtn(5, 190, 60, 45, gray_color, "<-", 0xFFFFFF);
-static uiButton rightArrowBtn(255, 190, 60, 45, gray_color, "->", 0xFFFFFF);
+    const uint32_t posBtnBgColors[] = {_green_color, _gray_color};
+    const char *posBtnText[] = {"POS", "ODA"};
+    const uint32_t posBtnTextColors[] = {_white_color, _white_color};
+    static uiCycleButton posCycleBtn(255, 105, 60, 80, 2, posBtnBgColors, posBtnText, posBtnTextColors);
 
+    const uint32_t actionmodeBtnBgColors[] = {_pink_color, _pink_color, _pink_color};
+    const char *actionmodeBtnText[] = {"ATK", "DEF", "RADICON"};
+    const uint32_t actionmodeBtnTextColors[] = {_white_color, _white_color, _white_color};
+    static uiCycleButton actionmodeBtn(70, 5, 180, 180, 3, actionmodeBtnBgColors, actionmodeBtnText, actionmodeBtnTextColors);
+
+    static uiFlexibleImageButton monitorBtn(5, 195, 5, 195, 120, 40, _gray_color, 20, 0, "MONITOR", _white_color, 40, 40, "/ui_monitor_icon.png");
+    static uiButton logBtn(130, 195, 120, 40, _gray_color, "LOG", _white_color);
+    static uiButton nextBtn(255, 195, 60, 40, _gray_color, "NEXT", _white_color);
+
+    void init()
+    {
+        monitorBtn.init();
+    }
+
+    void main()
+    {
+        // 背景画像描画
+        _canvas.fillScreen(TFT_WHITE);                   // 背景
+        _canvas.fillRect(0, 190, 320, 50, _black_color); // サイドバー
+
+        // コントロールオブジェクト更新
+        runToggle.update(_current_mouse);
+        goalCycleBtn.update(_current_mouse);
+        showToggle.update(_current_mouse);
+        posCycleBtn.update(_current_mouse);
+        actionmodeBtn.update(_current_mouse);
+        monitorBtn.update(_current_mouse);
+        logBtn.update(_current_mouse);
+        nextBtn.update(_current_mouse);
+
+        // コントロールオブジェクト描画
+        runToggle.draw(_canvas);
+        goalCycleBtn.draw(_canvas);
+        showToggle.draw(_canvas);
+        posCycleBtn.draw(_canvas);
+        actionmodeBtn.draw(_canvas);
+        monitorBtn.draw(_canvas);
+        logBtn.draw(_canvas);
+        nextBtn.draw(_canvas);
+
+        // ボタンが押されたときの処理
+        if (monitorBtn.isReleasedMoment())
+        {
+            _current_screen = ui_screen_t::MONITORSCREEN;
+        }
+        else if (logBtn.isReleasedMoment())
+        {
+            _current_screen = ui_screen_t::LOGSCREEN;
+        }
+        else if (nextBtn.isReleasedMoment())
+        {
+        }
+    }
+}
+
+// モニタースクリーン
+namespace _monitorscreen
+{
+    static uiImageButton appBtn(5, 5, 40, 40, 40, 40, "/ui_monitor_icon.png");
+    const uint32_t sensorBtnBgColors[] = {_gray_color, _yellow_color, _blue_color, _gray_color};
+    const char *sensorBtnText[] = {"GYRO", "YELLOW_CAM", "BLUE_CAM", "LIDAR"};
+    const uint32_t sensorBtnTextColors[] = {_white_color, _white_color, _white_color, _white_color};
+    static uiCycleButton sensorBtn(50, 5, 220, 40, 4, sensorBtnBgColors, sensorBtnText, sensorBtnTextColors, uiCycleSplitMode::Horizontal);
+    static uiButton closeBtn(275, 5, 40, 40, _red_color, "CLOSE", _white_color);
+
+    void init()
+    {
+        appBtn.init();
+    }
+
+    void main()
+    {
+        _canvas.fillScreen(TFT_WHITE);                 // 背景
+        _canvas.fillRect(0, 0, 320, 50, _black_color); // サイドバー
+
+        // コントロールオブジェクト更新
+        appBtn.update(_current_mouse);
+        sensorBtn.update(_current_mouse);
+        closeBtn.update(_current_mouse);
+
+        // コントロールオブジェクト描画
+        appBtn.draw(_canvas);
+        sensorBtn.draw(_canvas);
+        closeBtn.draw(_canvas);
+
+        if (appBtn.isReleasedMoment())
+        {
+            _current_screen = ui_screen_t::LOGSCREEN;
+        }
+
+        if (closeBtn.isReleasedMoment())
+        {
+            _current_screen = ui_screen_t::HOMESCREEN;
+        }
+    }
+}
+
+// ログスクリーン
+namespace _logscreen
+{
+    static uiImageButton appBtn(5, 5, 40, 40, 40, 40, "/ui_monitor_icon.png");
+    const uint32_t sensorCycleBgColors[] = {_gray_color, _yellow_color, _blue_color, _gray_color};
+    const char *sensorCycleText[] = {"GYRO", "YELLOW_CAM", "BLUE_CAM", "LIDAR"};
+    const uint32_t sensorCycleTxtColors[] = {_white_color, _white_color, _white_color, _white_color};
+    static uiCycleButton sensorBtn(50, 5, 220, 40, 4, sensorCycleBgColors, sensorCycleText, sensorCycleTxtColors);
+    static uiButton closeBtn(275, 5, 40, 40, _red_color, "CLOSE", _white_color);
+
+    void init()
+    {
+        appBtn.init();
+    }
+
+    void main()
+    {
+        _canvas.fillScreen(TFT_WHITE);                 // 背景
+        _canvas.fillRect(0, 0, 320, 50, _black_color); // サイドバー
+
+        // コントロールオブジェクト更新
+        appBtn.update(_current_mouse);
+        sensorBtn.update(_current_mouse);
+        closeBtn.update(_current_mouse);
+
+        // コントロールオブジェクト描画
+        appBtn.draw(_canvas);
+        sensorBtn.draw(_canvas);
+        closeBtn.draw(_canvas);
+
+        if (appBtn.isReleasedMoment())
+        {
+            _current_screen = ui_screen_t::MONITORSCREEN;
+        }
+
+        if (closeBtn.isReleasedMoment())
+        {
+            _current_screen = ui_screen_t::HOMESCREEN;
+        }
+    }
+}
+
+// 初期化
 bool uiInit()
 {
-    tft.init();
-    tft.setRotation(1);
-    tft.setBrightness(128);
+    _tft.init();
+    _tft.setRotation(1);
+    _tft.setBrightness(128);
 
     if (!SPIFFS.begin(true))
     {
-        tft.println("SPIFFS Mount Failed!");
+        _tft.println("SPIFFS Mount Failed!");
         return false;
     }
 
-    tft.fillScreen(TFT_BLACK);
+    _tft.fillScreen(TFT_BLACK);
 
-    canvas.setColorDepth(8);
-    canvas.createSprite(tft.width(), tft.height());
+    _canvas.setColorDepth(8);
+    _canvas.createSprite(_tft.width(), _tft.height());
+
+    _homescreen::init();
+    _monitorscreen::init();
+    _logscreen::init();
 
     return true;
 }
 
+// 更新
 void uiUpdate(mouse_t mouse)
 {
-    // 描画クリア
-    canvas.fillScreen(TFT_WHITE);
+    _current_mouse = mouse;
 
-    // コントロールオブジェクト更新
-    runToggle.update(mouse);
-    goalCycleBtn.update(mouse);
-    showToggle.update(mouse);
-    posCycleBtn.update(mouse);
-    atkBtn.update(mouse);
-    monitorBtn.update(mouse);
-    leftArrowBtn.update(mouse);
-    rightArrowBtn.update(mouse);
-
-    // コントロールオブジェクト描画
-    runToggle.draw(canvas);
-    goalCycleBtn.draw(canvas);
-    showToggle.draw(canvas);
-    posCycleBtn.draw(canvas);
-    atkBtn.draw(canvas);
-    monitorBtn.draw(canvas);
-    leftArrowBtn.draw(canvas);
-    rightArrowBtn.draw(canvas);
+    // スクリーン描画
+    switch (_current_screen)
+    {
+    case ui_screen_t::HOMESCREEN:
+        _homescreen::main();
+        break;
+    case ui_screen_t::MONITORSCREEN:
+        _monitorscreen::main();
+        break;
+    case ui_screen_t::LOGSCREEN:
+        _logscreen::main();
+        break;
+    }
 
     // マウス描画
-    canvas.fillCircle(mouse.posi.x, mouse.posi.y, 3, TFT_BLACK);
+    _canvas.fillCircle(_current_mouse.posi.x, _current_mouse.posi.y, 3, TFT_BLACK);
 
     // 描画更新
-    canvas.pushSprite(0, 0);
+    _canvas.pushSprite(0, 0);
 }
 
-int uiWidth() { return tft.width(); }
-int uiHeight() { return tft.height(); }
+// ゲッター
+int uiWidth() { return _tft.width(); }
+int uiHeight() { return _tft.height(); }
